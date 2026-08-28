@@ -147,6 +147,97 @@ body {
   margin-top: 1rem;
 }
 
+.public-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  padding: 1.25rem;
+  border-top: 1px solid var(--colour-border);
+}
+
+.public-footer button,
+.legal-navigation a {
+  border: 0;
+  color: var(--colour-text-muted);
+  background: transparent;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.legal-shell {
+  min-height: 100vh;
+  background: var(--colour-surface);
+}
+.legal-main {
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+.legal-heading h1 {
+  max-width: none;
+}
+.legal-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1.5rem 0;
+  padding: 0.85rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  background: rgb(255 255 255 / 96%);
+}
+.legal-content {
+  display: grid;
+  gap: 1rem;
+}
+.legal-content section {
+  padding: 1.25rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-medium);
+  background: var(--colour-canvas);
+  scroll-margin-top: 5rem;
+}
+.legal-content p + p {
+  margin-top: 0.75rem;
+}
+.terms-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border: 2px solid var(--colour-strong);
+  border-radius: var(--radius-medium);
+  background: var(--colour-canvas);
+}
+.terms-form label {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.terms-form input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  accent-color: var(--colour-strong);
+}
+.secondary-button {
+  min-height: 3rem;
+  margin-top: 1.25rem;
+  padding: 0 1.25rem;
+  border: 1px solid var(--colour-strong);
+  border-radius: var(--radius-small);
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+  font-weight: 750;
+}
+
 .security-shell {
   min-height: 100vh;
   background: var(--colour-surface);
