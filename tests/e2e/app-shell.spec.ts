@@ -70,6 +70,25 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   ).toHaveCount(0);
 });
 
+test("keeps the legal action inside the desktop viewport", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
+
+  const actionBox = await page
+    .getByRole("button", { name: "Accept and continue" })
+    .boundingBox();
+  const viewportHeight = await page.evaluate(() => window.innerHeight);
+
+  expect(actionBox).not.toBeNull();
+  expect(actionBox?.y).toBeGreaterThanOrEqual(0);
+  expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(
+    viewportHeight,
+  );
+});
+
 test("makes legal information available without entering setup", async ({
   page,
 }) => {
