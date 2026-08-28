@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+async function createLocalProfile(
+  page: import("@playwright/test").Page,
+): Promise<void> {
+  await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByLabel("Choose PIN").fill("4826");
+  await page.getByLabel("Confirm PIN").fill("4826");
+  await page.getByRole("button", { name: "Create private space" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
+  ).toBeVisible();
+}
+
 test("shows the anonymous landing page without tracker controls", async ({
   page,
 }) => {
@@ -35,24 +47,47 @@ test("shows the anonymous landing page without tracker controls", async ({
   });
 });
 
-test("opens local profile setup from the public landing page", async ({
-  page,
-}) => {
+test("opens PIN setup from the public landing page", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
+    page.getByRole("heading", { name: "Create your four-digit PIN" }),
   ).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
+  ).toHaveCount(0);
+});
+
+test("creates, locks, and unlocks a local private space", async ({ page }) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("button", { name: "Lock app" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Unlock your private space" }),
+  ).toBeVisible();
+  await page.getByLabel("Four-digit PIN").fill("1111");
+  await page.getByRole("button", { name: "Unlock" }).click();
+  await expect(page.getByRole("alert")).toContainText("could not unlock");
+
+  await page.getByLabel("Four-digit PIN").fill("4826");
+  await page.getByRole("button", { name: "Unlock" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
+  ).toBeVisible();
+
+  await page.reload();
+  await page.getByRole("button", { name: "Get started" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Unlock your private space" }),
   ).toBeVisible();
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
   await page.goto("/");
-  await page.getByRole("button", { name: "Get started" }).click();
+  await createLocalProfile(page);
 
   const navigationBox = await page
     .getByRole("navigation", { name: "Primary navigation" })
@@ -66,7 +101,7 @@ test("uses an app layout on mobile", async ({ page }, testInfo) => {
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   await page.goto("/");
-  await page.getByRole("button", { name: "Get started" }).click();
+  await createLocalProfile(page);
 
   const mainBox = await page.getByRole("main").boundingBox();
   const navigationBox = await page
