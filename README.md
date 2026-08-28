@@ -44,3 +44,13 @@ npm run test:e2e
 
 GitHub Actions runs formatting, linting, type checking, unit tests, a production
 build, and the mobile Playwright journey for every pull request.
+
+## Deployment
+
+The production app is deployed to GitHub Pages from `main` by
+`.github/workflows/deploy-pages.yml`. The repository’s Pages source must be set
+to **GitHub Actions**.
+
+Every push to `main` builds and deploys the current production app. A deployment
+can also be rerun manually from the **Deploy GitHub Pages** workflow. Generated
+`dist` files are uploaded as a deployment artifact and are not committed.
