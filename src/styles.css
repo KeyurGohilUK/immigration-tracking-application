@@ -147,6 +147,93 @@ body {
   margin-top: 1rem;
 }
 
+.security-shell {
+  min-height: 100vh;
+  background: var(--colour-surface);
+}
+
+.security-main {
+  display: grid;
+  min-height: calc(100vh - 4.5rem);
+  place-items: center;
+  padding: 1.5rem 1rem;
+}
+
+.security-card {
+  width: min(100%, 30rem);
+  padding: 1.5rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-large);
+  background: var(--colour-canvas);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 8%);
+}
+
+.security-card h1 {
+  max-width: 12ch;
+}
+
+.pin-form {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.pin-form label {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.pin-form input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+  font-size: 1.25rem;
+  letter-spacing: 0.45em;
+}
+
+.pin-form input:focus {
+  border-color: var(--colour-strong);
+  outline: 2px solid var(--colour-strong);
+  outline-offset: 2px;
+}
+
+.pin-form .primary-button {
+  margin-top: 0.75rem;
+}
+
+.form-error {
+  margin-top: 0.25rem;
+  color: var(--colour-text);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.pin-guidance {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-left: 3px solid var(--colour-strong);
+  background: var(--colour-surface);
+}
+
+.pin-guidance strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+}
+
+.pin-guidance p {
+  font-size: 0.78rem;
+}
+
+.pin-guidance p + p {
+  margin-top: 0.5rem;
+}
+
 button,
 a {
   font: inherit;
@@ -502,6 +589,10 @@ p {
   .landing-hero {
     grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 0.8fr);
     gap: 4rem;
+  }
+
+  .security-card {
+    padding: 2rem;
   }
 
   .top-bar {

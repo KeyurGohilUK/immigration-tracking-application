@@ -41,25 +41,27 @@ visual polish and public release.
 
 ## Phase 2 — Define privacy and local storage
 
-- [ ] Store all user-entered information locally with IndexedDB.
-- [ ] Do not add a database, analytics, advertising, tracking, or online user
+- [ ] Store all user-entered information locally with IndexedDB. The encrypted
+      vault foundation is complete; personal-data records remain to be added.
+- [x] Do not add a database, analytics, advertising, tracking, or online user
       accounts.
-- [ ] Treat account creation as creating a local household profile on the
+- [x] Treat account creation as creating a local household profile on the
       current device; do not imply that an online account exists.
-- [ ] Require the user to create a four-digit local PIN during setup.
-- [ ] Derive an encryption key from the PIN using a standard, salted,
+- [x] Require the user to create a four-digit local PIN during setup.
+- [x] Derive an encryption key from the PIN using a standard, salted,
       deliberately slow key-derivation function.
 - [ ] Encrypt sensitive IndexedDB records with the Web Crypto API rather than
-      storing the PIN or personal data as readable text.
-- [ ] Keep the unlocked encryption key in memory only and clear it on lock,
+      storing the PIN or personal data as readable text. PIN verifier encryption
+      is complete; personal-data records remain to be added.
+- [x] Keep the unlocked encryption key in memory only and clear it on lock,
       refresh, tab close, or expiry.
-- [ ] Add automatic locking after inactivity and when the app returns from the
+- [x] Add automatic locking after inactivity and when the app returns from the
       background.
-- [ ] Limit rapid PIN attempts in the interface without claiming this prevents
+- [x] Limit rapid PIN attempts in the interface without claiming this prevents
       offline brute-force attacks.
-- [ ] Explain that a four-digit PIN protects against casual access but is not
+- [x] Explain that a four-digit PIN protects against casual access but is not
       equivalent to strong device encryption or a high-entropy password.
-- [ ] Provide no PIN recovery or bypass; forgotten PIN recovery requires
+- [x] Provide no PIN recovery or bypass; forgotten PIN recovery requires
       deleting local data and restoring a backup.
 - [ ] Define a versioned local-data schema and migration mechanism.
 - [ ] Store immigration permissions separately from travel records.
