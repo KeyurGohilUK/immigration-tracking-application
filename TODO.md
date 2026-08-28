@@ -22,8 +22,10 @@ visual polish and public release.
 - [ ] Choose and document the frontend architecture and folder structure.
 - [ ] Add semantic HTML, responsive styling, and accessible form foundations.
 - [ ] Add a web app manifest and installable Progressive Web App behaviour.
+- [x] Define the professional monochrome interface palette and reserve natural
+      fox colours exclusively for Freddy; see `docs/brand-guidelines.md`.
 - [ ] Create an original, legally distinct visual design for Freddy the Urban
-      Fox and document his approved colours, expressions, and usage.
+      Fox and document his approved expressions and usage.
 - [ ] Add Freddy-based application icons, theme colours, and mobile safe-area
       handling.
 - [ ] Add offline application-shell support without caching sensitive exports.
@@ -165,8 +167,15 @@ visual polish and public release.
 - [ ] Add accessible success, warning, error, and manual-review states.
 - [ ] Design appropriate loading, saving, empty, and corrupted-data states.
 - [ ] Use large touch targets and mobile safe-area padding.
-- [ ] Support light mode initially and ensure adequate colour contrast.
-- [ ] Ensure important information is not communicated by colour alone.
+- [ ] Implement the white, near-black, and neutral-grey interface tokens from
+      the brand guidelines.
+- [ ] Keep buttons, navigation, charts, status surfaces, and illustrations other
+      than Freddy monochrome.
+- [ ] Use Freddy’s natural fox palette only inside Freddy artwork; do not reuse
+      his orange or cream colours as interface accents.
+- [ ] Support the monochrome light theme initially and verify WCAG contrast.
+- [ ] Communicate success, warning, error, and review states with labels, icons,
+      borders, and structure rather than additional colours.
 - [ ] Add a first-use explanation of local storage, backups, and legal limits.
 
 ## Phase 7 — Add backup and restore
