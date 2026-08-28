@@ -220,8 +220,8 @@ visual polish and public release.
 
 ## Phase 9 — Prepare the public release
 
-- [ ] Configure GitHub Pages deployment through GitHub Actions.
-- [ ] Use least-privilege workflow permissions.
+- [x] Configure GitHub Pages deployment through GitHub Actions.
+- [x] Use least-privilege workflow permissions.
 - [ ] Add a restrictive Content Security Policy where GitHub Pages permits it.
 - [ ] Add secure browser headers or document GitHub Pages limitations.
 - [ ] Confirm that no secrets, personal data, or test records are committed.
