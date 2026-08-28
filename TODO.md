@@ -18,9 +18,9 @@ visual polish and public release.
 
 ## Phase 1 — Establish the application foundation
 
-- [ ] Create a mobile-first static web application that works on GitHub Pages.
-- [ ] Choose and document the frontend architecture and folder structure.
-- [ ] Add semantic HTML, responsive styling, and accessible form foundations.
+- [x] Create a mobile-first static web application that works on GitHub Pages.
+- [x] Choose and document the frontend architecture and folder structure.
+- [x] Add semantic HTML, responsive styling, and accessible form foundations.
 - [ ] Add a web app manifest and installable Progressive Web App behaviour.
 - [x] Define the professional monochrome interface palette and reserve natural
       fox colours exclusively for Freddy; see `docs/brand-guidelines.md`.
@@ -29,9 +29,9 @@ visual polish and public release.
 - [ ] Add Freddy-based application icons, theme colours, and mobile safe-area
       handling.
 - [ ] Add offline application-shell support without caching sensitive exports.
-- [ ] Add application and data-schema version constants.
-- [ ] Add formatting, linting, unit-test, build, and browser-test commands.
-- [ ] Add GitHub Actions checks for every pull request.
+- [x] Add application and data-schema version constants.
+- [x] Add formatting, linting, unit-test, build, and browser-test commands.
+- [x] Add GitHub Actions checks for every pull request.
 - [ ] Configure branch protection for `main` after required checks exist.
 - [ ] Document local development, testing, and GitHub Pages deployment.
 

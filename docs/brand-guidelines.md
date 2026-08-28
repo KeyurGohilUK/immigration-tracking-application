@@ -12,16 +12,16 @@ casual or decorative.
 
 ## Interface palette
 
-| Token | Hex | Intended use |
-| --- | --- | --- |
-| `--colour-canvas` | `#FFFFFF` | Main page and app background |
-| `--colour-surface` | `#F7F7F5` | Cards, grouped controls, and quiet panels |
-| `--colour-surface-strong` | `#EFEFED` | Selected or raised neutral surfaces |
-| `--colour-border` | `#D8D8D4` | Dividers, input borders, and card outlines |
-| `--colour-text-muted` | `#62625E` | Secondary text and supporting metadata |
-| `--colour-text` | `#111111` | Primary text |
-| `--colour-strong` | `#000000` | Primary actions and highest emphasis |
-| `--colour-on-strong` | `#FFFFFF` | Text and icons on black controls |
+| Token                     | Hex       | Intended use                               |
+| ------------------------- | --------- | ------------------------------------------ |
+| `--colour-canvas`         | `#FFFFFF` | Main page and app background               |
+| `--colour-surface`        | `#F7F7F5` | Cards, grouped controls, and quiet panels  |
+| `--colour-surface-strong` | `#EFEFED` | Selected or raised neutral surfaces        |
+| `--colour-border`         | `#D8D8D4` | Dividers, input borders, and card outlines |
+| `--colour-text-muted`     | `#62625E` | Secondary text and supporting metadata     |
+| `--colour-text`           | `#111111` | Primary text                               |
+| `--colour-strong`         | `#000000` | Primary actions and highest emphasis       |
+| `--colour-on-strong`      | `#FFFFFF` | Text and icons on black controls           |
 
 These values are the initial design tokens. Every text and interactive
 combination must still be tested against the applicable WCAG contrast
@@ -31,14 +31,14 @@ requirement during implementation.
 
 Freddy should use a realistic but polished UK red-fox palette:
 
-| Freddy colour | Hex | Intended use |
-| --- | --- | --- |
-| Urban fox orange | `#C65A24` | Main coat |
-| Deep rust | `#7A2F1B` | Legs, ear edges, and shaded fur |
-| Warm cream | `#EEC895` | Chest, cheeks, and tail detail |
-| Soft fur white | `#FFF8EE` | Lightest fur areas |
-| Fox charcoal | `#211A17` | Eyes, nose, paws, and line detail |
-| Inner-ear warmth | `#C98276` | Restrained anatomical detail |
+| Freddy colour    | Hex       | Intended use                      |
+| ---------------- | --------- | --------------------------------- |
+| Urban fox orange | `#C65A24` | Main coat                         |
+| Deep rust        | `#7A2F1B` | Legs, ear edges, and shaded fur   |
+| Warm cream       | `#EEC895` | Chest, cheeks, and tail detail    |
+| Soft fur white   | `#FFF8EE` | Lightest fur areas                |
+| Fox charcoal     | `#211A17` | Eyes, nose, paws, and line detail |
+| Inner-ear warmth | `#C98276` | Restrained anatomical detail      |
 
 These colours are reserved for Freddy artwork. They must not be reused for
 buttons, links, progress bars, charts, badges, page backgrounds, focus states,
