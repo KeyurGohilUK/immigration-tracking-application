@@ -17,6 +17,10 @@ Anonymous visitors see a public introduction before entering local-profile
 setup. Tracker navigation and device controls are not rendered on the public
 screen.
 
+Local profiles are protected by a four-digit PIN. The PIN derives an encryption
+key in the browser and is never stored; see [Local PIN and encrypted
+vault](docs/local-security.md) for the design and its limitations.
+
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is
 available and caches only same-origin application resources for offline launch.
