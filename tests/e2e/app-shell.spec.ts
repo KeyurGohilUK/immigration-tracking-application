@@ -1,29 +1,44 @@
 import { expect, test } from "@playwright/test";
 
-test("shows the mobile UrbanFox foundation and legal boundary", async ({
+test("shows the anonymous landing page without tracker controls", async ({
   page,
 }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle("UrbanFox ILR");
   await expect(
+    page.getByRole("heading", { name: "Keep your ILR journey organised." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "A tracking tool—not legal advice" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Primary navigation" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Install app" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: "Lock app" })).toHaveCount(0);
+});
+
+test("opens local profile setup from the public landing page", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
+
+  await expect(
     page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Tracking estimate—not legal advice" }),
+    page.getByRole("navigation", { name: "Primary navigation" }),
   ).toBeVisible();
-  const primaryNavigation = page.getByRole("navigation", {
-    name: "Primary navigation",
-  });
-  await expect(primaryNavigation).toBeVisible();
-  await expect(
-    primaryNavigation.getByRole("link", { name: "Home" }),
-  ).toHaveAttribute("aria-current", "page");
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
   await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
 
   const navigationBox = await page
     .getByRole("navigation", { name: "Primary navigation" })
@@ -37,6 +52,7 @@ test("uses an app layout on mobile", async ({ page }, testInfo) => {
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
 
   const mainBox = await page.getByRole("main").boundingBox();
   const navigationBox = await page

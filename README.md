@@ -13,6 +13,10 @@ The interface adapts to its device: mobile screens use a touch-first app layout
 with fixed bottom navigation, while desktop screens use a wider website layout
 with top navigation and two-column content.
 
+Anonymous visitors see a public introduction before entering local-profile
+setup. Tracker navigation and device controls are not rendered on the public
+screen.
+
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is
 available and caches only same-origin application resources for offline launch.

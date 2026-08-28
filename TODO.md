@@ -23,6 +23,8 @@ visual polish and public release.
 - [x] Add semantic HTML, responsive styling, and accessible form foundations.
 - [x] Provide a wide desktop website layout while retaining an app-like mobile
       experience.
+- [x] Add a Freddy-led startup screen and separate anonymous landing page that
+      does not render tracker navigation or device controls.
 - [x] Add a web app manifest and installable Progressive Web App behaviour.
 - [x] Define the professional monochrome interface palette and reserve natural
       fox colours exclusively for Freddy; see `docs/brand-guidelines.md`.

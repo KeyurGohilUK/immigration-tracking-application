@@ -3,29 +3,46 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-export function initialiseInstallPrompt(button: HTMLButtonElement): void {
+export function initialiseInstallPrompt(root: HTMLElement): void {
   let deferredPrompt: BeforeInstallPromptEvent | null = null;
+
+  function updateButton(): void {
+    const button = root.querySelector<HTMLButtonElement>("#install-app");
+    if (!button || button.dataset.initialised) {
+      return;
+    }
+
+    button.dataset.initialised = "true";
+    button.hidden = deferredPrompt === null;
+    button.addEventListener("click", async () => {
+      if (!deferredPrompt) {
+        return;
+      }
+
+      await deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      button.hidden = true;
+    });
+  }
+
+  new MutationObserver(updateButton).observe(root, {
+    childList: true,
+    subtree: true,
+  });
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredPrompt = event as BeforeInstallPromptEvent;
-    button.hidden = false;
+    updateButton();
   });
 
   window.addEventListener("appinstalled", () => {
     deferredPrompt = null;
-    button.hidden = true;
-  });
-
-  button.addEventListener("click", async () => {
-    if (!deferredPrompt) {
-      return;
+    const button = root.querySelector<HTMLButtonElement>("#install-app");
+    if (button) {
+      button.hidden = true;
     }
-
-    await deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    button.hidden = true;
   });
 }
 
