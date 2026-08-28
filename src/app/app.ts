@@ -34,7 +34,7 @@ export function renderApp(root: HTMLElement): void {
         ${renderNavigation("desktop-navigation")}
         <div class="header-actions">
           <button id="install-app" class="install-button" type="button" hidden>Install app</button>
-          <button class="icon-button" type="button" aria-label="Lock app" disabled>
+          <button class="icon-button" type="button" aria-label="Lock app">
             <span aria-hidden="true">⌑</span>
           </button>
         </div>
