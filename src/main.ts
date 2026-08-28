@@ -1,4 +1,4 @@
-import { renderApp } from "./app/app";
+import { startApplication } from "./app/start-application";
 import {
   initialiseInstallPrompt,
   registerServiceWorker,
@@ -11,11 +11,6 @@ if (!root) {
   throw new Error("Application root was not found.");
 }
 
-renderApp(root);
-
-const installButton = document.querySelector<HTMLButtonElement>("#install-app");
-if (installButton) {
-  initialiseInstallPrompt(installButton);
-}
-
+initialiseInstallPrompt(root);
 registerServiceWorker();
+await startApplication(root);
