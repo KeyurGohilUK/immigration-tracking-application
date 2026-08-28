@@ -23,14 +23,14 @@ visual polish and public release.
 - [x] Add semantic HTML, responsive styling, and accessible form foundations.
 - [x] Provide a wide desktop website layout while retaining an app-like mobile
       experience.
-- [ ] Add a web app manifest and installable Progressive Web App behaviour.
+- [x] Add a web app manifest and installable Progressive Web App behaviour.
 - [x] Define the professional monochrome interface palette and reserve natural
       fox colours exclusively for Freddy; see `docs/brand-guidelines.md`.
 - [ ] Create an original, legally distinct visual design for Freddy the Urban
       Fox and document his approved expressions and usage.
 - [ ] Add Freddy-based application icons, theme colours, and mobile safe-area
       handling.
-- [ ] Add offline application-shell support without caching sensitive exports.
+- [x] Add offline application-shell support without caching sensitive exports.
 - [x] Add application and data-schema version constants.
 - [x] Add formatting, linting, unit-test, build, and browser-test commands.
 - [x] Add GitHub Actions checks for every pull request.

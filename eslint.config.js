@@ -12,4 +12,10 @@ export default tseslint.config(
       globals: globals.browser,
     },
   },
+  {
+    files: ["public/service-worker.js"],
+    languageOptions: {
+      globals: globals.serviceworker,
+    },
+  },
 );

@@ -13,6 +13,10 @@ The interface adapts to its device: mobile screens use a touch-first app layout
 with fixed bottom navigation, while desktop screens use a wider website layout
 with top navigation and two-column content.
 
+Supported browsers can install the site as a Progressive Web App. The app
+provides an install button when the browser reports that installation is
+available and caches only same-origin application resources for offline launch.
+
 **Freddy the Urban Fox**, a friendly UK urban fox, is the app’s main character
 and guides users through setup, family profiles, travel records, backups, and
 the app’s calculation explanations.
