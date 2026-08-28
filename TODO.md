@@ -76,22 +76,22 @@ visual polish and public release.
 
 ## Phase 3 — Add legal and safety content
 
-- [ ] Create Terms and Conditions for the public application.
-- [ ] State that the app is a tracking and organisational tool only.
-- [ ] State that results are estimates and are not legal or immigration advice.
-- [ ] State that UrbanFox ILR and Freddy are not affiliated with, endorsed by,
+- [x] Create Terms and Conditions for the public application.
+- [x] State that the app is a tracking and organisational tool only.
+- [x] State that results are estimates and are not legal or immigration advice.
+- [x] State that UrbanFox ILR and Freddy are not affiliated with, endorsed by,
       or representative of the UK Government, Home Office, or UKVI.
-- [ ] Tell users to verify current GOV.UK guidance and obtain qualified advice.
-- [ ] Add an appropriately limited warranty and liability disclaimer.
-- [ ] Explain that the user is responsible for evidence, deadlines, backups, and
+- [x] Tell users to verify current GOV.UK guidance and obtain qualified advice.
+- [x] Add an appropriately limited warranty and liability disclaimer.
+- [x] Explain that the user is responsible for evidence, deadlines, backups, and
       their immigration application.
-- [ ] Explain that clearing browser data, uninstalling the app, or losing the
+- [x] Explain that clearing browser data, uninstalling the app, or losing the
       device can permanently delete locally stored records.
-- [ ] Warn that exported backups may contain sensitive personal information.
-- [ ] Add Privacy, Terms, About, and Licence views linked from the app.
-- [ ] Require Terms acceptance before first use.
-- [ ] Store the accepted Terms version and acceptance date locally.
-- [ ] Require renewed acceptance following a material Terms update.
+- [x] Warn that exported backups may contain sensitive personal information.
+- [x] Add Privacy, Terms, About, and Licence views linked from the app.
+- [x] Require Terms acceptance before first use.
+- [x] Store the accepted Terms version and acceptance date locally.
+- [x] Require renewed acceptance following a material Terms update.
 - [ ] Display “Tracking estimate — not legal advice” near calculated results.
 - [ ] Add the chosen contact email to `SECURITY.md` before public release.
 - [ ] Obtain professional legal review before describing the app as production

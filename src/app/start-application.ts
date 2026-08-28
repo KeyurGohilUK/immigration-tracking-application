@@ -1,5 +1,10 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
+import { renderLegalScreen } from "../features/legal/components/legal-screen";
+import {
+  hasCurrentTermsAcceptance,
+  saveCurrentTermsAcceptance,
+} from "../features/legal/data/terms-repository";
 import {
   renderPinScreen,
   setPinFormBusy,
@@ -108,25 +113,63 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     });
   };
 
+  const continueToPin = async (): Promise<void> => {
+    try {
+      const record = await getVaultRecord();
+      showPinEntry(record ? "unlock" : "create", record ?? undefined);
+    } catch {
+      showPinEntry("create");
+      const form = root.querySelector<HTMLFormElement>("#pin-form");
+      if (form) {
+        setPinFormBusy(form, true);
+        showPinError(form, "Private storage is unavailable in this browser.");
+      }
+    }
+  };
+
+  const showLegal = (acceptanceRequired: boolean): void => {
+    renderLegalScreen(root, acceptanceRequired);
+    if (acceptanceRequired) {
+      root
+        .querySelector<HTMLFormElement>("#terms-form")
+        ?.addEventListener("submit", (event) => {
+          event.preventDefault();
+          try {
+            saveCurrentTermsAcceptance();
+            void continueToPin();
+          } catch {
+            const form = event.currentTarget as HTMLFormElement;
+            const button = form.querySelector<HTMLButtonElement>(
+              'button[type="submit"]',
+            );
+            if (button) button.textContent = "Acceptance could not be saved";
+          }
+        });
+      return;
+    }
+    root
+      .querySelector<HTMLButtonElement>("#legal-back")
+      ?.addEventListener("click", showLanding);
+  };
+
+  const showLanding = (): void => {
+    renderLandingPage(root);
+    root
+      .querySelector<HTMLButtonElement>("#get-started")
+      ?.addEventListener("click", () => {
+        if (hasCurrentTermsAcceptance()) void continueToPin();
+        else showLegal(true);
+      });
+    for (const link of root.querySelectorAll<HTMLButtonElement>(
+      "[data-legal-view]",
+    )) {
+      link.addEventListener("click", () => showLegal(false));
+    }
+  };
+
   renderSplash(root);
   await new Promise((resolve) =>
     window.setTimeout(resolve, SPLASH_DURATION_MS),
   );
-  renderLandingPage(root);
-
-  root
-    .querySelector<HTMLButtonElement>("#get-started")
-    ?.addEventListener("click", async () => {
-      try {
-        const record = await getVaultRecord();
-        showPinEntry(record ? "unlock" : "create", record ?? undefined);
-      } catch {
-        showPinEntry("create");
-        const form = root.querySelector<HTMLFormElement>("#pin-form");
-        if (form) {
-          setPinFormBusy(form, true);
-          showPinError(form, "Private storage is unavailable in this browser.");
-        }
-      }
-    });
+  showLanding();
 }
