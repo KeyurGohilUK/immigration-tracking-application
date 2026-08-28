@@ -18,6 +18,12 @@ account means creating a private vault in the browser on the current device.
 Future personal-data records must be encrypted with the in-memory key and a
 fresh AES-GCM initialisation vector per encryption operation.
 
+The household-owner profile is the first encrypted personal-data record. Its
+name and date of birth are JSON-encoded, encrypted with a fresh AES-GCM
+initialisation vector, and stored in the IndexedDB `profiles` store. Stored
+records are decrypted and structurally validated only after a successful PIN
+unlock.
+
 ## Security boundary
 
 A four-digit PIN has only 10,000 combinations. Key derivation and the interface
