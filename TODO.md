@@ -1,4 +1,4 @@
-# UK ILR Tracker — Product Roadmap
+# UrbanFox ILR — Product Roadmap
 
 This checklist records the agreed plan for the first release. Tasks are ordered
 so that calculation correctness and user-data safety are established before
@@ -6,7 +6,10 @@ visual polish and public release.
 
 ## Phase 0 — Confirm product decisions
 
-- [ ] Choose the final app name and repository description.
+- [x] Name the application **UrbanFox ILR**.
+- [x] Establish **Freddy the Urban Fox**, a UK urban fox, as the app’s main
+      character and user guide.
+- [ ] Update the GitHub repository description to use the final name.
 - [ ] Confirm Skilled Worker and Health and Care Worker main applicants as the
       first supported settlement route.
 - [ ] Choose a public contact email for security and legal enquiries.
@@ -19,7 +22,10 @@ visual polish and public release.
 - [ ] Choose and document the frontend architecture and folder structure.
 - [ ] Add semantic HTML, responsive styling, and accessible form foundations.
 - [ ] Add a web app manifest and installable Progressive Web App behaviour.
-- [ ] Add an application icon, theme colours, and mobile safe-area handling.
+- [ ] Create an original, legally distinct visual design for Freddy the Urban
+      Fox and document his approved colours, expressions, and usage.
+- [ ] Add Freddy-based application icons, theme colours, and mobile safe-area
+      handling.
 - [ ] Add offline application-shell support without caching sensitive exports.
 - [ ] Add application and data-schema version constants.
 - [ ] Add formatting, linting, unit-test, build, and browser-test commands.
@@ -65,6 +71,8 @@ visual polish and public release.
 - [ ] Create Terms and Conditions for the public application.
 - [ ] State that the app is a tracking and organisational tool only.
 - [ ] State that results are estimates and are not legal or immigration advice.
+- [ ] State that UrbanFox ILR and Freddy are not affiliated with, endorsed by,
+      or representative of the UK Government, Home Office, or UKVI.
 - [ ] Tell users to verify current GOV.UK guidance and obtain qualified advice.
 - [ ] Add an appropriately limited warranty and liability disclaimer.
 - [ ] Explain that the user is responsible for evidence, deadlines, backups, and
@@ -134,6 +142,17 @@ visual polish and public release.
 
 ## Phase 6 — Design the mobile-app experience
 
+- [ ] Define Freddy’s role as a friendly guide who explains app features,
+      prompts for missing information, and celebrates completed setup steps.
+- [ ] Give users a clear way to skip, dismiss, or replay Freddy’s guidance.
+- [ ] Ensure Freddy never presents a calculation as legal advice or gives a
+      definitive statement of immigration eligibility.
+- [ ] Keep legal warnings and critical error messages visually independent from
+      Freddy’s conversational guidance.
+- [ ] Provide accessible text for every Freddy expression or visual cue and do
+      not require animation to understand an instruction.
+- [ ] Respect reduced-motion preferences and avoid distracting animation during
+      forms, PIN entry, or warning states.
 - [ ] Create a dashboard showing progress, estimated eligibility date, absence
       status, and outstanding information.
 - [ ] Add mobile bottom navigation for Dashboard, Family, Trips, and More.
