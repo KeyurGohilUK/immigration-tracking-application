@@ -12,11 +12,11 @@ test("shows the mobile UrbanFox foundation and legal boundary", async ({
   await expect(
     page.getByRole("heading", { name: "Tracking estimate—not legal advice" }),
   ).toBeVisible();
+  const primaryNavigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+  await expect(primaryNavigation).toBeVisible();
   await expect(
-    page.getByRole("navigation", { name: "Primary navigation" }),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Home" })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+    primaryNavigation.getByRole("link", { name: "Home" }),
+  ).toHaveAttribute("aria-current", "page");
 });
