@@ -335,6 +335,106 @@ a {
   font: inherit;
 }
 
+.app-manager-trigger {
+  position: fixed;
+  z-index: 50;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  right: 1rem;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
+  border: 2px solid #000000;
+  border-radius: var(--radius-small);
+  color: #ffffff;
+  background: #000000;
+  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 18%);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.app-manager-dialog {
+  width: min(calc(100% - 2rem), 32rem);
+  max-height: calc(100vh - 2rem);
+  padding: 1.25rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-large);
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+  box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 30%);
+}
+
+.app-manager-dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+.app-manager-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.dialog-close {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+  font-size: 1.4rem;
+}
+.version-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.version-list div {
+  padding: 0.75rem;
+  border-radius: var(--radius-small);
+  background: var(--colour-surface);
+}
+.version-list dt {
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+.version-list dd {
+  margin: 0.25rem 0 0;
+  font-weight: 800;
+}
+.app-manager-dialog h3 {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+.app-manager-dialog ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--colour-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.app-manager-actions {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.app-manager-actions .secondary-button {
+  width: 100%;
+  margin: 0;
+}
+.app-manager-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (min-width: 48rem) {
+  .app-manager-trigger {
+    right: max(2rem, calc((100vw - 72rem) / 2));
+    bottom: 1.5rem;
+  }
+}
+
 button:focus-visible,
 a:focus-visible {
   outline: 3px solid var(--colour-strong);
