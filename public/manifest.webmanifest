@@ -1,0 +1,11 @@
+{
+  "name": "UrbanFox ILR",
+  "short_name": "UrbanFox",
+  "description": "A local-only UK indefinite leave to remain tracking tool.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "en-GB",
+  "orientation": "portrait-primary"
+}

@@ -24,3 +24,23 @@ representative of the UK Government, the Home Office, or UK Visas and
 Immigration.
 
 Copyright © 2026 Keyur Gohil. All rights reserved.
+
+## Development
+
+Requirements: Node.js 22 and npm.
+
+```bash
+npm install
+npm run dev
+```
+
+Before opening or merging a pull request, run:
+
+```bash
+npm run check
+npx playwright install chromium
+npm run test:e2e
+```
+
+GitHub Actions runs formatting, linting, type checking, unit tests, a production
+build, and the mobile Playwright journey for every pull request.
