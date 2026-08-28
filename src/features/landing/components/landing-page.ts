@@ -42,6 +42,9 @@ export function renderLandingPage(root: HTMLElement): void {
           </div>
         </aside>
       </main>
+      <footer class="public-footer" aria-label="Legal links">
+        <button type="button" data-legal-view>Terms</button><button type="button" data-legal-view>Privacy</button><button type="button" data-legal-view>About</button><button type="button" data-legal-view>Licence</button>
+      </footer>
     </div>
   `;
 }
