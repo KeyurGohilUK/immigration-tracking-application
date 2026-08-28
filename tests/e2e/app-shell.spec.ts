@@ -53,6 +53,25 @@ test("shows the anonymous landing page without tracker controls", async ({
   });
 });
 
+test("shows shared install and update controls on desktop", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  await page.goto("/");
+
+  const trigger = page.getByRole("button", { name: "App & updates" });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await expect(
+    page.getByRole("dialog", { name: "Install and updates" }),
+  ).toBeVisible();
+  await expect(page.getByText("Installed")).toBeVisible();
+  await expect(page.getByText("Latest")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Download updates" }),
+  ).toBeVisible();
+});
+
 test("opens PIN setup from the public landing page", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();

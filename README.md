@@ -24,6 +24,9 @@ vault](docs/local-security.md) for the design and its limitations.
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is
 available and caches only same-origin application resources for offline launch.
+The shared **App & updates** menu shows installed/latest versions and release
+notes, and can safely clear only UrbanFox application caches before reloading;
+encrypted IndexedDB records are preserved.
 
 **Freddy the Urban Fox**, a friendly UK urban fox, is the app’s main character
 and guides users through setup, family profiles, travel records, backups, and

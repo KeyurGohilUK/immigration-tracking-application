@@ -1,0 +1,8 @@
+{
+  "version": "0.2.0",
+  "notes": [
+    "Added encrypted household-owner profiles.",
+    "Added versioned Terms and privacy acceptance.",
+    "Improved desktop action visibility and app updates."
+  ]
+}

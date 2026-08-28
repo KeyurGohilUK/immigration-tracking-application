@@ -33,6 +33,8 @@ visual polish and public release.
 - [ ] Add Freddy-based application icons, theme colours, and mobile safe-area
       handling.
 - [x] Add offline application-shell support without caching sensitive exports.
+- [x] Add a shared install/update menu with release notes, version status, and a
+      data-safe application-cache refresh.
 - [x] Add application and data-schema version constants.
 - [x] Add formatting, linting, unit-test, build, and browser-test commands.
 - [x] Add GitHub Actions checks for every pull request.
