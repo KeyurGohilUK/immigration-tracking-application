@@ -21,6 +21,8 @@ visual polish and public release.
 - [x] Create a mobile-first static web application that works on GitHub Pages.
 - [x] Choose and document the frontend architecture and folder structure.
 - [x] Add semantic HTML, responsive styling, and accessible form foundations.
+- [x] Provide a wide desktop website layout while retaining an app-like mobile
+      experience.
 - [ ] Add a web app manifest and installable Progressive Web App behaviour.
 - [x] Define the professional monochrome interface palette and reserve natural
       fox colours exclusively for Freddy; see `docs/brand-guidelines.md`.
