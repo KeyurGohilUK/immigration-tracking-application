@@ -30,7 +30,25 @@ visual polish and public release.
 ## Phase 2 — Define privacy and local storage
 
 - [ ] Store all user-entered information locally with IndexedDB.
-- [ ] Do not add a database, analytics, advertising, tracking, or user accounts.
+- [ ] Do not add a database, analytics, advertising, tracking, or online user
+      accounts.
+- [ ] Treat account creation as creating a local household profile on the
+      current device; do not imply that an online account exists.
+- [ ] Require the user to create a four-digit local PIN during setup.
+- [ ] Derive an encryption key from the PIN using a standard, salted,
+      deliberately slow key-derivation function.
+- [ ] Encrypt sensitive IndexedDB records with the Web Crypto API rather than
+      storing the PIN or personal data as readable text.
+- [ ] Keep the unlocked encryption key in memory only and clear it on lock,
+      refresh, tab close, or expiry.
+- [ ] Add automatic locking after inactivity and when the app returns from the
+      background.
+- [ ] Limit rapid PIN attempts in the interface without claiming this prevents
+      offline brute-force attacks.
+- [ ] Explain that a four-digit PIN protects against casual access but is not
+      equivalent to strong device encryption or a high-entropy password.
+- [ ] Provide no PIN recovery or bypass; forgotten PIN recovery requires
+      deleting local data and restoring a backup.
 - [ ] Define a versioned local-data schema and migration mechanism.
 - [ ] Store immigration permissions separately from travel records.
 - [ ] Store visa grant dates, expiry dates, and actual UK arrival dates
@@ -65,9 +83,18 @@ visual polish and public release.
 
 ## Phase 4 — Build the core data-entry experience
 
-- [ ] Add a simple local profile with only information necessary for
+- [ ] Add a local household-owner profile with only information necessary for
       calculations.
-- [ ] Add, edit, and delete immigration-permission records.
+- [ ] Add, edit, and delete family-member profiles within the household.
+- [ ] Record each member’s name, date of birth, relationship to the household
+      owner, and main-applicant or dependant status only where needed.
+- [ ] Give every family member an internal identifier so permissions, trips,
+      calculations, and backups remain correctly associated.
+- [ ] Allow the user to switch between family members from the dashboard.
+- [ ] Clearly show when a family member’s immigration route does not yet have a
+      supported eligibility calculation.
+- [ ] Add, edit, and delete immigration-permission records for each family
+      member.
 - [ ] Record route, permission start, expiry, UK arrival, and main-applicant or
       dependant status.
 - [ ] Add, edit, and delete trips outside the UK.
@@ -95,6 +122,8 @@ visual polish and public release.
 - [ ] Calculate the qualifying-period completion date in calendar years.
 - [ ] Apply the route-specific 28-day early-application rule.
 - [ ] Show the estimated earliest application date.
+- [ ] Run calculations independently for each family member and never combine
+      one person’s qualifying residence or absences with another’s.
 - [ ] Detect gaps, non-qualifying permission, and incomplete history.
 - [ ] Never convert an uncertain or exceptional case into a definite pass.
 - [ ] Return structured results: pass, fail, incomplete data, or manual review.
@@ -107,7 +136,11 @@ visual polish and public release.
 
 - [ ] Create a dashboard showing progress, estimated eligibility date, absence
       status, and outstanding information.
-- [ ] Add mobile bottom navigation for Dashboard, Permissions, Trips, and More.
+- [ ] Add mobile bottom navigation for Dashboard, Family, Trips, and More.
+- [ ] Add a clear locked screen with PIN entry and safe reset guidance.
+- [ ] Add a visible lock-now action and configurable inactivity timeout.
+- [ ] Show the currently selected family member consistently on every relevant
+      screen.
 - [ ] Create a chronological immigration and travel timeline.
 - [ ] Show a rolling-absence risk summary without implying legal certainty.
 - [ ] Add accessible success, warning, error, and manual-review states.
@@ -119,7 +152,9 @@ visual polish and public release.
 
 ## Phase 7 — Add backup and restore
 
-- [ ] Export all local records as a downloadable JSON backup.
+- [ ] Export all household and family-member records as a downloadable backup.
+- [ ] Encrypt backup contents and require the user to set a backup password;
+      do not rely on the four-digit app PIN as strong backup protection.
 - [ ] Include backup format, schema version, app version, and export timestamp.
 - [ ] Use a clear dated filename.
 - [ ] Validate the file type, format marker, schema, and individual records
@@ -144,6 +179,10 @@ visual polish and public release.
 - [ ] Test visa gaps, route changes, and first-entry absence counting.
 - [ ] Test missing and contradictory information.
 - [ ] Test IndexedDB migrations and interrupted writes.
+- [ ] Test PIN setup, unlock, incorrect attempts, auto-lock, manual lock, and
+      forgotten-PIN data reset.
+- [ ] Test that encrypted records are not readable directly from IndexedDB.
+- [ ] Test family-member isolation so records and calculations cannot be mixed.
 - [ ] Test backup round trips and malicious or corrupted import files.
 - [ ] Add browser tests for the principal mobile user journey.
 - [ ] Run automated accessibility checks.
@@ -184,7 +223,7 @@ verified route configurations:
 
 ## Explicitly out of scope for the first release
 
-- Cloud accounts, login, or cross-device synchronisation.
+- Online accounts, server authentication, or cross-device synchronisation.
 - A remote database or server-side storage.
 - Uploading evidence or passport documents.
 - Automated legal advice or a guarantee of eligibility.
