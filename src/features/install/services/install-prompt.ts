@@ -3,7 +3,12 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-export function initialiseInstallPrompt(root: HTMLElement): void {
+export interface InstallController {
+  canInstall(): boolean;
+  prompt(): Promise<boolean>;
+}
+
+export function initialiseInstallPrompt(root: HTMLElement): InstallController {
   let deferredPrompt: BeforeInstallPromptEvent | null = null;
 
   function updateButton(): void {
@@ -35,6 +40,7 @@ export function initialiseInstallPrompt(root: HTMLElement): void {
     event.preventDefault();
     deferredPrompt = event as BeforeInstallPromptEvent;
     updateButton();
+    window.dispatchEvent(new Event("urbanfox-install-statechange"));
   });
 
   window.addEventListener("appinstalled", () => {
@@ -43,7 +49,22 @@ export function initialiseInstallPrompt(root: HTMLElement): void {
     if (button) {
       button.hidden = true;
     }
+    window.dispatchEvent(new Event("urbanfox-install-statechange"));
   });
+
+  return {
+    canInstall: () => deferredPrompt !== null,
+    prompt: async () => {
+      if (!deferredPrompt) return false;
+      await deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      const button = root.querySelector<HTMLButtonElement>("#install-app");
+      if (button) button.hidden = true;
+      window.dispatchEvent(new Event("urbanfox-install-statechange"));
+      return choice.outcome === "accepted";
+    },
+  };
 }
 
 export function registerServiceWorker(): void {
