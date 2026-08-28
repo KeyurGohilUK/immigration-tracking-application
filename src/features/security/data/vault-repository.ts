@@ -1,26 +1,14 @@
 import { isVaultRecord, type VaultRecord } from "../services/vault-crypto";
+import {
+  DATABASE_STORES,
+  openAppDatabase,
+} from "../../../infrastructure/storage/app-database";
 
-const DATABASE_NAME = "urbanfox-ilr";
-const DATABASE_VERSION = 1;
-const SECURITY_STORE = "security";
+const SECURITY_STORE = DATABASE_STORES.security;
 const VAULT_KEY = "vault";
 
-function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
-    request.onupgradeneeded = () => {
-      if (!request.result.objectStoreNames.contains(SECURITY_STORE)) {
-        request.result.createObjectStore(SECURITY_STORE);
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () =>
-      reject(new Error("Private storage could not be opened."));
-  });
-}
-
 export async function getVaultRecord(): Promise<VaultRecord | null> {
-  const database = await openDatabase();
+  const database = await openAppDatabase();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(SECURITY_STORE, "readonly");
     const request = transaction.objectStore(SECURITY_STORE).get(VAULT_KEY);
@@ -42,7 +30,7 @@ export async function getVaultRecord(): Promise<VaultRecord | null> {
 }
 
 export async function saveVaultRecord(record: VaultRecord): Promise<void> {
-  const database = await openDatabase();
+  const database = await openAppDatabase();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(SECURITY_STORE, "readwrite");
     transaction.objectStore(SECURITY_STORE).put(record, VAULT_KEY);
