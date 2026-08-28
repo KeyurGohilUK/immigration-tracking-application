@@ -106,6 +106,27 @@ a:focus-visible {
   background: var(--colour-canvas);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.install-button {
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 0;
+  border-radius: var(--radius-small);
+  color: var(--colour-on-strong);
+  background: var(--colour-strong);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.install-button[hidden] {
+  display: none;
+}
+
 .icon-button:disabled,
 .primary-button:disabled {
   cursor: not-allowed;
@@ -286,7 +307,11 @@ p {
   font-weight: 750;
 }
 
-.bottom-navigation {
+.desktop-navigation {
+  display: none;
+}
+
+.mobile-navigation {
   position: fixed;
   z-index: 20;
   right: 0;
@@ -303,7 +328,7 @@ p {
   backdrop-filter: blur(1rem);
 }
 
-.bottom-navigation a {
+.primary-navigation a {
   display: grid;
   place-content: center;
   gap: 0.25rem;
@@ -315,12 +340,12 @@ p {
   text-decoration: none;
 }
 
-.bottom-navigation a > span:first-child {
+.primary-navigation a > span:first-child {
   font-size: 1.1rem;
   line-height: 1;
 }
 
-.bottom-navigation a[aria-current="page"] {
+.primary-navigation a[aria-current="page"] {
   color: var(--colour-on-strong);
   background: var(--colour-strong);
 }
@@ -336,7 +361,7 @@ p {
     overflow: hidden;
   }
 
-  .bottom-navigation {
+  .mobile-navigation {
     bottom: 1.5rem;
     border: 1px solid var(--colour-border);
     border-radius: 0 0 2rem 2rem;
@@ -349,40 +374,41 @@ p {
   }
 
   .app-shell {
-    display: flex;
     width: 100%;
     min-height: 100vh;
-    flex-direction: column;
     border-radius: 0;
     overflow: visible;
     box-shadow: none;
   }
 
   .top-bar {
-    order: 1;
     min-height: 5rem;
     padding-right: max(2rem, calc((100vw - 72rem) / 2));
     padding-left: max(2rem, calc((100vw - 72rem) / 2));
   }
 
-  .bottom-navigation {
-    position: sticky;
-    top: 5rem;
-    bottom: auto;
-    display: flex;
-    width: 100%;
-    min-height: 4rem;
-    order: 2;
-    justify-content: flex-start;
-    gap: 0.5rem;
-    padding: 0.5rem max(2rem, calc((100vw - 72rem) / 2));
-    border: 0;
-    border-bottom: 1px solid var(--colour-border);
-    border-radius: 0;
+  .mobile-navigation {
+    display: none;
   }
 
-  .bottom-navigation a {
-    min-width: 7.5rem;
+  .desktop-navigation {
+    position: static;
+    display: flex;
+    width: auto;
+    min-height: auto;
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 0.25rem;
+    margin: 0 1.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .desktop-navigation a {
+    min-width: 6.5rem;
     min-height: 3rem;
     grid-auto-flow: column;
     gap: 0.5rem;
@@ -390,13 +416,12 @@ p {
     font-size: 0.78rem;
   }
 
-  .bottom-navigation a > span:first-child {
+  .desktop-navigation a > span:first-child {
     font-size: 1rem;
   }
 
   .main-content {
     width: min(100%, 72rem);
-    order: 3;
     grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.65fr);
     grid-template-rows: auto auto;
     gap: 1.5rem;

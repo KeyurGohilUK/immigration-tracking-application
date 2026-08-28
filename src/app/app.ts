@@ -7,6 +7,22 @@ const navigationItems = [
   { label: "More", icon: "•••" },
 ] as const;
 
+function renderNavigation(className: string): string {
+  return `
+    <nav class="primary-navigation ${className}" aria-label="Primary navigation">
+      ${navigationItems
+        .map(
+          ({ label, icon }, index) => `
+            <a href="#${label.toLowerCase()}" ${index === 0 ? 'aria-current="page"' : ""}>
+              <span aria-hidden="true">${icon}</span>
+              <span>${label}</span>
+            </a>`,
+        )
+        .join("")}
+    </nav>
+  `;
+}
+
 export function renderApp(root: HTMLElement): void {
   root.innerHTML = `
     <div class="app-shell">
@@ -15,9 +31,13 @@ export function renderApp(root: HTMLElement): void {
           <span class="wordmark-mark" aria-hidden="true">UF</span>
           <span>${APP_NAME}</span>
         </a>
-        <button class="icon-button" type="button" aria-label="Lock app" disabled>
-          <span aria-hidden="true">⌑</span>
-        </button>
+        ${renderNavigation("desktop-navigation")}
+        <div class="header-actions">
+          <button id="install-app" class="install-button" type="button" hidden>Install app</button>
+          <button class="icon-button" type="button" aria-label="Lock app" disabled>
+            <span aria-hidden="true">⌑</span>
+          </button>
+        </div>
       </header>
 
       <main id="main-content" class="main-content">
@@ -60,17 +80,8 @@ export function renderApp(root: HTMLElement): void {
         </section>
       </main>
 
-      <nav class="bottom-navigation" aria-label="Primary navigation">
-        ${navigationItems
-          .map(
-            ({ label, icon }, index) => `
-              <a href="#${label.toLowerCase()}" ${index === 0 ? 'aria-current="page"' : ""}>
-                <span aria-hidden="true">${icon}</span>
-                <span>${label}</span>
-              </a>`,
-          )
-          .join("")}
-      </nav>
+      ${renderNavigation("mobile-navigation")}
+
     </div>
   `;
 }

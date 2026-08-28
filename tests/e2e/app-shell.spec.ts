@@ -47,4 +47,16 @@ test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   expect(navigationBox).not.toBeNull();
   expect(mainBox?.width).toBeGreaterThan(900);
   expect(navigationBox?.y).toBeLessThan(mainBox?.y ?? 0);
+  expect(navigationBox?.height).toBeLessThanOrEqual(64);
+});
+
+test("registers the offline app service worker", async ({ page }) => {
+  await page.goto("/");
+
+  const registrationScope = await page.evaluate(async () => {
+    const registration = await navigator.serviceWorker.ready;
+    return registration.scope;
+  });
+
+  expect(registrationScope).toContain("127.0.0.1:4173");
 });
