@@ -9,9 +9,13 @@ async function createLocalProfile(
   await page.getByLabel("Choose PIN").fill("4826");
   await page.getByLabel("Confirm PIN").fill("4826");
   await page.getByRole("button", { name: "Create private space" }).click();
+  await page.getByLabel("Full name").fill("Keyur Gohil");
+  await page.getByLabel("Date of birth").fill("1990-01-15");
+  await page.getByRole("button", { name: "Save local profile" }).click();
   await expect(
     page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
   ).toBeVisible();
+  await expect(page.getByText("Welcome back, Keyur Gohil.")).toBeVisible();
 }
 
 test("shows the anonymous landing page without tracker controls", async ({
@@ -105,6 +109,23 @@ test("makes legal information available without entering setup", async ({
 test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
+  const storedProfile = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 2);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("profiles", "readonly")
+        .objectStore("profiles")
+        .get("owner");
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  });
+  expect(storedProfile).not.toContain("Keyur Gohil");
+  expect(storedProfile).toContain("ciphertext");
   await page.getByRole("button", { name: "Lock app" }).click();
 
   await expect(

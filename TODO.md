@@ -41,8 +41,7 @@ visual polish and public release.
 
 ## Phase 2 — Define privacy and local storage
 
-- [ ] Store all user-entered information locally with IndexedDB. The encrypted
-      vault foundation is complete; personal-data records remain to be added.
+- [x] Store all user-entered information locally with IndexedDB.
 - [x] Do not add a database, analytics, advertising, tracking, or online user
       accounts.
 - [x] Treat account creation as creating a local household profile on the
@@ -50,9 +49,8 @@ visual polish and public release.
 - [x] Require the user to create a four-digit local PIN during setup.
 - [x] Derive an encryption key from the PIN using a standard, salted,
       deliberately slow key-derivation function.
-- [ ] Encrypt sensitive IndexedDB records with the Web Crypto API rather than
-      storing the PIN or personal data as readable text. PIN verifier encryption
-      is complete; personal-data records remain to be added.
+- [x] Encrypt sensitive IndexedDB records with the Web Crypto API rather than
+      storing the PIN or personal data as readable text.
 - [x] Keep the unlocked encryption key in memory only and clear it on lock,
       refresh, tab close, or expiry.
 - [x] Add automatic locking after inactivity and when the app returns from the
@@ -99,7 +97,7 @@ visual polish and public release.
 
 ## Phase 4 — Build the core data-entry experience
 
-- [ ] Add a local household-owner profile with only information necessary for
+- [x] Add a local household-owner profile with only information necessary for
       calculations.
 - [ ] Add, edit, and delete family-member profiles within the household.
 - [ ] Record each member’s name, date of birth, relationship to the household

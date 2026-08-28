@@ -23,7 +23,7 @@ function renderNavigation(className: string): string {
   `;
 }
 
-export function renderApp(root: HTMLElement): void {
+export function renderApp(root: HTMLElement, ownerName?: string): void {
   root.innerHTML = `
     <div class="app-shell">
       <header class="top-bar">
@@ -47,6 +47,7 @@ export function renderApp(root: HTMLElement): void {
           </div>
           <div>
             <p class="eyebrow">Freddy the Urban Fox</p>
+            ${ownerName ? '<p>Welcome back, <strong id="owner-name"></strong>.</p>' : ""}
             <h1 id="welcome-title">Let’s organise your ILR journey.</h1>
             <p>
               I’ll help you record your household, immigration permissions, and trips—all stored
@@ -84,6 +85,8 @@ export function renderApp(root: HTMLElement): void {
 
     </div>
   `;
+  const ownerNameElement = root.querySelector<HTMLElement>("#owner-name");
+  if (ownerNameElement && ownerName) ownerNameElement.textContent = ownerName;
 }
 
 export function renderSplash(root: HTMLElement): void {
