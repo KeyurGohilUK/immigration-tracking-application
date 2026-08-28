@@ -85,3 +85,14 @@ export function renderApp(root: HTMLElement): void {
     </div>
   `;
 }
+
+export function renderSplash(root: HTMLElement): void {
+  root.innerHTML = `
+    <main class="splash-screen" aria-label="UrbanFox ILR is starting">
+      <span class="splash-mark" aria-hidden="true">UF</span>
+      <p class="eyebrow">Freddy the Urban Fox</p>
+      <h1>${APP_NAME}</h1>
+      <p>Preparing your private space…</p>
+    </main>
+  `;
+}
