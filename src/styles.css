@@ -343,6 +343,103 @@ p {
   }
 }
 
+@media (min-width: 48rem) {
+  body {
+    padding: 0;
+  }
+
+  .app-shell {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    flex-direction: column;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+  }
+
+  .top-bar {
+    order: 1;
+    min-height: 5rem;
+    padding-right: max(2rem, calc((100vw - 72rem) / 2));
+    padding-left: max(2rem, calc((100vw - 72rem) / 2));
+  }
+
+  .bottom-navigation {
+    position: sticky;
+    top: 5rem;
+    bottom: auto;
+    display: flex;
+    width: 100%;
+    min-height: 4rem;
+    order: 2;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem max(2rem, calc((100vw - 72rem) / 2));
+    border: 0;
+    border-bottom: 1px solid var(--colour-border);
+    border-radius: 0;
+  }
+
+  .bottom-navigation a {
+    min-width: 7.5rem;
+    min-height: 3rem;
+    grid-auto-flow: column;
+    gap: 0.5rem;
+    place-content: center;
+    font-size: 0.78rem;
+  }
+
+  .bottom-navigation a > span:first-child {
+    font-size: 1rem;
+  }
+
+  .main-content {
+    width: min(100%, 72rem);
+    order: 3;
+    grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.65fr);
+    grid-template-rows: auto auto;
+    gap: 1.5rem;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  .welcome-card {
+    grid-column: 1;
+    grid-row: 1;
+    grid-template-columns: 6rem 1fr;
+    padding: 2rem;
+  }
+
+  .freddy-placeholder {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .welcome-card h1 {
+    max-width: 18ch;
+    font-size: clamp(2.25rem, 4vw, 3.75rem);
+  }
+
+  .welcome-card p {
+    max-width: 56ch;
+    font-size: 1rem;
+  }
+
+  .notice {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .setup-card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    padding: 1.75rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

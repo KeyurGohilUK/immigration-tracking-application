@@ -20,3 +20,31 @@ test("shows the mobile UrbanFox foundation and legal boundary", async ({
     primaryNavigation.getByRole("link", { name: "Home" }),
   ).toHaveAttribute("aria-current", "page");
 });
+
+test("uses an app layout on mobile", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  await page.goto("/");
+
+  const navigationBox = await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .boundingBox();
+
+  expect(navigationBox).not.toBeNull();
+  expect(navigationBox?.y).toBeGreaterThan(600);
+  expect(navigationBox?.width).toBeLessThanOrEqual(430);
+});
+
+test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  await page.goto("/");
+
+  const mainBox = await page.getByRole("main").boundingBox();
+  const navigationBox = await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .boundingBox();
+
+  expect(mainBox).not.toBeNull();
+  expect(navigationBox).not.toBeNull();
+  expect(mainBox?.width).toBeGreaterThan(900);
+  expect(navigationBox?.y).toBeLessThan(mainBox?.y ?? 0);
+});
