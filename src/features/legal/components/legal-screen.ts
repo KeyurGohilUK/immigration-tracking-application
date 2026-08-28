@@ -17,6 +17,7 @@ export function renderLegalScreen(
         <nav class="legal-navigation" aria-label="Legal information">
           <a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#about">About</a><a href="#licence">Licence</a>
         </nav>
+        ${acceptanceRequired ? `<form id="terms-form" class="terms-form"><label><input name="acceptTerms" type="checkbox" required /> <span>I have read and accept the Terms, Privacy notice, and tracking-only disclaimer.</span></label><button class="primary-button" type="submit">Accept and continue</button></form>` : `<button id="legal-back" class="secondary-button legal-back" type="button">Back</button>`}
         <article class="legal-content">
           <section id="terms"><h2>Terms and conditions</h2>
             <p>UrbanFox ILR is a tracking and organisational tool only. It does not provide legal or immigration advice, determine eligibility, guarantee an outcome, or replace current GOV.UK guidance or advice from a qualified professional.</p>
@@ -30,7 +31,6 @@ export function renderLegalScreen(
           <section id="about"><h2>About</h2><p>Freddy the Urban Fox guides users through ${APP_NAME}, but Freddy’s guidance is not legal advice. Always verify information using official sources.</p></section>
           <section id="licence"><h2>Licence</h2><p>Copyright © 2026 Keyur Gohil. All rights reserved. Public repository visibility does not grant permission to use, copy, modify, redistribute, republish, fork, clone, or independently deploy the software. See the repository LICENSE for the complete notice.</p></section>
         </article>
-        ${acceptanceRequired ? `<form id="terms-form" class="terms-form"><label><input name="acceptTerms" type="checkbox" required /> <span>I have read and accept the Terms, Privacy notice, and tracking-only disclaimer.</span></label><button class="primary-button" type="submit">Accept and continue</button></form>` : `<button id="legal-back" class="secondary-button" type="button">Back</button>`}
       </main>
     </div>`;
 }
