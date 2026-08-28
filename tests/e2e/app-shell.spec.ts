@@ -4,6 +4,8 @@ async function createLocalProfile(
   page: import("@playwright/test").Page,
 ): Promise<void> {
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Accept and continue" }).click();
   await page.getByLabel("Choose PIN").fill("4826");
   await page.getByLabel("Confirm PIN").fill("4826");
   await page.getByRole("button", { name: "Create private space" }).click();
@@ -52,11 +54,33 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   await page.getByRole("button", { name: "Get started" }).click();
 
   await expect(
+    page.getByRole("heading", { name: "Terms and privacy" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Create your four-digit PIN" }),
+  ).toHaveCount(0);
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Accept and continue" }).click();
+
+  await expect(
     page.getByRole("heading", { name: "Create your four-digit PIN" }),
   ).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
   ).toHaveCount(0);
+});
+
+test("makes legal information available without entering setup", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Privacy" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Privacy and local data" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
 });
 
 test("creates, locks, and unlocks a local private space", async ({ page }) => {
