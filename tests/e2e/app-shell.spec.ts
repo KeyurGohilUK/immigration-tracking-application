@@ -19,6 +19,20 @@ test("shows the anonymous landing page without tracker controls", async ({
     0,
   );
   await expect(page.getByRole("button", { name: "Lock app" })).toHaveCount(0);
+
+  const getStartedButton = page.getByRole("button", { name: "Get started" });
+  const buttonColours = await getStartedButton.evaluate((button) => {
+    const style = window.getComputedStyle(button);
+    return {
+      background: style.backgroundColor,
+      text: style.color,
+    };
+  });
+
+  expect(buttonColours).toEqual({
+    background: "rgb(0, 0, 0)",
+    text: "rgb(255, 255, 255)",
+  });
 });
 
 test("opens local profile setup from the public landing page", async ({
