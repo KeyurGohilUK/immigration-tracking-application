@@ -1,4 +1,10 @@
 import { APP_NAME } from "../configuration/app-metadata";
+import {
+  populatePersonSwitcher,
+  renderPersonSwitcherMarkup,
+} from "../features/household/components/person-switcher";
+import type { FamilyMember } from "../features/household/domain/family-member";
+import type { OwnerProfile } from "../features/household/domain/owner-profile";
 
 const navigationItems = [
   {
@@ -68,7 +74,12 @@ export function renderAppShell(
   `;
 }
 
-export function renderApp(root: HTMLElement, ownerName?: string): void {
+export function renderApp(
+  root: HTMLElement,
+  owner: OwnerProfile,
+  members: FamilyMember[],
+  selectedProfileId: string,
+): void {
   renderAppShell(
     root,
     "Home",
@@ -79,12 +90,13 @@ export function renderApp(root: HTMLElement, ownerName?: string): void {
           </div>
           <div>
             <p class="eyebrow">Freddy the Urban Fox</p>
-            ${ownerName ? '<p>Welcome back, <strong id="owner-name"></strong>.</p>' : ""}
+            <p>Welcome back, <strong id="owner-name"></strong>.</p>
             <h1 id="welcome-title">Let’s organise your ILR journey.</h1>
-            <p>
+            <p class="welcome-description">
               I’ll help you record your household, immigration permissions, and trips—all stored
               locally on this device.
             </p>
+            ${renderPersonSwitcherMarkup()}
           </div>
         </section>
 
@@ -114,7 +126,8 @@ export function renderApp(root: HTMLElement, ownerName?: string): void {
       </main>`,
   );
   const ownerNameElement = root.querySelector<HTMLElement>("#owner-name");
-  if (ownerNameElement && ownerName) ownerNameElement.textContent = ownerName;
+  if (ownerNameElement) ownerNameElement.textContent = owner.fullName;
+  populatePersonSwitcher(root, owner, members, selectedProfileId);
 }
 
 export function renderSplash(root: HTMLElement): void {
