@@ -23,6 +23,8 @@ vault](docs/local-security.md) for the design and its limitations.
 Household owners can add, edit, and delete separate encrypted family-member
 profiles without sending those details to a server, then switch the active
 tracking profile consistently between Home and Family.
+Each profile can keep a separate encrypted immigration-permission history with
+route, permission dates, actual UK arrival, and applicant/dependant status.
 
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is
