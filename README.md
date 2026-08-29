@@ -25,6 +25,8 @@ profiles without sending those details to a server, then switch the active
 tracking profile consistently between Home and Family.
 Each profile can keep a separate encrypted immigration-permission history with
 route, permission dates, actual UK arrival, and applicant/dependant status.
+It can also keep separate encrypted travel records with open-trip support,
+overlap checks, and flags for absences that require evidence and manual review.
 
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is
