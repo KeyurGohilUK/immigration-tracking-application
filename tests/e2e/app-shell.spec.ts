@@ -154,7 +154,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 2);
+      const request = indexedDB.open("urbanfox-ilr", 3);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -234,7 +234,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByRole("link", { name: "Family" }).click();
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 2);
+      const request = indexedDB.open("urbanfox-ilr", 3);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -270,6 +270,65 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
   await expect(page.getByText("No family members added yet")).toBeVisible();
   await expect(page.getByLabel("Tracking profile")).toHaveValue("owner");
+});
+
+test("tracks encrypted immigration permissions without claiming eligibility", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page
+    .getByRole("button", { name: "Manage immigration history" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Immigration history" }),
+  ).toBeVisible();
+  await expect(page.getByText("No permissions recorded")).toBeVisible();
+  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByLabel("Immigration route").selectOption("skilled-worker");
+  await page.getByLabel("Permission held as").selectOption("main-applicant");
+  await page.getByLabel("Permission start date").fill("2024-01-01");
+  await page.getByLabel("Permission expiry date").fill("2026-12-31");
+  await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
+  await page.getByRole("button", { name: "Save permission" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Skilled Worker", level: 3 }),
+  ).toBeVisible();
+  await expect(page.getByText(/calculation is not active yet/i)).toBeVisible();
+  const storedPermission = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 3);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("permissions", "readonly")
+        .objectStore("permissions")
+        .get("owner");
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  });
+  expect(storedPermission).not.toContain("skilled-worker");
+  expect(storedPermission).toContain("ciphertext");
+
+  await page.getByRole("button", { name: "Edit Skilled Worker" }).click();
+  await page.getByLabel("Permission expiry date").fill("2027-12-31");
+  await page.getByRole("button", { name: "Save permission" }).click();
+  await expect(page.getByText("2027-12-31")).toBeVisible();
+
+  await page.getByRole("button", { name: "Lock app" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page
+    .getByRole("button", { name: "Manage immigration history" })
+    .click();
+  await expect(page.getByText("2027-12-31")).toBeVisible();
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete Skilled Worker" }).click();
+  await expect(page.getByText("No permissions recorded")).toBeVisible();
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {
