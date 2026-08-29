@@ -1,6 +1,7 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "notes": [
+    "Added encrypted trip tracking with open trips and manual-review flags.",
     "Added encrypted immigration-permission history for each selected profile.",
     "Added consistent household-profile switching across Home and Family.",
     "Added encrypted family-member profiles with add, edit, and delete controls.",
