@@ -53,14 +53,21 @@ test("shows the anonymous landing page without tracker controls", async ({
   });
 });
 
-test("shows shared install and update controls on desktop", async ({
+test("shows install and update controls in every device header", async ({
   page,
-}, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium");
+}) => {
   await page.goto("/");
 
-  const trigger = page.getByRole("button", { name: "App & updates" });
+  const trigger = page.getByRole("button", { name: "Install and updates" });
   await expect(trigger).toBeVisible();
+  const triggerBox = await trigger.boundingBox();
+  const headerBox = await page.getByRole("banner").boundingBox();
+  expect(triggerBox).not.toBeNull();
+  expect(headerBox).not.toBeNull();
+  expect(triggerBox?.y).toBeGreaterThanOrEqual(headerBox?.y ?? 0);
+  expect((triggerBox?.y ?? 0) + (triggerBox?.height ?? 0)).toBeLessThanOrEqual(
+    (headerBox?.y ?? 0) + (headerBox?.height ?? 0),
+  );
   await trigger.click();
   await expect(
     page.getByRole("dialog", { name: "Install and updates" }),
