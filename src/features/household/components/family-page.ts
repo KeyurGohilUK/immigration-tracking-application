@@ -1,4 +1,9 @@
 import { renderAppShell } from "../../../app/app";
+import type { OwnerProfile } from "../domain/owner-profile";
+import {
+  populatePersonSwitcher,
+  renderPersonSwitcherMarkup,
+} from "./person-switcher";
 import type {
   FamilyMember,
   FamilyMemberInput,
@@ -21,8 +26,9 @@ const immigrationRoleLabels: Record<ImmigrationRole, string> = {
 
 export function renderFamilyPage(
   root: HTMLElement,
-  ownerName: string,
+  owner: OwnerProfile,
   members: FamilyMember[],
+  selectedProfileId: string,
 ): void {
   renderAppShell(
     root,
@@ -32,6 +38,7 @@ export function renderFamilyPage(
         <div><p class="eyebrow">Local household</p><h1 id="family-title">Your family</h1><p>Keep each person separate so future permissions, trips, and estimates cannot be mixed.</p></div>
         <button id="add-family-member" class="primary-button compact-button" type="button">Add family member</button>
       </section>
+      ${renderPersonSwitcherMarkup()}
       <p class="local-data-banner"><strong>Stored only on this device.</strong> Family details are encrypted with your local PIN.</p>
       <section aria-labelledby="household-members-title">
         <div class="section-heading"><h2 id="household-members-title">Household members</h2><span id="family-count" class="step-count"></span></div>
@@ -61,9 +68,17 @@ export function renderFamilyPage(
   const list = root.querySelector<HTMLElement>("#family-list");
   const count = root.querySelector<HTMLElement>("#family-count");
   if (!list || !count) throw new Error("Family page could not be rendered.");
+  populatePersonSwitcher(root, owner, members, selectedProfileId);
   count.textContent = `${members.length + 1} ${members.length === 0 ? "person" : "people"}`;
 
-  const ownerCard = createMemberCard(ownerName, "Household owner", "You", null);
+  const ownerCard = createMemberCard(
+    owner.fullName,
+    "Household owner",
+    "You",
+    owner.id,
+    true,
+    selectedProfileId === owner.id,
+  );
   ownerCard.classList.add("owner-card");
   list.append(ownerCard);
 
@@ -83,6 +98,8 @@ export function renderFamilyPage(
         relationshipLabels[member.relationship],
         immigrationRoleLabels[member.immigrationRole],
         member.id,
+        false,
+        selectedProfileId === member.id,
       ),
     );
   }
@@ -92,7 +109,9 @@ function createMemberCard(
   name: string,
   relationship: string,
   role: string,
-  memberId: string | null,
+  profileId: string,
+  isOwner: boolean,
+  isSelected: boolean,
 ): HTMLElement {
   const card = document.createElement("article");
   card.className = "family-member-card";
@@ -108,23 +127,41 @@ function createMemberCard(
   if (heading) heading.textContent = name;
   if (relationshipElement) relationshipElement.textContent = relationship;
   if (roleElement) roleElement.textContent = role;
+  if (isSelected) {
+    card.classList.add("selected-member-card");
+    const selectedBadge = document.createElement("span");
+    selectedBadge.className = "selected-profile-badge";
+    selectedBadge.textContent = "Selected";
+    card.querySelector(".member-summary")?.append(selectedBadge);
+  }
 
-  if (memberId) {
+  if (!isSelected || !isOwner) {
     const actions = document.createElement("div");
     actions.className = "member-actions";
-    const edit = document.createElement("button");
-    edit.type = "button";
-    edit.className = "member-action";
-    edit.dataset.editMember = memberId;
-    edit.setAttribute("aria-label", `Edit ${name}`);
-    edit.textContent = "Edit";
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.className = "member-action destructive-action";
-    remove.dataset.deleteMember = memberId;
-    remove.setAttribute("aria-label", `Delete ${name}`);
-    remove.textContent = "Delete";
-    actions.append(edit, remove);
+    if (!isSelected) {
+      const select = document.createElement("button");
+      select.type = "button";
+      select.className = "member-action";
+      select.dataset.selectProfile = profileId;
+      select.setAttribute("aria-label", `Select ${name}`);
+      select.textContent = "Select";
+      actions.append(select);
+    }
+    if (!isOwner) {
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "member-action";
+      edit.dataset.editMember = profileId;
+      edit.setAttribute("aria-label", `Edit ${name}`);
+      edit.textContent = "Edit";
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "member-action destructive-action";
+      remove.dataset.deleteMember = profileId;
+      remove.setAttribute("aria-label", `Delete ${name}`);
+      remove.textContent = "Delete";
+      actions.append(edit, remove);
+    }
     card.append(actions);
   }
   return card;
