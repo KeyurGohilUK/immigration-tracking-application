@@ -12,9 +12,8 @@ async function createLocalProfile(
   await page.getByRole("button", { name: "Get started" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
-  await page.getByLabel("Choose PIN").fill(TEST_PROFILE.pin);
-  await page.getByLabel("Confirm PIN").fill(TEST_PROFILE.pin);
-  await page.getByRole("button", { name: "Create private space" }).click();
+  await enterPin(page, "Choose PIN", TEST_PROFILE.pin);
+  await enterPin(page, "Confirm PIN", TEST_PROFILE.pin);
   await page.getByLabel("Full name").fill(TEST_PROFILE.name);
   await page.getByLabel("Date of birth").fill(TEST_PROFILE.dateOfBirth);
   await page.getByRole("button", { name: "Save local profile" }).click();
@@ -24,6 +23,16 @@ async function createLocalProfile(
   await expect(
     page.getByText(`Welcome back, ${TEST_PROFILE.name}.`),
   ).toBeVisible();
+}
+
+async function enterPin(
+  page: import("@playwright/test").Page,
+  label: string,
+  pin: string,
+): Promise<void> {
+  for (const [index, digit] of [...pin].entries()) {
+    await page.getByLabel(`${label} digit ${index + 1}`).fill(digit);
+  }
 }
 
 test("shows the anonymous landing page without tracker controls", async ({
@@ -165,21 +174,22 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Unlock your private space" }),
   ).toBeVisible();
-  await page.getByLabel("Four-digit PIN").fill("1111");
-  await page.getByRole("button", { name: "Unlock" }).click();
+  await enterPin(page, "Four-digit PIN", "1111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
-  await page.getByLabel("Four-digit PIN").fill(TEST_PROFILE.pin);
-  await page.getByRole("button", { name: "Unlock" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
     page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
   ).toBeVisible();
 
   await page.reload();
-  await page.getByRole("button", { name: "Get started" }).click();
   await expect(
     page.getByRole("heading", { name: "Unlock your private space" }),
   ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Get started" })).toHaveCount(
+    0,
+  );
+  await expect(page.locator(".pin-digit")).toHaveCount(4);
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {

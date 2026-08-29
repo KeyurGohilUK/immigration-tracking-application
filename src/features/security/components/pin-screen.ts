@@ -2,6 +2,91 @@ import { APP_NAME } from "../../../configuration/app-metadata";
 
 export type PinScreenMode = "create" | "unlock";
 
+function renderPinInputs(name: string, label: string): string {
+  const inputs = Array.from(
+    { length: 4 },
+    (_, index) => `
+      <input
+        class="pin-digit"
+        data-pin-digit="${name}"
+        type="password"
+        inputmode="numeric"
+        autocomplete="${index === 0 ? "one-time-code" : "off"}"
+        pattern="[0-9]"
+        maxlength="1"
+        aria-label="${label} digit ${index + 1}"
+        required
+      />`,
+  ).join("");
+
+  return `
+    <fieldset class="pin-fieldset">
+      <legend>${label}</legend>
+      <div class="pin-inputs" role="group" aria-label="${label}">
+        ${inputs}
+      </div>
+      <input type="hidden" name="${name}" />
+    </fieldset>
+  `;
+}
+
+function initialisePinInputs(
+  form: HTMLFormElement,
+  name: string,
+  autoSubmit: boolean,
+): void {
+  const inputs = Array.from(
+    form.querySelectorAll<HTMLInputElement>(`[data-pin-digit="${name}"]`),
+  );
+  const valueInput = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
+
+  const updateValue = (): void => {
+    if (!valueInput) return;
+    valueInput.value = inputs.map((input) => input.value).join("");
+    if (autoSubmit && valueInput.value.length === inputs.length) {
+      form.requestSubmit();
+    }
+  };
+
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      const error = form.querySelector<HTMLElement>("#pin-error");
+      if (error) error.hidden = true;
+      input.value = input.value.replace(/\D/g, "").slice(-1);
+      if (input.value) inputs[index + 1]?.focus();
+      updateValue();
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Backspace" && !input.value && index > 0) {
+        inputs[index - 1]?.focus();
+      } else if (event.key === "ArrowLeft" && index > 0) {
+        event.preventDefault();
+        inputs[index - 1]?.focus();
+      } else if (event.key === "ArrowRight" && index < inputs.length - 1) {
+        event.preventDefault();
+        inputs[index + 1]?.focus();
+      }
+    });
+
+    input.addEventListener("paste", (event) => {
+      const digits = event.clipboardData
+        ?.getData("text")
+        .replace(/\D/g, "")
+        .slice(0, inputs.length);
+      if (!digits) return;
+
+      event.preventDefault();
+      digits.split("").forEach((digit, digitIndex) => {
+        const digitInput = inputs[digitIndex];
+        if (digitInput) digitInput.value = digit;
+      });
+      inputs[Math.min(digits.length, inputs.length) - 1]?.focus();
+      updateValue();
+    });
+  });
+}
+
 export function renderPinScreen(
   root: HTMLElement,
   mode: PinScreenMode,
@@ -23,9 +108,8 @@ export function renderPinScreen(
             ${creating ? "Your PIN will lock information stored on this device." : "Enter your PIN to access information stored on this device."}
           </p>
           <form id="pin-form" class="pin-form" novalidate>
-            <label for="pin">${creating ? "Choose PIN" : "Four-digit PIN"}</label>
-            <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="off" pattern="[0-9]{4}" maxlength="4" required />
-            ${creating ? '<label for="confirm-pin">Confirm PIN</label><input id="confirm-pin" name="confirmPin" type="password" inputmode="numeric" autocomplete="off" pattern="[0-9]{4}" maxlength="4" required />' : ""}
+            ${renderPinInputs("pin", creating ? "Choose PIN" : "Four-digit PIN")}
+            ${creating ? renderPinInputs("confirmPin", "Confirm PIN") : ""}
             <p id="pin-error" class="form-error" role="alert" hidden></p>
             <button class="primary-button" type="submit">${creating ? "Create private space" : "Unlock"}</button>
           </form>
@@ -43,6 +127,11 @@ export function renderPinScreen(
   if (!form) {
     throw new Error("PIN form could not be rendered.");
   }
+
+  initialisePinInputs(form, "pin", !creating);
+  if (creating) initialisePinInputs(form, "confirmPin", true);
+  form.querySelector<HTMLInputElement>('[data-pin-digit="pin"]')?.focus();
+
   return form;
 }
 
@@ -52,6 +141,17 @@ export function showPinError(form: HTMLFormElement, message: string): void {
     error.textContent = message;
     error.hidden = false;
   }
+}
+
+export function clearPinInputs(form: HTMLFormElement, name = "pin"): void {
+  for (const input of form.querySelectorAll<HTMLInputElement>(
+    `[data-pin-digit="${name}"]`,
+  )) {
+    input.value = "";
+  }
+  const valueInput = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
+  if (valueInput) valueInput.value = "";
+  form.querySelector<HTMLInputElement>(`[data-pin-digit="${name}"]`)?.focus();
 }
 
 export function setPinFormBusy(form: HTMLFormElement, busy: boolean): void {
