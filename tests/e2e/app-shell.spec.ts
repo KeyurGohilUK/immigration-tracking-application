@@ -212,7 +212,26 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByLabel("Immigration role").selectOption("dependant");
   await page.getByRole("button", { name: "Save family member" }).click();
 
-  await expect(page.getByText("Freddy Test Dependant")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Freddy Test Dependant", level: 3 }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Tracking profile")).toHaveValue(/.+/);
+  await expect(page.locator("#selected-person-name")).toHaveText(
+    "Freddy Test Dependant",
+  );
+
+  await page.getByRole("link", { name: "Home", exact: true }).click();
+  await expect(page.locator("#selected-person-name")).toHaveText(
+    "Freddy Test Dependant",
+  );
+  await page.getByLabel("Tracking profile").selectOption("owner");
+  await expect(page.locator("#selected-person-name")).toHaveText(
+    TEST_PROFILE.name,
+  );
+  await page
+    .getByLabel("Tracking profile")
+    .selectOption({ label: "Freddy Test Dependant" });
+  await page.getByRole("link", { name: "Family" }).click();
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 2);
@@ -236,16 +255,21 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
     .click();
   await page.getByLabel("Full name").fill("Freddy Test Child");
   await page.getByRole("button", { name: "Save family member" }).click();
-  await expect(page.getByText("Freddy Test Child")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Freddy Test Child", level: 3 }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page.getByRole("link", { name: "Family" }).click();
-  await expect(page.getByText("Freddy Test Child")).toBeVisible();
+  await expect(page.locator("#selected-person-name")).toHaveText(
+    "Freddy Test Child",
+  );
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
   await expect(page.getByText("No family members added yet")).toBeVisible();
+  await expect(page.getByLabel("Tracking profile")).toHaveValue("owner");
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {

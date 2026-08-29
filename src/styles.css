@@ -577,6 +577,62 @@ a:focus-visible {
   margin-bottom: 0.5rem;
 }
 
+.person-switcher {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(8.5rem, 0.8fr);
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  background: var(--colour-canvas);
+}
+
+.family-main > .person-switcher {
+  margin: 0 0 0.75rem;
+  background: var(--colour-surface);
+}
+
+.person-switcher label,
+.person-switcher strong,
+.person-switcher span {
+  display: block;
+}
+
+.person-switcher label {
+  color: var(--colour-text-muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.person-switcher strong {
+  margin-top: 0.1rem;
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-switcher span {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+}
+
+.person-switcher select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0 0.65rem;
+  border: 1px solid var(--colour-strong);
+  border-radius: 0.6rem;
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
 .compact-button {
   width: 100%;
 }
@@ -610,6 +666,10 @@ a:focus-visible {
 .owner-card {
   border-color: var(--colour-strong);
   background: var(--colour-surface);
+}
+
+.selected-member-card {
+  border: 2px solid var(--colour-strong);
 }
 
 .member-avatar {
@@ -646,6 +706,17 @@ a:focus-visible {
   border: 1px solid var(--colour-border);
   border-radius: 999px;
   color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.selected-profile-badge {
+  display: inline-block;
+  margin: 0.3rem 0 0 0.35rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  color: var(--colour-on-strong);
+  background: var(--colour-strong);
   font-size: 0.68rem;
   font-weight: 750;
 }
@@ -1006,9 +1077,14 @@ p {
     font-size: 1.35rem;
   }
 
-  .welcome-card > div:last-child > p:last-child,
+  .welcome-description,
   .setup-list small {
     display: none;
+  }
+
+  .welcome-card .person-switcher {
+    margin-top: 0.45rem;
+    padding: 0.45rem 0.55rem;
   }
 
   .notice {

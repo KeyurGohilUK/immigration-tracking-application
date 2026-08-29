@@ -7,6 +7,10 @@ import {
   showFamilyMemberForm,
 } from "../features/household/components/family-page";
 import {
+  isKnownProfileId,
+  OWNER_PROFILE_ID,
+} from "../features/household/components/person-switcher";
+import {
   getFamilyMembers,
   saveFamilyMembers,
 } from "../features/household/data/family-member-repository";
@@ -51,13 +55,15 @@ const SPLASH_DURATION_MS = 500;
 export async function startApplication(root: HTMLElement): Promise<void> {
   let sessionKey: CryptoKey | null = null;
   let stopSessionLock: (() => void) | null = null;
+  let selectedProfileId = OWNER_PROFILE_ID;
 
   const showTracker = async (
     key: CryptoKey,
     record: VaultRecord,
   ): Promise<void> => {
     sessionKey = key;
-    let familyMembers: FamilyMember[] | null = null;
+    let familyMembers: FamilyMember[] = [];
+    let familyProfilesAvailable = true;
 
     const lock = (): void => {
       if (!sessionKey) return;
@@ -67,7 +73,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       showPinEntry("unlock", record);
     };
 
-    const wireAuthenticatedShell = (profile: OwnerProfile): void => {
+    const wireAuthenticatedShell = (
+      profile: OwnerProfile,
+      currentView: "Home" | "Family",
+    ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
         ?.addEventListener("click", lock);
@@ -90,25 +99,34 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (destination === "Family") {
           link.addEventListener("click", (event) => {
             event.preventDefault();
-            void showFamily(profile);
+            showFamily(profile);
           });
         }
       }
+      root
+        .querySelector<HTMLSelectElement>("#active-person")
+        ?.addEventListener("change", (event) => {
+          const profileId = (event.currentTarget as HTMLSelectElement).value;
+          if (!isKnownProfileId(profileId, familyMembers)) return;
+          selectedProfileId = profileId;
+          if (currentView === "Family") renderFamily(profile, familyMembers);
+          else renderDashboard(profile);
+        });
       stopSessionLock?.();
       stopSessionLock = startSessionLock(lock);
     };
 
     const renderDashboard = (profile: OwnerProfile): void => {
-      renderApp(root, profile.fullName);
-      wireAuthenticatedShell(profile);
+      renderApp(root, profile, familyMembers, selectedProfileId);
+      wireAuthenticatedShell(profile, "Home");
     };
 
     const renderFamily = (
       profile: OwnerProfile,
       members: FamilyMember[],
     ): void => {
-      renderFamilyPage(root, profile.fullName, members);
-      wireAuthenticatedShell(profile);
+      renderFamilyPage(root, profile, members, selectedProfileId);
+      wireAuthenticatedShell(profile, "Family");
       const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
       const form = root.querySelector<HTMLFormElement>("#family-form");
       root
@@ -120,6 +138,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       dialog?.addEventListener("click", (event) => {
         if (event.target === dialog) dialog.close();
       });
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-select-profile]",
+      )) {
+        button.addEventListener("click", () => {
+          const profileId = button.dataset.selectProfile;
+          if (!profileId || !isKnownProfileId(profileId, members)) return;
+          selectedProfileId = profileId;
+          renderFamily(profile, members);
+        });
+      }
 
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-edit-member]",
@@ -150,6 +179,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           try {
             await saveFamilyMembers(nextMembers, key);
             familyMembers = nextMembers;
+            if (selectedProfileId === member.id)
+              selectedProfileId = OWNER_PROFILE_ID;
             renderFamily(profile, nextMembers);
           } catch {
             const error = root.querySelector<HTMLElement>("#family-page-error");
@@ -195,6 +226,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         try {
           await saveFamilyMembers(nextMembers, key);
           familyMembers = nextMembers;
+          familyProfilesAvailable = true;
+          if (!existingMember) selectedProfileId = member.id;
           dialog?.close();
           renderFamily(profile, nextMembers);
         } catch {
@@ -208,16 +241,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       });
     };
 
-    const showFamily = async (profile: OwnerProfile): Promise<void> => {
-      if (familyMembers !== null) {
-        renderFamily(profile, familyMembers);
-        return;
-      }
-      try {
-        familyMembers = await getFamilyMembers(key);
-        renderFamily(profile, familyMembers);
-      } catch {
-        renderFamily(profile, []);
+    const showFamily = (profile: OwnerProfile): void => {
+      renderFamily(profile, familyMembers);
+      if (!familyProfilesAvailable) {
         const addMember =
           root.querySelector<HTMLButtonElement>("#add-family-member");
         if (addMember) addMember.disabled = true;
@@ -233,6 +259,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     try {
       const profile = await getOwnerProfile(key);
       if (profile) {
+        try {
+          familyMembers = await getFamilyMembers(key);
+        } catch {
+          familyMembers = [];
+          familyProfilesAvailable = false;
+        }
+        if (!isKnownProfileId(selectedProfileId, familyMembers))
+          selectedProfileId = OWNER_PROFILE_ID;
         renderDashboard(profile);
         return;
       }

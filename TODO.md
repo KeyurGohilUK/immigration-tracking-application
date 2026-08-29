@@ -106,7 +106,7 @@ visual polish and public release.
       owner, and main-applicant or dependant status only where needed.
 - [x] Give every family member an internal identifier so permissions, trips,
       calculations, and backups remain correctly associated.
-- [ ] Allow the user to switch between family members from the dashboard.
+- [x] Allow the user to switch between family members from the dashboard.
 - [ ] Clearly show when a family member’s immigration route does not yet have a
       supported eligibility calculation.
 - [ ] Add, edit, and delete immigration-permission records for each family
@@ -166,7 +166,7 @@ visual polish and public release.
 - [ ] Add mobile bottom navigation for Dashboard, Family, Trips, and More.
 - [ ] Add a clear locked screen with PIN entry and safe reset guidance.
 - [ ] Add a visible lock-now action and configurable inactivity timeout.
-- [ ] Show the currently selected family member consistently on every relevant
+- [x] Show the currently selected family member consistently on every relevant
       screen.
 - [ ] Create a chronological immigration and travel timeline.
 - [ ] Show a rolling-absence risk summary without implying legal certainty.
