@@ -589,6 +589,10 @@ a:focus-visible {
   gap: 0.6rem;
 }
 
+.record-heading-actions.single-action {
+  grid-template-columns: 1fr;
+}
+
 .record-heading-actions .secondary-button,
 .record-heading-actions .primary-button {
   min-height: 2.75rem;
@@ -623,6 +627,22 @@ a:focus-visible {
 .record-card h3 {
   margin: 0;
   font-size: 1rem;
+}
+
+.trip-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.trip-notes {
+  margin: 0.25rem 0 0;
+  padding: 0.65rem;
+  border-radius: 0.55rem;
+  background: var(--colour-surface);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
 }
 
 .record-dates {
@@ -879,7 +899,8 @@ a:focus-visible {
 }
 
 .family-form input,
-.family-form select {
+.family-form select,
+.family-form textarea {
   width: 100%;
   min-height: 3rem;
   padding: 0 0.85rem;
@@ -887,13 +908,50 @@ a:focus-visible {
   border-radius: var(--radius-small);
   color: var(--colour-text);
   background: var(--colour-canvas);
+  font: inherit;
 }
 
 .family-form input:focus,
-.family-form select:focus {
+.family-form select:focus,
+.family-form textarea:focus {
   border-color: var(--colour-strong);
   outline: 2px solid var(--colour-strong);
   outline-offset: 2px;
+}
+
+.family-form textarea {
+  padding: 0.75rem 0.85rem;
+  resize: vertical;
+}
+
+.family-form .checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0.35rem 0;
+  padding: 0.75rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+}
+
+.family-form .checkbox-field input {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  min-height: 1.25rem;
+  margin: 0.1rem 0 0;
+  padding: 0;
+  accent-color: var(--colour-strong);
+}
+
+.checkbox-field strong,
+.checkbox-field small {
+  display: block;
+}
+
+.checkbox-field small {
+  margin-top: 0.2rem;
+  color: var(--colour-text-muted);
+  font-weight: 500;
 }
 
 .family-form #other-route-field:not([hidden]) {
