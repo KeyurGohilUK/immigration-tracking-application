@@ -1,5 +1,5 @@
 import { isValidPin } from "../domain/pin";
-import { bytesToHex, hexToBytes } from "./crypto-encoding";
+import { bytesToHex, hexToBytes } from "../../../shared/encoding/hex";
 
 const KEY_DERIVATION_ITERATIONS = 310_000;
 const VALIDATION_MESSAGE = "urbanfox-ilr-vault-v1";
