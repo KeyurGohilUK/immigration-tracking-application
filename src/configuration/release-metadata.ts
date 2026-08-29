@@ -1,6 +1,7 @@
-export const APP_VERSION = "0.4.0";
+export const APP_VERSION = "0.5.0";
 
 export const RELEASE_NOTES = [
+  "Added encrypted trip tracking with open trips and manual-review flags.",
   "Added encrypted immigration-permission history for each selected profile.",
   "Added consistent household-profile switching across Home and Family.",
   "Added encrypted family-member profiles with add, edit, and delete controls.",
