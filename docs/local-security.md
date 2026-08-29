@@ -21,13 +21,16 @@ fresh AES-GCM initialisation vector per encryption operation.
 Household-owner and family-member profiles are JSON-encoded, encrypted with a
 fresh AES-GCM initialisation vector, and stored in the IndexedDB `profiles`
 store. Immigration permissions use the separate `permissions` store and are
-encrypted independently for each profile identifier. Stored records are
-decrypted and structurally validated only after a successful PIN unlock.
+encrypted independently for each profile identifier. Travel history uses a
+separate `trips` store with the same per-profile encryption boundary. Stored
+records are decrypted and structurally validated only after a successful PIN
+unlock.
 
-IndexedDB schema version 3 adds the `permissions` store without rewriting or
-deleting the existing `security` and `profiles` stores. Every decrypted domain
-record also carries its own version and is rejected if its structure, version,
-profile association, date ordering, or identifier uniqueness is invalid.
+IndexedDB schema version 4 adds the `trips` store without rewriting or deleting
+the existing `security`, `profiles`, or `permissions` stores. Every decrypted
+domain record also carries its own version and is rejected if its structure,
+version, profile association, date ordering, or identifier uniqueness is
+invalid.
 
 ## Security boundary
 
