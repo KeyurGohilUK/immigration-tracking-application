@@ -19,13 +19,18 @@ const navigationItems = [
   },
 ] as const;
 
-function renderNavigation(className: string): string {
+export type NavigationId = (typeof navigationItems)[number]["label"];
+
+function renderNavigation(
+  className: string,
+  activeNavigation: NavigationId,
+): string {
   return `
     <nav class="primary-navigation ${className}" aria-label="Primary navigation">
       ${navigationItems
         .map(
-          ({ label, icon }, index) => `
-            <a href="#${label.toLowerCase()}" ${index === 0 ? 'aria-current="page"' : ""}>
+          ({ label, icon }) => `
+            <a href="#${label.toLowerCase()}" data-navigation="${label}" ${label === activeNavigation ? 'aria-current="page"' : ""}>
               <svg aria-hidden="true" viewBox="0 0 24 24">${icon}</svg>
               <span class="navigation-label">${label}</span>
             </a>`,
@@ -35,7 +40,11 @@ function renderNavigation(className: string): string {
   `;
 }
 
-export function renderApp(root: HTMLElement, ownerName?: string): void {
+export function renderAppShell(
+  root: HTMLElement,
+  activeNavigation: NavigationId,
+  mainContent: string,
+): void {
   root.innerHTML = `
     <div class="app-shell">
       <header class="top-bar">
@@ -43,7 +52,7 @@ export function renderApp(root: HTMLElement, ownerName?: string): void {
           <span class="wordmark-mark" aria-hidden="true">UF</span>
           <span>${APP_NAME}</span>
         </a>
-        ${renderNavigation("desktop-navigation")}
+        ${renderNavigation("desktop-navigation", activeNavigation)}
         <div class="header-actions">
           <button class="icon-button" type="button" aria-label="Lock app">
             <span aria-hidden="true">⌑</span>
@@ -51,7 +60,19 @@ export function renderApp(root: HTMLElement, ownerName?: string): void {
         </div>
       </header>
 
-      <main id="main-content" class="main-content">
+      ${mainContent}
+
+      ${renderNavigation("mobile-navigation", activeNavigation)}
+
+    </div>
+  `;
+}
+
+export function renderApp(root: HTMLElement, ownerName?: string): void {
+  renderAppShell(
+    root,
+    "Home",
+    `<main id="main-content" class="main-content">
         <section class="welcome-card" aria-labelledby="welcome-title">
           <div class="freddy-placeholder" aria-label="Freddy the Urban Fox artwork is coming soon">
             <span aria-hidden="true">F</span>
@@ -90,12 +111,8 @@ export function renderApp(root: HTMLElement, ownerName?: string): void {
           </ol>
           <button class="primary-button" type="button" disabled>Setup coming next</button>
         </section>
-      </main>
-
-      ${renderNavigation("mobile-navigation")}
-
-    </div>
-  `;
+      </main>`,
+  );
   const ownerNameElement = root.querySelector<HTMLElement>("#owner-name");
   if (ownerNameElement && ownerName) ownerNameElement.textContent = ownerName;
 }

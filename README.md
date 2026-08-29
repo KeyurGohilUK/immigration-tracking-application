@@ -20,6 +20,8 @@ screen.
 Local profiles are protected by a four-digit PIN. The PIN derives an encryption
 key in the browser and is never stored; see [Local PIN and encrypted
 vault](docs/local-security.md) for the design and its limitations.
+Household owners can add, edit, and delete separate encrypted family-member
+profiles without sending those details to a server.
 
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is

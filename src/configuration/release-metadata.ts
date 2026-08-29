@@ -1,6 +1,7 @@
-export const APP_VERSION = "0.2.3";
+export const APP_VERSION = "0.3.0";
 
 export const RELEASE_NOTES = [
+  "Added encrypted family-member profiles with add, edit, and delete controls.",
   "Returning users now go directly to a four-box MPIN unlock screen.",
   "Added a compact no-scroll mobile Home and floating icon navigation.",
   "Moved install and update access into every screen header.",
