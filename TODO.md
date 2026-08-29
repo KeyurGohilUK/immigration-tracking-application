@@ -101,10 +101,10 @@ visual polish and public release.
 
 - [x] Add a local household-owner profile with only information necessary for
       calculations.
-- [ ] Add, edit, and delete family-member profiles within the household.
-- [ ] Record each member’s name, date of birth, relationship to the household
+- [x] Add, edit, and delete family-member profiles within the household.
+- [x] Record each member’s name, date of birth, relationship to the household
       owner, and main-applicant or dependant status only where needed.
-- [ ] Give every family member an internal identifier so permissions, trips,
+- [x] Give every family member an internal identifier so permissions, trips,
       calculations, and backups remain correctly associated.
 - [ ] Allow the user to switch between family members from the dashboard.
 - [ ] Clearly show when a family member’s immigration route does not yet have a
