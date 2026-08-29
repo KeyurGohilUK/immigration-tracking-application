@@ -220,7 +220,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
     "Freddy Test Dependant",
   );
 
-  await page.getByRole("link", { name: "Home" }).click();
+  await page.getByRole("link", { name: "Home", exact: true }).click();
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Dependant",
   );
