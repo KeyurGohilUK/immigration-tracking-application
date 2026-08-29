@@ -1,6 +1,7 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "notes": [
+    "Moved install and update access into every screen header.",
     "Added encrypted household-owner profiles.",
     "Added versioned Terms and privacy acceptance.",
     "Improved desktop action visibility and app updates."
