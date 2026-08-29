@@ -1,6 +1,17 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import {
+  readTripInput,
+  renderTripsPage,
+  showTripForm,
+} from "../features/travel/components/trips-page";
+import { getTrips, saveTrips } from "../features/travel/data/trip-repository";
+import {
+  findOverlappingTrip,
+  validateTripInput,
+  type Trip,
+} from "../features/travel/domain/trip";
+import {
   readImmigrationPermissionInput,
   renderImmigrationHistoryPage,
   showImmigrationPermissionForm,
@@ -80,6 +91,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     let familyMembers: FamilyMember[] = [];
     let familyProfilesAvailable = true;
     const permissionCache = new Map<string, ImmigrationPermission[]>();
+    const tripCache = new Map<string, Trip[]>();
 
     const lock = (): void => {
       if (!sessionKey) return;
@@ -91,7 +103,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const wireAuthenticatedShell = (
       profile: OwnerProfile,
-      currentView: "Home" | "Family" | "Permissions",
+      currentView: "Home" | "Family" | "Permissions" | "Trips",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -118,6 +130,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             showFamily(profile);
           });
         }
+        if (destination === "Trips") {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            void showTrips(profile);
+          });
+        }
       }
       root
         .querySelector<HTMLSelectElement>("#active-person")
@@ -127,6 +145,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           selectedProfileId = profileId;
           if (currentView === "Family") renderFamily(profile, familyMembers);
           else if (currentView === "Permissions") void showPermissions(profile);
+          else if (currentView === "Trips") void showTrips(profile);
           else renderDashboard(profile);
         });
       stopSessionLock?.();
@@ -428,6 +447,135 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (error) {
           error.textContent =
             "This profile’s encrypted immigration permissions could not be opened.";
+          error.hidden = false;
+        }
+      }
+    };
+
+    const renderTrips = (profile: OwnerProfile, trips: Trip[]): void => {
+      renderTripsPage(root, profile, familyMembers, selectedProfileId, trips);
+      wireAuthenticatedShell(profile, "Trips");
+      const dialog = root.querySelector<HTMLDialogElement>("#trip-dialog");
+      const form = root.querySelector<HTMLFormElement>("#trip-form");
+      root
+        .querySelector<HTMLButtonElement>("#add-trip")
+        ?.addEventListener("click", () => showTripForm(root));
+      root
+        .querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => dialog?.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-trip]",
+      )) {
+        button.addEventListener("click", () => {
+          const trip = trips.find(({ id }) => id === button.dataset.editTrip);
+          if (trip) showTripForm(root, trip);
+        });
+      }
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-delete-trip]",
+      )) {
+        button.addEventListener("click", async () => {
+          const trip = trips.find(({ id }) => id === button.dataset.deleteTrip);
+          if (
+            !trip ||
+            !window.confirm(
+              `Delete the trip to ${trip.destination}? This cannot be undone.`,
+            )
+          )
+            return;
+          const nextTrips = trips.filter(({ id }) => id !== trip.id);
+          try {
+            await saveTrips(selectedProfileId, nextTrips, key);
+            tripCache.set(selectedProfileId, nextTrips);
+            renderTrips(profile, nextTrips);
+          } catch {
+            const error = root.querySelector<HTMLElement>("#trip-page-error");
+            if (error) {
+              error.textContent =
+                "The trip could not be deleted. Your existing data is unchanged.";
+              error.hidden = false;
+            }
+          }
+        });
+      }
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { tripId, input } = readTripInput(form);
+        const error = form.querySelector<HTMLElement>("#trip-form-error");
+        const validationError = validateTripInput(input);
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const overlap = findOverlappingTrip(input, trips, tripId);
+        if (overlap) {
+          if (error) {
+            error.textContent = `This trip overlaps the existing trip to ${overlap.destination}. Edit the existing dates first.`;
+            error.hidden = false;
+          }
+          return;
+        }
+        const existing = trips.find(({ id }) => id === tripId);
+        const timestamp = new Date().toISOString();
+        const trip: Trip = {
+          version: 1,
+          id: existing?.id ?? crypto.randomUUID(),
+          profileId: selectedProfileId,
+          ...input,
+          createdAt: existing?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        };
+        const nextTrips = existing
+          ? trips.map((current) =>
+              current.id === existing.id ? trip : current,
+            )
+          : [...trips, trip];
+        const submit = form.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveTrips(selectedProfileId, nextTrips, key);
+          tripCache.set(selectedProfileId, nextTrips);
+          dialog?.close();
+          renderTrips(profile, nextTrips);
+        } catch {
+          if (error) {
+            error.textContent = "This encrypted trip could not be saved.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
+    };
+
+    const showTrips = async (profile: OwnerProfile): Promise<void> => {
+      const cached = tripCache.get(selectedProfileId);
+      if (cached) {
+        renderTrips(profile, cached);
+        return;
+      }
+      try {
+        const trips = await getTrips(selectedProfileId, key);
+        tripCache.set(selectedProfileId, trips);
+        renderTrips(profile, trips);
+      } catch {
+        renderTrips(profile, []);
+        const add = root.querySelector<HTMLButtonElement>("#add-trip");
+        if (add) add.disabled = true;
+        const error = root.querySelector<HTMLElement>("#trip-page-error");
+        if (error) {
+          error.textContent =
+            "This profile’s encrypted travel records could not be opened.";
           error.hidden = false;
         }
       }
