@@ -192,6 +192,62 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(".pin-digit")).toHaveCount(4);
 });
 
+test("adds, edits, persists, and deletes an encrypted family member", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Family" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Your family" }),
+  ).toBeVisible();
+  await expect(page.getByText("No family members added yet")).toBeVisible();
+  await page.getByRole("button", { name: "Add family member" }).click();
+  await page.getByLabel("Full name").fill("Freddy Test Dependant");
+  await page.getByLabel("Date of birth").fill("2005-06-15");
+  await page
+    .getByLabel("Relationship to household owner")
+    .selectOption("child");
+  await page.getByLabel("Immigration role").selectOption("dependant");
+  await page.getByRole("button", { name: "Save family member" }).click();
+
+  await expect(page.getByText("Freddy Test Dependant")).toBeVisible();
+  const storedFamily = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 2);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("profiles", "readonly")
+        .objectStore("profiles")
+        .get("family-members");
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  });
+  expect(storedFamily).not.toContain("Freddy Test Dependant");
+  expect(storedFamily).toContain("ciphertext");
+
+  await page
+    .getByRole("button", { name: "Edit Freddy Test Dependant" })
+    .click();
+  await page.getByLabel("Full name").fill("Freddy Test Child");
+  await page.getByRole("button", { name: "Save family member" }).click();
+  await expect(page.getByText("Freddy Test Child")).toBeVisible();
+
+  await page.getByRole("button", { name: "Lock app" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Family" }).click();
+  await expect(page.getByText("Freddy Test Child")).toBeVisible();
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
+  await expect(page.getByText("No family members added yet")).toBeVisible();
+});
+
 test("uses an app layout on mobile", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
   await page.goto("/");
