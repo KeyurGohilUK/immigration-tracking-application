@@ -567,6 +567,104 @@ a:focus-visible {
   padding: 1rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
 }
 
+.record-main {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
+}
+
+.record-heading {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.record-heading h1 {
+  margin-bottom: 0.5rem;
+}
+
+.record-heading-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.record-heading-actions .secondary-button,
+.record-heading-actions .primary-button {
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0 0.65rem;
+  font-size: 0.75rem;
+}
+
+.compact-notice {
+  margin: 0.75rem 0 1rem;
+}
+
+.record-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.record-card {
+  padding: 0.9rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-medium);
+  background: var(--colour-canvas);
+}
+
+.record-card-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.record-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.record-dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.record-dates div {
+  min-width: 0;
+  padding: 0.55rem;
+  border-radius: 0.55rem;
+  background: var(--colour-surface);
+}
+
+.record-dates dt {
+  color: var(--colour-text-muted);
+  font-size: 0.62rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.record-dates dd {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.calculation-support {
+  padding: 0.55rem 0.65rem;
+  border-left: 3px solid var(--colour-strong);
+  background: var(--colour-surface);
+  font-size: 0.75rem;
+}
+
+.optional-label {
+  color: var(--colour-text-muted);
+  font-weight: 500;
+}
+
 .family-heading {
   display: grid;
   gap: 1rem;
@@ -796,6 +894,15 @@ a:focus-visible {
   border-color: var(--colour-strong);
   outline: 2px solid var(--colour-strong);
   outline-offset: 2px;
+}
+
+.family-form #other-route-field:not([hidden]) {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.family-form [hidden] {
+  display: none;
 }
 
 .field-guidance {
@@ -1197,6 +1304,26 @@ p {
     margin: 0 auto;
     overflow: visible;
     padding: 2.5rem 2rem 4rem;
+  }
+
+  .record-main {
+    width: min(100%, 72rem);
+    margin: 0 auto;
+    overflow: visible;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  .record-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .record-heading-actions {
+    min-width: 22rem;
+  }
+
+  .record-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .family-heading {
