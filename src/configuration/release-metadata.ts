@@ -1,6 +1,7 @@
-export const APP_VERSION = "0.3.1";
+export const APP_VERSION = "0.4.0";
 
 export const RELEASE_NOTES = [
+  "Added encrypted immigration-permission history for each selected profile.",
   "Added consistent household-profile switching across Home and Family.",
   "Added encrypted family-member profiles with add, edit, and delete controls.",
   "Returning users now go directly to a four-box MPIN unlock screen.",
