@@ -15,6 +15,7 @@ import {
   saveCurrentTermsAcceptance,
 } from "../features/legal/data/terms-repository";
 import {
+  clearPinInputs,
   renderPinScreen,
   setPinFormBusy,
   showPinError,
@@ -154,6 +155,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
         failedAttempts += 1;
         showPinError(form, "That PIN could not unlock this private space.");
+        clearPinInputs(form);
         if (failedAttempts >= 5) {
           showPinError(form, "Too many attempts. Try again in 30 seconds.");
           window.setTimeout(() => {
@@ -231,5 +233,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
   await new Promise((resolve) =>
     window.setTimeout(resolve, SPLASH_DURATION_MS),
   );
+  try {
+    const record = await getVaultRecord();
+    if (record) {
+      showPinEntry("unlock", record);
+      return;
+    }
+  } catch {
+    // The normal setup flow will display a storage error if the user continues.
+  }
   showLanding();
 }
