@@ -1,5 +1,20 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
+import {
+  readImmigrationPermissionInput,
+  renderImmigrationHistoryPage,
+  showImmigrationPermissionForm,
+  updateOtherRouteField,
+} from "../features/immigration/components/immigration-history-page";
+import {
+  getImmigrationPermissions,
+  saveImmigrationPermissions,
+} from "../features/immigration/data/immigration-permission-repository";
+import {
+  getPermissionRouteLabel,
+  validateImmigrationPermissionInput,
+  type ImmigrationPermission,
+} from "../features/immigration/domain/immigration-permission";
 import { renderOwnerProfileForm } from "../features/household/components/owner-profile-form";
 import {
   readFamilyMemberInput,
@@ -64,6 +79,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     sessionKey = key;
     let familyMembers: FamilyMember[] = [];
     let familyProfilesAvailable = true;
+    const permissionCache = new Map<string, ImmigrationPermission[]>();
 
     const lock = (): void => {
       if (!sessionKey) return;
@@ -75,7 +91,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const wireAuthenticatedShell = (
       profile: OwnerProfile,
-      currentView: "Home" | "Family",
+      currentView: "Home" | "Family" | "Permissions",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -110,6 +126,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (!isKnownProfileId(profileId, familyMembers)) return;
           selectedProfileId = profileId;
           if (currentView === "Family") renderFamily(profile, familyMembers);
+          else if (currentView === "Permissions") void showPermissions(profile);
           else renderDashboard(profile);
         });
       stopSessionLock?.();
@@ -119,6 +136,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const renderDashboard = (profile: OwnerProfile): void => {
       renderApp(root, profile, familyMembers, selectedProfileId);
       wireAuthenticatedShell(profile, "Home");
+      root
+        .querySelector<HTMLButtonElement>("#manage-permissions")
+        ?.addEventListener("click", () => void showPermissions(profile));
     };
 
     const renderFamily = (
@@ -251,6 +271,163 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (error) {
           error.textContent =
             "Your encrypted family profiles could not be opened.";
+          error.hidden = false;
+        }
+      }
+    };
+
+    const renderPermissions = (
+      profile: OwnerProfile,
+      permissions: ImmigrationPermission[],
+    ): void => {
+      renderImmigrationHistoryPage(
+        root,
+        profile,
+        familyMembers,
+        selectedProfileId,
+        permissions,
+      );
+      wireAuthenticatedShell(profile, "Permissions");
+      const dialog =
+        root.querySelector<HTMLDialogElement>("#permission-dialog");
+      const form = root.querySelector<HTMLFormElement>("#permission-form");
+      root
+        .querySelector<HTMLButtonElement>("#back-to-dashboard")
+        ?.addEventListener("click", () => renderDashboard(profile));
+      root
+        .querySelector<HTMLButtonElement>("#add-permission")
+        ?.addEventListener("click", () => showImmigrationPermissionForm(root));
+      root
+        .querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => dialog?.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+      form
+        ?.querySelector<HTMLSelectElement>("#permission-route")
+        ?.addEventListener("change", () => updateOtherRouteField(form));
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-permission]",
+      )) {
+        button.addEventListener("click", () => {
+          const permission = permissions.find(
+            ({ id }) => id === button.dataset.editPermission,
+          );
+          if (permission) showImmigrationPermissionForm(root, permission);
+        });
+      }
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-delete-permission]",
+      )) {
+        button.addEventListener("click", async () => {
+          const permission = permissions.find(
+            ({ id }) => id === button.dataset.deletePermission,
+          );
+          if (
+            !permission ||
+            !window.confirm(
+              `Delete the ${getPermissionRouteLabel(permission)} permission? This cannot be undone.`,
+            )
+          )
+            return;
+          const nextPermissions = permissions.filter(
+            ({ id }) => id !== permission.id,
+          );
+          try {
+            await saveImmigrationPermissions(
+              selectedProfileId,
+              nextPermissions,
+              key,
+            );
+            permissionCache.set(selectedProfileId, nextPermissions);
+            renderPermissions(profile, nextPermissions);
+          } catch {
+            const error = root.querySelector<HTMLElement>(
+              "#permission-page-error",
+            );
+            if (error) {
+              error.textContent =
+                "The permission could not be deleted. Your existing data is unchanged.";
+              error.hidden = false;
+            }
+          }
+        });
+      }
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { permissionId, input } = readImmigrationPermissionInput(form);
+        const validationError = validateImmigrationPermissionInput(input);
+        const error = form.querySelector<HTMLElement>("#permission-form-error");
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const existing = permissions.find(({ id }) => id === permissionId);
+        const timestamp = new Date().toISOString();
+        const permission: ImmigrationPermission = {
+          version: 1,
+          id: existing?.id ?? crypto.randomUUID(),
+          profileId: selectedProfileId,
+          ...input,
+          createdAt: existing?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        };
+        const nextPermissions = existing
+          ? permissions.map((current) =>
+              current.id === existing.id ? permission : current,
+            )
+          : [...permissions, permission];
+        const submit = form.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveImmigrationPermissions(
+            selectedProfileId,
+            nextPermissions,
+            key,
+          );
+          permissionCache.set(selectedProfileId, nextPermissions);
+          dialog?.close();
+          renderPermissions(profile, nextPermissions);
+        } catch {
+          if (error) {
+            error.textContent =
+              "This encrypted immigration permission could not be saved.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
+    };
+
+    const showPermissions = async (profile: OwnerProfile): Promise<void> => {
+      const cached = permissionCache.get(selectedProfileId);
+      if (cached) {
+        renderPermissions(profile, cached);
+        return;
+      }
+      try {
+        const permissions = await getImmigrationPermissions(
+          selectedProfileId,
+          key,
+        );
+        permissionCache.set(selectedProfileId, permissions);
+        renderPermissions(profile, permissions);
+      } catch {
+        renderPermissions(profile, []);
+        const add = root.querySelector<HTMLButtonElement>("#add-permission");
+        if (add) add.disabled = true;
+        const error = root.querySelector<HTMLElement>("#permission-page-error");
+        if (error) {
+          error.textContent =
+            "This profile’s encrypted immigration permissions could not be opened.";
           error.hidden = false;
         }
       }
