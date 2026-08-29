@@ -121,7 +121,7 @@ export function renderApp(
             <li><span aria-hidden="true">2</span><div><strong>Add your household</strong><small>Keep each family member separate</small></div></li>
             <li><span aria-hidden="true">3</span><div><strong>Record immigration history</strong><small>Add permissions and UK arrival dates</small></div></li>
           </ol>
-          <button class="primary-button" type="button" disabled>Setup coming next</button>
+          <button id="manage-permissions" class="primary-button" type="button">Manage immigration history</button>
         </section>
       </main>`,
   );

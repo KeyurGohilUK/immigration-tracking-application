@@ -1,19 +1,14 @@
-import {
-  DATABASE_STORES,
-  openAppDatabase,
-} from "../../../infrastructure/storage/app-database";
-import {
-  bytesToHex,
-  hexToBytes,
-} from "../../security/services/crypto-encoding";
+import { bytesToHex, hexToBytes } from "../../shared/encoding/hex";
+import { openAppDatabase, type AppDatabaseStore } from "./app-database";
 
-interface EncryptedProfileRecord {
+interface EncryptedRecord {
   version: 1;
   initializationVector: string;
   ciphertext: string;
 }
 
-export async function saveEncryptedProfileRecord(
+export async function saveEncryptedRecord(
+  storeName: AppDatabaseStore,
   recordKey: string,
   value: unknown,
   key: CryptoKey,
@@ -24,47 +19,40 @@ export async function saveEncryptedProfileRecord(
     key,
     new TextEncoder().encode(JSON.stringify(value)),
   );
-  const record: EncryptedProfileRecord = {
+  const record: EncryptedRecord = {
     version: 1,
     initializationVector: bytesToHex(initializationVector),
     ciphertext: bytesToHex(new Uint8Array(encrypted)),
   };
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
-    const transaction = database.transaction(
-      DATABASE_STORES.profiles,
-      "readwrite",
-    );
-    transaction.objectStore(DATABASE_STORES.profiles).put(record, recordKey);
+    const transaction = database.transaction(storeName, "readwrite");
+    transaction.objectStore(storeName).put(record, recordKey);
     transaction.oncomplete = () => {
       database.close();
       resolve();
     };
     transaction.onerror = () => {
       database.close();
-      reject(new Error("Encrypted profile data could not be saved."));
+      reject(new Error("Encrypted local data could not be saved."));
     };
   });
 }
 
-export async function getEncryptedProfileRecord(
+export async function getEncryptedRecord(
+  storeName: AppDatabaseStore,
   recordKey: string,
   key: CryptoKey,
 ): Promise<unknown | null> {
   const database = await openAppDatabase();
-  const record = await new Promise<EncryptedProfileRecord | null>(
+  const record = await new Promise<EncryptedRecord | null>(
     (resolve, reject) => {
-      const transaction = database.transaction(
-        DATABASE_STORES.profiles,
-        "readonly",
-      );
-      const request = transaction
-        .objectStore(DATABASE_STORES.profiles)
-        .get(recordKey);
+      const transaction = database.transaction(storeName, "readonly");
+      const request = transaction.objectStore(storeName).get(recordKey);
       request.onsuccess = () =>
-        resolve((request.result as EncryptedProfileRecord | undefined) ?? null);
+        resolve((request.result as EncryptedRecord | undefined) ?? null);
       request.onerror = () =>
-        reject(new Error("Encrypted profile data could not be read."));
+        reject(new Error("Encrypted local data could not be read."));
       transaction.oncomplete = () => database.close();
     },
   );
@@ -74,7 +62,7 @@ export async function getEncryptedProfileRecord(
     typeof record.initializationVector !== "string" ||
     typeof record.ciphertext !== "string"
   )
-    throw new Error("Encrypted profile data is invalid.");
+    throw new Error("Encrypted local data is invalid.");
   const decrypted = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv: hexToBytes(record.initializationVector) },
     key,

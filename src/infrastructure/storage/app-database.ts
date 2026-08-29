@@ -1,10 +1,14 @@
 export const DATABASE_STORES = {
   security: "security",
   profiles: "profiles",
+  permissions: "permissions",
 } as const;
 
+export type AppDatabaseStore =
+  (typeof DATABASE_STORES)[keyof typeof DATABASE_STORES];
+
 const DATABASE_NAME = "urbanfox-ilr";
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 export function openAppDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

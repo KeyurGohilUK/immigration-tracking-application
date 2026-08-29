@@ -18,11 +18,16 @@ account means creating a private vault in the browser on the current device.
 Future personal-data records must be encrypted with the in-memory key and a
 fresh AES-GCM initialisation vector per encryption operation.
 
-The household-owner profile is the first encrypted personal-data record. Its
-name and date of birth are JSON-encoded, encrypted with a fresh AES-GCM
-initialisation vector, and stored in the IndexedDB `profiles` store. Stored
-records are decrypted and structurally validated only after a successful PIN
-unlock.
+Household-owner and family-member profiles are JSON-encoded, encrypted with a
+fresh AES-GCM initialisation vector, and stored in the IndexedDB `profiles`
+store. Immigration permissions use the separate `permissions` store and are
+encrypted independently for each profile identifier. Stored records are
+decrypted and structurally validated only after a successful PIN unlock.
+
+IndexedDB schema version 3 adds the `permissions` store without rewriting or
+deleting the existing `security` and `profiles` stores. Every decrypted domain
+record also carries its own version and is rejected if its structure, version,
+profile association, date ordering, or identifier uniqueness is invalid.
 
 ## Security boundary
 
