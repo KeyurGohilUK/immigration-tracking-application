@@ -1,10 +1,22 @@
 import { APP_NAME } from "../configuration/app-metadata";
 
 const navigationItems = [
-  { label: "Home", icon: "⌂" },
-  { label: "Family", icon: "♙" },
-  { label: "Trips", icon: "↗" },
-  { label: "More", icon: "•••" },
+  {
+    label: "Home",
+    icon: '<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z" />',
+  },
+  {
+    label: "Family",
+    icon: '<circle cx="9" cy="8" r="3" /><circle cx="17" cy="9" r="2.5" /><path d="M3 20c0-4 2.5-6 6-6s6 2 6 6M14 15c3.5-.5 6 1.2 7 4.5" />',
+  },
+  {
+    label: "Trips",
+    icon: '<path d="m3 11 18-7-7 18-2.5-8.5ZM11.5 13.5 21 4" />',
+  },
+  {
+    label: "More",
+    icon: '<circle cx="5" cy="12" r="1" fill="currentColor" /><circle cx="12" cy="12" r="1" fill="currentColor" /><circle cx="19" cy="12" r="1" fill="currentColor" />',
+  },
 ] as const;
 
 function renderNavigation(className: string): string {
@@ -14,8 +26,8 @@ function renderNavigation(className: string): string {
         .map(
           ({ label, icon }, index) => `
             <a href="#${label.toLowerCase()}" ${index === 0 ? 'aria-current="page"' : ""}>
-              <span aria-hidden="true">${icon}</span>
-              <span>${label}</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24">${icon}</svg>
+              <span class="navigation-label">${label}</span>
             </a>`,
         )
         .join("")}

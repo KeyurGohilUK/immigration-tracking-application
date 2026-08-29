@@ -1,21 +1,29 @@
 import { expect, test } from "@playwright/test";
 
+const TEST_PROFILE = {
+  name: "Urban Fox Test User",
+  dateOfBirth: "2000-01-01",
+  pin: "2468",
+} as const;
+
 async function createLocalProfile(
   page: import("@playwright/test").Page,
 ): Promise<void> {
   await page.getByRole("button", { name: "Get started" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
-  await page.getByLabel("Choose PIN").fill("4826");
-  await page.getByLabel("Confirm PIN").fill("4826");
+  await page.getByLabel("Choose PIN").fill(TEST_PROFILE.pin);
+  await page.getByLabel("Confirm PIN").fill(TEST_PROFILE.pin);
   await page.getByRole("button", { name: "Create private space" }).click();
-  await page.getByLabel("Full name").fill("Keyur Gohil");
-  await page.getByLabel("Date of birth").fill("1990-01-15");
+  await page.getByLabel("Full name").fill(TEST_PROFILE.name);
+  await page.getByLabel("Date of birth").fill(TEST_PROFILE.dateOfBirth);
   await page.getByRole("button", { name: "Save local profile" }).click();
   await expect(
     page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
   ).toBeVisible();
-  await expect(page.getByText("Welcome back, Keyur Gohil.")).toBeVisible();
+  await expect(
+    page.getByText(`Welcome back, ${TEST_PROFILE.name}.`),
+  ).toBeVisible();
 }
 
 test("shows the anonymous landing page without tracker controls", async ({
@@ -150,7 +158,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
       request.onerror = () => reject(request.error);
     });
   });
-  expect(storedProfile).not.toContain("Keyur Gohil");
+  expect(storedProfile).not.toContain(TEST_PROFILE.name);
   expect(storedProfile).toContain("ciphertext");
   await page.getByRole("button", { name: "Lock app" }).click();
 
@@ -161,7 +169,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await page.getByRole("button", { name: "Unlock" }).click();
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
-  await page.getByLabel("Four-digit PIN").fill("4826");
+  await page.getByLabel("Four-digit PIN").fill(TEST_PROFILE.pin);
   await page.getByRole("button", { name: "Unlock" }).click();
   await expect(
     page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
@@ -182,10 +190,36 @@ test("uses an app layout on mobile", async ({ page }, testInfo) => {
   const navigationBox = await page
     .getByRole("navigation", { name: "Primary navigation" })
     .boundingBox();
+  const viewport = await page.evaluate(() => ({
+    height: window.innerHeight,
+    width: window.innerWidth,
+    scrollHeight: document.documentElement.scrollHeight,
+  }));
+  const navigationStyles = await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .evaluate((navigation) => {
+      const style = window.getComputedStyle(navigation);
+      return {
+        background: style.backgroundColor,
+        borderRadius: style.borderRadius,
+      };
+    });
 
   expect(navigationBox).not.toBeNull();
-  expect(navigationBox?.y).toBeGreaterThan(600);
-  expect(navigationBox?.width).toBeLessThanOrEqual(430);
+  expect(viewport.scrollHeight).toBeLessThanOrEqual(viewport.height);
+  expect(navigationBox?.x).toBeGreaterThan(0);
+  expect(navigationBox?.width).toBeLessThan(viewport.width);
+  expect((navigationBox?.y ?? 0) + (navigationBox?.height ?? 0)).toBeLessThan(
+    viewport.height,
+  );
+  expect(navigationStyles.background).toContain("0.72");
+  expect(navigationStyles.borderRadius).not.toBe("0px");
+  await expect(
+    page
+      .getByRole("navigation", { name: "Primary navigation" })
+      .locator(".navigation-label")
+      .first(),
+  ).toHaveCSS("position", "absolute");
 });
 
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
@@ -203,6 +237,11 @@ test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   expect(mainBox?.width).toBeGreaterThan(900);
   expect(navigationBox?.y).toBeLessThan(mainBox?.y ?? 0);
   expect(navigationBox?.height).toBeLessThanOrEqual(64);
+  await expect(
+    page
+      .getByRole("navigation", { name: "Primary navigation" })
+      .getByText("Home", { exact: true }),
+  ).toBeVisible();
 });
 
 test("registers the offline app service worker", async ({ page }) => {
