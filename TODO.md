@@ -63,8 +63,8 @@ visual polish and public release.
       equivalent to strong device encryption or a high-entropy password.
 - [x] Provide no PIN recovery or bypass; forgotten PIN recovery requires
       deleting local data and restoring a backup.
-- [ ] Define a versioned local-data schema and migration mechanism.
-- [ ] Store immigration permissions separately from travel records.
+- [x] Define a versioned local-data schema and additive migration mechanism.
+- [x] Store immigration permissions separately from travel records.
 - [ ] Store visa grant dates, expiry dates, and actual UK arrival dates
       separately.
 - [ ] Validate all records before saving them.
@@ -107,11 +107,11 @@ visual polish and public release.
 - [x] Give every family member an internal identifier so permissions, trips,
       calculations, and backups remain correctly associated.
 - [x] Allow the user to switch between family members from the dashboard.
-- [ ] Clearly show when a family member’s immigration route does not yet have a
+- [x] Clearly show when a family member’s immigration route does not yet have a
       supported eligibility calculation.
-- [ ] Add, edit, and delete immigration-permission records for each family
+- [x] Add, edit, and delete immigration-permission records for each family
       member.
-- [ ] Record route, permission start, expiry, UK arrival, and main-applicant or
+- [x] Record route, permission start, expiry, UK arrival, and main-applicant or
       dependant status.
 - [ ] Add, edit, and delete trips outside the UK.
 - [ ] Record departure date, return date, destination, and optional notes.
