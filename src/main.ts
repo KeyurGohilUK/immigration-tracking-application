@@ -13,6 +13,6 @@ if (!root) {
 }
 
 const installController = initialiseInstallPrompt(root);
-initialiseReleaseManager(installController);
+initialiseReleaseManager(root, installController);
 registerServiceWorker();
 await startApplication(root);

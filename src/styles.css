@@ -336,19 +336,31 @@ a {
 }
 
 .app-manager-trigger {
-  position: fixed;
-  z-index: 50;
-  bottom: calc(5.5rem + env(safe-area-inset-bottom));
-  right: 1rem;
-  min-height: 2.75rem;
-  padding: 0 0.9rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0;
+  place-items: center;
   border: 2px solid #000000;
-  border-radius: var(--radius-small);
+  border-radius: 50%;
   color: #ffffff;
   background: #000000;
   box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 18%);
-  font-size: 0.78rem;
-  font-weight: 750;
+}
+
+.header-actions .app-manager-trigger {
+  margin-left: 0;
+}
+.app-manager-trigger svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .app-manager-dialog {
@@ -426,13 +438,6 @@ a {
 .app-manager-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-}
-
-@media (min-width: 48rem) {
-  .app-manager-trigger {
-    right: max(2rem, calc((100vw - 72rem) / 2));
-    bottom: 1.5rem;
-  }
 }
 
 button:focus-visible,
