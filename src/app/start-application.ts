@@ -2,6 +2,15 @@ import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import { renderOwnerProfileForm } from "../features/household/components/owner-profile-form";
 import {
+  readFamilyMemberInput,
+  renderFamilyPage,
+  showFamilyMemberForm,
+} from "../features/household/components/family-page";
+import {
+  getFamilyMembers,
+  saveFamilyMembers,
+} from "../features/household/data/family-member-repository";
+import {
   getOwnerProfile,
   saveOwnerProfile,
 } from "../features/household/data/owner-profile-repository";
@@ -9,6 +18,10 @@ import {
   validateOwnerInput,
   type OwnerProfile,
 } from "../features/household/domain/owner-profile";
+import {
+  validateFamilyMemberInput,
+  type FamilyMember,
+} from "../features/household/domain/family-member";
 import { renderLegalScreen } from "../features/legal/components/legal-screen";
 import {
   hasCurrentTermsAcceptance,
@@ -44,19 +57,177 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     record: VaultRecord,
   ): Promise<void> => {
     sessionKey = key;
-    const renderDashboard = (profile: OwnerProfile): void => {
-      renderApp(root, profile.fullName);
-      const lock = (): void => {
-        if (!sessionKey) return;
-        sessionKey = null;
-        stopSessionLock?.();
-        stopSessionLock = null;
-        showPinEntry("unlock", record);
-      };
+    let familyMembers: FamilyMember[] | null = null;
+
+    const lock = (): void => {
+      if (!sessionKey) return;
+      sessionKey = null;
+      stopSessionLock?.();
+      stopSessionLock = null;
+      showPinEntry("unlock", record);
+    };
+
+    const wireAuthenticatedShell = (profile: OwnerProfile): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
         ?.addEventListener("click", lock);
+      root
+        .querySelector<HTMLAnchorElement>(".wordmark")
+        ?.addEventListener("click", (event) => {
+          event.preventDefault();
+          renderDashboard(profile);
+        });
+      for (const link of root.querySelectorAll<HTMLAnchorElement>(
+        "[data-navigation]",
+      )) {
+        const destination = link.dataset.navigation;
+        if (destination === "Home") {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            renderDashboard(profile);
+          });
+        }
+        if (destination === "Family") {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            void showFamily(profile);
+          });
+        }
+      }
+      stopSessionLock?.();
       stopSessionLock = startSessionLock(lock);
+    };
+
+    const renderDashboard = (profile: OwnerProfile): void => {
+      renderApp(root, profile.fullName);
+      wireAuthenticatedShell(profile);
+    };
+
+    const renderFamily = (
+      profile: OwnerProfile,
+      members: FamilyMember[],
+    ): void => {
+      renderFamilyPage(root, profile.fullName, members);
+      wireAuthenticatedShell(profile);
+      const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
+      const form = root.querySelector<HTMLFormElement>("#family-form");
+      root
+        .querySelector<HTMLButtonElement>("#add-family-member")
+        ?.addEventListener("click", () => showFamilyMemberForm(root));
+      root
+        .querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => dialog?.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-member]",
+      )) {
+        button.addEventListener("click", () => {
+          const member = members.find(
+            ({ id }) => id === button.dataset.editMember,
+          );
+          if (member) showFamilyMemberForm(root, member);
+        });
+      }
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-delete-member]",
+      )) {
+        button.addEventListener("click", async () => {
+          const member = members.find(
+            ({ id }) => id === button.dataset.deleteMember,
+          );
+          if (
+            !member ||
+            !window.confirm(
+              `Delete ${member.fullName} from this local household? This cannot be undone.`,
+            )
+          )
+            return;
+          const nextMembers = members.filter(({ id }) => id !== member.id);
+          try {
+            await saveFamilyMembers(nextMembers, key);
+            familyMembers = nextMembers;
+            renderFamily(profile, nextMembers);
+          } catch {
+            const error = root.querySelector<HTMLElement>("#family-page-error");
+            if (error) {
+              error.textContent =
+                "The family member could not be deleted. Your existing data is unchanged.";
+              error.hidden = false;
+            }
+          }
+        });
+      }
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { memberId, input } = readFamilyMemberInput(form);
+        const validationError = validateFamilyMemberInput(input);
+        const error = form.querySelector<HTMLElement>("#family-form-error");
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const existingMember = members.find(({ id }) => id === memberId);
+        const timestamp = new Date().toISOString();
+        const member: FamilyMember = {
+          version: 1,
+          id: existingMember?.id ?? crypto.randomUUID(),
+          ...input,
+          createdAt: existingMember?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        };
+        const nextMembers = existingMember
+          ? members.map((current) =>
+              current.id === existingMember.id ? member : current,
+            )
+          : [...members, member];
+        const submit = form.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveFamilyMembers(nextMembers, key);
+          familyMembers = nextMembers;
+          dialog?.close();
+          renderFamily(profile, nextMembers);
+        } catch {
+          if (error) {
+            error.textContent =
+              "This encrypted family profile could not be saved.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
+    };
+
+    const showFamily = async (profile: OwnerProfile): Promise<void> => {
+      if (familyMembers !== null) {
+        renderFamily(profile, familyMembers);
+        return;
+      }
+      try {
+        familyMembers = await getFamilyMembers(key);
+        renderFamily(profile, familyMembers);
+      } catch {
+        renderFamily(profile, []);
+        const addMember =
+          root.querySelector<HTMLButtonElement>("#add-family-member");
+        if (addMember) addMember.disabled = true;
+        const error = root.querySelector<HTMLElement>("#family-page-error");
+        if (error) {
+          error.textContent =
+            "Your encrypted family profiles could not be opened.";
+          error.hidden = false;
+        }
+      }
     };
 
     try {
