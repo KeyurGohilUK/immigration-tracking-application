@@ -68,8 +68,8 @@ visual polish and public release.
 - [ ] Store visa grant dates, expiry dates, and actual UK arrival dates
       separately.
 - [ ] Validate all records before saving them.
-- [ ] Prevent or explain overlapping travel records and invalid date ranges.
-- [ ] Provide a clear empty state when no records exist.
+- [x] Prevent or explain overlapping travel records and invalid date ranges.
+- [x] Provide a clear empty state when no records exist.
 - [ ] Add a permanent indication that data is stored only on the current device.
 - [ ] Add a “Delete all local data” action with destructive confirmation.
 - [ ] Test behaviour when browser storage is unavailable or full.
@@ -113,12 +113,12 @@ visual polish and public release.
       member.
 - [x] Record route, permission start, expiry, UK arrival, and main-applicant or
       dependant status.
-- [ ] Add, edit, and delete trips outside the UK.
-- [ ] Record departure date, return date, destination, and optional notes.
-- [ ] Allow a trip to remain open while the user is outside the UK.
-- [ ] Allow a user to flag a potentially permitted or exceptional absence.
-- [ ] Make clear that exceptional absences require evidence and manual review.
-- [ ] Add confirmations for destructive actions.
+- [x] Add, edit, and delete trips outside the UK.
+- [x] Record departure date, return date, destination, and optional notes.
+- [x] Allow a trip to remain open while the user is outside the UK.
+- [x] Allow a user to flag a potentially permitted or exceptional absence.
+- [x] Make clear that exceptional absences require evidence and manual review.
+- [x] Add confirmations for destructive actions.
 - [ ] Ensure forms work comfortably on narrow mobile screens and with keyboards.
 - [ ] Add useful validation messages without presenting legal conclusions.
 
