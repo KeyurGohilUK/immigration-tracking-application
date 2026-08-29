@@ -154,7 +154,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 3);
+      const request = indexedDB.open("urbanfox-ilr", 4);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -234,7 +234,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByRole("link", { name: "Family" }).click();
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 3);
+      const request = indexedDB.open("urbanfox-ilr", 4);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -298,7 +298,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(page.getByText(/calculation is not active yet/i)).toBeVisible();
   const storedPermission = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 3);
+      const request = indexedDB.open("urbanfox-ilr", 4);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -329,6 +329,84 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Skilled Worker" }).click();
   await expect(page.getByText("No permissions recorded")).toBeVisible();
+});
+
+test("tracks encrypted trips, open travel, and overlap warnings", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Trips", exact: true }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Trips outside the UK" }),
+  ).toBeVisible();
+  await expect(page.getByText("No trips recorded")).toBeVisible();
+  await page.getByRole("button", { name: "Add trip" }).click();
+  await page.getByLabel("UK departure date").fill("2024-02-01");
+  await page.getByLabel(/UK return date/).fill("2024-02-10");
+  await page.getByLabel("Destination").fill("India");
+  await page.getByLabel(/Notes/).fill("Family visit");
+  await page.getByLabel("Flag for manual review").check();
+  await page.getByRole("button", { name: "Save trip" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "India", level: 3 }),
+  ).toBeVisible();
+  await expect(page.getByText("Manual review flagged")).toBeVisible();
+  await expect(page.getByText("8", { exact: true })).toBeVisible();
+  const storedTrip = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 4);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("trips", "readonly")
+        .objectStore("trips")
+        .get("owner");
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  });
+  expect(storedTrip).not.toContain("India");
+  expect(storedTrip).toContain("ciphertext");
+
+  await page.getByRole("button", { name: "Add trip" }).click();
+  await page.getByLabel("UK departure date").fill("2024-02-05");
+  await page.getByLabel(/UK return date/).fill("2024-02-12");
+  await page.getByLabel("Destination").fill("France");
+  await page.getByRole("button", { name: "Save trip" }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "overlaps the existing trip to India",
+  );
+  await page.getByRole("button", { name: "Close trip form" }).click();
+
+  await page.getByRole("button", { name: "Edit trip to India" }).click();
+  await page.getByLabel(/UK return date/).fill("2024-02-12");
+  await page.getByRole("button", { name: "Save trip" }).click();
+  await expect(page.getByText("2024-02-12")).toBeVisible();
+
+  await page.getByRole("button", { name: "Add trip" }).click();
+  await page.getByLabel("UK departure date").fill("2025-01-01");
+  await page.getByLabel("Destination").fill("Canada");
+  await page.getByRole("button", { name: "Save trip" }).click();
+  await expect(page.getByText("Open trip")).toBeVisible();
+  await expect(page.getByText("Pending return")).toBeVisible();
+
+  await page.getByRole("button", { name: "Lock app" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Trips", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Canada", level: 3 }),
+  ).toBeVisible();
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete trip to Canada" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Canada", level: 3 }),
+  ).toHaveCount(0);
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {
