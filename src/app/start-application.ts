@@ -1,5 +1,6 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
+import { renderMorePage } from "../features/settings/components/more-page";
 import {
   renderAbsenceSummary,
   renderAbsenceSummaryUnavailable,
@@ -109,7 +110,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const wireAuthenticatedShell = (
       profile: OwnerProfile,
-      currentView: "Home" | "Family" | "Permissions" | "Trips",
+      currentView: "Home" | "Family" | "Permissions" | "Trips" | "More",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -142,6 +143,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             void showTrips(profile);
           });
         }
+        if (destination === "More") {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            renderMore(profile);
+          });
+        }
       }
       root
         .querySelector<HTMLSelectElement>("#active-person")
@@ -164,6 +171,19 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       wireDashboardActions(profile);
       const profileId = selectedProfileId;
       void updateDashboardCalculation(profile, profileId);
+    };
+
+    const renderMore = (profile: OwnerProfile): void => {
+      renderMorePage(root);
+      wireAuthenticatedShell(profile, "More");
+      root
+        .querySelector<HTMLButtonElement>("#lock-from-more")
+        ?.addEventListener("click", lock);
+      root
+        .querySelector<HTMLButtonElement>("#view-legal")
+        ?.addEventListener("click", () =>
+          showLegal(false, () => renderMore(profile)),
+        );
     };
 
     const wireDashboardActions = (profile: OwnerProfile): void => {
@@ -770,7 +790,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     }
   };
 
-  const showLegal = (acceptanceRequired: boolean): void => {
+  const showLegal = (
+    acceptanceRequired: boolean,
+    backAction?: () => void,
+  ): void => {
     renderLegalScreen(root, acceptanceRequired);
     if (acceptanceRequired) {
       root
@@ -792,7 +815,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     }
     root
       .querySelector<HTMLButtonElement>("#legal-back")
-      ?.addEventListener("click", showLanding);
+      ?.addEventListener("click", backAction ?? showLanding);
   };
 
   const showLanding = (): void => {

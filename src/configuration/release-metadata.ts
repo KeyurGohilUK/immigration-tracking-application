@@ -1,6 +1,7 @@
-export const APP_VERSION = "0.6.1";
+export const APP_VERSION = "0.6.2";
 
 export const RELEASE_NOTES = [
+  "Added a More screen for local-data safety, security, legal information, and backup status.",
   "Added translucent fixed headers and a mobile dock that compacts while scrolling.",
   "Added separate visa grant dates and an official-source recorded-absence check.",
   "Added encrypted trip tracking with open trips and manual-review flags.",

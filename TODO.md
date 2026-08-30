@@ -70,7 +70,7 @@ visual polish and public release.
 - [ ] Validate all records before saving them.
 - [x] Prevent or explain overlapping travel records and invalid date ranges.
 - [x] Provide a clear empty state when no records exist.
-- [ ] Add a permanent indication that data is stored only on the current device.
+- [x] Add a permanent indication that data is stored only on the current device.
 - [ ] Add a “Delete all local data” action with destructive confirmation.
 - [ ] Test behaviour when browser storage is unavailable or full.
 
@@ -167,7 +167,7 @@ visual polish and public release.
       forms, PIN entry, or warning states.
 - [ ] Create a dashboard showing progress, estimated eligibility date, absence
       status, and outstanding information.
-- [ ] Add mobile bottom navigation for Dashboard, Family, Trips, and More.
+- [x] Add mobile bottom navigation for Dashboard, Family, Trips, and More.
 - [ ] Add a clear locked screen with PIN entry and safe reset guidance.
 - [ ] Add a visible lock-now action and configurable inactivity timeout.
 - [x] Show the currently selected family member consistently on every relevant
