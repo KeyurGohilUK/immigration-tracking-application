@@ -58,6 +58,15 @@ describe("family member validation", () => {
     };
     expect(isFamilyMember(member)).toBe(true);
     expect(isFamilyMember({ ...member, fullName: "" })).toBe(false);
+    expect(isFamilyMember({ ...member, fullName: " Family member " })).toBe(
+      false,
+    );
+    expect(
+      isFamilyMember({
+        ...member,
+        updatedAt: "2026-08-29T09:59:59.000Z",
+      }),
+    ).toBe(false);
     expect(isFamilyMember({ ...member, version: 2 })).toBe(false);
     expect(isFamilyMemberCollection([member])).toBe(true);
     expect(isFamilyMemberCollection([member, member])).toBe(false);

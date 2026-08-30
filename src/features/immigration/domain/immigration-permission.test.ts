@@ -35,6 +35,12 @@ describe("immigration permission validation", () => {
         actualUkArrivalDate: "2023-12-31",
       }),
     ).toBe("Actual UK arrival must fall within this permission period.");
+    expect(
+      validateImmigrationPermissionInput({
+        ...validInput,
+        grantDate: "2027-01-01",
+      }),
+    ).toBe("Visa grant date cannot be after permission expiry.");
   });
 
   it("requires a name for routes that are not listed", () => {
@@ -62,6 +68,12 @@ describe("immigration permission validation", () => {
     expect(isImmigrationPermissionCollection([permission], "another")).toBe(
       false,
     );
+    expect(
+      isImmigrationPermissionCollection(
+        [{ ...permission, createdAt: "not-a-timestamp" }],
+        "owner",
+      ),
+    ).toBe(false);
   });
 
   it("migrates existing version 1 records with a missing grant date", () => {

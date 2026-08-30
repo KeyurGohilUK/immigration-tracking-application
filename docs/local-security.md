@@ -26,6 +26,11 @@ separate `trips` store with the same per-profile encryption boundary. Stored
 records are decrypted and structurally validated only after a successful PIN
 unlock.
 
+The same domain validators run before every encrypted save. They reject
+malformed identifiers, non-canonical timestamps or text, records updated before
+creation, mixed profile associations, duplicate identifiers, impossible dates,
+and overlapping travel records before IndexedDB is changed.
+
 IndexedDB schema version 4 adds the `trips` store without rewriting or deleting
 the existing `security`, `profiles`, or `permissions` stores. Every decrypted
 domain record also carries its own version and is rejected if its structure,
