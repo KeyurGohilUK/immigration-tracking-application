@@ -250,9 +250,7 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
   await page.getByRole("link", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
   await page.getByLabel("Encrypted backup file").setInputFiles(downloadPath);
-  await page
-    .getByLabel("Backup password", { exact: true })
-    .fill(backupPassword);
+  await page.getByLabel("Restore backup password").fill(backupPassword);
   await page.getByRole("button", { name: "Review backup" }).click();
   await expect(
     page.getByRole("heading", { name: "Review before replacing data" }),
