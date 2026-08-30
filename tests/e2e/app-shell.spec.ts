@@ -192,6 +192,36 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(".pin-digit")).toHaveCount(4);
 });
 
+test("opens the More screen and keeps local safety actions available", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await expect(
+    page.getByText("On this device", { exact: true }),
+  ).toBeAttached();
+  await page.getByRole("link", { name: "More", exact: true }).click();
+
+  await expect(page.getByRole("heading", { name: "More" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Stored only on this device" }),
+  ).toBeVisible();
+  await expect(page.getByText("Coming next", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "View legal information" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Terms and privacy" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { name: "More" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Lock now" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Unlock your private space" }),
+  ).toBeVisible();
+});
+
 test("adds, edits, persists, and deletes an encrypted family member", async ({
   page,
 }) => {

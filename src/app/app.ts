@@ -60,6 +60,10 @@ export function renderAppShell(
         </a>
         ${renderNavigation("desktop-navigation", activeNavigation)}
         <div class="header-actions">
+          <span class="device-storage-indicator" title="Data stored on this device">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 8.5h14v10H5zM8 8.5V6a4 4 0 0 1 8 0v2.5" /></svg>
+            <span>On this device</span>
+          </span>
           <button class="icon-button" type="button" aria-label="Lock app">
             <span aria-hidden="true">⌑</span>
           </button>

@@ -545,6 +545,37 @@ a:focus-visible {
   gap: 0.5rem;
 }
 
+.device-storage-indicator {
+  display: inline-flex;
+  min-width: 2rem;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  background: rgb(255 255 255 / 58%);
+}
+
+.device-storage-indicator svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.device-storage-indicator > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 .install-button {
   min-height: 2.75rem;
   padding: 0 0.85rem;
@@ -584,6 +615,77 @@ a:focus-visible {
   min-height: 0;
   overflow: visible;
   padding: 1rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
+}
+
+.more-main {
+  min-height: 0;
+  padding: 1rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
+}
+
+.more-heading {
+  margin-bottom: 1rem;
+}
+
+.more-heading h1 {
+  margin-bottom: 0.4rem;
+}
+
+.more-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.more-card {
+  padding: 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-medium);
+  background: rgb(255 255 255 / 68%);
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 5%);
+  -webkit-backdrop-filter: blur(1rem) saturate(130%);
+  backdrop-filter: blur(1rem) saturate(130%);
+}
+
+.more-card-heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.more-card-heading h2 {
+  font-size: 1.05rem;
+}
+
+.more-card-icon {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.more-card > p {
+  color: var(--colour-text-muted);
+}
+
+.more-card .local-data-banner {
+  margin-top: 0.75rem;
+  color: var(--colour-text);
+}
+
+.more-action {
+  width: 100%;
+  margin: 0.85rem 0 0;
+}
+
+.more-version {
+  margin: 1.25rem 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  text-align: center;
 }
 
 .record-heading {
@@ -1513,6 +1615,38 @@ p {
     margin: 0 auto;
     overflow: visible;
     padding: 2.5rem 2rem 4rem;
+  }
+
+  .more-main {
+    width: min(100%, 72rem);
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  .more-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .more-card {
+    padding: 1.5rem;
+  }
+
+  .device-storage-indicator {
+    gap: 0.45rem;
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+  }
+
+  .device-storage-indicator > span {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    font-size: 0.72rem;
+    font-weight: 750;
+    white-space: normal;
   }
 
   .record-heading {
