@@ -51,6 +51,9 @@ and Terms acceptance through a typed and final destructive confirmation.
 The locked screen offers the same protected reset when a PIN has been forgotten;
 there is no PIN recovery or bypass.
 
+Release versions, cache updates, and version-specific **What’s new** notes
+follow the process in [docs/releases.md](docs/releases.md).
+
 **Freddy the Urban Fox**, a friendly UK urban fox, is the app’s main character
 and guides users through setup, family profiles, travel records, backups, and
 the app’s calculation explanations.

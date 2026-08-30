@@ -95,6 +95,14 @@ test("shows install and update controls in every device header", async ({
   await expect(
     page.getByRole("button", { name: "Download updates" }),
   ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Validated every owner, family, permission, and trip record",
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
+  ).toHaveCount(0);
 });
 
 test("opens PIN setup from the public landing page", async ({ page }) => {

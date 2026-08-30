@@ -1,4 +1,11 @@
-import { getUkCalendarDate } from "../../../shared/date/uk-calendar-date";
+import {
+  getUkCalendarDate,
+  isCalendarDate,
+} from "../../../shared/date/uk-calendar-date";
+import {
+  hasValidStoredRecordMetadata,
+  isRecordIdentifier,
+} from "../../../shared/validation/stored-record";
 
 export interface TripInput {
   departureDate: string;
@@ -14,20 +21,6 @@ export interface Trip extends TripInput {
   profileId: string;
   createdAt: string;
   updatedAt: string;
-}
-
-function isCalendarDate(value: string): boolean {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return false;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return (
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
-  );
 }
 
 export function validateTripInput(input: TripInput): string | null {
@@ -56,20 +49,15 @@ export function isTrip(value: unknown): value is Trip {
   if (!value || typeof value !== "object") return false;
   const trip = value as Partial<Trip>;
   if (
-    trip.version !== 1 ||
-    typeof trip.id !== "string" ||
-    trip.id.length < 1 ||
-    trip.id.length > 100 ||
-    typeof trip.profileId !== "string" ||
-    trip.profileId.length < 1 ||
-    trip.profileId.length > 100 ||
+    !hasValidStoredRecordMetadata(trip, 1) ||
+    !isRecordIdentifier(trip.profileId) ||
     typeof trip.departureDate !== "string" ||
     typeof trip.returnDate !== "string" ||
     typeof trip.destination !== "string" ||
+    trip.destination !== trip.destination.trim() ||
     typeof trip.notes !== "string" ||
-    typeof trip.exceptionalAbsence !== "boolean" ||
-    typeof trip.createdAt !== "string" ||
-    typeof trip.updatedAt !== "string"
+    trip.notes !== trip.notes.trim() ||
+    typeof trip.exceptionalAbsence !== "boolean"
   )
     return false;
   return validateTripInput(trip as Trip) === null;
@@ -84,7 +72,10 @@ export function isTripCollection(
     !value.every((trip) => isTrip(trip) && trip.profileId === profileId)
   )
     return false;
-  return new Set(value.map(({ id }) => id)).size === value.length;
+  if (new Set(value.map(({ id }) => id)).size !== value.length) return false;
+  return !value.some((trip, index) =>
+    value.slice(index + 1).some((other) => tripsOverlap(trip, other)),
+  );
 }
 
 function tripsOverlap(left: TripInput, right: TripInput): boolean {

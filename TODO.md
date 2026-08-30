@@ -67,7 +67,7 @@ visual polish and public release.
 - [x] Store immigration permissions separately from travel records.
 - [x] Store visa grant dates, expiry dates, and actual UK arrival dates
       separately.
-- [ ] Validate all records before saving them.
+- [x] Validate all records before saving them.
 - [x] Prevent or explain overlapping travel records and invalid date ranges.
 - [x] Provide a clear empty state when no records exist.
 - [x] Add a permanent indication that data is stored only on the current device.

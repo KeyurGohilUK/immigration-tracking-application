@@ -1,3 +1,9 @@
+import { isCalendarDate } from "../../../shared/date/uk-calendar-date";
+import {
+  hasValidStoredRecordMetadata,
+  isRecordIdentifier,
+} from "../../../shared/validation/stored-record";
+
 export const IMMIGRATION_ROUTES = [
   "skilled-worker",
   "health-and-care-worker",
@@ -27,26 +33,14 @@ export interface ImmigrationPermission extends ImmigrationPermissionInput {
   updatedAt: string;
 }
 
-function isCalendarDate(value: string): boolean {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return false;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return (
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
-  );
-}
-
 export function validateImmigrationPermissionInput(
   input: ImmigrationPermissionInput,
 ): string | null {
   if (!IMMIGRATION_ROUTES.includes(input.route))
     return "Choose an immigration route.";
   const otherRouteName = input.otherRouteName.trim();
+  if (otherRouteName.length > 100)
+    return "Permission route name must be 100 characters or fewer.";
   if (
     input.route === "other" &&
     (otherRouteName.length < 1 || otherRouteName.length > 100)
@@ -62,6 +56,8 @@ export function validateImmigrationPermissionInput(
     return "Enter a valid permission expiry date.";
   if (input.permissionStartDate > input.permissionExpiryDate)
     return "Permission expiry must be on or after its start date.";
+  if (input.grantDate && input.grantDate > input.permissionExpiryDate)
+    return "Visa grant date cannot be after permission expiry.";
   if (input.actualUkArrivalDate) {
     if (!isCalendarDate(input.actualUkArrivalDate))
       return "Enter a valid actual UK arrival date.";
@@ -80,22 +76,16 @@ export function isImmigrationPermission(
   if (!value || typeof value !== "object") return false;
   const permission = value as Partial<ImmigrationPermission>;
   if (
-    permission.version !== 2 ||
-    typeof permission.id !== "string" ||
-    permission.id.length < 1 ||
-    permission.id.length > 100 ||
-    typeof permission.profileId !== "string" ||
-    permission.profileId.length < 1 ||
-    permission.profileId.length > 100 ||
+    !hasValidStoredRecordMetadata(permission, 2) ||
+    !isRecordIdentifier(permission.profileId) ||
     !IMMIGRATION_ROUTES.includes(permission.route as ImmigrationRoute) ||
     typeof permission.otherRouteName !== "string" ||
+    permission.otherRouteName !== permission.otherRouteName.trim() ||
     !PERMISSION_ROLES.includes(permission.role as PermissionRole) ||
     typeof permission.grantDate !== "string" ||
     typeof permission.permissionStartDate !== "string" ||
     typeof permission.permissionExpiryDate !== "string" ||
-    typeof permission.actualUkArrivalDate !== "string" ||
-    typeof permission.createdAt !== "string" ||
-    typeof permission.updatedAt !== "string"
+    typeof permission.actualUkArrivalDate !== "string"
   )
     return false;
   return (
@@ -133,21 +123,15 @@ function isLegacyImmigrationPermission(
   if (!value || typeof value !== "object") return false;
   const permission = value as Partial<LegacyImmigrationPermission>;
   if (
-    permission.version !== 1 ||
-    typeof permission.id !== "string" ||
-    permission.id.length < 1 ||
-    permission.id.length > 100 ||
-    typeof permission.profileId !== "string" ||
-    permission.profileId.length < 1 ||
-    permission.profileId.length > 100 ||
+    !hasValidStoredRecordMetadata(permission, 1) ||
+    !isRecordIdentifier(permission.profileId) ||
     !IMMIGRATION_ROUTES.includes(permission.route as ImmigrationRoute) ||
     typeof permission.otherRouteName !== "string" ||
+    permission.otherRouteName !== permission.otherRouteName.trim() ||
     !PERMISSION_ROLES.includes(permission.role as PermissionRole) ||
     typeof permission.permissionStartDate !== "string" ||
     typeof permission.permissionExpiryDate !== "string" ||
-    typeof permission.actualUkArrivalDate !== "string" ||
-    typeof permission.createdAt !== "string" ||
-    typeof permission.updatedAt !== "string"
+    typeof permission.actualUkArrivalDate !== "string"
   )
     return false;
   return (

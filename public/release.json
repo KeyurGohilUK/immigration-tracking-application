@@ -1,21 +1,8 @@
 {
-  "version": "0.10.0",
+  "version": "0.11.0",
   "notes": [
-    "Added a protected forgotten-PIN reset from the locked screen.",
-    "Added confirmed deletion of all local records, PIN data, and Terms acceptance.",
-    "Added validated, review-first encrypted backup restore with atomic local replacement.",
-    "Added password-protected downloads containing all current encrypted household backup data.",
-    "Added a More screen for local-data safety, security, legal information, and backup status.",
-    "Added translucent fixed headers and a mobile dock that compacts while scrolling.",
-    "Added separate visa grant dates and an official-source recorded-absence check.",
-    "Added encrypted trip tracking with open trips and manual-review flags.",
-    "Added encrypted immigration-permission history for each selected profile.",
-    "Added consistent household-profile switching across Home and Family.",
-    "Added encrypted family-member profiles with add, edit, and delete controls.",
-    "Returning users now go directly to a four-box MPIN unlock screen.",
-    "Added a compact no-scroll mobile Home and floating icon navigation.",
-    "Moved install and update access into every screen header.",
-    "Added encrypted household-owner profiles.",
-    "Added versioned Terms and privacy acceptance."
+    "Validated every owner, family, permission, and trip record before encrypted storage.",
+    "Added strict identifiers, timestamps, canonical text, and overlapping-trip checks at storage boundaries.",
+    "Aligned date-of-birth validation with the UK civil calendar date."
   ]
 }

@@ -69,5 +69,22 @@ describe("trip validation", () => {
     expect(isTripCollection([trip], "owner")).toBe(true);
     expect(isTripCollection([trip, trip], "owner")).toBe(false);
     expect(isTripCollection([trip], "another-profile")).toBe(false);
+    expect(
+      isTripCollection(
+        [
+          trip,
+          {
+            ...trip,
+            id: "trip-overlap",
+            departureDate: "2024-01-05",
+            returnDate: "2024-01-12",
+          },
+        ],
+        "owner",
+      ),
+    ).toBe(false);
+    expect(
+      isTripCollection([{ ...trip, destination: " India " }], "owner"),
+    ).toBe(false);
   });
 });

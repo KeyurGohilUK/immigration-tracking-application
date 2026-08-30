@@ -11,6 +11,7 @@ export async function saveOwnerProfile(
   profile: OwnerProfile,
   key: CryptoKey,
 ): Promise<void> {
+  if (!isOwnerProfile(profile)) throw new Error("Owner profile is invalid.");
   await saveEncryptedRecord(
     DATABASE_STORES.profiles,
     OWNER_PROFILE_RECORD_KEY,
