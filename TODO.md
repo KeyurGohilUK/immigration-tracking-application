@@ -150,6 +150,10 @@ visual polish and public release.
 
 ## Phase 6 — Design the mobile-app experience
 
+- [ ] Apply an original, consistent translucent glass style across headers,
+      navigation, cards, menus, modals, and form surfaces, inspired by the new
+      iPhone visual language while preserving the monochrome UrbanFox palette,
+      text contrast, accessibility, browser fallbacks, and performance.
 - [ ] Define Freddy’s role as a friendly guide who explains app features,
       prompts for missing information, and celebrates completed setup steps.
 - [ ] Give users a clear way to skip, dismiss, or replay Freddy’s guidance.
