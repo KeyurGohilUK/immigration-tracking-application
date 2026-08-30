@@ -1,0 +1,58 @@
+import { describe, expect, it } from "vitest";
+import type { BackupData } from "../domain/backup";
+import {
+  createEncryptedBackup,
+  decryptBackupForValidation,
+} from "./backup-service";
+
+const backupData: BackupData = {
+  owner: {
+    version: 1,
+    id: "owner",
+    fullName: "Encrypted Test Person",
+    dateOfBirth: "1990-01-01",
+    createdAt: "2026-08-30T10:00:00.000Z",
+    updatedAt: "2026-08-30T10:00:00.000Z",
+  },
+  familyMembers: [],
+  permissions: [{ profileId: "owner", records: [] }],
+  trips: [{ profileId: "owner", records: [] }],
+};
+
+describe("encrypted backup", () => {
+  it("keeps personal data out of the readable backup wrapper", async () => {
+    const backup = await createEncryptedBackup(
+      backupData,
+      "a-secure-backup-password",
+      "2026-08-30T12:00:00.000Z",
+    );
+
+    expect(JSON.stringify(backup)).not.toContain("Encrypted Test Person");
+    expect(backup.encryption.algorithm).toBe("AES-GCM-256");
+    expect(backup.encryption.keyDerivation).toBe("PBKDF2-HMAC-SHA-256");
+  });
+
+  it("decrypts with the separate backup password", async () => {
+    const password = "a-secure-backup-password";
+    const backup = await createEncryptedBackup(
+      backupData,
+      password,
+      "2026-08-30T12:00:00.000Z",
+    );
+    const payload = await decryptBackupForValidation(backup, password);
+
+    expect(payload.data).toEqual(backupData);
+    expect(payload.exportedAt).toBe("2026-08-30T12:00:00.000Z");
+  });
+
+  it("rejects an incorrect backup password", async () => {
+    const backup = await createEncryptedBackup(
+      backupData,
+      "a-secure-backup-password",
+    );
+
+    await expect(
+      decryptBackupForValidation(backup, "the-wrong-backup-password"),
+    ).rejects.toThrow();
+  });
+});

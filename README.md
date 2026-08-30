@@ -42,7 +42,9 @@ The shared install icon in every screen header opens installed/latest versions
 and release notes, and can safely clear only UrbanFox application caches before
 reloading; encrypted IndexedDB records are preserved.
 The More screen keeps the app's local-only storage status visible and provides
-access to locking, legal information, and the planned backup/restore area.
+access to locking, legal information, and encrypted backup downloads. Backups
+use a separate password rather than the four-digit local PIN; restore support
+is planned as the next data-safety step.
 
 **Freddy the Urban Fox**, a friendly UK urban fox, is the app’s main character
 and guides users through setup, family profiles, travel records, backups, and
