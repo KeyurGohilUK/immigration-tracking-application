@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Redesigned Dashboard around a responsive household overview",
+      "Redesigned Family with a cleaner responsive household layout",
     ),
   ).toBeVisible();
   await expect(
@@ -450,6 +450,11 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Your family" }),
   ).toBeVisible();
+  await expect(page.getByText("1 person", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Household members" }),
+  ).toBeVisible();
+  await expect(page.getByText("Private", { exact: true })).toBeVisible();
   await expect(page.getByText("No family members added yet")).toBeVisible();
   await page.getByRole("button", { name: "Add family member" }).click();
   await page.getByLabel("Full name").fill("Freddy Test Dependant");
@@ -463,6 +468,8 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Freddy Test Dependant", level: 3 }),
   ).toBeVisible();
+  await expect(page.getByText("2 people", { exact: true })).toBeVisible();
+  await expect(page.getByText("Selected", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Tracking profile")).toHaveValue(/.+/);
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Dependant",

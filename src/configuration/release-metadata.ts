@@ -1,7 +1,7 @@
-export const APP_VERSION = "0.13.0";
+export const APP_VERSION = "0.14.0";
 
 export const RELEASE_NOTES = [
-  "Redesigned Dashboard around a responsive household overview with separate profile cards.",
-  "Added a translucent monochrome visual system to Dashboard and Travel while keeping status information accessible.",
-  "Rebuilt Travel as a chronological timeline with compact recorded-day and trip summaries.",
+  "Redesigned Family with a cleaner responsive household layout and Liquid Glass styling.",
+  "Improved profile cards with clearer owner, immigration-role, and selected-profile states.",
+  "Modernised the add and edit family member form while preserving encrypted local storage.",
 ] as const;
