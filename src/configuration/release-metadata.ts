@@ -1,7 +1,7 @@
-export const APP_VERSION = "0.14.0";
+export const APP_VERSION = "0.15.0";
 
 export const RELEASE_NOTES = [
-  "Redesigned Family with a cleaner responsive household layout and Liquid Glass styling.",
-  "Improved profile cards with clearer owner, immigration-role, and selected-profile states.",
-  "Modernised the add and edit family member form while preserving encrypted local storage.",
+  "Redesigned Immigration History as a responsive Liquid Glass permission timeline.",
+  "Added clearer calculation-supported, dependant-record, and review-required states.",
+  "Modernised permission summaries and the add or edit form without changing calculation rules.",
 ] as const;
