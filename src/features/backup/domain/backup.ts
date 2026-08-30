@@ -1,11 +1,23 @@
-import type { FamilyMember } from "../../household/domain/family-member";
-import type { OwnerProfile } from "../../household/domain/owner-profile";
-import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
-import type { Trip } from "../../travel/domain/trip";
+import { DATA_SCHEMA_VERSION } from "../../../configuration/app-metadata";
+import {
+  isFamilyMemberCollection,
+  type FamilyMember,
+} from "../../household/domain/family-member";
+import {
+  isOwnerProfile,
+  type OwnerProfile,
+} from "../../household/domain/owner-profile";
+import {
+  isImmigrationPermissionCollection,
+  type ImmigrationPermission,
+} from "../../immigration/domain/immigration-permission";
+import { isTripCollection, type Trip } from "../../travel/domain/trip";
 
 export const BACKUP_FORMAT = "urbanfox-ilr-encrypted-backup";
 export const BACKUP_VERSION = 1;
 export const BACKUP_PASSWORD_MINIMUM_LENGTH = 12;
+export const BACKUP_KEY_DERIVATION_ITERATIONS = 600_000;
+export const MAXIMUM_BACKUP_FILE_BYTES = 10 * 1024 * 1024;
 
 export interface ProfileRecords<T> {
   profileId: string;
@@ -52,4 +64,99 @@ export function validateBackupPassword(
     return `Use at least ${BACKUP_PASSWORD_MINIMUM_LENGTH} characters for the backup password.`;
   if (password !== confirmation) return "The backup passwords do not match.";
   return null;
+}
+
+function isIsoTimestamp(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) &&
+    !Number.isNaN(Date.parse(value))
+  );
+}
+
+function isHexOfLength(value: unknown, bytes: number): value is string {
+  return (
+    typeof value === "string" &&
+    value.length === bytes * 2 &&
+    /^[0-9a-f]+$/i.test(value)
+  );
+}
+
+export function isEncryptedBackupFile(
+  value: unknown,
+): value is EncryptedBackupFile {
+  if (!value || typeof value !== "object") return false;
+  const backup = value as Partial<EncryptedBackupFile>;
+  const encryption = backup.encryption;
+  return (
+    backup.format === BACKUP_FORMAT &&
+    backup.version === BACKUP_VERSION &&
+    typeof backup.appVersion === "string" &&
+    /^\d+\.\d+\.\d+$/.test(backup.appVersion) &&
+    backup.dataSchemaVersion === DATA_SCHEMA_VERSION &&
+    isIsoTimestamp(backup.exportedAt) &&
+    !!encryption &&
+    encryption.algorithm === "AES-GCM-256" &&
+    encryption.keyDerivation === "PBKDF2-HMAC-SHA-256" &&
+    encryption.iterations === BACKUP_KEY_DERIVATION_ITERATIONS &&
+    isHexOfLength(encryption.salt, 16) &&
+    isHexOfLength(encryption.initializationVector, 12) &&
+    typeof backup.ciphertext === "string" &&
+    backup.ciphertext.length >= 32 &&
+    backup.ciphertext.length % 2 === 0 &&
+    /^[0-9a-f]+$/i.test(backup.ciphertext)
+  );
+}
+
+function hasExactlyExpectedProfiles<T>(
+  value: unknown,
+  profileIds: string[],
+  validateRecords: (records: unknown, profileId: string) => records is T[],
+): value is ProfileRecords<T>[] {
+  if (!Array.isArray(value) || value.length !== profileIds.length) return false;
+  const expected = new Set(profileIds);
+  const found = new Set<string>();
+  for (const item of value) {
+    if (!item || typeof item !== "object") return false;
+    const candidate = item as Partial<ProfileRecords<T>>;
+    if (
+      typeof candidate.profileId !== "string" ||
+      !expected.has(candidate.profileId) ||
+      found.has(candidate.profileId) ||
+      !validateRecords(candidate.records, candidate.profileId)
+    )
+      return false;
+    found.add(candidate.profileId);
+  }
+  return true;
+}
+
+export function isBackupPayload(value: unknown): value is BackupPayload {
+  if (!value || typeof value !== "object") return false;
+  const payload = value as Partial<BackupPayload>;
+  if (
+    payload.format !== "urbanfox-ilr-backup-payload" ||
+    payload.version !== 1 ||
+    payload.dataSchemaVersion !== DATA_SCHEMA_VERSION ||
+    typeof payload.appVersion !== "string" ||
+    !/^\d+\.\d+\.\d+$/.test(payload.appVersion) ||
+    !isIsoTimestamp(payload.exportedAt) ||
+    !payload.data ||
+    !isOwnerProfile(payload.data.owner) ||
+    !isFamilyMemberCollection(payload.data.familyMembers)
+  )
+    return false;
+  const profileIds = [
+    payload.data.owner.id,
+    ...payload.data.familyMembers.map(({ id }) => id),
+  ];
+  if (new Set(profileIds).size !== profileIds.length) return false;
+  return (
+    hasExactlyExpectedProfiles(
+      payload.data.permissions,
+      profileIds,
+      isImmigrationPermissionCollection,
+    ) &&
+    hasExactlyExpectedProfiles(payload.data.trips, profileIds, isTripCollection)
+  );
 }

@@ -7,14 +7,16 @@ import { getImmigrationPermissions } from "../../immigration/data/immigration-pe
 import { getTrips } from "../../travel/data/trip-repository";
 import {
   BACKUP_FORMAT,
+  BACKUP_KEY_DERIVATION_ITERATIONS,
   BACKUP_VERSION,
+  isBackupPayload,
+  isEncryptedBackupFile,
+  MAXIMUM_BACKUP_FILE_BYTES,
   type BackupData,
   type BackupPayload,
   type EncryptedBackupFile,
   validateBackupPassword,
 } from "../domain/backup";
-
-const BACKUP_KEY_DERIVATION_ITERATIONS = 600_000;
 
 async function deriveBackupKey(
   password: string,
@@ -79,6 +81,8 @@ export async function createEncryptedBackup(
     exportedAt,
     data,
   };
+  if (!isBackupPayload(payload))
+    throw new Error("The local records are not valid for backup.");
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const initializationVector = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveBackupKey(password, salt);
@@ -104,10 +108,12 @@ export async function createEncryptedBackup(
   };
 }
 
-export async function decryptBackupForValidation(
+export async function decryptAndValidateBackup(
   backup: EncryptedBackupFile,
   password: string,
 ): Promise<BackupPayload> {
+  if (!isEncryptedBackupFile(backup))
+    throw new Error("The backup file format is not supported.");
   const key = await deriveBackupKey(
     password,
     hexToBytes(backup.encryption.salt),
@@ -120,7 +126,32 @@ export async function decryptBackupForValidation(
     key,
     hexToBytes(backup.ciphertext),
   );
-  return JSON.parse(new TextDecoder().decode(decrypted)) as BackupPayload;
+  const value: unknown = JSON.parse(new TextDecoder().decode(decrypted));
+  if (!isBackupPayload(value))
+    throw new Error("The decrypted backup data is invalid.");
+  if (
+    value.appVersion !== backup.appVersion ||
+    value.dataSchemaVersion !== backup.dataSchemaVersion ||
+    value.exportedAt !== backup.exportedAt
+  )
+    throw new Error("The backup metadata does not match its encrypted data.");
+  return value;
+}
+
+export function parseEncryptedBackupFile(
+  contents: string,
+): EncryptedBackupFile {
+  if (new TextEncoder().encode(contents).byteLength > MAXIMUM_BACKUP_FILE_BYTES)
+    throw new Error("The backup file is too large.");
+  let value: unknown;
+  try {
+    value = JSON.parse(contents);
+  } catch {
+    throw new Error("The backup file is not valid JSON.");
+  }
+  if (!isEncryptedBackupFile(value))
+    throw new Error("The backup file format is not supported.");
+  return value;
 }
 
 export function downloadBackupFile(backup: EncryptedBackupFile): void {

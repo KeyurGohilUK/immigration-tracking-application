@@ -694,6 +694,44 @@ a:focus-visible {
   font-size: 0.75rem;
 }
 
+.restore-summary {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--colour-border);
+}
+
+.restore-summary[hidden] {
+  display: none;
+}
+
+.restore-counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.restore-counts div {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  text-align: center;
+}
+
+.restore-counts dt {
+  color: var(--colour-text-muted);
+  font-size: 0.7rem;
+}
+
+.restore-counts dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
 .more-version {
   margin: 1.25rem 0 0;
   color: var(--colour-text-muted);

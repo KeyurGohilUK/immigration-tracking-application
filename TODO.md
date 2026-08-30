@@ -195,15 +195,15 @@ visual polish and public release.
       do not rely on the four-digit app PIN as strong backup protection.
 - [x] Include backup format, schema version, app version, and export timestamp.
 - [x] Use a clear dated filename.
-- [ ] Validate the file type, format marker, schema, and individual records
+- [x] Validate the file type, format marker, schema, and individual records
       before import.
-- [ ] Reject unsupported, malformed, or unexpectedly large backup files safely.
-- [ ] Show an import summary before changing existing data.
-- [ ] Use replace-only restore for the first release to avoid unsafe merging.
-- [ ] Require confirmation before replacing local data.
-- [ ] Preserve existing data if any restore step fails.
-- [ ] Prompt the user to create a backup before destructive replacement.
-- [ ] Confirm successful export and restore.
+- [x] Reject unsupported, malformed, or unexpectedly large backup files safely.
+- [x] Show an import summary before changing existing data.
+- [x] Use replace-only restore for the first release to avoid unsafe merging.
+- [x] Require confirmation before replacing local data.
+- [x] Preserve existing data if any restore step fails.
+- [x] Prompt the user to create a backup before destructive replacement.
+- [x] Confirm successful export and restore.
 - [ ] Test restoration from every supported older schema version.
 
 ## Phase 8 — Test correctness and resilience

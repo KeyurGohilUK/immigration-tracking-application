@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { BackupData } from "../domain/backup";
 import {
   createEncryptedBackup,
-  decryptBackupForValidation,
+  decryptAndValidateBackup,
+  parseEncryptedBackupFile,
 } from "./backup-service";
 
 const backupData: BackupData = {
@@ -39,7 +40,7 @@ describe("encrypted backup", () => {
       password,
       "2026-08-30T12:00:00.000Z",
     );
-    const payload = await decryptBackupForValidation(backup, password);
+    const payload = await decryptAndValidateBackup(backup, password);
 
     expect(payload.data).toEqual(backupData);
     expect(payload.exportedAt).toBe("2026-08-30T12:00:00.000Z");
@@ -52,7 +53,27 @@ describe("encrypted backup", () => {
     );
 
     await expect(
-      decryptBackupForValidation(backup, "the-wrong-backup-password"),
+      decryptAndValidateBackup(backup, "the-wrong-backup-password"),
     ).rejects.toThrow();
+  });
+
+  it("rejects unsupported wrappers before decryption", async () => {
+    const backup = await createEncryptedBackup(
+      backupData,
+      "a-secure-backup-password",
+    );
+
+    await expect(
+      decryptAndValidateBackup(
+        { ...backup, dataSchemaVersion: 999 },
+        "a-secure-backup-password",
+      ),
+    ).rejects.toThrow("format is not supported");
+  });
+
+  it("rejects malformed backup JSON", () => {
+    expect(() => parseEncryptedBackupFile("{not-json")).toThrow(
+      "not valid JSON",
+    );
   });
 });

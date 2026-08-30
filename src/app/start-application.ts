@@ -1,12 +1,23 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import { renderMorePage } from "../features/settings/components/more-page";
-import { validateBackupPassword } from "../features/backup/domain/backup";
+import {
+  BACKUP_PASSWORD_MINIMUM_LENGTH,
+  MAXIMUM_BACKUP_FILE_BYTES,
+  type BackupPayload,
+  validateBackupPassword,
+} from "../features/backup/domain/backup";
 import {
   collectBackupData,
   createEncryptedBackup,
+  decryptAndValidateBackup,
   downloadBackupFile,
+  parseEncryptedBackupFile,
 } from "../features/backup/services/backup-service";
+import {
+  replaceAllLocalData,
+  summariseBackup,
+} from "../features/backup/services/restore-service";
 import {
   renderAbsenceSummary,
   renderAbsenceSummaryUnavailable,
@@ -185,6 +196,18 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const backupDialog =
         root.querySelector<HTMLDialogElement>("#backup-dialog");
       const backupForm = root.querySelector<HTMLFormElement>("#backup-form");
+      const restoreDialog =
+        root.querySelector<HTMLDialogElement>("#restore-dialog");
+      const restoreForm = root.querySelector<HTMLFormElement>("#restore-form");
+      const restoreSummary =
+        restoreForm?.querySelector<HTMLElement>("#restore-summary");
+      const restoreConfirmation = restoreForm?.querySelector<HTMLInputElement>(
+        "#restore-confirmation",
+      );
+      const replaceButton = restoreForm?.querySelector<HTMLButtonElement>(
+        "#replace-local-data",
+      );
+      let reviewedBackup: BackupPayload | null = null;
       root
         .querySelector<HTMLButtonElement>("#lock-from-more")
         ?.addEventListener("click", lock);
@@ -252,6 +275,152 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             submit.disabled = false;
             submit.textContent = "Download encrypted backup";
           }
+        }
+      });
+      root
+        .querySelector<HTMLButtonElement>("#restore-backup")
+        ?.addEventListener("click", () => {
+          reviewedBackup = null;
+          restoreForm?.reset();
+          if (restoreSummary) restoreSummary.hidden = true;
+          if (replaceButton) replaceButton.disabled = true;
+          const error = restoreForm?.querySelector<HTMLElement>(
+            "#restore-form-error",
+          );
+          if (error) error.hidden = true;
+          restoreDialog?.showModal();
+        });
+      restoreDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => restoreDialog.close());
+      restoreDialog?.addEventListener("click", (event) => {
+        if (event.target === restoreDialog) restoreDialog.close();
+      });
+      restoreConfirmation?.addEventListener("change", () => {
+        if (replaceButton)
+          replaceButton.disabled = !restoreConfirmation.checked;
+      });
+      restoreForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        reviewedBackup = null;
+        if (restoreSummary) restoreSummary.hidden = true;
+        if (restoreConfirmation) restoreConfirmation.checked = false;
+        if (replaceButton) replaceButton.disabled = true;
+        const error = restoreForm.querySelector<HTMLElement>(
+          "#restore-form-error",
+        );
+        if (error) error.hidden = true;
+        const data = new FormData(restoreForm);
+        const fileInput =
+          restoreForm.querySelector<HTMLInputElement>("#restore-file");
+        const file = fileInput?.files?.[0];
+        const password = String(data.get("password") ?? "");
+        if (!file) {
+          if (error) {
+            error.textContent = "Choose an UrbanFox JSON backup file.";
+            error.hidden = false;
+          }
+          return;
+        }
+        if (!file.name.toLowerCase().endsWith(".json")) {
+          if (error) {
+            error.textContent = "Choose a backup file ending in .json.";
+            error.hidden = false;
+          }
+          return;
+        }
+        if (file.size === 0 || file.size > MAXIMUM_BACKUP_FILE_BYTES) {
+          if (error) {
+            error.textContent =
+              "The backup file must be between 1 byte and 10 MB.";
+            error.hidden = false;
+          }
+          return;
+        }
+        if (password.length < BACKUP_PASSWORD_MINIMUM_LENGTH) {
+          if (error) {
+            error.textContent = `Enter the backup password of at least ${BACKUP_PASSWORD_MINIMUM_LENGTH} characters.`;
+            error.hidden = false;
+          }
+          return;
+        }
+        const reviewButton =
+          restoreForm.querySelector<HTMLButtonElement>("#review-backup");
+        if (reviewButton) {
+          reviewButton.disabled = true;
+          reviewButton.textContent = "Validating backup…";
+        }
+        try {
+          const encrypted = parseEncryptedBackupFile(await file.text());
+          const payload = await decryptAndValidateBackup(encrypted, password);
+          const summary = summariseBackup(payload.data);
+          reviewedBackup = payload;
+          const owner =
+            restoreForm.querySelector<HTMLElement>("#restore-owner");
+          const people =
+            restoreForm.querySelector<HTMLElement>("#restore-people");
+          const permissions = restoreForm.querySelector<HTMLElement>(
+            "#restore-permissions",
+          );
+          const trips =
+            restoreForm.querySelector<HTMLElement>("#restore-trips");
+          const exported =
+            restoreForm.querySelector<HTMLElement>("#restore-exported");
+          if (owner) owner.textContent = `Household: ${summary.ownerName}`;
+          if (people) people.textContent = String(summary.people);
+          if (permissions)
+            permissions.textContent = String(summary.permissions);
+          if (trips) trips.textContent = String(summary.trips);
+          if (exported)
+            exported.textContent = `Exported: ${new Date(payload.exportedAt).toLocaleString("en-GB")}`;
+          if (restoreSummary) restoreSummary.hidden = false;
+        } catch {
+          if (error) {
+            error.textContent =
+              "The backup could not be opened. Check the file and backup password.";
+            error.hidden = false;
+          }
+        } finally {
+          if (reviewButton) {
+            reviewButton.disabled = false;
+            reviewButton.textContent = "Review backup";
+          }
+        }
+      });
+      replaceButton?.addEventListener("click", async () => {
+        if (!reviewedBackup || !restoreConfirmation?.checked) return;
+        if (
+          !window.confirm(
+            "Replace all household, permission, and trip records on this device with this backup?",
+          )
+        )
+          return;
+        replaceButton.disabled = true;
+        replaceButton.textContent = "Restoring encrypted data…";
+        try {
+          await replaceAllLocalData(reviewedBackup.data, key);
+          familyMembers = reviewedBackup.data.familyMembers;
+          permissionCache.clear();
+          tripCache.clear();
+          selectedProfileId = OWNER_PROFILE_ID;
+          const restoredOwner = reviewedBackup.data.owner;
+          restoreDialog?.close();
+          renderMore(restoredOwner);
+          const status = root.querySelector<HTMLElement>("#backup-status");
+          if (status)
+            status.textContent =
+              "Backup restored successfully. All restored records are encrypted with this device’s local PIN.";
+        } catch {
+          const error = restoreForm?.querySelector<HTMLElement>(
+            "#restore-form-error",
+          );
+          if (error) {
+            error.textContent =
+              "Restore failed. Your previous local data remains unchanged.";
+            error.hidden = false;
+          }
+          replaceButton.disabled = false;
+          replaceButton.textContent = "Replace local data";
         }
       });
     };
