@@ -190,11 +190,11 @@ visual polish and public release.
 
 ## Phase 7 — Add backup and restore
 
-- [ ] Export all household and family-member records as a downloadable backup.
-- [ ] Encrypt backup contents and require the user to set a backup password;
+- [x] Export all household and family-member records as a downloadable backup.
+- [x] Encrypt backup contents and require the user to set a backup password;
       do not rely on the four-digit app PIN as strong backup protection.
-- [ ] Include backup format, schema version, app version, and export timestamp.
-- [ ] Use a clear dated filename.
+- [x] Include backup format, schema version, app version, and export timestamp.
+- [x] Use a clear dated filename.
 - [ ] Validate the file type, format marker, schema, and individual records
       before import.
 - [ ] Reject unsupported, malformed, or unexpectedly large backup files safely.

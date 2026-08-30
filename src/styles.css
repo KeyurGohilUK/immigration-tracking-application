@@ -681,6 +681,19 @@ a:focus-visible {
   margin: 0.85rem 0 0;
 }
 
+.more-card-status {
+  min-height: 1.25rem;
+  margin-top: 0.65rem;
+  color: var(--colour-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.more-card .field-guidance {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
 .more-version {
   margin: 1.25rem 0 0;
   color: var(--colour-text-muted);

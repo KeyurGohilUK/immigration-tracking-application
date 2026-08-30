@@ -1,6 +1,12 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import { renderMorePage } from "../features/settings/components/more-page";
+import { validateBackupPassword } from "../features/backup/domain/backup";
+import {
+  collectBackupData,
+  createEncryptedBackup,
+  downloadBackupFile,
+} from "../features/backup/services/backup-service";
 import {
   renderAbsenceSummary,
   renderAbsenceSummaryUnavailable,
@@ -176,6 +182,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const renderMore = (profile: OwnerProfile): void => {
       renderMorePage(root);
       wireAuthenticatedShell(profile, "More");
+      const backupDialog =
+        root.querySelector<HTMLDialogElement>("#backup-dialog");
+      const backupForm = root.querySelector<HTMLFormElement>("#backup-form");
       root
         .querySelector<HTMLButtonElement>("#lock-from-more")
         ?.addEventListener("click", lock);
@@ -184,6 +193,67 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ?.addEventListener("click", () =>
           showLegal(false, () => renderMore(profile)),
         );
+      root
+        .querySelector<HTMLButtonElement>("#create-backup")
+        ?.addEventListener("click", () => {
+          backupForm?.reset();
+          const error =
+            backupForm?.querySelector<HTMLElement>("#backup-form-error");
+          if (error) error.hidden = true;
+          backupDialog?.showModal();
+        });
+      backupDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => backupDialog.close());
+      backupDialog?.addEventListener("click", (event) => {
+        if (event.target === backupDialog) backupDialog.close();
+      });
+      backupForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const data = new FormData(backupForm);
+        const password = String(data.get("password") ?? "");
+        const confirmation = String(data.get("confirmation") ?? "");
+        const error =
+          backupForm.querySelector<HTMLElement>("#backup-form-error");
+        if (error) error.hidden = true;
+        const validationError = validateBackupPassword(password, confirmation);
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const submit = backupForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) {
+          submit.disabled = true;
+          submit.textContent = "Encrypting backup…";
+        }
+        try {
+          const backupData = await collectBackupData(profile, key);
+          const backup = await createEncryptedBackup(backupData, password);
+          downloadBackupFile(backup);
+          backupForm.reset();
+          backupDialog?.close();
+          const status = root.querySelector<HTMLElement>("#backup-status");
+          if (status)
+            status.textContent =
+              "Encrypted backup downloaded. Store the file and password separately.";
+        } catch {
+          if (error) {
+            error.textContent =
+              "The encrypted backup could not be created. Your local data is unchanged.";
+            error.hidden = false;
+          }
+        } finally {
+          if (submit) {
+            submit.disabled = false;
+            submit.textContent = "Download encrypted backup";
+          }
+        }
+      });
     };
 
     const wireDashboardActions = (profile: OwnerProfile): void => {

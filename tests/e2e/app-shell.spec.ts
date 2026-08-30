@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 
 const TEST_PROFILE = {
   name: "Urban Fox Test User",
@@ -192,9 +193,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(".pin-digit")).toHaveCount(4);
 });
 
-test("opens the More screen and keeps local safety actions available", async ({
-  page,
-}) => {
+test("exports an encrypted backup from the More screen", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
 
@@ -207,7 +206,35 @@ test("opens the More screen and keeps local safety actions available", async ({
   await expect(
     page.getByRole("heading", { name: "Stored only on this device" }),
   ).toBeVisible();
-  await expect(page.getByText("Coming next", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Create encrypted backup" }).click();
+  await page.getByLabel("Backup password", { exact: true }).fill("too-short");
+  await page.getByLabel("Confirm backup password").fill("too-short");
+  await page.getByRole("button", { name: "Download encrypted backup" }).click();
+  await expect(page.getByRole("alert")).toContainText("at least 12");
+
+  const backupPassword = "a-secure-test-backup-password";
+  await page
+    .getByLabel("Backup password", { exact: true })
+    .fill(backupPassword);
+  await page.getByLabel("Confirm backup password").fill(backupPassword);
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download encrypted backup" }).click();
+  const download = await downloadPromise;
+  const downloadPath = await download.path();
+  expect(download.suggestedFilename()).toMatch(
+    /^urbanfox-ilr-backup-\d{4}-\d{2}-\d{2}\.json$/,
+  );
+  expect(downloadPath).not.toBeNull();
+  if (!downloadPath) throw new Error("Backup download path was unavailable.");
+  const backupText = await readFile(downloadPath, "utf8");
+  const backup = JSON.parse(backupText) as Record<string, unknown>;
+  expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
+  expect(backup.version).toBe(1);
+  expect(backup.dataSchemaVersion).toBe(4);
+  expect(backupText).not.toContain(TEST_PROFILE.name);
+  await expect(
+    page.getByText("Encrypted backup downloaded", { exact: false }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "View legal information" }).click();
   await expect(

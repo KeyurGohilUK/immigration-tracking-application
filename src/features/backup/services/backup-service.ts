@@ -1,0 +1,137 @@
+import { APP_VERSION } from "../../../configuration/release-metadata";
+import { DATA_SCHEMA_VERSION } from "../../../configuration/app-metadata";
+import { bytesToHex, hexToBytes } from "../../../shared/encoding/hex";
+import { getFamilyMembers } from "../../household/data/family-member-repository";
+import type { OwnerProfile } from "../../household/domain/owner-profile";
+import { getImmigrationPermissions } from "../../immigration/data/immigration-permission-repository";
+import { getTrips } from "../../travel/data/trip-repository";
+import {
+  BACKUP_FORMAT,
+  BACKUP_VERSION,
+  type BackupData,
+  type BackupPayload,
+  type EncryptedBackupFile,
+  validateBackupPassword,
+} from "../domain/backup";
+
+const BACKUP_KEY_DERIVATION_ITERATIONS = 600_000;
+
+async function deriveBackupKey(
+  password: string,
+  salt: Uint8Array<ArrayBuffer>,
+): Promise<CryptoKey> {
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"],
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      hash: "SHA-256",
+      salt,
+      iterations: BACKUP_KEY_DERIVATION_ITERATIONS,
+    },
+    material,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
+export async function collectBackupData(
+  owner: OwnerProfile,
+  vaultKey: CryptoKey,
+): Promise<BackupData> {
+  const familyMembers = await getFamilyMembers(vaultKey);
+  const profileIds = [owner.id, ...familyMembers.map(({ id }) => id)];
+  const [permissions, trips] = await Promise.all([
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getImmigrationPermissions(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getTrips(profileId, vaultKey),
+      })),
+    ),
+  ]);
+  return { owner, familyMembers, permissions, trips };
+}
+
+export async function createEncryptedBackup(
+  data: BackupData,
+  password: string,
+  exportedAt = new Date().toISOString(),
+): Promise<EncryptedBackupFile> {
+  const passwordError = validateBackupPassword(password, password);
+  if (passwordError) throw new Error(passwordError);
+  const payload: BackupPayload = {
+    format: "urbanfox-ilr-backup-payload",
+    version: 1,
+    dataSchemaVersion: DATA_SCHEMA_VERSION,
+    appVersion: APP_VERSION,
+    exportedAt,
+    data,
+  };
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const initializationVector = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveBackupKey(password, salt);
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: initializationVector },
+    key,
+    new TextEncoder().encode(JSON.stringify(payload)),
+  );
+  return {
+    format: BACKUP_FORMAT,
+    version: BACKUP_VERSION,
+    appVersion: APP_VERSION,
+    dataSchemaVersion: DATA_SCHEMA_VERSION,
+    exportedAt,
+    encryption: {
+      algorithm: "AES-GCM-256",
+      keyDerivation: "PBKDF2-HMAC-SHA-256",
+      iterations: BACKUP_KEY_DERIVATION_ITERATIONS,
+      salt: bytesToHex(salt),
+      initializationVector: bytesToHex(initializationVector),
+    },
+    ciphertext: bytesToHex(new Uint8Array(encrypted)),
+  };
+}
+
+export async function decryptBackupForValidation(
+  backup: EncryptedBackupFile,
+  password: string,
+): Promise<BackupPayload> {
+  const key = await deriveBackupKey(
+    password,
+    hexToBytes(backup.encryption.salt),
+  );
+  const decrypted = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: hexToBytes(backup.encryption.initializationVector),
+    },
+    key,
+    hexToBytes(backup.ciphertext),
+  );
+  return JSON.parse(new TextDecoder().decode(decrypted)) as BackupPayload;
+}
+
+export function downloadBackupFile(backup: EncryptedBackupFile): void {
+  const date = backup.exportedAt.slice(0, 10);
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `urbanfox-ilr-backup-${date}.json`;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
