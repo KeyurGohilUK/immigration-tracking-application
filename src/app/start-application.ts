@@ -1,6 +1,11 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import {
+  renderAbsenceSummary,
+  renderAbsenceSummaryUnavailable,
+} from "../features/calculation/components/absence-summary";
+import { calculateRecordedAbsenceCheck } from "../features/calculation/domain/absence-calculation";
+import {
   readTripInput,
   renderTripsPage,
   showTripForm,
@@ -75,6 +80,7 @@ import {
   unlockVault,
   type VaultRecord,
 } from "../features/security/services/vault-crypto";
+import { getUkCalendarDate } from "../shared/date/uk-calendar-date";
 
 const SPLASH_DURATION_MS = 500;
 
@@ -155,9 +161,18 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const renderDashboard = (profile: OwnerProfile): void => {
       renderApp(root, profile, familyMembers, selectedProfileId);
       wireAuthenticatedShell(profile, "Home");
+      wireDashboardActions(profile);
+      const profileId = selectedProfileId;
+      void updateDashboardCalculation(profile, profileId);
+    };
+
+    const wireDashboardActions = (profile: OwnerProfile): void => {
       root
         .querySelector<HTMLButtonElement>("#manage-permissions")
         ?.addEventListener("click", () => void showPermissions(profile));
+      root
+        .querySelector<HTMLButtonElement>("#manage-trips")
+        ?.addEventListener("click", () => void showTrips(profile));
     };
 
     const renderFamily = (
@@ -390,7 +405,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const existing = permissions.find(({ id }) => id === permissionId);
         const timestamp = new Date().toISOString();
         const permission: ImmigrationPermission = {
-          version: 1,
+          version: 2,
           id: existing?.id ?? crypto.randomUUID(),
           profileId: selectedProfileId,
           ...input,
@@ -578,6 +593,42 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             "This profile’s encrypted travel records could not be opened.";
           error.hidden = false;
         }
+      }
+    };
+
+    const updateDashboardCalculation = async (
+      profile: OwnerProfile,
+      profileId: string,
+    ): Promise<void> => {
+      try {
+        const cachedPermissions = permissionCache.get(profileId);
+        const cachedTrips = tripCache.get(profileId);
+        const [permissions, trips] = await Promise.all([
+          cachedPermissions ?? getImmigrationPermissions(profileId, key),
+          cachedTrips ?? getTrips(profileId, key),
+        ]);
+        permissionCache.set(profileId, permissions);
+        tripCache.set(profileId, trips);
+        if (
+          selectedProfileId !== profileId ||
+          !root.querySelector("#absence-summary")
+        )
+          return;
+        const result = calculateRecordedAbsenceCheck({
+          permissions,
+          trips,
+          asOfDate: getUkCalendarDate(),
+        });
+        renderAbsenceSummary(root, result);
+        wireDashboardActions(profile);
+      } catch {
+        if (
+          selectedProfileId !== profileId ||
+          !root.querySelector("#absence-summary")
+        )
+          return;
+        renderAbsenceSummaryUnavailable(root);
+        wireDashboardActions(profile);
       }
     };
 

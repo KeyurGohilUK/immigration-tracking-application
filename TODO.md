@@ -65,7 +65,7 @@ visual polish and public release.
       deleting local data and restoring a backup.
 - [x] Define a versioned local-data schema and additive migration mechanism.
 - [x] Store immigration permissions separately from travel records.
-- [ ] Store visa grant dates, expiry dates, and actual UK arrival dates
+- [x] Store visa grant dates, expiry dates, and actual UK arrival dates
       separately.
 - [ ] Validate all records before saving them.
 - [x] Prevent or explain overlapping travel records and invalid date ranges.
@@ -92,7 +92,7 @@ visual polish and public release.
 - [x] Require Terms acceptance before first use.
 - [x] Store the accepted Terms version and acceptance date locally.
 - [x] Require renewed acceptance following a material Terms update.
-- [ ] Display “Tracking estimate — not legal advice” near calculated results.
+- [x] Display “Tracking estimate — not legal advice” near calculated results.
 - [ ] Add the chosen contact email to `SECURITY.md` before public release.
 - [ ] Obtain professional legal review before describing the app as production
       ready.
@@ -124,16 +124,16 @@ visual polish and public release.
 
 ## Phase 5 — Implement the calculation engine
 
-- [ ] Keep calculation logic independent from the user interface and storage.
-- [ ] Create versioned, effective-dated route configurations.
+- [x] Keep calculation logic independent from the user interface and storage.
+- [x] Create versioned, effective-dated route configurations.
 - [ ] Support Skilled Worker and Health and Care Worker main applicants first.
 - [ ] Define the exact permission categories that may count for that route.
 - [ ] Exclude dependant permission from a main-applicant qualifying period.
-- [ ] Count only complete days outside the UK.
-- [ ] Exclude both the UK departure day and UK return day from absence totals.
-- [ ] Use UK civil calendar dates rather than timestamps or elapsed hours.
-- [ ] Calculate absence totals across every rolling 12-calendar-month window.
-- [ ] Flag a potential failure only when countable absences exceed 180 days.
+- [x] Count only complete days outside the UK.
+- [x] Exclude both the UK departure day and UK return day from absence totals.
+- [x] Use UK civil calendar dates rather than timestamps or elapsed hours.
+- [x] Calculate absence totals across every rolling 12-calendar-month window.
+- [x] Flag a potential failure only when countable absences exceed 180 days.
 - [ ] Handle the pre-11-January-2018 transitional calculation separately.
 - [ ] Calculate the qualifying-period completion date in calendar years.
 - [ ] Apply the route-specific 28-day early-application rule.
@@ -141,12 +141,12 @@ visual polish and public release.
 - [ ] Run calculations independently for each family member and never combine
       one person’s qualifying residence or absences with another’s.
 - [ ] Detect gaps, non-qualifying permission, and incomplete history.
-- [ ] Never convert an uncertain or exceptional case into a definite pass.
+- [x] Never convert an uncertain or exceptional case into a definite pass.
 - [ ] Return structured results: pass, fail, incomplete data, or manual review.
 - [ ] Explain which records caused a warning or potential failure.
-- [ ] Show the official source, rule version, effective date, and last-verified
+- [x] Show the official source, rule version, effective date, and last-verified
       date used by each calculation.
-- [ ] Add a prominent warning when the embedded rules may be outdated.
+- [x] Add a prominent warning when the embedded rules may be outdated.
 
 ## Phase 6 — Design the mobile-app experience
 

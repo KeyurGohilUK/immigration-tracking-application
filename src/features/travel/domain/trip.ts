@@ -1,3 +1,5 @@
+import { getUkCalendarDate } from "../../../shared/date/uk-calendar-date";
+
 export interface TripInput {
   departureDate: string;
   returnDate: string;
@@ -29,7 +31,7 @@ function isCalendarDate(value: string): boolean {
 }
 
 export function validateTripInput(input: TripInput): string | null {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getUkCalendarDate();
   if (!isCalendarDate(input.departureDate))
     return "Enter a valid UK departure date.";
   if (input.departureDate > today)

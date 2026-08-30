@@ -13,13 +13,14 @@ export interface ImmigrationPermissionInput {
   route: ImmigrationRoute;
   otherRouteName: string;
   role: PermissionRole;
+  grantDate: string;
   permissionStartDate: string;
   permissionExpiryDate: string;
   actualUkArrivalDate: string;
 }
 
 export interface ImmigrationPermission extends ImmigrationPermissionInput {
-  version: 1;
+  version: 2;
   id: string;
   profileId: string;
   createdAt: string;
@@ -53,6 +54,8 @@ export function validateImmigrationPermissionInput(
     return "Enter the permission route name.";
   if (!PERMISSION_ROLES.includes(input.role))
     return "Choose whether this permission was as a main applicant or dependant.";
+  if (input.grantDate && !isCalendarDate(input.grantDate))
+    return "Enter a valid visa grant date.";
   if (!isCalendarDate(input.permissionStartDate))
     return "Enter a valid permission start date.";
   if (!isCalendarDate(input.permissionExpiryDate))
@@ -77,7 +80,7 @@ export function isImmigrationPermission(
   if (!value || typeof value !== "object") return false;
   const permission = value as Partial<ImmigrationPermission>;
   if (
-    permission.version !== 1 ||
+    permission.version !== 2 ||
     typeof permission.id !== "string" ||
     permission.id.length < 1 ||
     permission.id.length > 100 ||
@@ -87,6 +90,7 @@ export function isImmigrationPermission(
     !IMMIGRATION_ROUTES.includes(permission.route as ImmigrationRoute) ||
     typeof permission.otherRouteName !== "string" ||
     !PERMISSION_ROLES.includes(permission.role as PermissionRole) ||
+    typeof permission.grantDate !== "string" ||
     typeof permission.permissionStartDate !== "string" ||
     typeof permission.permissionExpiryDate !== "string" ||
     typeof permission.actualUkArrivalDate !== "string" ||
@@ -116,6 +120,67 @@ export function isImmigrationPermissionCollection(
   return new Set(value.map(({ id }) => id)).size === value.length;
 }
 
+interface LegacyImmigrationPermission extends Omit<
+  ImmigrationPermission,
+  "version" | "grantDate"
+> {
+  version: 1;
+}
+
+function isLegacyImmigrationPermission(
+  value: unknown,
+): value is LegacyImmigrationPermission {
+  if (!value || typeof value !== "object") return false;
+  const permission = value as Partial<LegacyImmigrationPermission>;
+  if (
+    permission.version !== 1 ||
+    typeof permission.id !== "string" ||
+    permission.id.length < 1 ||
+    permission.id.length > 100 ||
+    typeof permission.profileId !== "string" ||
+    permission.profileId.length < 1 ||
+    permission.profileId.length > 100 ||
+    !IMMIGRATION_ROUTES.includes(permission.route as ImmigrationRoute) ||
+    typeof permission.otherRouteName !== "string" ||
+    !PERMISSION_ROLES.includes(permission.role as PermissionRole) ||
+    typeof permission.permissionStartDate !== "string" ||
+    typeof permission.permissionExpiryDate !== "string" ||
+    typeof permission.actualUkArrivalDate !== "string" ||
+    typeof permission.createdAt !== "string" ||
+    typeof permission.updatedAt !== "string"
+  )
+    return false;
+  return (
+    validateImmigrationPermissionInput({
+      ...(permission as LegacyImmigrationPermission),
+      grantDate: "",
+    }) === null
+  );
+}
+
+export function migrateImmigrationPermissionCollection(
+  value: unknown,
+  profileId: string,
+): ImmigrationPermission[] | null {
+  if (!Array.isArray(value)) return null;
+  if (isImmigrationPermissionCollection(value, profileId)) return value;
+  if (
+    !value.every(
+      (permission) =>
+        isLegacyImmigrationPermission(permission) &&
+        permission.profileId === profileId,
+    ) ||
+    new Set(value.map(({ id }: LegacyImmigrationPermission) => id)).size !==
+      value.length
+  )
+    return null;
+  return value.map((permission: LegacyImmigrationPermission) => ({
+    ...permission,
+    version: 2,
+    grantDate: "",
+  }));
+}
+
 export function getPermissionRouteLabel(
   permission: ImmigrationPermission,
 ): string {
@@ -128,5 +193,5 @@ export function getPermissionRouteLabel(
 export function getCalculationSupportMessage(route: ImmigrationRoute): string {
   return route === "other"
     ? "Eligibility calculation is not supported for this route."
-    : "Eligibility calculation is not active yet; official rules are still being implemented.";
+    : "A recorded absence check is available on Home; full eligibility calculation is not active yet.";
 }

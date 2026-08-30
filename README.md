@@ -24,9 +24,15 @@ Household owners can add, edit, and delete separate encrypted family-member
 profiles without sending those details to a server, then switch the active
 tracking profile consistently between Home and Family.
 Each profile can keep a separate encrypted immigration-permission history with
-route, permission dates, actual UK arrival, and applicant/dependant status.
+route, grant date, permission dates, actual UK arrival, and
+applicant/dependant status.
 It can also keep separate encrypted travel records with open-trip support,
 overlap checks, and flags for absences that require evidence and manual review.
+The Home dashboard performs a limited, local recorded-absence check for Skilled
+Worker and Health and Care Worker main applicants. Its versioned method and
+official GOV.UK sources are documented in
+[Calculation methodology](docs/calculation-methodology.md); it is not a full
+eligibility result.
 
 Supported browsers can install the site as a Progressive Web App. The app
 provides an install button when the browser reports that installation is

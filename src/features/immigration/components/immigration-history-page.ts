@@ -31,7 +31,7 @@ export function renderImmigrationHistoryPage(
       <section aria-labelledby="permission-list-title"><div class="section-heading"><h2 id="permission-list-title">Recorded permissions</h2><span id="permission-count" class="step-count"></span></div><div id="permission-list" class="record-list"></div></section>
       <p id="permission-page-error" class="form-error" role="alert" hidden></p>
     </main>
-    <dialog id="permission-dialog" class="family-dialog" aria-labelledby="permission-form-title"><form id="permission-form" class="family-form" novalidate><div class="app-manager-heading"><div><p class="eyebrow">Encrypted local record</p><h2 id="permission-form-title">Add immigration permission</h2></div><button class="dialog-close" type="button" aria-label="Close permission form">×</button></div><input name="permissionId" type="hidden" /><label for="permission-route">Immigration route</label><select id="permission-route" name="route" required><option value="">Choose route</option><option value="skilled-worker">Skilled Worker</option><option value="health-and-care-worker">Health and Care Worker</option><option value="other">Other or not listed</option></select><div id="other-route-field" hidden><label for="other-route-name">Permission route name</label><input id="other-route-name" name="otherRouteName" maxlength="100" /></div><label for="permission-role">Permission held as</label><select id="permission-role" name="role" required><option value="">Choose role</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select><label for="permission-start">Permission start date</label><input id="permission-start" name="permissionStartDate" type="date" required /><label for="permission-expiry">Permission expiry date</label><input id="permission-expiry" name="permissionExpiryDate" type="date" required /><label for="actual-uk-arrival">Actual UK arrival date <span class="optional-label">Optional</span></label><input id="actual-uk-arrival" name="actualUkArrivalDate" type="date" /><p class="field-guidance">Leave arrival blank for an in-country permission or when this permission did not involve entering the UK.</p><p id="permission-form-error" class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Save permission</button></form></dialog>`,
+    <dialog id="permission-dialog" class="family-dialog" aria-labelledby="permission-form-title"><form id="permission-form" class="family-form" novalidate><div class="app-manager-heading"><div><p class="eyebrow">Encrypted local record</p><h2 id="permission-form-title">Add immigration permission</h2></div><button class="dialog-close" type="button" aria-label="Close permission form">×</button></div><input name="permissionId" type="hidden" /><label for="permission-route">Immigration route</label><select id="permission-route" name="route" required><option value="">Choose route</option><option value="skilled-worker">Skilled Worker</option><option value="health-and-care-worker">Health and Care Worker</option><option value="other">Other or not listed</option></select><div id="other-route-field" hidden><label for="other-route-name">Permission route name</label><input id="other-route-name" name="otherRouteName" maxlength="100" /></div><label for="permission-role">Permission held as</label><select id="permission-role" name="role" required><option value="">Choose role</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select><label for="grant-date">Visa grant date <span class="optional-label">Needed for absence calculations</span></label><input id="grant-date" name="grantDate" type="date" /><p class="field-guidance">Use the decision or grant notice date. This is stored separately from the permission start date.</p><label for="permission-start">Permission start date</label><input id="permission-start" name="permissionStartDate" type="date" required /><label for="permission-expiry">Permission expiry date</label><input id="permission-expiry" name="permissionExpiryDate" type="date" required /><label for="actual-uk-arrival">Actual UK arrival date <span class="optional-label">Optional</span></label><input id="actual-uk-arrival" name="actualUkArrivalDate" type="date" /><p class="field-guidance">Leave arrival blank for an in-country permission or when this permission did not involve entering the UK.</p><p id="permission-form-error" class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Save permission</button></form></dialog>`,
   );
 
   populatePersonSwitcher(root, owner, members, selectedProfileId);
@@ -58,7 +58,7 @@ export function renderImmigrationHistoryPage(
 function createPermissionCard(permission: ImmigrationPermission): HTMLElement {
   const card = document.createElement("article");
   card.className = "record-card";
-  card.innerHTML = `<div class="record-card-heading"><div><p class="eyebrow">Immigration permission</p><h3></h3><span class="member-role permission-role"></span></div><div class="member-actions"><button class="member-action" type="button">Edit</button><button class="member-action destructive-action" type="button">Delete</button></div></div><dl class="record-dates"><div><dt>Start</dt><dd></dd></div><div><dt>Expiry</dt><dd></dd></div><div><dt>Actual UK arrival</dt><dd></dd></div></dl><p class="calculation-support"></p>`;
+  card.innerHTML = `<div class="record-card-heading"><div><p class="eyebrow">Immigration permission</p><h3></h3><span class="member-role permission-role"></span></div><div class="member-actions"><button class="member-action" type="button">Edit</button><button class="member-action destructive-action" type="button">Delete</button></div></div><dl class="record-dates permission-dates"><div><dt>Grant</dt><dd></dd></div><div><dt>Start</dt><dd></dd></div><div><dt>Expiry</dt><dd></dd></div><div><dt>Actual UK arrival</dt><dd></dd></div></dl><p class="calculation-support"></p>`;
   const route = card.querySelector<HTMLElement>("h3");
   const role = card.querySelector<HTMLElement>(".permission-role");
   const dateValues = card.querySelectorAll<HTMLElement>(".record-dates dd");
@@ -68,14 +68,19 @@ function createPermissionCard(permission: ImmigrationPermission): HTMLElement {
   if (role)
     role.textContent =
       permission.role === "main-applicant" ? "Main applicant" : "Dependant";
-  if (dateValues[0]) dateValues[0].textContent = permission.permissionStartDate;
-  if (dateValues[1])
-    dateValues[1].textContent = permission.permissionExpiryDate;
+  if (dateValues[0])
+    dateValues[0].textContent = permission.grantDate || "Missing";
+  if (dateValues[1]) dateValues[1].textContent = permission.permissionStartDate;
   if (dateValues[2])
-    dateValues[2].textContent =
+    dateValues[2].textContent = permission.permissionExpiryDate;
+  if (dateValues[3])
+    dateValues[3].textContent =
       permission.actualUkArrivalDate || "Not recorded";
   if (support)
-    support.textContent = getCalculationSupportMessage(permission.route);
+    support.textContent =
+      permission.route !== "other" && !permission.grantDate
+        ? "Add the visa grant date before using the recorded absence check."
+        : getCalculationSupportMessage(permission.route);
   const edit = actions[0];
   const remove = actions[1];
   if (edit) {
@@ -131,6 +136,8 @@ export function showImmigrationPermissionForm(
       permission.otherRouteName;
     (form.elements.namedItem("role") as HTMLSelectElement).value =
       permission.role;
+    (form.elements.namedItem("grantDate") as HTMLInputElement).value =
+      permission.grantDate;
     (form.elements.namedItem("permissionStartDate") as HTMLInputElement).value =
       permission.permissionStartDate;
     (
@@ -158,6 +165,7 @@ export function readImmigrationPermissionInput(form: HTMLFormElement): {
           ? String(data.get("otherRouteName") ?? "").trim()
           : "",
       role: String(data.get("role") ?? "") as PermissionRole,
+      grantDate: String(data.get("grantDate") ?? ""),
       permissionStartDate: String(data.get("permissionStartDate") ?? ""),
       permissionExpiryDate: String(data.get("permissionExpiryDate") ?? ""),
       actualUkArrivalDate: String(data.get("actualUkArrivalDate") ?? ""),

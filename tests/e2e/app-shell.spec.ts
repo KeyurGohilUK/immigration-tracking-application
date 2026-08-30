@@ -287,6 +287,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.getByRole("button", { name: "Add permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
+  await page.getByLabel(/Visa grant date/).fill("2023-12-15");
   await page.getByLabel("Permission start date").fill("2024-01-01");
   await page.getByLabel("Permission expiry date").fill("2026-12-31");
   await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
@@ -407,6 +408,56 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await expect(
     page.getByRole("heading", { name: "Canada", level: 3 }),
   ).toHaveCount(0);
+});
+
+test("shows a sourced recorded-absence warning without claiming eligibility", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await expect(
+    page.getByRole("heading", { name: "Add immigration permission history" }),
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Manage immigration history" })
+    .click();
+  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByLabel("Immigration route").selectOption("skilled-worker");
+  await page.getByLabel("Permission held as").selectOption("main-applicant");
+  await page.getByLabel(/Visa grant date/).fill("2022-01-01");
+  await page.getByLabel("Permission start date").fill("2022-01-01");
+  await page.getByLabel("Permission expiry date").fill("2028-01-01");
+  await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
+  await page.getByRole("button", { name: "Save permission" }).click();
+  await page.getByRole("link", { name: "Home", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "No complete absence days recorded" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Manage trips" }).click();
+  await page.getByRole("button", { name: "Add trip" }).click();
+  await page.getByLabel("UK departure date").fill("2024-01-01");
+  await page.getByLabel(/UK return date/).fill("2024-07-01");
+  await page.getByLabel("Destination").fill("Test destination");
+  await page.getByRole("button", { name: "Save trip" }).click();
+  await page.getByRole("link", { name: "Home", exact: true }).click();
+
+  await expect(page.getByText("Potential limit issue")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "181 recorded days in one rolling year",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/does not determine ILR eligibility/i),
+  ).toBeVisible();
+  await page.getByText("Method and official sources").click();
+  await expect(
+    page.getByRole("link", {
+      name: "Immigration Rules Appendix Continuous Residence",
+    }),
+  ).toBeVisible();
 });
 
 test("uses an app layout on mobile", async ({ page }, testInfo) => {

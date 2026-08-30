@@ -5,6 +5,7 @@ import {
 } from "../../../infrastructure/storage/encrypted-record-store";
 import {
   isImmigrationPermissionCollection,
+  migrateImmigrationPermissionCollection,
   type ImmigrationPermission,
 } from "../domain/immigration-permission";
 
@@ -18,9 +19,10 @@ export async function getImmigrationPermissions(
     key,
   );
   if (value === null) return [];
-  if (!isImmigrationPermissionCollection(value, profileId))
+  const permissions = migrateImmigrationPermissionCollection(value, profileId);
+  if (!permissions)
     throw new Error("Decrypted immigration permissions are invalid.");
-  return value;
+  return permissions;
 }
 
 export async function saveImmigrationPermissions(
