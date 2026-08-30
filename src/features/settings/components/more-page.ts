@@ -51,6 +51,16 @@ export function renderMorePage(root: HTMLElement): void {
           <p>Review the tracking-only disclaimer, local privacy notice, app information, and proprietary licence.</p>
           <button id="view-legal" class="secondary-button more-action" type="button">View legal information</button>
         </section>
+
+        <section class="more-card" aria-labelledby="delete-data-title">
+          <div class="more-card-heading">
+            <span class="more-card-icon" aria-hidden="true">×</span>
+            <div><p class="eyebrow">Permanent action</p><h2 id="delete-data-title">Delete all local data</h2></div>
+          </div>
+          <p>Permanently remove this household, every family member, permission and trip, the local PIN, and Terms acceptance from this browser.</p>
+          <p class="local-data-banner"><strong>This cannot be undone.</strong> Create and safely store an encrypted backup first if you may need these records again.</p>
+          <button id="open-delete-data" class="secondary-button more-action destructive-action" type="button">Delete all local data</button>
+        </section>
       </div>
 
       <p class="more-version">UrbanFox ILR version ${APP_VERSION}</p>
@@ -87,6 +97,17 @@ export function renderMorePage(root: HTMLElement): void {
           <label class="checkbox-field" for="restore-confirmation"><input id="restore-confirmation" type="checkbox" /><span><strong>I understand this replaces my current local records</strong></span></label>
           <button id="replace-local-data" class="primary-button" type="button" disabled>Replace local data</button>
         </section>
+      </form>
+    </dialog>
+    <dialog id="delete-data-dialog" class="family-dialog" aria-labelledby="delete-data-dialog-title">
+      <form id="delete-data-form" class="family-form" novalidate>
+        <div class="app-manager-heading"><div><p class="eyebrow">Permanent deletion</p><h2 id="delete-data-dialog-title">Delete everything on this device?</h2></div><button class="dialog-close" type="button" aria-label="Close delete data form">×</button></div>
+        <p id="delete-data-guidance">This deletes all encrypted UrbanFox records, the local PIN, and your Terms acceptance from this browser. It does not delete any backup files you previously downloaded.</p>
+        <p class="local-data-banner"><strong>Create an encrypted backup before continuing</strong> if you may need to restore this information.</p>
+        <label for="delete-data-confirmation">Type DELETE to confirm</label>
+        <input id="delete-data-confirmation" name="confirmationPhrase" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="delete-data-guidance" required />
+        <p id="delete-data-error" class="form-error" role="alert" hidden></p>
+        <button id="confirm-delete-data" class="primary-button destructive-confirmation" type="submit">Permanently delete local data</button>
       </form>
     </dialog>`,
   );

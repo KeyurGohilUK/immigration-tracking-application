@@ -19,6 +19,7 @@ export function renderLandingPage(root: HTMLElement): void {
               Freddy the Urban Fox helps you track family details, immigration history, and trips.
               Your information stays locally on this device.
             </p>
+            <p id="landing-status" class="landing-status" role="status" hidden></p>
             <button id="get-started" class="primary-button landing-action" type="button">
               Get started
             </button>

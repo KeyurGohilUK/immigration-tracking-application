@@ -46,6 +46,8 @@ access to locking, legal information, and encrypted backup downloads. Backups
 use a separate password rather than the four-digit local PIN. Restore validates
 the file and every record, shows a summary, and replaces local records only
 after explicit confirmation in one atomic transaction.
+Users can also permanently delete every encrypted record, the local PIN vault,
+and Terms acceptance through a typed and final destructive confirmation.
 
 **Freddy the Urban Fox**, a friendly UK urban fox, is the app’s main character
 and guides users through setup, family profiles, travel records, backups, and
