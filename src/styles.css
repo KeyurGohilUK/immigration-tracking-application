@@ -18,6 +18,10 @@
   --colour-text: #111111;
   --colour-strong: #000000;
   --colour-on-strong: #ffffff;
+  --colour-danger: #9a341f;
+  --colour-danger-hover: #7a2818;
+  --colour-danger-surface: rgb(255 246 243 / 82%);
+  --colour-on-danger: #ffffff;
   --radius-small: 0.75rem;
   --radius-medium: 1.25rem;
   --radius-large: 1.75rem;
@@ -694,8 +698,40 @@ a:focus-visible {
   font-size: 0.75rem;
 }
 
-.destructive-confirmation {
-  border: 2px solid var(--colour-strong);
+.more-card.danger-zone {
+  border-color: var(--colour-danger);
+  background: var(--colour-danger-surface);
+  box-shadow: 0 0.75rem 2rem rgb(154 52 31 / 9%);
+}
+
+.danger-zone .eyebrow,
+.danger-zone .more-card-icon,
+.more-card .danger-warning,
+.family-form .danger-warning {
+  color: var(--colour-danger);
+  font-weight: 700;
+}
+
+.danger-zone .more-card-icon {
+  border-color: var(--colour-danger);
+}
+
+.secondary-button.danger-button,
+.primary-button.danger-button {
+  border: 1px solid var(--colour-danger);
+  color: var(--colour-on-danger);
+  background: var(--colour-danger);
+}
+
+.secondary-button.danger-button:hover,
+.primary-button.danger-button:hover {
+  border-color: var(--colour-danger-hover);
+  background: var(--colour-danger-hover);
+}
+
+.secondary-button.danger-button:focus-visible,
+.primary-button.danger-button:focus-visible {
+  outline-color: var(--colour-danger);
 }
 
 .landing-status {
