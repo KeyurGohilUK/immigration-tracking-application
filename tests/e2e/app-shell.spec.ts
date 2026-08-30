@@ -460,31 +460,35 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   ).toBeVisible();
 });
 
-test("uses an app layout on mobile", async ({ page }, testInfo) => {
+test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
+  page,
+}, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
   await page.goto("/");
   await createLocalProfile(page);
 
-  const navigationBox = await page
-    .getByRole("navigation", { name: "Primary navigation" })
-    .boundingBox();
+  await page.getByRole("main").evaluate((main) => {
+    main.style.minHeight = "150vh";
+  });
+
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+  const header = page.locator(".top-bar");
+  const navigationBox = await navigation.boundingBox();
   const viewport = await page.evaluate(() => ({
     height: window.innerHeight,
     width: window.innerWidth,
-    scrollHeight: document.documentElement.scrollHeight,
   }));
-  const navigationStyles = await page
-    .getByRole("navigation", { name: "Primary navigation" })
-    .evaluate((navigation) => {
-      const style = window.getComputedStyle(navigation);
-      return {
-        background: style.backgroundColor,
-        borderRadius: style.borderRadius,
-      };
-    });
+  const navigationStyles = await navigation.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return {
+      background: style.backgroundColor,
+      borderRadius: style.borderRadius,
+    };
+  });
 
   expect(navigationBox).not.toBeNull();
-  expect(viewport.scrollHeight).toBeLessThanOrEqual(viewport.height);
   expect(navigationBox?.x).toBeGreaterThan(0);
   expect(navigationBox?.width).toBeLessThan(viewport.width);
   expect((navigationBox?.y ?? 0) + (navigationBox?.height ?? 0)).toBeLessThan(
@@ -492,12 +496,32 @@ test("uses an app layout on mobile", async ({ page }, testInfo) => {
   );
   expect(navigationStyles.background).toContain("0.72");
   expect(navigationStyles.borderRadius).not.toBe("0px");
-  await expect(
-    page
-      .getByRole("navigation", { name: "Primary navigation" })
-      .locator(".navigation-label")
-      .first(),
-  ).toHaveCSS("position", "absolute");
+  await expect(header).toHaveCSS("position", "sticky");
+  await expect(navigation.locator(".navigation-label").first()).toHaveCSS(
+    "position",
+    "absolute",
+  );
+
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(32);
+  await expect(navigation).toHaveClass(/is-scroll-compact/);
+  await expect(navigation).toHaveCSS(
+    "background-color",
+    "rgba(255, 255, 255, 0.54)",
+  );
+
+  const compactNavigationBox = await navigation.boundingBox();
+  const compactNavigationBackground = await navigation.evaluate(
+    (element) => window.getComputedStyle(element).backgroundColor,
+  );
+  const scrolledHeaderBox = await header.boundingBox();
+
+  expect(compactNavigationBox?.width).toBeLessThan(navigationBox?.width ?? 0);
+  expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
+  expect(compactNavigationBackground).toContain("0.54");
+  expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
@@ -515,11 +539,23 @@ test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   expect(mainBox?.width).toBeGreaterThan(900);
   expect(navigationBox?.y).toBeLessThan(mainBox?.y ?? 0);
   expect(navigationBox?.height).toBeLessThanOrEqual(64);
+  await expect(page.locator(".top-bar")).toHaveCSS("position", "sticky");
   await expect(
     page
       .getByRole("navigation", { name: "Primary navigation" })
       .getByText("Home", { exact: true }),
   ).toBeVisible();
+
+  await page.getByRole("main").evaluate((main) => {
+    main.style.minHeight = "150vh";
+  });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(0);
+
+  const scrolledHeaderBox = await page.locator(".top-bar").boundingBox();
+  expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 
 test("registers the offline app service worker", async ({ page }) => {

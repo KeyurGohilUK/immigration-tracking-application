@@ -9,9 +9,10 @@
 UrbanFox ILR is a mobile-first, local-only web application for tracking
 information relevant to UK indefinite leave to remain eligibility.
 
-The interface adapts to its device: the signed-in mobile Home fits the viewport
-and uses a translucent floating icon dock, while desktop screens use a wider
-website layout with labelled top navigation and two-column content.
+The interface adapts to its device: signed-in pages scroll beneath a translucent
+sticky header, and mobile screens use a floating icon dock that becomes smaller
+and more transparent while scrolling. Desktop screens use a wider website
+layout with labelled top navigation and two-column content.
 
 Anonymous visitors see a public introduction before entering local-profile
 setup. Tracker navigation and device controls are not rendered on the public

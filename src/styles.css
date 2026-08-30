@@ -30,6 +30,7 @@
 html {
   min-width: 320px;
   min-height: 100%;
+  scroll-padding-top: 5rem;
   background: var(--colour-surface-strong);
 }
 
@@ -72,11 +73,17 @@ body {
 }
 
 .public-header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
   display: flex;
   min-height: 4.5rem;
   align-items: center;
   padding: 0.75rem max(1.25rem, calc((100vw - 72rem) / 2));
   border-bottom: 1px solid var(--colour-border);
+  background: rgb(255 255 255 / 82%);
+  -webkit-backdrop-filter: blur(1rem) saturate(140%);
+  backdrop-filter: blur(1rem) saturate(140%);
 }
 
 .landing-main {
@@ -465,15 +472,12 @@ a:focus-visible {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  display: block;
   width: min(100%, 32rem);
-  height: 100vh;
-  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: visible;
   background: var(--colour-canvas);
   box-shadow: 0 0 3rem rgb(0 0 0 / 8%);
 }
@@ -488,8 +492,17 @@ a:focus-visible {
   min-height: 4.5rem;
   padding: max(0.75rem, env(safe-area-inset-top)) 1.25rem 0.75rem;
   border-bottom: 1px solid var(--colour-border);
-  background: rgb(255 255 255 / 94%);
-  backdrop-filter: blur(1rem);
+  background: rgb(255 255 255 / 82%);
+  -webkit-backdrop-filter: blur(1rem) saturate(140%);
+  backdrop-filter: blur(1rem) saturate(140%);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.top-bar.is-scrolled {
+  background: rgb(255 255 255 / 74%);
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 8%);
 }
 
 .wordmark {
@@ -557,19 +570,19 @@ a:focus-visible {
   display: grid;
   min-height: 0;
   gap: 0.65rem;
-  overflow: hidden;
+  overflow: visible;
   padding: 0.75rem 1rem calc(5.4rem + env(safe-area-inset-bottom));
 }
 
 .family-main {
   min-height: 0;
-  overflow-y: auto;
+  overflow: visible;
   padding: 1rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
 }
 
 .record-main {
   min-height: 0;
-  overflow-y: auto;
+  overflow: visible;
   padding: 1rem 1rem calc(5.75rem + env(safe-area-inset-bottom));
 }
 
@@ -1259,7 +1272,27 @@ p {
   border-radius: 1.5rem;
   background: rgb(255 255 255 / 72%);
   box-shadow: 0 0.65rem 2rem rgb(0 0 0 / 14%);
+  -webkit-backdrop-filter: blur(1.25rem) saturate(150%);
   backdrop-filter: blur(1.25rem) saturate(150%);
+  transition:
+    right 180ms ease,
+    left 180ms ease,
+    min-height 180ms ease,
+    padding 180ms ease,
+    border-radius 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.mobile-navigation.is-scroll-compact {
+  right: 2rem;
+  left: 2rem;
+  max-width: 26rem;
+  min-height: 3.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 1.25rem;
+  background: rgb(255 255 255 / 54%);
+  box-shadow: 0 0.4rem 1.25rem rgb(0 0 0 / 10%);
 }
 
 .primary-navigation a {
@@ -1286,6 +1319,16 @@ p {
 
 .mobile-navigation a {
   min-height: 3rem;
+  transition: min-height 180ms ease;
+}
+
+.mobile-navigation.is-scroll-compact a {
+  min-height: 2.75rem;
+}
+
+.mobile-navigation.is-scroll-compact svg {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .mobile-navigation .navigation-label {
@@ -1311,11 +1354,14 @@ p {
   }
 
   .app-shell {
-    height: calc(100vh - 3rem);
-    height: calc(100dvh - 3rem);
     min-height: calc(100vh - 3rem);
     min-height: calc(100dvh - 3rem);
     border-radius: 2rem;
+  }
+
+  .top-bar {
+    top: 1.5rem;
+    border-radius: 2rem 2rem 0 0;
   }
 
   .mobile-navigation {
@@ -1399,7 +1445,9 @@ p {
   }
 
   .top-bar {
+    top: 0;
     min-height: 5rem;
+    border-radius: 0;
     padding-right: max(2rem, calc((100vw - 72rem) / 2));
     padding-left: max(2rem, calc((100vw - 72rem) / 2));
   }

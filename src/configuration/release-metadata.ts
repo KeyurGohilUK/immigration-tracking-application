@@ -1,6 +1,7 @@
-export const APP_VERSION = "0.6.0";
+export const APP_VERSION = "0.6.1";
 
 export const RELEASE_NOTES = [
+  "Added translucent fixed headers and a mobile dock that compacts while scrolling.",
   "Added separate visa grant dates and an official-source recorded-absence check.",
   "Added encrypted trip tracking with open trips and manual-review flags.",
   "Added encrypted immigration-permission history for each selected profile.",
