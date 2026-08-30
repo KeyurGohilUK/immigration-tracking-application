@@ -42,9 +42,12 @@ IndexedDB data from attempting every PIN offline. The app must not describe the
 PIN as equivalent to a strong password, operating-system login, or full-device
 encryption.
 
-There is no PIN recovery or bypass. Recovery from a forgotten PIN will require
-deleting the local vault and restoring a compatible backup using its correct
-PIN. Backup and reset controls are separate future features.
+There is no PIN recovery or bypass. While the app is unlocked, the More screen
+provides a confirmed deletion flow that clears encrypted records, the local PIN
+vault, and Terms acceptance. This cannot be undone; users should create an
+encrypted backup first if they may need the records again. A safe reset entry
+point for someone who has already forgotten their PIN remains a separate
+roadmap item.
 
 The design does not protect an unlocked session from malicious browser
 extensions, compromised devices, injected scripts, or a person who already has

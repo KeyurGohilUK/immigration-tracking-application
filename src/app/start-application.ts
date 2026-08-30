@@ -1,6 +1,7 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import { renderMorePage } from "../features/settings/components/more-page";
+import { deleteAllLocalData } from "../features/settings/services/local-data-service";
 import {
   BACKUP_PASSWORD_MINIMUM_LENGTH,
   MAXIMUM_BACKUP_FILE_BYTES,
@@ -199,6 +200,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const restoreDialog =
         root.querySelector<HTMLDialogElement>("#restore-dialog");
       const restoreForm = root.querySelector<HTMLFormElement>("#restore-form");
+      const deleteDataDialog = root.querySelector<HTMLDialogElement>(
+        "#delete-data-dialog",
+      );
+      const deleteDataForm =
+        root.querySelector<HTMLFormElement>("#delete-data-form");
       const restoreSummary =
         restoreForm?.querySelector<HTMLElement>("#restore-summary");
       const restoreConfirmation = restoreForm?.querySelector<HTMLInputElement>(
@@ -421,6 +427,74 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           replaceButton.disabled = false;
           replaceButton.textContent = "Replace local data";
+        }
+      });
+      root
+        .querySelector<HTMLButtonElement>("#open-delete-data")
+        ?.addEventListener("click", () => {
+          deleteDataForm?.reset();
+          const error =
+            deleteDataForm?.querySelector<HTMLElement>("#delete-data-error");
+          if (error) error.hidden = true;
+          deleteDataDialog?.showModal();
+        });
+      deleteDataDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => deleteDataDialog.close());
+      deleteDataDialog?.addEventListener("click", (event) => {
+        if (event.target === deleteDataDialog) deleteDataDialog.close();
+      });
+      deleteDataForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const error =
+          deleteDataForm.querySelector<HTMLElement>("#delete-data-error");
+        if (error) error.hidden = true;
+        const confirmationPhrase = String(
+          new FormData(deleteDataForm).get("confirmationPhrase") ?? "",
+        ).trim();
+        if (confirmationPhrase !== "DELETE") {
+          if (error) {
+            error.textContent = "Type DELETE exactly as shown to continue.";
+            error.hidden = false;
+          }
+          return;
+        }
+        if (
+          !window.confirm(
+            "Permanently delete all UrbanFox ILR data and the local PIN from this browser?",
+          )
+        )
+          return;
+        const submit = deleteDataForm.querySelector<HTMLButtonElement>(
+          "#confirm-delete-data",
+        );
+        if (submit) {
+          submit.disabled = true;
+          submit.textContent = "Deleting local data…";
+        }
+        try {
+          await deleteAllLocalData();
+          sessionKey = null;
+          stopSessionLock?.();
+          stopSessionLock = null;
+          familyMembers = [];
+          permissionCache.clear();
+          tripCache.clear();
+          selectedProfileId = OWNER_PROFILE_ID;
+          deleteDataDialog?.close();
+          showLanding(
+            "All UrbanFox ILR data and the local PIN were deleted from this browser.",
+          );
+        } catch {
+          if (error) {
+            error.textContent =
+              "Local data could not be deleted. Your private space remains available.";
+            error.hidden = false;
+          }
+          if (submit) {
+            submit.disabled = false;
+            submit.textContent = "Permanently delete local data";
+          }
         }
       });
     };
@@ -1054,11 +1128,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     }
     root
       .querySelector<HTMLButtonElement>("#legal-back")
-      ?.addEventListener("click", backAction ?? showLanding);
+      ?.addEventListener("click", backAction ?? (() => showLanding()));
   };
 
-  const showLanding = (): void => {
+  const showLanding = (statusMessage?: string): void => {
     renderLandingPage(root);
+    const status = root.querySelector<HTMLElement>("#landing-status");
+    if (statusMessage && status) {
+      status.textContent = statusMessage;
+      status.hidden = false;
+    }
     root
       .querySelector<HTMLButtonElement>("#get-started")
       ?.addEventListener("click", () => {

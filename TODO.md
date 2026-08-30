@@ -71,7 +71,7 @@ visual polish and public release.
 - [x] Prevent or explain overlapping travel records and invalid date ranges.
 - [x] Provide a clear empty state when no records exist.
 - [x] Add a permanent indication that data is stored only on the current device.
-- [ ] Add a “Delete all local data” action with destructive confirmation.
+- [x] Add a “Delete all local data” action with destructive confirmation.
 - [ ] Test behaviour when browser storage is unavailable or full.
 
 ## Phase 3 — Add legal and safety content

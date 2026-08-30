@@ -305,6 +305,65 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("permanently deletes all local application data", async ({ page }) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("button", { name: "Delete all local data" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Delete everything on this device?" }),
+  ).toBeVisible();
+  await page.getByLabel("Type DELETE to confirm").fill("delete");
+  await page
+    .getByRole("button", { name: "Permanently delete local data" })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("Type DELETE exactly");
+
+  await page.getByLabel("Type DELETE to confirm").fill("DELETE");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("button", { name: "Permanently delete local data" })
+    .click();
+  await expect(page.locator("#landing-status")).toContainText(
+    "All UrbanFox ILR data and the local PIN were deleted",
+  );
+  await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
+
+  const localData = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 4);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const storeNames = ["security", "profiles", "permissions", "trips"];
+    const transaction = database.transaction(storeNames, "readonly");
+    const counts = await Promise.all(
+      storeNames.map(
+        (storeName) =>
+          new Promise<number>((resolve, reject) => {
+            const request = transaction.objectStore(storeName).count();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          }),
+      ),
+    );
+    database.close();
+    return {
+      counts,
+      termsAcceptance: localStorage.getItem("urbanfox-ilr:terms-acceptance"),
+    };
+  });
+  expect(localData).toEqual({ counts: [0, 0, 0, 0], termsAcceptance: null });
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
+  await page.getByRole("button", { name: "Get started" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Terms and privacy" }),
+  ).toBeVisible();
+});
+
 test("adds, edits, persists, and deletes an encrypted family member", async ({
   page,
 }) => {

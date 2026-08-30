@@ -23,3 +23,7 @@ export function saveCurrentTermsAcceptance(): TermsAcceptance {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(acceptance));
   return acceptance;
 }
+
+export function clearCurrentTermsAcceptance(): void {
+  localStorage.removeItem(STORAGE_KEY);
+}
