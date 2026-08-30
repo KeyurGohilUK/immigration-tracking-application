@@ -22,6 +22,10 @@
   --colour-danger-hover: #7a2818;
   --colour-danger-surface: rgb(255 246 243 / 82%);
   --colour-on-danger: #ffffff;
+  --glass-surface: rgb(255 255 255 / 68%);
+  --glass-surface-strong: rgb(255 255 255 / 82%);
+  --glass-border: rgb(17 17 17 / 14%);
+  --glass-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 7%);
   --radius-small: 0.75rem;
   --radius-medium: 1.25rem;
   --radius-large: 1.75rem;
@@ -631,6 +635,123 @@ a:focus-visible {
   padding: 0.75rem 1rem calc(5.4rem + env(safe-area-inset-bottom));
 }
 
+.dashboard-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.2rem 0.35rem;
+}
+
+.dashboard-intro h1 {
+  max-width: none;
+}
+
+.dashboard-intro .freddy-placeholder {
+  flex: 0 0 auto;
+}
+
+.dashboard-profile-picker,
+.dashboard-household,
+.timeline-panel,
+.travel-summary-card {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(1.1rem) saturate(135%);
+  backdrop-filter: blur(1.1rem) saturate(135%);
+}
+
+.dashboard-profile-picker,
+.dashboard-household,
+.timeline-panel {
+  padding: 0.85rem;
+  border-radius: var(--radius-large);
+}
+
+.dashboard-profile-picker .person-switcher {
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+.dashboard-family-list {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.dashboard-person-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  min-height: 4.25rem;
+  padding: 0.7rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-medium);
+  color: var(--colour-text);
+  background: rgb(255 255 255 / 62%);
+  text-align: left;
+}
+
+.dashboard-person-card.is-selected {
+  border-color: var(--colour-strong);
+  box-shadow: inset 0.2rem 0 0 var(--colour-strong);
+}
+
+.dashboard-person-avatar {
+  display: grid;
+  width: 2.65rem;
+  height: 2.65rem;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  background: var(--colour-surface);
+  font-weight: 800;
+}
+
+.dashboard-person-copy {
+  min-width: 0;
+}
+
+.dashboard-person-copy strong,
+.dashboard-person-copy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-person-copy strong {
+  font-size: 0.9rem;
+}
+
+.dashboard-person-copy small {
+  margin-top: 0.2rem;
+  color: var(--colour-text-muted);
+  font-size: 0.7rem;
+}
+
+.dashboard-person-state {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.dashboard-family-action {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.dashboard-notice {
+  margin: 0;
+}
+
 .family-main {
   min-height: 0;
   overflow: visible;
@@ -848,6 +969,100 @@ a:focus-visible {
   display: grid;
   gap: 0.75rem;
   margin-top: 0.75rem;
+}
+
+.travel-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0.9rem 0;
+}
+
+.travel-summary-card {
+  padding: 0.9rem;
+  border-radius: var(--radius-medium);
+}
+
+.travel-summary-value {
+  color: var(--colour-text);
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.travel-summary-value span {
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.travel-summary-card small {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+}
+
+.timeline-panel {
+  margin-top: 0.9rem;
+}
+
+.travel-timeline {
+  position: relative;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding-left: 0.2rem;
+}
+
+.travel-timeline::before {
+  position: absolute;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 1.35rem;
+  width: 1px;
+  background: var(--colour-border);
+  content: "";
+}
+
+.timeline-entry {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.7rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.timeline-marker {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  background: var(--glass-surface-strong);
+  -webkit-backdrop-filter: blur(1rem);
+  backdrop-filter: blur(1rem);
+}
+
+.timeline-marker svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.timeline-entry-content {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-medium);
+  background: rgb(255 255 255 / 58%);
 }
 
 .record-card {
@@ -1316,6 +1531,13 @@ p {
   gap: 0.65rem;
 }
 
+.dashboard-main .absence-summary {
+  background: var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(1.1rem) saturate(135%);
+  backdrop-filter: blur(1.1rem) saturate(135%);
+}
+
 .absence-summary h2 {
   margin-bottom: 0;
 }
@@ -1758,6 +1980,40 @@ p {
     padding: 2.5rem 2rem 4rem;
   }
 
+  .dashboard-main {
+    grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 0.7fr);
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .dashboard-main .dashboard-intro,
+  .dashboard-main .dashboard-profile-picker,
+  .dashboard-main .dashboard-notice {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-main .dashboard-intro {
+    grid-row: 1;
+  }
+
+  .dashboard-main .dashboard-profile-picker {
+    grid-row: 2;
+  }
+
+  .dashboard-main .setup-card {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: stretch;
+  }
+
+  .dashboard-main .dashboard-household {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .dashboard-main .dashboard-notice {
+    grid-row: 4;
+  }
+
   .family-main {
     width: min(100%, 72rem);
     margin: 0 auto;
@@ -1815,6 +2071,18 @@ p {
 
   .record-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .travel-main {
+    width: min(100%, 64rem);
+  }
+
+  .travel-main .travel-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .travel-main .travel-summary-grid {
+    max-width: 42rem;
   }
 
   .family-heading {

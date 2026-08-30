@@ -8,24 +8,28 @@ import type { OwnerProfile } from "../features/household/domain/owner-profile";
 
 const navigationItems = [
   {
-    label: "Home",
+    id: "Home",
+    label: "Dashboard",
     icon: '<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z" />',
   },
   {
+    id: "Family",
     label: "Family",
     icon: '<circle cx="9" cy="8" r="3" /><circle cx="17" cy="9" r="2.5" /><path d="M3 20c0-4 2.5-6 6-6s6 2 6 6M14 15c3.5-.5 6 1.2 7 4.5" />',
   },
   {
-    label: "Trips",
+    id: "Trips",
+    label: "Travel",
     icon: '<path d="m3 11 18-7-7 18-2.5-8.5ZM11.5 13.5 21 4" />',
   },
   {
+    id: "More",
     label: "More",
     icon: '<circle cx="5" cy="12" r="1" fill="currentColor" /><circle cx="12" cy="12" r="1" fill="currentColor" /><circle cx="19" cy="12" r="1" fill="currentColor" />',
   },
 ] as const;
 
-export type NavigationId = (typeof navigationItems)[number]["label"];
+export type NavigationId = (typeof navigationItems)[number]["id"];
 
 function renderNavigation(
   className: string,
@@ -35,8 +39,8 @@ function renderNavigation(
     <nav class="primary-navigation ${className}" aria-label="Primary navigation">
       ${navigationItems
         .map(
-          ({ label, icon }) => `
-            <a href="#${label.toLowerCase()}" data-navigation="${label}" ${label === activeNavigation ? 'aria-current="page"' : ""}>
+          ({ id, label, icon }) => `
+            <a href="#${id.toLowerCase()}" data-navigation="${id}" ${id === activeNavigation ? 'aria-current="page"' : ""}>
               <svg aria-hidden="true" viewBox="0 0 24 24">${icon}</svg>
               <span class="navigation-label">${label}</span>
             </a>`,
@@ -88,30 +92,19 @@ export function renderApp(
   renderAppShell(
     root,
     "Home",
-    `<main id="main-content" class="main-content">
-        <section class="welcome-card" aria-labelledby="welcome-title">
-          <div class="freddy-placeholder" aria-label="Freddy the Urban Fox artwork is coming soon">
-            <span aria-hidden="true">F</span>
-          </div>
+    `<main id="main-content" class="main-content dashboard-main">
+        <section class="dashboard-intro" aria-labelledby="welcome-title">
           <div>
-            <p class="eyebrow">Freddy the Urban Fox</p>
-            <p>Welcome back, <strong id="owner-name"></strong>.</p>
-            <h1 id="welcome-title">Let’s organise your ILR journey.</h1>
-            <p class="welcome-description">
-              I’ll help you record your household, immigration permissions, and trips—all stored
-              locally on this device.
-            </p>
-            ${renderPersonSwitcherMarkup()}
+            <p class="eyebrow">Private household tracker</p>
+            <h1 id="welcome-title">Household ILR overview</h1>
+            <p class="welcome-description">Welcome back, <strong id="owner-name"></strong>. Review each person separately so immigration and travel records are never combined.</p>
           </div>
+          <div class="freddy-placeholder" aria-label="Freddy the Urban Fox artwork is coming soon"><span aria-hidden="true">F</span></div>
         </section>
 
-        <aside class="notice" aria-labelledby="notice-title">
-          <span class="notice-icon" aria-hidden="true">i</span>
-          <div>
-            <h2 id="notice-title">Tracking estimate—not legal advice</h2>
-            <p>Always verify current GOV.UK guidance and obtain qualified advice before applying.</p>
-          </div>
-        </aside>
+        <section class="dashboard-profile-picker" aria-label="Selected tracking profile">
+          ${renderPersonSwitcherMarkup()}
+        </section>
 
         <section id="absence-summary" class="setup-card absence-summary" aria-labelledby="absence-summary-title" aria-live="polite">
           <div class="section-heading">
@@ -123,11 +116,80 @@ export function renderApp(
           <p>This check stays on your device and does not determine ILR eligibility.</p>
           <div class="dashboard-actions"><button id="manage-permissions" class="secondary-button" type="button">Immigration history</button><button id="manage-trips" class="primary-button" type="button">Manage trips</button></div>
         </section>
+
+        <section class="dashboard-household" aria-labelledby="dashboard-household-title">
+          <div class="section-heading"><div><p class="eyebrow">Local household</p><h2 id="dashboard-household-title">Household profiles</h2></div><span class="step-count">${members.length + 1} ${members.length === 0 ? "person" : "people"}</span></div>
+          <div id="dashboard-family-list" class="dashboard-family-list"></div>
+          <button id="manage-family" class="secondary-button dashboard-family-action" type="button">Manage family members</button>
+        </section>
+
+        <aside class="notice dashboard-notice" aria-labelledby="notice-title">
+          <span class="notice-icon" aria-hidden="true">i</span>
+          <div><h2 id="notice-title">Tracking estimate—not legal advice</h2><p>Always verify current GOV.UK guidance and obtain qualified advice before applying.</p></div>
+        </aside>
       </main>`,
   );
   const ownerNameElement = root.querySelector<HTMLElement>("#owner-name");
   if (ownerNameElement) ownerNameElement.textContent = owner.fullName;
   populatePersonSwitcher(root, owner, members, selectedProfileId);
+  const familyList = root.querySelector<HTMLElement>("#dashboard-family-list");
+  familyList?.append(
+    createDashboardProfileCard(
+      owner.fullName,
+      "You · Household owner",
+      owner.id,
+      selectedProfileId === owner.id,
+    ),
+  );
+  for (const member of members) {
+    familyList?.append(
+      createDashboardProfileCard(
+        member.fullName,
+        getDashboardMemberContext(member),
+        member.id,
+        selectedProfileId === member.id,
+      ),
+    );
+  }
+}
+
+function getDashboardMemberContext(member: FamilyMember): string {
+  const relationship =
+    member.relationship === "spouse-or-partner"
+      ? "Spouse or partner"
+      : member.relationship.charAt(0).toUpperCase() +
+        member.relationship.slice(1);
+  const role =
+    member.immigrationRole === "main-applicant"
+      ? "Main applicant"
+      : member.immigrationRole === "dependant"
+        ? "Dependant"
+        : "Role not set";
+  return `${relationship} · ${role}`;
+}
+
+function createDashboardProfileCard(
+  name: string,
+  context: string,
+  profileId: string,
+  selected: boolean,
+): HTMLElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "dashboard-person-card";
+  if (selected) button.classList.add("is-selected");
+  button.dataset.selectDashboardProfile = profileId;
+  button.setAttribute("aria-label", `${selected ? "Viewing" : "View"} ${name}`);
+  button.innerHTML = `<span class="dashboard-person-avatar" aria-hidden="true"></span><span class="dashboard-person-copy"><strong></strong><small></small></span><span class="dashboard-person-state"></span>`;
+  const avatar = button.querySelector<HTMLElement>(".dashboard-person-avatar");
+  const heading = button.querySelector<HTMLElement>("strong");
+  const description = button.querySelector<HTMLElement>("small");
+  const state = button.querySelector<HTMLElement>(".dashboard-person-state");
+  if (avatar) avatar.textContent = name.trim().charAt(0).toUpperCase() || "?";
+  if (heading) heading.textContent = name;
+  if (description) description.textContent = context;
+  if (state) state.textContent = selected ? "Viewing" : "Open";
+  return button;
 }
 
 export function renderSplash(root: HTMLElement): void {

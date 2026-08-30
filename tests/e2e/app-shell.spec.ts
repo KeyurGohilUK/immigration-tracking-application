@@ -19,10 +19,16 @@ async function createLocalProfile(
   await page.getByLabel("Date of birth").fill(TEST_PROFILE.dateOfBirth);
   await page.getByRole("button", { name: "Save local profile" }).click();
   await expect(
-    page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
+    page.getByRole("heading", { name: "Household ILR overview" }),
   ).toBeVisible();
   await expect(
     page.getByText(`Welcome back, ${TEST_PROFILE.name}.`),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Household profiles" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: `Viewing ${TEST_PROFILE.name}` }),
   ).toBeVisible();
 }
 
@@ -96,7 +102,9 @@ test("shows install and update controls in every device header", async ({
     page.getByRole("button", { name: "Download updates" }),
   ).toBeVisible();
   await expect(
-    page.getByText("Added a sourced five-year qualifying-period"),
+    page.getByText(
+      "Redesigned Dashboard around a responsive household overview",
+    ),
   ).toBeVisible();
   await expect(
     page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
@@ -189,7 +197,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
 
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
-    page.getByRole("heading", { name: "Let’s organise your ILR journey." }),
+    page.getByRole("heading", { name: "Household ILR overview" }),
   ).toBeVisible();
 
   await page.reload();
@@ -460,7 +468,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
     "Freddy Test Dependant",
   );
 
-  await page.getByRole("link", { name: "Home", exact: true }).click();
+  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Dependant",
   );
@@ -577,11 +585,13 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page.getByRole("link", { name: "Trips", exact: true }).click();
+  await page.getByRole("link", { name: "Travel", exact: true }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Trips outside the UK" }),
+    page.getByRole("heading", { name: "Travel timeline" }),
   ).toBeVisible();
+  await expect(page.getByText("Recorded complete days")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
   await expect(page.getByText("No trips recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add trip" }).click();
   await page.getByLabel("UK departure date").fill("2024-02-01");
@@ -638,7 +648,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
-  await page.getByRole("link", { name: "Trips", exact: true }).click();
+  await page.getByRole("link", { name: "Travel", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Canada", level: 3 }),
   ).toBeVisible();
@@ -670,7 +680,7 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   await page.getByLabel("Permission expiry date").fill("2028-01-01");
   await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
   await page.getByRole("button", { name: "Save permission" }).click();
-  await page.getByRole("link", { name: "Home", exact: true }).click();
+  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Earliest estimated application: 2026-12-04",
@@ -686,7 +696,7 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   await page.getByLabel(/UK return date/).fill("2024-07-01");
   await page.getByLabel("Destination").fill("Test destination");
   await page.getByRole("button", { name: "Save trip" }).click();
-  await page.getByRole("link", { name: "Home", exact: true }).click();
+  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
 
   await expect(page.getByText("Potential limit issue")).toBeVisible();
   await expect(
