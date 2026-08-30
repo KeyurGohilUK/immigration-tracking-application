@@ -245,7 +245,9 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
     .selectOption("other");
   await page.getByLabel("Immigration role").selectOption("not-set");
   await page.getByRole("button", { name: "Save family member" }).click();
-  await expect(page.getByText("Temporary Family Member")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Temporary Family Member", exact: true }),
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
