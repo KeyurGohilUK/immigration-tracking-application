@@ -633,7 +633,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await page.getByLabel("UK departure date").fill("2025-01-01");
   await page.getByLabel("Destination").fill("Canada");
   await page.getByRole("button", { name: "Save trip" }).click();
-  await expect(page.getByText("Open trip")).toBeVisible();
+  await expect(page.getByText("Open trip", { exact: true })).toBeVisible();
   await expect(page.getByText("Pending return")).toBeVisible();
 
   await page.getByRole("button", { name: "Lock app" }).click();

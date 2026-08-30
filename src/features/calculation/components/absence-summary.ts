@@ -41,7 +41,7 @@ function getSummaryContent(result: AbsenceCheckResult): SummaryContent {
         ? "Add the visa grant date"
         : result.issues.includes("open-trip")
           ? "Complete the open trip after returning"
-          : "Add immigration permission history",
+          : "Absence check waiting for permission history",
       description:
         "UrbanFox needs complete records before it can show a recorded absence check.",
     };
