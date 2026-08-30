@@ -73,7 +73,7 @@ export function renderMorePage(root: HTMLElement): void {
         <p id="restore-guidance">Choose an UrbanFox encrypted JSON backup and enter its separate backup password. Nothing changes until you review and confirm.</p>
         <label for="restore-file">Encrypted backup file</label>
         <input id="restore-file" name="backupFile" type="file" accept="application/json,.json" aria-describedby="restore-guidance" required />
-        <label for="restore-password">Backup password</label>
+        <label for="restore-password">Restore backup password</label>
         <input id="restore-password" name="password" type="password" minlength="12" autocomplete="current-password" required />
         <p id="restore-form-error" class="form-error" role="alert" hidden></p>
         <button id="review-backup" class="primary-button" type="submit">Review backup</button>
