@@ -591,7 +591,9 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
     page.getByRole("heading", { name: "Travel timeline" }),
   ).toBeVisible();
   await expect(page.getByText("Recorded complete days")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Timeline", exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("No trips recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add trip" }).click();
   await page.getByLabel("UK departure date").fill("2024-02-01");
@@ -798,7 +800,7 @@ test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   await expect(
     page
       .getByRole("navigation", { name: "Primary navigation" })
-      .getByText("Home", { exact: true }),
+      .getByText("Dashboard", { exact: true }),
   ).toBeVisible();
 
   await page.getByRole("main").evaluate((main) => {

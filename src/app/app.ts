@@ -102,7 +102,7 @@ export function renderApp(
           <div class="freddy-placeholder" aria-label="Freddy the Urban Fox artwork is coming soon"><span aria-hidden="true">F</span></div>
         </section>
 
-        <section class="dashboard-profile-picker" aria-label="Selected tracking profile">
+        <section class="dashboard-profile-picker">
           ${renderPersonSwitcherMarkup()}
         </section>
 
