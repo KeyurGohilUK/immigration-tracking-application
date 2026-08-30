@@ -709,6 +709,7 @@ a:focus-visible {
 .more-card .danger-warning,
 .family-form .danger-warning {
   color: var(--colour-danger);
+  font-weight: 700;
 }
 
 .danger-zone .more-card-icon {
