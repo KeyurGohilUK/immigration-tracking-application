@@ -5,13 +5,18 @@ import {
 } from "../../../infrastructure/storage/encrypted-record-store";
 import { DATABASE_STORES } from "../../../infrastructure/storage/app-database";
 
-const OWNER_KEY = "owner";
+export const OWNER_PROFILE_RECORD_KEY = "owner";
 
 export async function saveOwnerProfile(
   profile: OwnerProfile,
   key: CryptoKey,
 ): Promise<void> {
-  await saveEncryptedRecord(DATABASE_STORES.profiles, OWNER_KEY, profile, key);
+  await saveEncryptedRecord(
+    DATABASE_STORES.profiles,
+    OWNER_PROFILE_RECORD_KEY,
+    profile,
+    key,
+  );
 }
 
 export async function getOwnerProfile(
@@ -19,7 +24,7 @@ export async function getOwnerProfile(
 ): Promise<OwnerProfile | null> {
   const profile = await getEncryptedRecord(
     DATABASE_STORES.profiles,
-    OWNER_KEY,
+    OWNER_PROFILE_RECORD_KEY,
     key,
   );
   if (profile === null) return null;

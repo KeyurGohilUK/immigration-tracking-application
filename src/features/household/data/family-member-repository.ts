@@ -8,14 +8,14 @@ import {
 } from "../../../infrastructure/storage/encrypted-record-store";
 import { DATABASE_STORES } from "../../../infrastructure/storage/app-database";
 
-const FAMILY_MEMBERS_KEY = "family-members";
+export const FAMILY_MEMBERS_RECORD_KEY = "family-members";
 
 export async function getFamilyMembers(
   key: CryptoKey,
 ): Promise<FamilyMember[]> {
   const value = await getEncryptedRecord(
     DATABASE_STORES.profiles,
-    FAMILY_MEMBERS_KEY,
+    FAMILY_MEMBERS_RECORD_KEY,
     key,
   );
   if (value === null) return [];
@@ -32,7 +32,7 @@ export async function saveFamilyMembers(
     throw new Error("Family profiles are invalid.");
   await saveEncryptedRecord(
     DATABASE_STORES.profiles,
-    FAMILY_MEMBERS_KEY,
+    FAMILY_MEMBERS_RECORD_KEY,
     members,
     key,
   );

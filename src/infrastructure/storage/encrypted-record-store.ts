@@ -1,10 +1,27 @@
 import { bytesToHex, hexToBytes } from "../../shared/encoding/hex";
 import { openAppDatabase, type AppDatabaseStore } from "./app-database";
 
-interface EncryptedRecord {
+export interface EncryptedRecord {
   version: 1;
   initializationVector: string;
   ciphertext: string;
+}
+
+export async function encryptRecord(
+  value: unknown,
+  key: CryptoKey,
+): Promise<EncryptedRecord> {
+  const initializationVector = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: initializationVector },
+    key,
+    new TextEncoder().encode(JSON.stringify(value)),
+  );
+  return {
+    version: 1,
+    initializationVector: bytesToHex(initializationVector),
+    ciphertext: bytesToHex(new Uint8Array(encrypted)),
+  };
 }
 
 export async function saveEncryptedRecord(
@@ -13,17 +30,7 @@ export async function saveEncryptedRecord(
   value: unknown,
   key: CryptoKey,
 ): Promise<void> {
-  const initializationVector = crypto.getRandomValues(new Uint8Array(12));
-  const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: initializationVector },
-    key,
-    new TextEncoder().encode(JSON.stringify(value)),
-  );
-  const record: EncryptedRecord = {
-    version: 1,
-    initializationVector: bytesToHex(initializationVector),
-    ciphertext: bytesToHex(new Uint8Array(encrypted)),
-  };
+  const record = await encryptRecord(value, key);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(storeName, "readwrite");

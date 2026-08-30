@@ -193,7 +193,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(".pin-digit")).toHaveCount(4);
 });
 
-test("exports an encrypted backup from the More screen", async ({ page }) => {
+test("exports and restores an encrypted backup from More", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
 
@@ -235,6 +235,43 @@ test("exports an encrypted backup from the More screen", async ({ page }) => {
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
   ).toBeVisible();
+
+  await page.getByRole("link", { name: "Family", exact: true }).click();
+  await page.getByRole("button", { name: "Add family member" }).click();
+  await page.getByLabel("Full name").fill("Temporary Family Member");
+  await page.getByLabel("Date of birth").fill("2005-06-15");
+  await page
+    .getByLabel("Relationship to household owner")
+    .selectOption("other");
+  await page.getByLabel("Immigration role").selectOption("not-set");
+  await page.getByRole("button", { name: "Save family member" }).click();
+  await expect(page.getByText("Temporary Family Member")).toBeVisible();
+
+  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("button", { name: "Restore encrypted backup" }).click();
+  await page.getByLabel("Encrypted backup file").setInputFiles(downloadPath);
+  await page
+    .getByLabel("Backup password", { exact: true })
+    .fill(backupPassword);
+  await page.getByRole("button", { name: "Review backup" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Review before replacing data" }),
+  ).toBeVisible();
+  await expect(page.getByText(`Household: ${TEST_PROFILE.name}`)).toBeVisible();
+  await expect(page.locator("#restore-people")).toHaveText("1");
+  await expect(page.locator("#restore-permissions")).toHaveText("0");
+  await expect(page.locator("#restore-trips")).toHaveText("0");
+  await page
+    .getByLabel("I understand this replaces my current local records")
+    .check();
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Replace local data" }).click();
+  await expect(
+    page.getByText("Backup restored successfully", { exact: false }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Family", exact: true }).click();
+  await expect(page.getByText("No family members added yet")).toBeVisible();
+  await page.getByRole("link", { name: "More", exact: true }).click();
 
   await page.getByRole("button", { name: "View legal information" }).click();
   await expect(

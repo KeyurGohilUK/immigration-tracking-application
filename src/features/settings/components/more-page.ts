@@ -29,8 +29,9 @@ export function renderMorePage(root: HTMLElement): void {
           </div>
           <p>Download all current household records as one password-protected file. The backup password is separate from your four-digit PIN.</p>
           <button id="create-backup" class="primary-button more-action" type="button">Create encrypted backup</button>
+          <button id="restore-backup" class="secondary-button more-action" type="button">Restore encrypted backup</button>
           <p id="backup-status" class="more-card-status" role="status"></p>
-          <p class="field-guidance">Restore will be added next. Keep the file and password somewhere safe and separate.</p>
+          <p class="field-guidance">Keep each backup file and its password somewhere safe and separate.</p>
         </section>
 
         <section class="more-card" aria-labelledby="security-title">
@@ -64,6 +65,28 @@ export function renderMorePage(root: HTMLElement): void {
         <input id="backup-password-confirmation" name="confirmation" type="password" minlength="12" autocomplete="new-password" required />
         <p id="backup-form-error" class="form-error" role="alert" hidden></p>
         <button class="primary-button" type="submit">Download encrypted backup</button>
+      </form>
+    </dialog>
+    <dialog id="restore-dialog" class="family-dialog" aria-labelledby="restore-dialog-title">
+      <form id="restore-form" class="family-form" novalidate>
+        <div class="app-manager-heading"><div><p class="eyebrow">Replace-only restore</p><h2 id="restore-dialog-title">Restore a backup</h2></div><button class="dialog-close" type="button" aria-label="Close restore form">×</button></div>
+        <p id="restore-guidance">Choose an UrbanFox encrypted JSON backup and enter its separate backup password. Nothing changes until you review and confirm.</p>
+        <label for="restore-file">Encrypted backup file</label>
+        <input id="restore-file" name="backupFile" type="file" accept="application/json,.json" aria-describedby="restore-guidance" required />
+        <label for="restore-password">Backup password</label>
+        <input id="restore-password" name="password" type="password" minlength="12" autocomplete="current-password" required />
+        <p id="restore-form-error" class="form-error" role="alert" hidden></p>
+        <button id="review-backup" class="primary-button" type="submit">Review backup</button>
+        <section id="restore-summary" class="restore-summary" aria-labelledby="restore-summary-title" hidden>
+          <p class="eyebrow">Validated backup</p>
+          <h3 id="restore-summary-title">Review before replacing data</h3>
+          <p id="restore-owner"></p>
+          <dl class="restore-counts"><div><dt>People</dt><dd id="restore-people"></dd></div><div><dt>Permissions</dt><dd id="restore-permissions"></dd></div><div><dt>Trips</dt><dd id="restore-trips"></dd></div></dl>
+          <p id="restore-exported"></p>
+          <p class="local-data-banner"><strong>This replaces all current household records.</strong> Create a fresh backup first if you may need the data currently on this device.</p>
+          <label class="checkbox-field" for="restore-confirmation"><input id="restore-confirmation" type="checkbox" /><span><strong>I understand this replaces my current local records</strong></span></label>
+          <button id="replace-local-data" class="primary-button" type="button" disabled>Replace local data</button>
+        </section>
       </form>
     </dialog>`,
   );
