@@ -1,4 +1,5 @@
 import { APP_NAME } from "../../../configuration/app-metadata";
+import { renderDeleteDataDialog } from "../../settings/components/delete-data-dialog";
 
 export type PinScreenMode = "create" | "unlock";
 
@@ -118,8 +119,19 @@ export function renderPinScreen(
             <p>A four-digit PIN helps prevent casual access, but it is not equivalent to your device encryption or a strong password.</p>
             <p>There is no PIN recovery. A forgotten PIN will require deleting local data and restoring a backup.</p>
           </aside>
+          ${
+            creating
+              ? ""
+              : `<aside class="pin-reset danger-zone" aria-labelledby="pin-reset-title">
+                  <p class="eyebrow">Danger Zone</p>
+                  <h2 id="pin-reset-title">Forgot your PIN?</h2>
+                  <p>The PIN cannot be recovered. Reset only if you accept losing these local records or already have an encrypted backup and its password.</p>
+                  <button id="forgot-pin-reset" class="secondary-button danger-button" type="button">Reset local data</button>
+                </aside>`
+          }
         </section>
       </main>
+      ${creating ? "" : renderDeleteDataDialog("locked")}
     </div>
   `;
 

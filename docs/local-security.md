@@ -42,12 +42,12 @@ IndexedDB data from attempting every PIN offline. The app must not describe the
 PIN as equivalent to a strong password, operating-system login, or full-device
 encryption.
 
-There is no PIN recovery or bypass. While the app is unlocked, the More screen
-provides a confirmed deletion flow that clears encrypted records, the local PIN
-vault, and Terms acceptance. This cannot be undone; users should create an
-encrypted backup first if they may need the records again. A safe reset entry
-point for someone who has already forgotten their PIN remains a separate
-roadmap item.
+There is no PIN recovery or bypass. The locked screen provides a forgotten-PIN
+reset, and the More screen provides the same deletion flow while unlocked. Both
+require the user to type `DELETE` and accept a final confirmation before the app
+clears encrypted records, the local PIN vault, and Terms acceptance. This cannot
+be undone. A user who may need their records must already have an encrypted
+backup and its separate password before resetting from the locked screen.
 
 The design does not protect an unlocked session from malicious browser
 extensions, compromised devices, injected scripts, or a person who already has
