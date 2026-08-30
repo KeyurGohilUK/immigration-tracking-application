@@ -52,14 +52,14 @@ export function renderMorePage(root: HTMLElement): void {
           <button id="view-legal" class="secondary-button more-action" type="button">View legal information</button>
         </section>
 
-        <section class="more-card" aria-labelledby="delete-data-title">
+        <section class="more-card danger-zone" aria-labelledby="delete-data-title">
           <div class="more-card-heading">
             <span class="more-card-icon" aria-hidden="true">×</span>
-            <div><p class="eyebrow">Permanent action</p><h2 id="delete-data-title">Delete all local data</h2></div>
+            <div><p class="eyebrow">Danger Zone</p><h2 id="delete-data-title">Delete all local data</h2></div>
           </div>
           <p>Permanently remove this household, every family member, permission and trip, the local PIN, and Terms acceptance from this browser.</p>
-          <p class="local-data-banner"><strong>This cannot be undone.</strong> Create and safely store an encrypted backup first if you may need these records again.</p>
-          <button id="open-delete-data" class="secondary-button more-action destructive-action" type="button">Delete all local data</button>
+          <p class="local-data-banner danger-warning"><strong>This cannot be undone.</strong> Create and safely store an encrypted backup first if you may need these records again.</p>
+          <button id="open-delete-data" class="secondary-button more-action danger-button" type="button">Delete all local data</button>
         </section>
       </div>
 
@@ -103,11 +103,11 @@ export function renderMorePage(root: HTMLElement): void {
       <form id="delete-data-form" class="family-form" novalidate>
         <div class="app-manager-heading"><div><p class="eyebrow">Permanent deletion</p><h2 id="delete-data-dialog-title">Delete everything on this device?</h2></div><button class="dialog-close" type="button" aria-label="Close delete data form">×</button></div>
         <p id="delete-data-guidance">This deletes all encrypted UrbanFox records, the local PIN, and your Terms acceptance from this browser. It does not delete any backup files you previously downloaded.</p>
-        <p class="local-data-banner"><strong>Create an encrypted backup before continuing</strong> if you may need to restore this information.</p>
+        <p class="local-data-banner danger-warning"><strong>This cannot be undone.</strong> Create an encrypted backup before continuing if you may need to restore this information.</p>
         <label for="delete-data-confirmation">Type DELETE to confirm</label>
         <input id="delete-data-confirmation" name="confirmationPhrase" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="delete-data-guidance" required />
         <p id="delete-data-error" class="form-error" role="alert" hidden></p>
-        <button id="confirm-delete-data" class="primary-button destructive-confirmation" type="submit">Permanently delete local data</button>
+        <button id="confirm-delete-data" class="primary-button danger-button" type="submit">Permanently delete local data</button>
       </form>
     </dialog>`,
   );
