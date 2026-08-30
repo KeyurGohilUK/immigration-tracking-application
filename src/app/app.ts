@@ -108,20 +108,15 @@ export function renderApp(
           </div>
         </aside>
 
-        <section class="setup-card" aria-labelledby="setup-title">
+        <section id="absence-summary" class="setup-card absence-summary" aria-labelledby="absence-summary-title" aria-live="polite">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Private by design</p>
-              <h2 id="setup-title">Start your local household</h2>
+              <p class="eyebrow">Official-rule absence check</p>
+              <h2 id="absence-summary-title">Reviewing recorded absences…</h2>
             </div>
-            <span class="step-count">0 of 3</span>
           </div>
-          <ol class="setup-list">
-            <li><span aria-hidden="true">1</span><div><strong>Create a 4-digit PIN</strong><small>Lock access on this device</small></div></li>
-            <li><span aria-hidden="true">2</span><div><strong>Add your household</strong><small>Keep each family member separate</small></div></li>
-            <li><span aria-hidden="true">3</span><div><strong>Record immigration history</strong><small>Add permissions and UK arrival dates</small></div></li>
-          </ol>
-          <button id="manage-permissions" class="primary-button" type="button">Manage immigration history</button>
+          <p>This check stays on your device and does not determine ILR eligibility.</p>
+          <div class="dashboard-actions"><button id="manage-permissions" class="secondary-button" type="button">Immigration history</button><button id="manage-trips" class="primary-button" type="button">Manage trips</button></div>
         </section>
       </main>`,
   );

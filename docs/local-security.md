@@ -30,7 +30,9 @@ IndexedDB schema version 4 adds the `trips` store without rewriting or deleting
 the existing `security`, `profiles`, or `permissions` stores. Every decrypted
 domain record also carries its own version and is rejected if its structure,
 version, profile association, date ordering, or identifier uniqueness is
-invalid.
+invalid. Version 1 immigration-permission records are migrated in memory to
+version 2 with an empty grant date, so existing encrypted history remains
+readable and the calculation safely requests the missing date.
 
 ## Security boundary
 
