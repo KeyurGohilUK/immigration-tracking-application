@@ -24,6 +24,7 @@ import {
   renderAbsenceSummaryUnavailable,
 } from "../features/calculation/components/absence-summary";
 import { calculateRecordedAbsenceCheck } from "../features/calculation/domain/absence-calculation";
+import { calculateSkilledWorkerQualifyingPeriod } from "../features/calculation/domain/qualifying-period-calculation";
 import {
   readTripInput,
   renderTripsPage,
@@ -896,7 +897,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           trips,
           asOfDate: getUkCalendarDate(),
         });
-        renderAbsenceSummary(root, result);
+        const period = calculateSkilledWorkerQualifyingPeriod({
+          permissions,
+          asOfDate: getUkCalendarDate(),
+        });
+        renderAbsenceSummary(root, result, period);
         wireDashboardActions(profile);
       } catch {
         if (

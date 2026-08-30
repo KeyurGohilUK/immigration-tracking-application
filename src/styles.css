@@ -1324,6 +1324,37 @@ p {
   font-size: 0.82rem;
 }
 
+.calculation-issues {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+}
+
+.period-metrics {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .period-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.calculation-subsection {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--colour-border);
+}
+
+.calculation-subsection h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 .calculation-boundary {
   padding-left: 0.55rem;
   border-left: 3px solid var(--colour-strong);

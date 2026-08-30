@@ -10,7 +10,7 @@ visual polish and public release.
 - [x] Establish **Freddy the Urban Fox**, a UK urban fox, as the app’s main
       character and user guide.
 - [ ] Update the GitHub repository description to use the final name.
-- [ ] Confirm Skilled Worker and Health and Care Worker main applicants as the
+- [x] Confirm Skilled Worker and Health and Care Worker main applicants as the
       first supported settlement route.
 - [ ] Choose a public contact email for security and legal enquiries.
 - [ ] Confirm whether the initial release is described as alpha or beta.
@@ -126,24 +126,25 @@ visual polish and public release.
 
 - [x] Keep calculation logic independent from the user interface and storage.
 - [x] Create versioned, effective-dated route configurations.
-- [ ] Support Skilled Worker and Health and Care Worker main applicants first.
-- [ ] Define the exact permission categories that may count for that route.
-- [ ] Exclude dependant permission from a main-applicant qualifying period.
+- [x] Support Skilled Worker and Health and Care Worker main applicants first.
+- [x] Define the exact permission categories that may count for that route.
+- [x] Exclude dependant permission from a main-applicant qualifying period.
 - [x] Count only complete days outside the UK.
 - [x] Exclude both the UK departure day and UK return day from absence totals.
 - [x] Use UK civil calendar dates rather than timestamps or elapsed hours.
 - [x] Calculate absence totals across every rolling 12-calendar-month window.
 - [x] Flag a potential failure only when countable absences exceed 180 days.
 - [ ] Handle the pre-11-January-2018 transitional calculation separately.
-- [ ] Calculate the qualifying-period completion date in calendar years.
-- [ ] Apply the route-specific 28-day early-application rule.
-- [ ] Show the estimated earliest application date.
-- [ ] Run calculations independently for each family member and never combine
+- [x] Calculate the qualifying-period completion date in calendar years.
+- [x] Apply the route-specific 28-day early-application rule.
+- [x] Show the estimated earliest application date.
+- [x] Run calculations independently for each family member and never combine
       one person’s qualifying residence or absences with another’s.
-- [ ] Detect gaps, non-qualifying permission, and incomplete history.
+- [x] Detect gaps, non-qualifying permission, and incomplete history.
 - [x] Never convert an uncertain or exceptional case into a definite pass.
-- [ ] Return structured results: pass, fail, incomplete data, or manual review.
-- [ ] Explain which records caused a warning or potential failure.
+- [x] Return structured tracking states for incomplete data, manual review,
+      unsupported routes, dates in progress, and completed recorded periods.
+- [x] Explain which records caused a warning or potential failure.
 - [x] Show the official source, rule version, effective date, and last-verified
       date used by each calculation.
 - [x] Add a prominent warning when the embedded rules may be outdated.

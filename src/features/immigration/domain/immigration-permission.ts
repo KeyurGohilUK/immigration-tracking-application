@@ -7,6 +7,14 @@ import {
 export const IMMIGRATION_ROUTES = [
   "skilled-worker",
   "health-and-care-worker",
+  "tier-2-general",
+  "global-talent",
+  "innovator-founder",
+  "t2-minister-of-religion",
+  "international-sportsperson",
+  "representative-overseas-business",
+  "tier-1",
+  "scale-up",
   "other",
 ] as const;
 
@@ -168,14 +176,28 @@ export function migrateImmigrationPermissionCollection(
 export function getPermissionRouteLabel(
   permission: ImmigrationPermission,
 ): string {
-  if (permission.route === "skilled-worker") return "Skilled Worker";
-  if (permission.route === "health-and-care-worker")
-    return "Health and Care Worker";
-  return permission.otherRouteName;
+  if (permission.route === "other") return permission.otherRouteName;
+  return PERMISSION_ROUTE_LABELS[permission.route];
 }
+
+export const PERMISSION_ROUTE_LABELS: Record<
+  Exclude<ImmigrationRoute, "other">,
+  string
+> = {
+  "skilled-worker": "Skilled Worker",
+  "health-and-care-worker": "Health and Care Worker",
+  "tier-2-general": "Tier 2 (General)",
+  "global-talent": "Global Talent",
+  "innovator-founder": "Innovator Founder",
+  "t2-minister-of-religion": "T2 Minister of Religion",
+  "international-sportsperson": "International Sportsperson",
+  "representative-overseas-business": "Representative of an Overseas Business",
+  "tier-1": "Tier 1 (not Graduate Entrepreneur)",
+  "scale-up": "Scale-up",
+};
 
 export function getCalculationSupportMessage(route: ImmigrationRoute): string {
   return route === "other"
     ? "Eligibility calculation is not supported for this route."
-    : "A recorded absence check is available on Home; full eligibility calculation is not active yet.";
+    : "This route can be assessed as part of a Skilled Worker main-applicant qualifying period on Home.";
 }
