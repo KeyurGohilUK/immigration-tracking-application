@@ -309,11 +309,34 @@ test("permanently deletes all local application data", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "More", exact: true }).click();
-  await page.getByRole("button", { name: "Delete all local data" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Delete all local data" }),
+  ).toBeVisible();
+  const openDeleteButton = page.getByRole("button", {
+    name: "Delete all local data",
+  });
+  const dangerColours = await openDeleteButton.evaluate((button) => {
+    const style = window.getComputedStyle(button);
+    return { background: style.backgroundColor, text: style.color };
+  });
+  expect(dangerColours).toEqual({
+    background: "rgb(154, 52, 31)",
+    text: "rgb(255, 255, 255)",
+  });
+  await expect(page.locator(".danger-zone .danger-warning")).toContainText(
+    "This cannot be undone",
+  );
+  await openDeleteButton.click();
 
   await expect(
     page.getByRole("heading", { name: "Delete everything on this device?" }),
   ).toBeVisible();
+  await expect(page.locator("#delete-data-form .danger-warning")).toContainText(
+    "This cannot be undone",
+  );
+  await expect(
+    page.getByRole("button", { name: "Permanently delete local data" }),
+  ).toHaveCSS("background-color", "rgb(154, 52, 31)");
   await page.getByLabel("Type DELETE to confirm").fill("delete");
   await page
     .getByRole("button", { name: "Permanently delete local data" })
