@@ -251,7 +251,11 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
 
   await page.getByRole("link", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
-  await page.getByLabel("Encrypted backup file").setInputFiles(downloadPath);
+  await page.getByLabel("Encrypted backup file").setInputFiles({
+    name: "urbanfox-ilr-backup.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(backupText),
+  });
   await page.getByLabel("Restore backup password").fill(backupPassword);
   await page.getByRole("button", { name: "Review backup" }).click();
   const restoreSummaryHeading = page.getByRole("heading", {
