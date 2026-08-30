@@ -116,6 +116,9 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
   ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Reset local data" }),
+  ).toHaveCount(0);
 });
 
 test("keeps the legal action inside the desktop viewport", async ({
@@ -191,6 +194,42 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
     0,
   );
   await expect(page.locator(".pin-digit")).toHaveCount(4);
+});
+
+test("resets local data safely when the PIN is forgotten", async ({ page }) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("button", { name: "Lock app" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Forgot your PIN?" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Reset local data" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Reset this private space?" }),
+  ).toBeVisible();
+  await expect(page.locator("#delete-data-form .danger-warning")).toContainText(
+    "This cannot be undone",
+  );
+
+  await page.getByLabel("Type DELETE to confirm").fill("RESET");
+  await page.getByRole("button", { name: "Delete data and reset PIN" }).click();
+  await expect(page.getByRole("alert")).toContainText("Type DELETE exactly");
+
+  await page.getByLabel("Type DELETE to confirm").fill("DELETE");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete data and reset PIN" }).click();
+  await expect(page.locator("#landing-status")).toContainText(
+    "previous local data and PIN were deleted",
+  );
+  await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
+  await page.getByRole("button", { name: "Get started" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Terms and privacy" }),
+  ).toBeVisible();
 });
 
 test("exports and restores an encrypted backup from More", async ({ page }) => {

@@ -168,7 +168,7 @@ visual polish and public release.
 - [ ] Create a dashboard showing progress, estimated eligibility date, absence
       status, and outstanding information.
 - [x] Add mobile bottom navigation for Dashboard, Family, Trips, and More.
-- [ ] Add a clear locked screen with PIN entry and safe reset guidance.
+- [x] Add a clear locked screen with PIN entry and safe reset guidance.
 - [ ] Add a visible lock-now action and configurable inactivity timeout.
 - [x] Show the currently selected family member consistently on every relevant
       screen.

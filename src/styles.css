@@ -359,6 +359,28 @@ body {
   margin-top: 0.5rem;
 }
 
+.pin-reset {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--colour-danger);
+  border-radius: var(--radius-medium);
+  background: var(--colour-danger-surface);
+}
+
+.pin-reset h2 {
+  margin: 0.2rem 0 0.45rem;
+  font-size: 1.05rem;
+}
+
+.pin-reset p:not(.eyebrow) {
+  font-size: 0.78rem;
+}
+
+.pin-reset .danger-button {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
 button,
 a {
   font: inherit;

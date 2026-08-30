@@ -1,6 +1,7 @@
-export const APP_VERSION = "0.9.0";
+export const APP_VERSION = "0.10.0";
 
 export const RELEASE_NOTES = [
+  "Added a protected forgotten-PIN reset from the locked screen.",
   "Added confirmed deletion of all local records, PIN data, and Terms acceptance.",
   "Added validated, review-first encrypted backup restore with atomic local replacement.",
   "Added password-protected downloads containing all current encrypted household backup data.",
