@@ -1,4 +1,5 @@
 import { startApplication } from "./app/start-application";
+import { initialiseScrollChrome } from "./app/scroll-chrome";
 import {
   initialiseInstallPrompt,
   registerServiceWorker,
@@ -14,5 +15,6 @@ if (!root) {
 
 const installController = initialiseInstallPrompt(root);
 initialiseReleaseManager(root, installController);
+initialiseScrollChrome(root);
 registerServiceWorker();
 await startApplication(root);
