@@ -451,6 +451,19 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#manage-trips")
         ?.addEventListener("click", () => void showTrips(profile));
+      root
+        .querySelector<HTMLButtonElement>("#manage-family")
+        ?.addEventListener("click", () => showFamily(profile));
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-select-dashboard-profile]",
+      )) {
+        button.addEventListener("click", () => {
+          const profileId = button.dataset.selectDashboardProfile;
+          if (!profileId || !isKnownProfileId(profileId, familyMembers)) return;
+          selectedProfileId = profileId;
+          renderDashboard(profile);
+        });
+      }
     };
 
     const renderFamily = (
