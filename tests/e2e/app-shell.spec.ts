@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Redesigned Family with a cleaner responsive household layout",
+      "Redesigned Immigration History as a responsive Liquid Glass permission timeline",
     ),
   ).toBeVisible();
   await expect(
@@ -538,6 +538,13 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByRole("heading", { name: "Immigration history" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Permission timeline" }),
+  ).toBeVisible();
+  await expect(page.locator("#permission-count")).toHaveText("0");
+  await expect(page.locator(".permission-summary-date")).toHaveText(
+    "Not recorded",
+  );
   await expect(page.getByText("No permissions recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
@@ -551,7 +558,14 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByRole("heading", { name: "Skilled Worker", level: 3 }),
   ).toBeVisible();
-  await expect(page.getByText(/qualifying period on Home/i)).toBeVisible();
+  await expect(
+    page.getByText("Calculation supported", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#permission-count")).toHaveText("1");
+  await expect(page.locator(".permission-summary-date")).toHaveText(
+    "2026-12-31",
+  );
+  await expect(page.getByText(/qualifying period on Dashboard/i)).toBeVisible();
   const storedPermission = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 4);
@@ -571,16 +585,27 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   expect(storedPermission).toContain("ciphertext");
 
   await page.getByRole("button", { name: "Edit Skilled Worker" }).click();
+  await page.getByLabel(/Visa grant date/).clear();
   await page.getByLabel("Permission expiry date").fill("2027-12-31");
   await page.getByRole("button", { name: "Save permission" }).click();
-  await expect(page.getByText("2027-12-31")).toBeVisible();
+  await expect(
+    page.getByText("Review required", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Add the visa grant date", { exact: false }),
+  ).toBeVisible();
+  await expect(page.locator(".permission-summary-date")).toHaveText(
+    "2027-12-31",
+  );
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page
     .getByRole("button", { name: "Manage immigration history" })
     .click();
-  await expect(page.getByText("2027-12-31")).toBeVisible();
+  await expect(page.locator(".permission-summary-date")).toHaveText(
+    "2027-12-31",
+  );
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Skilled Worker" }).click();

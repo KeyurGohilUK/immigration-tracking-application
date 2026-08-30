@@ -21,25 +21,36 @@ export function renderImmigrationHistoryPage(
   selectedProfileId: string,
   permissions: ImmigrationPermission[],
 ): void {
+  const latestRecordedExpiry = permissions.reduce(
+    (latest, permission) =>
+      permission.permissionExpiryDate > latest
+        ? permission.permissionExpiryDate
+        : latest,
+    "",
+  );
+  const mainApplicantRecords = permissions.filter(
+    ({ role }) => role === "main-applicant",
+  ).length;
   renderAppShell(
     root,
     "Home",
-    `<main id="main-content" class="record-main">
-      <section class="record-heading" aria-labelledby="permission-title"><div><p class="eyebrow">Selected profile</p><h1 id="permission-title">Immigration history</h1><p>Record each permission separately. UrbanFox uses supported records for a tracking estimate, not an eligibility decision.</p></div><div class="record-heading-actions"><button id="back-to-dashboard" class="secondary-button" type="button">Back to Home</button><button id="add-permission" class="primary-button compact-button" type="button">Add permission</button></div></section>
-      ${renderPersonSwitcherMarkup()}
-      <aside class="notice compact-notice" aria-labelledby="permission-warning-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="permission-warning-title">Tracking only—not an eligibility result</h2><p>Permission dates and UK arrival dates are stored separately. Verify every record against official documents.</p></div></aside>
-      <section aria-labelledby="permission-list-title"><div class="section-heading"><h2 id="permission-list-title">Recorded permissions</h2><span id="permission-count" class="step-count"></span></div><div id="permission-list" class="record-list"></div></section>
+    `<main id="main-content" class="record-main immigration-main">
+      <section class="record-heading immigration-heading" aria-labelledby="permission-title"><div><p class="eyebrow">Selected profile</p><h1 id="permission-title">Immigration history</h1><p>Build a separate chronological record from official immigration documents.</p></div><div class="record-heading-actions"><button id="back-to-dashboard" class="secondary-button" type="button">Back to Dashboard</button><button id="add-permission" class="primary-button compact-button" type="button"><span aria-hidden="true">＋</span> Add permission</button></div></section>
+      <section class="immigration-profile-picker" aria-label="Choose a profile for immigration history">${renderPersonSwitcherMarkup()}</section>
+      <section class="permission-summary-grid" aria-label="Recorded immigration summary">
+        <article class="permission-summary-card"><p class="eyebrow">Recorded permissions</p><p class="permission-summary-value"><span id="permission-count">${permissions.length}</span><small>${permissions.length === 1 ? "record" : "records"}</small></p><p>${mainApplicantRecords} ${mainApplicantRecords === 1 ? "main-applicant record" : "main-applicant records"}</p></article>
+        <article class="permission-summary-card"><p class="eyebrow">Latest recorded expiry</p><p class="permission-summary-date">${latestRecordedExpiry || "Not recorded"}</p><p>This is a stored document date, not a current-status decision.</p></article>
+      </section>
+      <aside class="notice compact-notice immigration-notice" aria-labelledby="permission-warning-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="permission-warning-title">Tracking only—not an eligibility result</h2><p>Verify grant, start, arrival, and expiry dates against official documents. UrbanFox does not confirm immigration status.</p></div></aside>
+      <section class="permission-timeline-panel" aria-labelledby="permission-list-title"><div class="section-heading"><div><p class="eyebrow">Chronological record</p><h2 id="permission-list-title">Permission timeline</h2></div></div><div id="permission-list" class="record-list permission-timeline"></div></section>
       <p id="permission-page-error" class="form-error" role="alert" hidden></p>
     </main>
-    <dialog id="permission-dialog" class="family-dialog" aria-labelledby="permission-form-title"><form id="permission-form" class="family-form" novalidate><div class="app-manager-heading"><div><p class="eyebrow">Encrypted local record</p><h2 id="permission-form-title">Add immigration permission</h2></div><button class="dialog-close" type="button" aria-label="Close permission form">×</button></div><input name="permissionId" type="hidden" /><label for="permission-route">Immigration route</label><select id="permission-route" name="route" required><option value="">Choose route</option><optgroup label="Current Skilled Worker route"><option value="skilled-worker">Skilled Worker</option><option value="health-and-care-worker">Health and Care Worker</option><option value="tier-2-general">Tier 2 (General)</option></optgroup><optgroup label="Other routes that may count"><option value="global-talent">Global Talent</option><option value="innovator-founder">Innovator Founder</option><option value="t2-minister-of-religion">T2 Minister of Religion</option><option value="international-sportsperson">International Sportsperson</option><option value="representative-overseas-business">Representative of an Overseas Business</option><option value="tier-1">Tier 1 (not Graduate Entrepreneur)</option><option value="scale-up">Scale-up</option></optgroup><option value="other">Other or not listed</option></select><div id="other-route-field" hidden><label for="other-route-name">Permission route name</label><input id="other-route-name" name="otherRouteName" maxlength="100" /></div><label for="permission-role">Permission held as</label><select id="permission-role" name="role" required><option value="">Choose role</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select><label for="grant-date">Visa grant date <span class="optional-label">Needed for calculations</span></label><input id="grant-date" name="grantDate" type="date" /><p class="field-guidance">Use the date entry clearance or permission was granted. Pre-entry days after an entry-clearance grant count as absence days under Home Office guidance.</p><label for="permission-start">Permission start date</label><input id="permission-start" name="permissionStartDate" type="date" required /><label for="permission-expiry">Permission expiry date</label><input id="permission-expiry" name="permissionExpiryDate" type="date" required /><label for="actual-uk-arrival">Actual UK arrival date <span class="optional-label">Optional</span></label><input id="actual-uk-arrival" name="actualUkArrivalDate" type="date" /><p class="field-guidance">Leave arrival blank for an in-country permission or when this permission did not involve entering the UK.</p><p id="permission-form-error" class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Save permission</button></form></dialog>`,
+    <dialog id="permission-dialog" class="family-dialog permission-dialog" aria-labelledby="permission-form-title"><form id="permission-form" class="family-form" novalidate><div class="app-manager-heading family-form-heading"><div><p class="eyebrow">Encrypted local record</p><h2 id="permission-form-title">Add immigration permission</h2><p>Copy dates exactly from official documents.</p></div><button class="dialog-close" type="button" aria-label="Close permission form">×</button></div><input name="permissionId" type="hidden" /><div class="family-form-fields permission-form-fields"><div class="family-field family-field-wide"><label for="permission-route">Immigration route</label><select id="permission-route" name="route" required><option value="">Choose route</option><optgroup label="Current Skilled Worker route"><option value="skilled-worker">Skilled Worker</option><option value="health-and-care-worker">Health and Care Worker</option><option value="tier-2-general">Tier 2 (General)</option></optgroup><optgroup label="Other routes that may count"><option value="global-talent">Global Talent</option><option value="innovator-founder">Innovator Founder</option><option value="t2-minister-of-religion">T2 Minister of Religion</option><option value="international-sportsperson">International Sportsperson</option><option value="representative-overseas-business">Representative of an Overseas Business</option><option value="tier-1">Tier 1 (not Graduate Entrepreneur)</option><option value="scale-up">Scale-up</option></optgroup><option value="other">Other or not listed</option></select></div><div id="other-route-field" class="family-field family-field-wide" hidden><label for="other-route-name">Permission route name</label><input id="other-route-name" name="otherRouteName" maxlength="100" /></div><div class="family-field family-field-wide"><label for="permission-role">Permission held as</label><select id="permission-role" name="role" required><option value="">Choose role</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select></div><div class="family-field"><label for="grant-date">Visa grant date <span class="optional-label">Needed for calculations</span></label><input id="grant-date" name="grantDate" type="date" /><p class="field-guidance">Use the date entry clearance or permission was granted.</p></div><div class="family-field"><label for="permission-start">Permission start date</label><input id="permission-start" name="permissionStartDate" type="date" required /></div><div class="family-field"><label for="permission-expiry">Permission expiry date</label><input id="permission-expiry" name="permissionExpiryDate" type="date" required /></div><div class="family-field"><label for="actual-uk-arrival">Actual UK arrival date <span class="optional-label">Optional</span></label><input id="actual-uk-arrival" name="actualUkArrivalDate" type="date" /><p class="field-guidance">Leave blank for an in-country permission or when no UK entry was involved.</p></div></div><p class="permission-form-guidance">Pre-entry days after an entry-clearance grant count as absence days under Home Office guidance.</p><p id="permission-form-error" class="form-error" role="alert" hidden></p><button class="primary-button family-save-button" type="submit">Save permission</button></form></dialog>`,
   );
 
   populatePersonSwitcher(root, owner, members, selectedProfileId);
   const list = root.querySelector<HTMLElement>("#permission-list");
-  const count = root.querySelector<HTMLElement>("#permission-count");
-  if (!list || !count)
-    throw new Error("Immigration history could not be rendered.");
-  count.textContent = `${permissions.length} ${permissions.length === 1 ? "record" : "records"}`;
+  if (!list) throw new Error("Immigration history could not be rendered.");
   if (permissions.length === 0) {
     const empty = document.createElement("div");
     empty.className = "family-empty-state";
@@ -49,7 +60,7 @@ export function renderImmigrationHistoryPage(
     return;
   }
   for (const permission of [...permissions].sort((left, right) =>
-    right.permissionStartDate.localeCompare(left.permissionStartDate),
+    left.permissionStartDate.localeCompare(right.permissionStartDate),
   )) {
     list.append(createPermissionCard(permission));
   }
@@ -57,10 +68,11 @@ export function renderImmigrationHistoryPage(
 
 function createPermissionCard(permission: ImmigrationPermission): HTMLElement {
   const card = document.createElement("article");
-  card.className = "record-card";
-  card.innerHTML = `<div class="record-card-heading"><div><p class="eyebrow">Immigration permission</p><h3></h3><span class="member-role permission-role"></span></div><div class="member-actions"><button class="member-action" type="button">Edit</button><button class="member-action destructive-action" type="button">Delete</button></div></div><dl class="record-dates permission-dates"><div><dt>Grant</dt><dd></dd></div><div><dt>Start</dt><dd></dd></div><div><dt>Expiry</dt><dd></dd></div><div><dt>Actual UK arrival</dt><dd></dd></div></dl><p class="calculation-support"></p>`;
+  card.className = "record-card permission-entry";
+  card.innerHTML = `<span class="permission-marker" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="permission-card-content"><div class="record-card-heading"><div><p class="eyebrow">Immigration permission</p><h3></h3><div class="permission-badges"><span class="member-role permission-role"></span><span class="permission-state"></span></div></div></div><dl class="record-dates permission-dates"><div><dt>Grant</dt><dd></dd></div><div><dt>Permission start</dt><dd></dd></div><div><dt>UK arrival</dt><dd></dd></div><div><dt>Permission expiry</dt><dd></dd></div></dl><p class="calculation-support permission-support"></p><div class="member-actions"><button class="member-action" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10Z"/><path d="m14 7 3 3"/></svg><span>Edit</span></button><button class="member-action destructive-action" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg><span>Delete</span></button></div></div>`;
   const route = card.querySelector<HTMLElement>("h3");
   const role = card.querySelector<HTMLElement>(".permission-role");
+  const state = card.querySelector<HTMLElement>(".permission-state");
   const dateValues = card.querySelectorAll<HTMLElement>(".record-dates dd");
   const support = card.querySelector<HTMLElement>(".calculation-support");
   const actions = card.querySelectorAll<HTMLButtonElement>(".member-action");
@@ -72,15 +84,31 @@ function createPermissionCard(permission: ImmigrationPermission): HTMLElement {
     dateValues[0].textContent = permission.grantDate || "Missing";
   if (dateValues[1]) dateValues[1].textContent = permission.permissionStartDate;
   if (dateValues[2])
-    dateValues[2].textContent = permission.permissionExpiryDate;
-  if (dateValues[3])
-    dateValues[3].textContent =
+    dateValues[2].textContent =
       permission.actualUkArrivalDate || "Not recorded";
-  if (support)
-    support.textContent =
-      permission.route !== "other" && !permission.grantDate
+  if (dateValues[3])
+    dateValues[3].textContent = permission.permissionExpiryDate;
+  const isMissingGrant = permission.route !== "other" && !permission.grantDate;
+  const requiresManualReview = permission.route === "other";
+  const isDependant = permission.role === "dependant";
+  if (state) {
+    state.textContent = isDependant
+      ? "Dependant record"
+      : isMissingGrant || requiresManualReview
+        ? "Review required"
+        : "Calculation supported";
+    if (isMissingGrant || requiresManualReview)
+      state.classList.add("requires-review");
+  }
+  if (support) {
+    support.textContent = isDependant
+      ? "Dependant time is kept separate and is not included in the Skilled Worker main-applicant estimate."
+      : isMissingGrant
         ? "Add the visa grant date before using the recorded absence check."
         : getCalculationSupportMessage(permission.route);
+    if (isMissingGrant || requiresManualReview)
+      support.classList.add("requires-review");
+  }
   const edit = actions[0];
   const remove = actions[1];
   if (edit) {

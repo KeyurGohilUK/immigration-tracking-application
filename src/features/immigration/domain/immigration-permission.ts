@@ -199,5 +199,5 @@ export const PERMISSION_ROUTE_LABELS: Record<
 export function getCalculationSupportMessage(route: ImmigrationRoute): string {
   return route === "other"
     ? "Eligibility calculation is not supported for this route."
-    : "This route can be assessed as part of a Skilled Worker main-applicant qualifying period on Home.";
+    : "This route can be assessed as part of a Skilled Worker main-applicant qualifying period on Dashboard.";
 }

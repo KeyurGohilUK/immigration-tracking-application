@@ -1005,6 +1005,209 @@ a:focus-visible {
   font-size: 0.68rem;
 }
 
+.immigration-main {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.immigration-heading {
+  padding-bottom: 0.25rem;
+}
+
+.immigration-heading p:last-child {
+  max-width: 42rem;
+  color: var(--colour-text-muted);
+}
+
+.immigration-profile-picker,
+.permission-summary-card,
+.permission-timeline-panel {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(1.25rem) saturate(145%);
+  backdrop-filter: blur(1.25rem) saturate(145%);
+}
+
+.immigration-profile-picker,
+.permission-timeline-panel {
+  padding: 0.9rem;
+  border-radius: var(--radius-large);
+}
+
+.immigration-profile-picker .person-switcher {
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+.permission-summary-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.permission-summary-card {
+  padding: 1rem;
+  border-radius: var(--radius-medium);
+}
+
+.permission-summary-value {
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+  margin: 0.25rem 0 0.45rem;
+}
+
+.permission-summary-value > span {
+  color: var(--colour-text);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.permission-summary-value small {
+  color: var(--colour-text-muted);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.permission-summary-date {
+  margin: 0.3rem 0 0.45rem;
+  color: var(--colour-text);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.permission-summary-card > p:last-child {
+  color: var(--colour-text-muted);
+  font-size: 0.7rem;
+}
+
+.immigration-notice {
+  margin: 0;
+}
+
+.permission-timeline-panel .section-heading {
+  margin-bottom: 0;
+}
+
+.permission-timeline {
+  position: relative;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 0.9rem;
+  padding-left: 0.2rem;
+}
+
+.permission-timeline::before {
+  position: absolute;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 1.35rem;
+  width: 1px;
+  background: var(--colour-border);
+  content: "";
+}
+
+.permission-entry {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.7rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.permission-marker {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  background: var(--glass-surface-strong);
+  -webkit-backdrop-filter: blur(1rem);
+  backdrop-filter: blur(1rem);
+}
+
+.permission-marker svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.permission-card-content {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-medium);
+  background: rgb(255 255 255 / 56%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 78%);
+}
+
+.permission-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.permission-badges .member-role {
+  margin: 0;
+}
+
+.permission-state {
+  display: inline-block;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  color: var(--colour-text);
+  background: var(--glass-surface-strong);
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.permission-state.requires-review {
+  border-style: dashed;
+  color: var(--colour-text-muted);
+}
+
+.permission-entry .member-actions {
+  margin-top: 0.75rem;
+}
+
+.permission-support {
+  margin: 0;
+  border-left-color: var(--colour-strong);
+  border-radius: 0 0.55rem 0.55rem 0;
+  background: rgb(247 247 245 / 70%);
+}
+
+.permission-support.requires-review {
+  border-left-style: dashed;
+}
+
+.permission-dialog {
+  width: min(calc(100% - 2rem), 38rem);
+}
+
+.permission-form-guidance {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-small);
+  color: var(--colour-text-muted);
+  background: rgb(255 255 255 / 48%);
+  font-size: 0.72rem;
+}
+
 .timeline-panel {
   margin-top: 0.9rem;
 }
@@ -1732,6 +1935,10 @@ p {
   .family-field-wide {
     grid-column: 1 / -1;
   }
+
+  .permission-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .calculation-subsection {
@@ -2246,7 +2453,15 @@ p {
     width: min(100%, 64rem);
   }
 
+  .immigration-main {
+    width: min(100%, 64rem);
+  }
+
   .travel-main .travel-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .immigration-main .permission-timeline {
     grid-template-columns: 1fr;
   }
 
