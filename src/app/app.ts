@@ -116,8 +116,8 @@ export function renderApp(
         <section id="absence-summary" class="setup-card absence-summary" aria-labelledby="absence-summary-title" aria-live="polite">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Official-rule absence check</p>
-              <h2 id="absence-summary-title">Reviewing recorded absences…</h2>
+              <p class="eyebrow">Official-rule residence tracker</p>
+              <h2 id="absence-summary-title">Reviewing recorded history…</h2>
             </div>
           </div>
           <p>This check stays on your device and does not determine ILR eligibility.</p>

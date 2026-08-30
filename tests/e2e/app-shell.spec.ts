@@ -96,9 +96,7 @@ test("shows install and update controls in every device header", async ({
     page.getByRole("button", { name: "Download updates" }),
   ).toBeVisible();
   await expect(
-    page.getByText(
-      "Validated every owner, family, permission, and trip record",
-    ),
+    page.getByText("Added a sourced five-year qualifying-period"),
   ).toBeVisible();
   await expect(
     page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
@@ -538,7 +536,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByRole("heading", { name: "Skilled Worker", level: 3 }),
   ).toBeVisible();
-  await expect(page.getByText(/calculation is not active yet/i)).toBeVisible();
+  await expect(page.getByText(/qualifying period on Home/i)).toBeVisible();
   const storedPermission = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 4);
@@ -673,6 +671,11 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
   await page.getByRole("button", { name: "Save permission" }).click();
   await page.getByRole("link", { name: "Home", exact: true }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Earliest estimated application: 2026-12-04",
+    }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "No complete absence days recorded" }),
   ).toBeVisible();

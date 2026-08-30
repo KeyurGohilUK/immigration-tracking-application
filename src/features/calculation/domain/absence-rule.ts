@@ -3,7 +3,11 @@ import type { ImmigrationRoute } from "../../immigration/domain/immigration-perm
 export const ABSENCE_RULE = {
   id: "skilled-worker-main-applicant-absence-v1",
   version: 1,
-  supportedRoutes: ["skilled-worker", "health-and-care-worker"],
+  supportedRoutes: [
+    "skilled-worker",
+    "health-and-care-worker",
+    "tier-2-general",
+  ],
   supportedRole: "main-applicant",
   qualifyingYears: 5,
   maximumDays: 180,
@@ -41,7 +45,7 @@ export const ABSENCE_RULE = {
 
 export function isAbsenceRuleRoute(
   route: ImmigrationRoute,
-): route is "skilled-worker" | "health-and-care-worker" {
+): route is "skilled-worker" | "health-and-care-worker" | "tier-2-general" {
   return ABSENCE_RULE.supportedRoutes.some(
     (supportedRoute) => supportedRoute === route,
   );

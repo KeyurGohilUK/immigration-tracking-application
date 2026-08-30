@@ -10,7 +10,7 @@ const permission: ImmigrationPermission = {
   route: "skilled-worker",
   otherRouteName: "",
   role: "main-applicant",
-  grantDate: "2021-12-15",
+  grantDate: "2022-01-01",
   permissionStartDate: "2022-01-01",
   permissionExpiryDate: "2028-01-01",
   actualUkArrivalDate: "2022-01-01",
@@ -83,6 +83,22 @@ describe("recorded absence check", () => {
       asOfDate: "2026-08-30",
     });
     expect(result.maximumRecordedDays).toBe(2);
+  });
+
+  it("counts pre-entry days from the recorded entry-clearance grant", () => {
+    const result = calculateRecordedAbsenceCheck({
+      permissions: [
+        {
+          ...permission,
+          grantDate: "2021-12-15",
+          permissionStartDate: "2022-01-01",
+          actualUkArrivalDate: "2022-01-15",
+        },
+      ],
+      trips: [],
+      asOfDate: "2026-08-30",
+    });
+    expect(result.maximumRecordedDays).toBe(31);
   });
 
   it("counts completed days in an open trip but marks the check incomplete", () => {

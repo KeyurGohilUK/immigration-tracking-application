@@ -95,9 +95,9 @@ describe("immigration permission validation", () => {
     ]);
   });
 
-  it("never describes a route as calculation-ready", () => {
+  it("describes supported and unsupported calculation routes accurately", () => {
     expect(getCalculationSupportMessage("skilled-worker")).toContain(
-      "recorded absence check",
+      "qualifying period",
     );
     expect(getCalculationSupportMessage("other")).toContain("not supported");
   });

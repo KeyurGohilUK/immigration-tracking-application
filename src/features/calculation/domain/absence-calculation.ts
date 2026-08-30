@@ -1,6 +1,10 @@
-import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
+import {
+  getPermissionRouteLabel,
+  type ImmigrationPermission,
+} from "../../immigration/domain/immigration-permission";
 import type { Trip } from "../../travel/domain/trip";
 import { ABSENCE_RULE, isAbsenceRuleRoute } from "./absence-rule";
+import { isSkilledWorkerQualifyingRoute } from "./qualifying-period-rule";
 
 const DAY_IN_MILLISECONDS = 86_400_000;
 
@@ -68,7 +72,11 @@ function addTwelveCalendarMonths(timestamp: number): number {
   );
 }
 
-function collectWholeAbsenceDays(trips: Trip[], asOfDate: string): number[] {
+function collectWholeAbsenceDays(
+  trips: Trip[],
+  permissions: ImmigrationPermission[],
+  asOfDate: string,
+): number[] {
   const asOf = parseDate(asOfDate);
   const days = new Set<number>();
   for (const trip of trips) {
@@ -77,6 +85,17 @@ function collectWholeAbsenceDays(trips: Trip[], asOfDate: string): number[] {
     for (
       let day = departure + DAY_IN_MILLISECONDS;
       day < returned;
+      day += DAY_IN_MILLISECONDS
+    )
+      days.add(day);
+  }
+  for (const permission of permissions) {
+    if (!permission.actualUkArrivalDate || !permission.grantDate) continue;
+    const granted = parseDate(permission.grantDate);
+    const arrived = parseDate(permission.actualUkArrivalDate);
+    for (
+      let day = granted;
+      day < arrived && day <= asOf;
       day += DAY_IN_MILLISECONDS
     )
       days.add(day);
@@ -121,31 +140,41 @@ export function calculateRecordedAbsenceCheck({
   asOfDate,
 }: AbsenceCalculationInput): AbsenceCheckResult {
   parseDate(asOfDate);
-  const supportedPermissions = permissions
+  const qualifyingPermissions = permissions
+    .filter(
+      ({ route, role }) =>
+        role === ABSENCE_RULE.supportedRole &&
+        isSkilledWorkerQualifyingRoute(route),
+    )
+    .sort((left, right) =>
+      right.permissionStartDate.localeCompare(left.permissionStartDate),
+    );
+  const latestPermission = permissions
     .filter(
       ({ route, role }) =>
         role === ABSENCE_RULE.supportedRole && isAbsenceRuleRoute(route),
     )
     .sort((left, right) =>
       right.permissionStartDate.localeCompare(left.permissionStartDate),
-    );
-  const latestPermission = supportedPermissions[0];
+    )[0];
   const routeLabel = latestPermission
-    ? latestPermission.route === "health-and-care-worker"
-      ? "Health and Care Worker"
-      : "Skilled Worker"
+    ? getPermissionRouteLabel(latestPermission)
     : null;
-  const absenceDays = collectWholeAbsenceDays(trips, asOfDate);
+  const absenceDays = collectWholeAbsenceDays(
+    trips,
+    qualifyingPermissions,
+    asOfDate,
+  );
   const maximumWindow = findMaximumWindow(absenceDays);
   const maximumRecordedDays = maximumWindow?.daysOutside ?? 0;
   const issues: AbsenceCheckResult["issues"] = [];
   if (trips.some(({ returnDate }) => !returnDate)) issues.push("open-trip");
-  if (supportedPermissions.some(({ grantDate }) => !grantDate))
+  if (qualifyingPermissions.some(({ grantDate }) => !grantDate))
     issues.push("missing-grant-date");
   if (trips.some(({ exceptionalAbsence }) => exceptionalAbsence))
     issues.push("potentially-permitted");
   if (
-    supportedPermissions.some(
+    qualifyingPermissions.some(
       ({ grantDate }) => grantDate && grantDate < ABSENCE_RULE.effectiveFrom,
     )
   )
