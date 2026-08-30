@@ -254,9 +254,24 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
   await page.getByLabel("Encrypted backup file").setInputFiles(downloadPath);
   await page.getByLabel("Restore backup password").fill(backupPassword);
   await page.getByRole("button", { name: "Review backup" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Review before replacing data" }),
-  ).toBeVisible();
+  const restoreSummaryHeading = page.getByRole("heading", {
+    name: "Review before replacing data",
+  });
+  await expect
+    .poll(
+      async () => {
+        if (await restoreSummaryHeading.isVisible()) return "ready";
+        const restoreError = await page
+          .locator("#restore-form-error")
+          .textContent();
+        return restoreError?.trim() || "validating";
+      },
+      {
+        message: "Backup validation should show its review summary",
+        timeout: 20_000,
+      },
+    )
+    .toBe("ready");
   await expect(page.getByText(`Household: ${TEST_PROFILE.name}`)).toBeVisible();
   await expect(page.locator("#restore-people")).toHaveText("1");
   await expect(page.locator("#restore-permissions")).toHaveText("0");
