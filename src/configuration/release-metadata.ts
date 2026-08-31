@@ -1,7 +1,6 @@
-export const APP_VERSION = "2.2.0";
+export const APP_VERSION = "2.2.1";
 
 export const RELEASE_NOTES = [
-  "Redesigned the unlock screen with an Ibiza Sunset Liquid Glass PIN keypad.",
-  "Added four visual PIN indicators, circular number controls, backspace, ambient glow, and a focused forgot-PIN action.",
-  "Kept the existing encrypted PIN validation and automatic unlock behaviour while simplifying the locked screen.",
+  "Stopped the on-screen PIN keypad from opening the iPhone system keyboard while entering digits.",
+  "Kept focus on the visible keypad controls instead of moving it into hidden PIN inputs.",
 ] as const;
