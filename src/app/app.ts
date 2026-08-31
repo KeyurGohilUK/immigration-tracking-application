@@ -202,7 +202,10 @@ function createDashboardProfileCard(
     button.setAttribute("aria-label", `Edit ${name}`);
   } else {
     button.dataset.selectDashboardProfile = profileId;
-    button.setAttribute("aria-label", `${selected ? "Viewing" : "View"} ${name}`);
+    button.setAttribute(
+      "aria-label",
+      `${selected ? "Viewing" : "View"} ${name}`,
+    );
   }
   button.innerHTML = `
     <span class="dashboard-person-avatar" aria-hidden="true"></span>
