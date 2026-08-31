@@ -97,7 +97,7 @@ test("shows install and update controls in every device header", async ({
     page.getByRole("dialog", { name: "Install and updates" }),
   ).toBeVisible();
   await expect(page.getByText("Installed")).toBeVisible();
-  await expect(page.getByText("Latest")).toBeVisible();
+  await expect(page.getByText("Latest", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Download updates" }),
   ).toBeVisible();

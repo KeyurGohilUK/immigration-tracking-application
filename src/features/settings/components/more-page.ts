@@ -53,7 +53,7 @@ export function renderMorePage(
           </div>
           <div class="settings-list">
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span><div><h3>Install and updates</h3><p>Version ${APP_VERSION} · Check for a newer cached app.</p></div><button id="open-install-settings" class="settings-row-action" type="button">Open</button></div>
-            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg></span><div><h3 id="legal-title">Terms, privacy, and licence</h3><p>Review the tracking disclaimer, privacy notice and proprietary licence.</p></div><button id="view-legal" class="settings-row-action" type="button">View</button></div>
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg></span><div><h3 id="legal-title">Terms, privacy, and licence</h3><p>Review the tracking disclaimer, privacy notice and proprietary licence.</p></div><button id="view-legal" class="settings-row-action" type="button" aria-label="View legal information">View</button></div>
           </div>
         </section>
 
