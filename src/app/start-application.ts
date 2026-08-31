@@ -1,6 +1,10 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import { renderMorePage } from "../features/settings/components/more-page";
+import {
+  setThemePreference,
+  type ThemePreference,
+} from "../features/settings/services/theme-preference";
 import { wireDeleteDataDialog } from "../features/settings/components/delete-data-dialog";
 import {
   BACKUP_PASSWORD_MINIMUM_LENGTH,
@@ -253,6 +257,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#lock-from-more")
         ?.addEventListener("click", lock);
+      root
+        .querySelector<HTMLSelectElement>("#theme-preference")
+        ?.addEventListener("change", (event) => {
+          const preference = (event.currentTarget as HTMLSelectElement)
+            .value as ThemePreference;
+          setThemePreference(preference);
+        });
       root
         .querySelector<HTMLButtonElement>("#open-install-settings")
         ?.addEventListener("click", () =>
