@@ -1092,9 +1092,10 @@ test("opens the centre ILR hero journey for the household", async ({
   await ilrLinks.first().click();
 
   await expect(navigation).toHaveClass(/is-hero-active/);
-  await expect(
-    navigation.locator('a[data-navigation="ILR"]'),
-  ).toHaveAttribute("aria-current", "page");
+  await expect(navigation.locator('a[data-navigation="ILR"]')).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await expect
     .poll(() =>
       indicator.evaluate(
@@ -1102,9 +1103,10 @@ test("opens the centre ILR hero journey for the household", async ({
       ),
     )
     .not.toBe(beforeHeroBackground);
-  await expect(
-    navigation.locator('a[data-navigation="ILR"]'),
-  ).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(navigation.locator('a[data-navigation="ILR"]')).toHaveCSS(
+    "color",
+    "rgb(255, 255, 255)",
+  );
 
   await expect(
     page.getByRole("heading", { name: "Your ILR journey" }),
