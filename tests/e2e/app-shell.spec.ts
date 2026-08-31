@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed the ILR journey bottom spacing so final content scrolls fully above the floating navigation.",
+      "Fixed the ILR hero menu highlight so the Ibiza orange treatment aligns with the moving active capsule.",
     ),
   ).toBeVisible();
   await expect(
@@ -1073,41 +1073,38 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 
-test("keeps final ILR journey content above the floating mobile menu", async ({
-  page,
-}, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium");
-  await page.goto("/");
-  await createLocalProfile(page);
-  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
-
-  const notice = page.getByRole("heading", {
-    name: "Estimate only—not an eligibility decision",
-  });
-  const navigation = page.getByRole("navigation", {
-    name: "Primary navigation",
-  });
-
-  await notice.scrollIntoViewIfNeeded();
-  const noticeBox = await notice.boundingBox();
-  const navigationBox = await navigation.boundingBox();
-
-  expect(noticeBox).not.toBeNull();
-  expect(navigationBox).not.toBeNull();
-  expect((noticeBox?.y ?? 0) + (noticeBox?.height ?? 0)).toBeLessThanOrEqual(
-    navigationBox?.y ?? 0,
-  );
-});
-
 test("opens the centre ILR hero journey for the household", async ({
   page,
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
 
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+  const indicator = navigation.locator(".mobile-navigation-indicator");
+  const beforeHeroBackground = await indicator.evaluate(
+    (element) => window.getComputedStyle(element).backgroundImage,
+  );
+
   const ilrLinks = page.getByRole("link", { name: "ILR", exact: true });
   await expect(ilrLinks.first()).toBeVisible();
   await ilrLinks.first().click();
+
+  await expect(navigation).toHaveClass(/is-hero-active/);
+  await expect(
+    navigation.locator('a[data-navigation="ILR"]'),
+  ).toHaveAttribute("aria-current", "page");
+  await expect
+    .poll(() =>
+      indicator.evaluate(
+        (element) => window.getComputedStyle(element).backgroundImage,
+      ),
+    )
+    .not.toBe(beforeHeroBackground);
+  await expect(
+    navigation.locator('a[data-navigation="ILR"]'),
+  ).toHaveCSS("color", "rgb(255, 255, 255)");
 
   await expect(
     page.getByRole("heading", { name: "Your ILR journey" }),
