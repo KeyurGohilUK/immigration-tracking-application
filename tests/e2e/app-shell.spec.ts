@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Refined the floating mobile menu with a more curved capsule, larger icons, and a wider glass active state.",
+      "Added a gliding glass capsule that animates smoothly between mobile navigation items.",
     ),
   ).toBeVisible();
   await expect(
@@ -1017,8 +1017,11 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
       'a[aria-current="page"]',
     );
     const activeIcon = activeLink?.querySelector<SVGElement>("svg");
-    const activeStyle = activeLink
-      ? window.getComputedStyle(activeLink)
+    const indicator = element.querySelector<HTMLElement>(
+      ".mobile-navigation-indicator",
+    );
+    const indicatorStyle = indicator
+      ? window.getComputedStyle(indicator)
       : undefined;
     const iconStyle = activeIcon
       ? window.getComputedStyle(activeIcon)
@@ -1026,7 +1029,8 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
     return {
       background: style.backgroundColor,
       borderRadius: style.borderRadius,
-      activeRadius: activeStyle?.borderRadius ?? "",
+      indicatorRadius: indicatorStyle?.borderRadius ?? "",
+      indicatorTransition: indicatorStyle?.transitionDuration ?? "",
       iconWidth: iconStyle?.width ?? "",
     };
   });
@@ -1039,7 +1043,8 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   );
   expect(navigationStyles.background).toContain("0.76");
   expect(navigationStyles.borderRadius).toBe("999px");
-  expect(navigationStyles.activeRadius).toBe("999px");
+  expect(navigationStyles.indicatorRadius).toBe("999px");
+  expect(navigationStyles.indicatorTransition).toBe("0.38s");
   expect(navigationStyles.iconWidth).toBe("28px");
   await expect(header).toHaveCSS("position", "sticky");
   await expect(navigation.locator(".navigation-label").first()).toHaveCSS(
@@ -1067,6 +1072,40 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
   expect(compactNavigationBackground).toContain("0.64");
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
+});
+
+test("glides the active mobile navigation capsule between sections", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+  const indicator = navigation.locator(".mobile-navigation-indicator");
+  await expect(indicator).toHaveCount(1);
+
+  const initialTransform = await indicator.evaluate(
+    (element) => window.getComputedStyle(element).transform,
+  );
+  await page.getByRole("link", { name: "Travel", exact: true }).click();
+  await expect(
+    navigation.locator('a[data-navigation="Trips"]'),
+  ).toHaveAttribute("aria-current", "page");
+  await expect
+    .poll(() =>
+      navigation.evaluate((element) =>
+        element.style.getPropertyValue("--mobile-navigation-offset"),
+      ),
+    )
+    .toBe("100%");
+
+  const movedTransform = await indicator.evaluate(
+    (element) => window.getComputedStyle(element).transform,
+  );
+  expect(movedTransform).not.toBe(initialTransform);
 });
 
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
