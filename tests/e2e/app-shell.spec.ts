@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the initial selected-looking keypad state and enlarged the fox logo without the outer circle.",
+      "Kept the enlarged security logo free of the outer circle while restoring softly rounded corners.",
     ),
   ).toBeVisible();
   await expect(
@@ -202,6 +202,10 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(":focus")).toHaveClass(/security-keypad/);
   await expect(page.locator(":focus")).not.toHaveAttribute("data-pin-key");
   await expect(page.locator(".security-logo-mark")).toBeVisible();
+  await expect(page.locator(".security-logo-mark img")).toHaveCSS(
+    "border-radius",
+    "24px",
+  );
   await expect(page.locator(".security-logo-orb")).toHaveCount(0);
   await page.getByRole("button", { name: "Enter 1" }).click();
   await enterPin(page, "Four-digit PIN", "111");
