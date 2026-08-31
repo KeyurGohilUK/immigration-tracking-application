@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed the household member editor so dialogs and form controls use proper dark surfaces and readable text.",
+      "Standardized date fields and dropdowns across the app so they share the same control styling.",
     ),
   ).toBeVisible();
   await expect(
@@ -474,6 +474,22 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
   await expect(page.getByLabel("Full name")).toHaveCSS(
     "background-color",
     "rgba(255, 255, 255, 0.08)",
+  );
+  await expect(page.getByLabel("Date of birth")).toHaveCSS(
+    "background-color",
+    "rgba(255, 255, 255, 0.1)",
+  );
+  await expect(page.getByLabel("Immigration role")).toHaveCSS(
+    "appearance",
+    "none",
+  );
+  await expect(page.getByLabel("Date of birth")).toHaveCSS(
+    "border-radius",
+    "12px",
+  );
+  await expect(page.getByLabel("Immigration role")).toHaveCSS(
+    "border-radius",
+    "12px",
   );
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
