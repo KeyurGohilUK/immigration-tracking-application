@@ -41,17 +41,50 @@ export function renderFamilyPage(
       <aside class="notice family-notice" aria-labelledby="family-notice-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="family-notice-title">Profiles do not confirm eligibility</h2><p>Each person’s route and circumstances must be assessed separately against current official guidance.</p></div></aside>
       <p id="family-page-error" class="form-error" role="alert" hidden></p>
     </main>
-    <dialog id="family-dialog" class="family-dialog" aria-labelledby="family-form-title">
-      <form id="family-form" class="family-form" novalidate>
-        <div class="app-manager-heading family-form-heading"><div><p class="eyebrow">Encrypted local profile</p><h2 id="family-form-title">Add household member</h2><p>Every member uses the same profile model.</p></div><button class="dialog-close" type="button" aria-label="Close family form">×</button></div>
+    <dialog id="family-dialog" class="family-dialog member-profile-dialog" aria-labelledby="family-form-title">
+      <form id="family-form" class="family-form member-profile-form" novalidate>
+        <button class="dialog-close member-profile-close" type="button" aria-label="Close family form">×</button>
+        <div class="member-profile-header">
+          <div class="member-profile-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c0-3.2 2.2-5.2 5.5-5.2s5.5 2 5.5 5.2"/><path d="M17 7v6M14 10h6"/></svg>
+          </div>
+          <p class="eyebrow">Encrypted local profile</p>
+          <h2 id="family-form-title">Add household member</h2>
+          <p id="family-form-subtitle">Add this person’s details to keep their ILR tracking separate and accurate.</p>
+        </div>
         <input id="family-member-id" name="memberId" type="hidden" />
-        <div class="family-form-fields">
-          <div class="family-field family-field-wide"><label for="family-full-name">Full name</label><input id="family-full-name" name="fullName" autocomplete="name" maxlength="100" required /></div>
-          <div class="family-field"><label for="family-date-of-birth">Date of birth</label><input id="family-date-of-birth" name="dateOfBirth" type="date" autocomplete="bday" required /></div>
-          <div class="family-field family-field-wide"><label for="family-immigration-role">Immigration role</label><select id="family-immigration-role" name="immigrationRole" required><option value="not-set">Not set yet</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select><p class="field-guidance">This describes the person’s immigration role only. It does not make them an app owner.</p></div>
+        <div class="member-profile-fields">
+          <div class="member-profile-field">
+            <label for="family-full-name">Full name</label>
+            <div class="member-profile-control">
+              <span class="member-profile-control-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M13 10h4M13 14h4"/></svg>
+              </span>
+              <input id="family-full-name" name="fullName" autocomplete="name" maxlength="100" placeholder="e.g. Jane Doe" required />
+            </div>
+          </div>
+          <div class="member-profile-field">
+            <label for="family-date-of-birth">Date of birth</label>
+            <div class="member-profile-control">
+              <span class="member-profile-control-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 3v5M16 3v5M4 10h16"/></svg>
+              </span>
+              <input id="family-date-of-birth" name="dateOfBirth" type="date" autocomplete="bday" required />
+            </div>
+          </div>
+          <div class="member-profile-field">
+            <label for="family-immigration-role">Immigration role</label>
+            <div class="member-profile-control">
+              <span class="member-profile-control-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6Z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg>
+              </span>
+              <select id="family-immigration-role" name="immigrationRole" required><option value="not-set">Not set yet</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select>
+            </div>
+            <p class="field-guidance">This is the person’s immigration role only. It does not make them an app owner.</p>
+          </div>
         </div>
         <p id="family-form-error" class="form-error" role="alert" hidden></p>
-        <button class="primary-button family-save-button" type="submit">Save household member</button>
+        <button class="primary-button family-save-button member-profile-save" type="submit"><span>Save household member</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
     </dialog>`,
   );
@@ -139,11 +172,16 @@ export function showHouseholdMemberForm(
   if (!dialog || !form) throw new Error("Family form is unavailable.");
   form.reset();
   const title = form.querySelector<HTMLElement>("#family-form-title");
+  const subtitle = form.querySelector<HTMLElement>("#family-form-subtitle");
   const error = form.querySelector<HTMLElement>("#family-form-error");
   if (title)
     title.textContent = member
       ? "Edit household member"
       : "Add household member";
+  if (subtitle)
+    subtitle.textContent = member
+      ? "Update this person’s profile details without changing their stored immigration history."
+      : "Add this person’s details to keep their ILR tracking separate and accurate.";
   if (error) {
     error.textContent = "";
     error.hidden = true;
