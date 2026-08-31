@@ -1102,10 +1102,11 @@ test("glides the active mobile navigation capsule between sections", async ({
     )
     .toBe("100%");
 
-  const movedTransform = await indicator.evaluate(
-    (element) => window.getComputedStyle(element).transform,
-  );
-  expect(movedTransform).not.toBe(initialTransform);
+  await expect
+    .poll(() =>
+      indicator.evaluate((element) => window.getComputedStyle(element).transform),
+    )
+    .not.toBe(initialTransform);
 });
 
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
