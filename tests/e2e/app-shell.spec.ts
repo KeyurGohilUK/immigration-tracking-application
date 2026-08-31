@@ -824,7 +824,9 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("Manual review flagged")).toBeVisible();
   await expect(page.getByText("8", { exact: true })).toBeVisible();
-  const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
+  const tripProfileId = await page
+    .getByLabel("Tracking profile")
+    .inputValue();
   const storedTrip = await page.evaluate(
     async (profileId) => {
       const database = await new Promise<IDBDatabase>((resolve, reject) => {
