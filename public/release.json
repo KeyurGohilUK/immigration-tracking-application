@@ -1,7 +1,7 @@
 {
-  "version": "2.2.1",
+  "version": "2.2.2",
   "notes": [
-    "Stopped the on-screen PIN keypad from opening the iPhone system keyboard while entering digits.",
-    "Kept focus on the visible keypad controls instead of moving it into hidden PIN inputs."
+    "Removed the initial selected-looking keypad state and enlarged the fox logo without the outer circle.",
+    "Moved unlock focus to the keypad container so no number appears preselected while keyboard accessibility remains available."
   ]
 }
