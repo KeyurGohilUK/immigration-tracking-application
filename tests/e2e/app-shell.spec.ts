@@ -1075,7 +1075,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
 
 test("opens the centre ILR hero journey for the household", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/");
   await createLocalProfile(page);
 
@@ -1083,9 +1083,12 @@ test("opens the centre ILR hero journey for the household", async ({
     name: "Primary navigation",
   });
   const indicator = navigation.locator(".mobile-navigation-indicator");
-  const beforeHeroBackground = await indicator.evaluate(
-    (element) => window.getComputedStyle(element).backgroundImage,
-  );
+  const beforeHeroBackground =
+    testInfo.project.name === "mobile-chromium"
+      ? await indicator.evaluate(
+          (element) => window.getComputedStyle(element).backgroundImage,
+        )
+      : null;
 
   const ilrLinks = page.getByRole("link", { name: "ILR", exact: true });
   await expect(ilrLinks.first()).toBeVisible();
@@ -1096,13 +1099,15 @@ test("opens the centre ILR hero journey for the household", async ({
     "aria-current",
     "page",
   );
-  await expect
-    .poll(() =>
-      indicator.evaluate(
-        (element) => window.getComputedStyle(element).backgroundImage,
-      ),
-    )
-    .not.toBe(beforeHeroBackground);
+  if (beforeHeroBackground) {
+    await expect
+      .poll(() =>
+        indicator.evaluate(
+          (element) => window.getComputedStyle(element).backgroundImage,
+        ),
+      )
+      .not.toBe(beforeHeroBackground);
+  }
   await expect(navigation.locator('a[data-navigation="ILR"]')).toHaveCSS(
     "color",
     "rgb(255, 255, 255)",
