@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Stopped the on-screen PIN keypad from opening the iPhone system keyboard while entering digits.",
+      "Removed the initial selected-looking keypad state and enlarged the fox logo without the outer circle.",
     ),
   ).toBeVisible();
   await expect(
@@ -199,8 +199,11 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
+  await expect(page.locator(":focus")).toHaveClass(/security-keypad/);
+  await expect(page.locator(":focus")).not.toHaveAttribute("data-pin-key");
+  await expect(page.locator(".security-logo-mark")).toBeVisible();
+  await expect(page.locator(".security-logo-orb")).toHaveCount(0);
   await page.getByRole("button", { name: "Enter 1" }).click();
-  await expect(page.locator(":focus")).toHaveAttribute("data-pin-key", "1");
   await enterPin(page, "Four-digit PIN", "111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
