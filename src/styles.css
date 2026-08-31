@@ -3938,7 +3938,10 @@ html[data-theme="dark"]
   color: rgb(227 189 197 / 38%);
 }
 
-html[data-theme="dark"] .member-profile-form .member-profile-control input:focus,
+html[data-theme="dark"]
+  .member-profile-form
+  .member-profile-control
+  input:focus,
 html[data-theme="dark"]
   .member-profile-form
   .member-profile-control
