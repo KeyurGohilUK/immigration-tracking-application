@@ -7,6 +7,20 @@ export interface EncryptedRecord {
   ciphertext: string;
 }
 
+export function isEncryptedRecord(value: unknown): value is EncryptedRecord {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Partial<EncryptedRecord>;
+  return (
+    record.version === 1 &&
+    typeof record.initializationVector === "string" &&
+    /^[0-9a-f]{24}$/i.test(record.initializationVector) &&
+    typeof record.ciphertext === "string" &&
+    record.ciphertext.length >= 32 &&
+    record.ciphertext.length % 2 === 0 &&
+    /^[0-9a-f]+$/i.test(record.ciphertext)
+  );
+}
+
 export async function encryptRecord(
   value: unknown,
   key: CryptoKey,
@@ -46,6 +60,20 @@ export async function saveEncryptedRecord(
   });
 }
 
+export async function decryptRecord(
+  record: EncryptedRecord,
+  key: CryptoKey,
+): Promise<unknown> {
+  if (!isEncryptedRecord(record))
+    throw new Error("Encrypted local data is invalid.");
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: hexToBytes(record.initializationVector) },
+    key,
+    hexToBytes(record.ciphertext),
+  );
+  return JSON.parse(new TextDecoder().decode(decrypted)) as unknown;
+}
+
 export async function getEncryptedRecord(
   storeName: AppDatabaseStore,
   recordKey: string,
@@ -64,16 +92,5 @@ export async function getEncryptedRecord(
     },
   );
   if (!record) return null;
-  if (
-    record.version !== 1 ||
-    typeof record.initializationVector !== "string" ||
-    typeof record.ciphertext !== "string"
-  )
-    throw new Error("Encrypted local data is invalid.");
-  const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv: hexToBytes(record.initializationVector) },
-    key,
-    hexToBytes(record.ciphertext),
-  );
-  return JSON.parse(new TextDecoder().decode(decrypted)) as unknown;
+  return decryptRecord(record, key);
 }

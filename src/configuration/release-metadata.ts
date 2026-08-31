@@ -1,7 +1,7 @@
-export const APP_VERSION = "0.16.0";
+export const APP_VERSION = "0.17.0";
 
 export const RELEASE_NOTES = [
-  "Replaced More with a responsive Liquid Glass Profile and Settings experience.",
-  "Added a local household-owner summary and grouped privacy, security, backup, update, and legal controls.",
-  "Kept deletion in a separate fox-red Danger Zone and added an Install and Updates settings shortcut.",
+  "Added per-profile encrypted local PDF, JPG, and PNG document storage.",
+  "Added document categories, opening, downloading, renaming, reordering, deletion, and storage limits.",
+  "Added clear guidance that document files are not yet included in JSON backups and originals must be retained.",
 ] as const;

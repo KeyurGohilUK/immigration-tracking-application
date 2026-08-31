@@ -23,6 +23,11 @@ const navigationItems = [
     icon: '<path d="m3 11 18-7-7 18-2.5-8.5ZM11.5 13.5 21 4" />',
   },
   {
+    id: "Documents",
+    label: "Documents",
+    icon: '<path d="M6 3h9l4 4v14H6Z" /><path d="M15 3v5h4M9 12h7M9 16h7" />',
+  },
+  {
     id: "More",
     label: "Profile",
     icon: '<circle cx="12" cy="8" r="3" /><path d="M5 20c0-4.2 2.8-6.5 7-6.5s7 2.3 7 6.5" />',

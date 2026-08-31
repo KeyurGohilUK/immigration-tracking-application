@@ -7,7 +7,7 @@ const messages = {
     eyebrow: "Permanent deletion",
     title: "Delete everything on this device?",
     guidance:
-      "This deletes all encrypted UrbanFox records, the local PIN, and your Terms acceptance from this browser. It does not delete any backup files you previously downloaded.",
+      "This deletes all encrypted UrbanFox records and document files, the local PIN, and your Terms acceptance from this browser. It does not delete any backup files you previously downloaded.",
     warning:
       "Create an encrypted backup before continuing if you may need to restore this information.",
     button: "Permanently delete local data",
