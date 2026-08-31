@@ -9,7 +9,7 @@ export function getThemePreference(): ThemePreference {
   const stored = localStorage.getItem(STORAGE_KEY);
   return stored === "light" || stored === "dark" || stored === "system"
     ? stored
-    : "system";
+    : "light";
 }
 
 export function setThemePreference(preference: ThemePreference): void {
