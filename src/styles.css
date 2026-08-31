@@ -3547,3 +3547,70 @@ html[data-theme="dark"] .app-manager-dialog {
   outline: 2px solid var(--ibiza-primary);
   outline-offset: 2px;
 }
+
+/* Shared date and select controls */
+input[type="date"],
+select:not([multiple]) {
+  min-height: 3rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  color: var(--colour-text);
+  background-color: var(--glass-surface-strong);
+  font: inherit;
+}
+
+input[type="date"] {
+  width: 100%;
+  padding: 0 0.85rem;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  min-height: 1.2em;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+select:not([multiple]) {
+  width: 100%;
+  padding: 0 2.6rem 0 0.85rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%2362625e' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 0.8rem auto;
+}
+
+select:not([multiple]) option,
+select:not([multiple]) optgroup {
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+}
+
+input[type="date"]:focus,
+select:not([multiple]):focus {
+  border-color: var(--colour-strong);
+  outline: 2px solid var(--colour-strong);
+  outline-offset: 2px;
+}
+
+html[data-theme="dark"] input[type="date"],
+html[data-theme="dark"] select:not([multiple]) {
+  border-color: rgb(255 255 255 / 18%);
+  color: var(--colour-text);
+  background-color: rgb(255 255 255 / 10%);
+}
+
+html[data-theme="dark"] select:not([multiple]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23e3bdc5' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.82;
+}

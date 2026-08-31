@@ -1,7 +1,7 @@
-export const APP_VERSION = "2.0.1";
+export const APP_VERSION = "2.0.2";
 
 export const RELEASE_NOTES = [
-  "Fixed the household member editor so dialogs and form controls use proper dark surfaces and readable text.",
-  "Extended dark-theme styling across shared cards, settings, legal, security, timeline, and dialog surfaces.",
-  "Enabled native dark colour-scheme support so iPhone date and select controls match the selected theme.",
+  "Standardized date fields and dropdowns across the app so they share the same control styling.",
+  "Improved iPhone and Safari date alignment while keeping native date-picker behaviour.",
+  "Added consistent dropdown chevrons, spacing, focus states, and dark-mode colours.",
 ] as const;
