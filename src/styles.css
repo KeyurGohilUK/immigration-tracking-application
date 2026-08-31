@@ -447,6 +447,7 @@ body {
 .security-logo-mark img {
   width: 7rem;
   height: 7rem;
+  border-radius: 1.5rem;
   object-fit: contain;
   filter: drop-shadow(0 0.8rem 1.5rem rgb(0 0 0 / 34%));
 }
