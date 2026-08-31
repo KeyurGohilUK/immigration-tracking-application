@@ -1,8 +1,8 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "notes": [
-    "Removed the special household owner profile so every person now uses the same member model.",
-    "Any household member can be a main applicant, dependant, or have their immigration role left unset.",
-    "Made every Home member card editable and updated profile switching, backups, and local storage for the equal-member structure."
+    "Fixed the household member editor so dialogs and form controls use proper dark surfaces and readable text.",
+    "Extended dark-theme styling across shared cards, settings, legal, security, timeline, and dialog surfaces.",
+    "Enabled native dark colour-scheme support so iPhone date and select controls match the selected theme."
   ]
 }
