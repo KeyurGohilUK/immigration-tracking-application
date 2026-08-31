@@ -50,7 +50,7 @@ export function populatePersonSwitcher(
   selectedName.textContent = selectedPerson.fullName;
   selectedContext.textContent = selectedMember
     ? `${relationshipLabels[selectedMember.relationship]} · ${immigrationRoleLabels[selectedMember.immigrationRole]}`
-    : "Household owner";
+    : "Primary local profile";
   return select;
 }
 

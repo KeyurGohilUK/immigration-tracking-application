@@ -23,7 +23,11 @@ import {
   renderAbsenceSummary,
   renderAbsenceSummaryUnavailable,
 } from "../features/calculation/components/absence-summary";
-import { calculateRecordedAbsenceCheck } from "../features/calculation/domain/absence-calculation";
+import {
+  calculateRecordedAbsenceCheck,
+  calculateRecordedDependantAbsenceCheck,
+} from "../features/calculation/domain/absence-calculation";
+import { calculateSkilledWorkerDependantQualifyingPeriod } from "../features/calculation/domain/dependant-qualifying-period-calculation";
 import { calculateSkilledWorkerQualifyingPeriod } from "../features/calculation/domain/qualifying-period-calculation";
 import {
   readTripInput,
@@ -1310,15 +1314,27 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           !root.querySelector("#absence-summary")
         )
           return;
-        const result = calculateRecordedAbsenceCheck({
+        const latestPermission = [...permissions].sort((left, right) =>
+          right.permissionStartDate.localeCompare(left.permissionStartDate),
+        )[0];
+        const isDependant = latestPermission?.role === "dependant";
+        const calculationInput = {
           permissions,
           trips,
           asOfDate: getUkCalendarDate(),
-        });
-        const period = calculateSkilledWorkerQualifyingPeriod({
-          permissions,
-          asOfDate: getUkCalendarDate(),
-        });
+        };
+        const result = isDependant
+          ? calculateRecordedDependantAbsenceCheck(calculationInput)
+          : calculateRecordedAbsenceCheck(calculationInput);
+        const period = isDependant
+          ? calculateSkilledWorkerDependantQualifyingPeriod(
+              permissions,
+              getUkCalendarDate(),
+            )
+          : calculateSkilledWorkerQualifyingPeriod({
+              permissions,
+              asOfDate: getUkCalendarDate(),
+            });
         renderAbsenceSummary(root, result, period);
         wireDashboardActions(profile);
       } catch {

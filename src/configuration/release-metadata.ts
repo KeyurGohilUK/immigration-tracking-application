@@ -1,7 +1,7 @@
-export const APP_VERSION = "0.18.0";
+export const APP_VERSION = "0.19.0";
 
 export const RELEASE_NOTES = [
-  "Added ordered, application-ready PDF document packs for each household profile.",
-  "Added uploaded document files to encrypted backup and restore while preserving legacy backup compatibility.",
-  "Added document counts, restore guidance, integrity checks, and safer PDF filenames.",
+  "Added a separate five-year timing estimate and recorded-absence check for supported Skilled Worker dependants.",
+  "Renamed Household owner to Primary local profile so local ownership is not confused with immigration role.",
+  "Added official dependant sources and clear manual-review guidance for partner-linkage and transitional cases.",
 ] as const;

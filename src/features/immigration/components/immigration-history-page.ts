@@ -13,6 +13,7 @@ import {
   type ImmigrationRoute,
   type PermissionRole,
 } from "../domain/immigration-permission";
+import { isSkilledWorkerDependantRoute } from "../../calculation/domain/dependant-qualifying-period-rule";
 
 export function renderImmigrationHistoryPage(
   root: HTMLElement,
@@ -91,22 +92,38 @@ function createPermissionCard(permission: ImmigrationPermission): HTMLElement {
   const isMissingGrant = permission.route !== "other" && !permission.grantDate;
   const requiresManualReview = permission.route === "other";
   const isDependant = permission.role === "dependant";
+  const isSupportedDependant =
+    isDependant && isSkilledWorkerDependantRoute(permission.route);
   if (state) {
-    state.textContent = isDependant
-      ? "Dependant record"
-      : isMissingGrant || requiresManualReview
-        ? "Review required"
-        : "Calculation supported";
+    state.textContent =
+      isSupportedDependant && !isMissingGrant
+        ? "Dependant calculation supported"
+        : isSupportedDependant
+          ? "Review required"
+          : isDependant
+            ? "Dependant review required"
+            : isMissingGrant || requiresManualReview
+              ? "Review required"
+              : "Calculation supported";
     if (isMissingGrant || requiresManualReview)
       state.classList.add("requires-review");
   }
   if (support) {
-    support.textContent = isDependant
-      ? "Dependant time is kept separate and is not included in the Skilled Worker main-applicant estimate."
-      : isMissingGrant
-        ? "Add the visa grant date before using the recorded absence check."
-        : getCalculationSupportMessage(permission.route);
-    if (isMissingGrant || requiresManualReview)
+    support.textContent =
+      isSupportedDependant && isMissingGrant
+        ? "Add the visa grant date before using the dependant timing and recorded-absence checks."
+        : isSupportedDependant
+          ? "This dependant period is calculated separately on the Dashboard and requires confirmation of the linked partner history."
+          : isDependant
+            ? "This dependant route is not supported for an automated estimate."
+            : isMissingGrant
+              ? "Add the visa grant date before using the recorded absence check."
+              : getCalculationSupportMessage(permission.route);
+    if (
+      isMissingGrant ||
+      requiresManualReview ||
+      (isDependant && !isSupportedDependant)
+    )
       support.classList.add("requires-review");
   }
   const edit = actions[0];

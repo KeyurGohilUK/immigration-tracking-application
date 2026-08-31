@@ -58,7 +58,7 @@ export function renderFamilyPage(
         <div class="family-form-fields">
           <div class="family-field family-field-wide"><label for="family-full-name">Full name</label><input id="family-full-name" name="fullName" autocomplete="name" maxlength="100" required /></div>
           <div class="family-field"><label for="family-date-of-birth">Date of birth</label><input id="family-date-of-birth" name="dateOfBirth" type="date" autocomplete="bday" required /></div>
-          <div class="family-field"><label for="family-relationship">Relationship to household owner</label><select id="family-relationship" name="relationship" required><option value="">Choose relationship</option><option value="spouse-or-partner">Spouse or partner</option><option value="child">Child</option><option value="parent">Parent</option><option value="other">Other</option></select></div>
+          <div class="family-field"><label for="family-relationship">Relationship to primary local profile</label><select id="family-relationship" name="relationship" required><option value="">Choose relationship</option><option value="spouse-or-partner">Spouse or partner</option><option value="child">Child</option><option value="parent">Parent</option><option value="other">Other</option></select></div>
           <div class="family-field family-field-wide"><label for="family-immigration-role">Immigration role</label><select id="family-immigration-role" name="immigrationRole" required><option value="not-set">Not set yet</option><option value="main-applicant">Main applicant</option><option value="dependant">Dependant</option></select><p class="field-guidance">Choose “Not set yet” if you are unsure. UrbanFox will wait for complete route details before showing an estimate.</p></div>
         </div>
         <p id="family-form-error" class="form-error" role="alert" hidden></p>
@@ -75,7 +75,7 @@ export function renderFamilyPage(
 
   const ownerCard = createMemberCard(
     owner.fullName,
-    "Household owner",
+    "Primary local profile",
     "You",
     owner.id,
     true,
