@@ -3613,10 +3613,7 @@ p {
   top: var(--mobile-navigation-padding-y);
   bottom: var(--mobile-navigation-padding-y);
   left: var(--mobile-navigation-padding-x);
-  width: calc(
-    (100% - (2 * var(--mobile-navigation-padding-x))) /
-      4
-  );
+  width: calc((100% - (2 * var(--mobile-navigation-padding-x))) / 4);
   border-radius: 999px;
   background: linear-gradient(
     145deg,
