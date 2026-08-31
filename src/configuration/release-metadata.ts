@@ -1,6 +1,6 @@
-export const APP_VERSION = "2.2.1";
+export const APP_VERSION = "2.2.2";
 
 export const RELEASE_NOTES = [
-  "Stopped the on-screen PIN keypad from opening the iPhone system keyboard while entering digits.",
-  "Kept focus on the visible keypad controls instead of moving it into hidden PIN inputs.",
+  "Removed the initial selected-looking keypad state and enlarged the fox logo without the outer circle.",
+  "Moved unlock focus to the keypad container so no number appears preselected while keyboard accessibility remains available.",
 ] as const;
