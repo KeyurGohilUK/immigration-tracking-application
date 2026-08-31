@@ -1336,6 +1336,32 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               asOfDate: getUkCalendarDate(),
             });
         renderAbsenceSummary(root, result, period);
+        const householdStatus = root.querySelector<HTMLElement>(
+          "#household-status-value",
+        );
+        const householdStatusCopy = root.querySelector<HTMLElement>(
+          "#household-status-copy",
+        );
+        const householdAbsence = root.querySelector<HTMLElement>(
+          "#household-total-absence",
+        );
+        if (householdAbsence)
+          householdAbsence.textContent = String(result.maximumRecordedDays);
+        if (householdStatus && householdStatusCopy) {
+          if (result.status === "within-recorded-limit") {
+            householdStatus.textContent = "On Track";
+            householdStatusCopy.textContent = "Recorded Absences Within Limit";
+          } else if (result.status === "potentially-over-limit") {
+            householdStatus.textContent = "Review";
+            householdStatusCopy.textContent = "Potential Absence Limit Issue";
+          } else if (result.status === "manual-review") {
+            householdStatus.textContent = "Review";
+            householdStatusCopy.textContent = "Manual Review Needed";
+          } else {
+            householdStatus.textContent = "Setup";
+            householdStatusCopy.textContent = "More Information Needed";
+          }
+        }
         wireDashboardActions(profile);
       } catch {
         if (
