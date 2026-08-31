@@ -26,9 +26,7 @@ const navigationItems = [
 ] as const;
 
 export type NavigationId =
-  | (typeof navigationItems)[number]["id"]
-  | "Family"
-  | "Permissions";
+  (typeof navigationItems)[number]["id"] | "Family" | "Permissions";
 
 function renderNavigation(
   className: string,
@@ -200,10 +198,7 @@ function createDashboardProfileCard(
   button.className = `dashboard-person-card family-overview-member ${accent === "secondary" ? "is-secondary" : ""}`;
   if (selected) button.classList.add("is-selected");
   button.dataset.selectDashboardProfile = profileId;
-  button.setAttribute(
-    "aria-label",
-    `${selected ? "Viewing" : "View"} ${name}`,
-  );
+  button.setAttribute("aria-label", `${selected ? "Viewing" : "View"} ${name}`);
   button.innerHTML = `
     <span class="dashboard-person-avatar" aria-hidden="true"></span>
     <span class="dashboard-person-copy">
@@ -217,9 +212,7 @@ function createDashboardProfileCard(
     </span>
   `;
 
-  const avatar = button.querySelector<HTMLElement>(
-    ".dashboard-person-avatar",
-  );
+  const avatar = button.querySelector<HTMLElement>(".dashboard-person-avatar");
   const heading = button.querySelector<HTMLElement>("strong");
   const badge = button.querySelector<HTMLElement>(".dashboard-person-badge");
   const description = button.querySelector<HTMLElement>("small");
