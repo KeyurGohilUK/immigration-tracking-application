@@ -207,14 +207,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const profileId = (event.currentTarget as HTMLSelectElement).value;
           if (!isKnownProfileId(profileId, familyMembers)) return;
           selectedProfileId = profileId;
-          const selectedMember = familyMembers.find(({ id }) => id === profileId);
+          const selectedMember = familyMembers.find(
+            ({ id }) => id === profileId,
+          );
           if (!selectedMember) return;
           if (currentView === "Family")
             renderFamily(selectedMember, familyMembers);
           else if (currentView === "Permissions")
             void showPermissions(selectedMember);
           else if (currentView === "Trips") void showTrips(selectedMember);
-          else if (currentView === "Documents") void showDocuments(selectedMember);
+          else if (currentView === "Documents")
+            void showDocuments(selectedMember);
           else renderDashboard(selectedMember);
         });
       stopSessionLock?.();
@@ -547,12 +550,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       profile: HouseholdMember,
       documents: DocumentMetadata[],
     ): void => {
-      renderDocumentsPage(
-        root,
-        familyMembers,
-        selectedProfileId,
-        documents,
-      );
+      renderDocumentsPage(root, familyMembers, selectedProfileId, documents);
       wireAuthenticatedShell(profile, "Documents");
       const uploadDialog =
         root.querySelector<HTMLDialogElement>("#document-dialog");
