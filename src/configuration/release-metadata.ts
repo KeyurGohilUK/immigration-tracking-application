@@ -1,7 +1,7 @@
-export const APP_VERSION = "2.1.0";
+export const APP_VERSION = "2.1.1";
 
 export const RELEASE_NOTES = [
-  "Restyled the add and edit household member form with the Ibiza Sunset Liquid Glass design used on Home.",
-  "Added focused member-form icons, ambient glow, glass fields, and an Ibiza gradient save action.",
-  "Kept the existing household data model and validation while improving light and dark mode presentation.",
+  "Fixed the dark-mode household member dropdown on iPhone and matched the date field height to the other controls.",
+  "Replaced the repeating select background graphic with a single dedicated chevron.",
+  "Kept native date selection while making the member form controls visually consistent.",
 ] as const;

@@ -3804,7 +3804,9 @@ html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
 
 .member-profile-form .member-profile-control input,
 .member-profile-form .member-profile-control select {
+  height: 3.35rem;
   min-height: 3.35rem;
+  box-sizing: border-box;
   padding-left: 3rem;
   border: 1px solid rgb(91 63 70 / 16%);
   border-radius: 1rem;
@@ -3834,9 +3836,37 @@ html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
     0 0 1.15rem rgb(238 9 121 / 10%);
 }
 
+.member-profile-form .member-profile-control input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 1.2;
+}
+
 .member-profile-form .member-profile-control select {
   padding-right: 2.75rem;
   cursor: pointer;
+}
+
+html[data-theme] .member-profile-form .member-profile-select-control select {
+  background-image: none;
+  background-repeat: no-repeat;
+}
+
+.member-profile-select-control::after {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid rgb(91 63 70 / 58%);
+  border-bottom: 2px solid rgb(91 63 70 / 58%);
+  content: "";
+  pointer-events: none;
+  transform: translateY(-65%) rotate(45deg);
+}
+
+.member-profile-field:focus-within .member-profile-select-control::after {
+  border-color: var(--ibiza-primary);
 }
 
 .member-profile-field .field-guidance {
@@ -3921,6 +3951,10 @@ html[data-theme="dark"] .member-profile-header .eyebrow {
 
 html[data-theme="dark"] .member-profile-control-icon {
   color: rgb(227 189 197 / 60%);
+}
+
+html[data-theme="dark"] .member-profile-select-control::after {
+  border-color: rgb(227 189 197 / 70%);
 }
 
 html[data-theme="dark"] .member-profile-form .member-profile-control input,

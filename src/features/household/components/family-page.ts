@@ -74,7 +74,7 @@ export function renderFamilyPage(
           </div>
           <div class="member-profile-field">
             <label for="family-immigration-role">Immigration role</label>
-            <div class="member-profile-control">
+            <div class="member-profile-control member-profile-select-control">
               <span class="member-profile-control-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6Z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg>
               </span>

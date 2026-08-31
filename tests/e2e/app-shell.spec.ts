@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Restyled the add and edit household member form with the Ibiza Sunset Liquid Glass design used on Home.",
+      "Fixed the dark-mode household member dropdown on iPhone and matched the date field height to the other controls.",
     ),
   ).toBeVisible();
   await expect(
@@ -491,6 +491,23 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
     "border-radius",
     "16px",
   );
+  await expect(page.getByLabel("Immigration role")).toHaveCSS(
+    "background-image",
+    "none",
+  );
+  const memberControlHeights = await page.evaluate(() => {
+    const ids = [
+      "family-full-name",
+      "family-date-of-birth",
+      "family-immigration-role",
+    ];
+    return ids.map(
+      (id) => document.getElementById(id)?.getBoundingClientRect().height ?? 0,
+    );
+  });
+  expect(
+    Math.max(...memberControlHeights) - Math.min(...memberControlHeights),
+  ).toBeLessThanOrEqual(1);
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
