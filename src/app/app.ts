@@ -197,8 +197,13 @@ function createDashboardProfileCard(
   button.type = "button";
   button.className = `dashboard-person-card family-overview-member ${accent === "secondary" ? "is-secondary" : ""}`;
   if (selected) button.classList.add("is-selected");
-  button.dataset.selectDashboardProfile = profileId;
-  button.setAttribute("aria-label", `${selected ? "Viewing" : "View"} ${name}`);
+  if (accent === "secondary") {
+    button.dataset.editDashboardMember = profileId;
+    button.setAttribute("aria-label", `Edit ${name}`);
+  } else {
+    button.dataset.selectDashboardProfile = profileId;
+    button.setAttribute("aria-label", `${selected ? "Viewing" : "View"} ${name}`);
+  }
   button.innerHTML = `
     <span class="dashboard-person-avatar" aria-hidden="true"></span>
     <span class="dashboard-person-copy">
@@ -227,7 +232,9 @@ function createDashboardProfileCard(
   if (heading) heading.textContent = name;
   if (badge) badge.textContent = relationship;
   if (description) description.textContent = context;
-  if (state) state.textContent = selected ? "Viewing" : "Open";
+  if (state)
+    state.textContent =
+      accent === "secondary" ? "Edit" : selected ? "Viewing" : "Open";
   if (progress) progress.style.width = selected ? "66%" : "25%";
   return button;
 }
