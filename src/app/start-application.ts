@@ -59,32 +59,21 @@ import {
   validateImmigrationPermissionInput,
   type ImmigrationPermission,
 } from "../features/immigration/domain/immigration-permission";
-import { renderOwnerProfileForm } from "../features/household/components/owner-profile-form";
+import { renderFirstMemberForm } from "../features/household/components/first-member-form";
 import {
-  readFamilyMemberInput,
+  readHouseholdMemberInput,
   renderFamilyPage,
-  showFamilyMemberForm,
+  showHouseholdMemberForm,
 } from "../features/household/components/family-page";
+import { isKnownProfileId } from "../features/household/components/person-switcher";
 import {
-  isKnownProfileId,
-  OWNER_PROFILE_ID,
-} from "../features/household/components/person-switcher";
+  getHouseholdMembers,
+  saveHouseholdMembers,
+} from "../features/household/data/household-member-repository";
 import {
-  getFamilyMembers,
-  saveFamilyMembers,
-} from "../features/household/data/family-member-repository";
-import {
-  getOwnerProfile,
-  saveOwnerProfile,
-} from "../features/household/data/owner-profile-repository";
-import {
-  validateOwnerInput,
-  type OwnerProfile,
-} from "../features/household/domain/owner-profile";
-import {
-  validateFamilyMemberInput,
-  type FamilyMember,
-} from "../features/household/domain/family-member";
+  validateHouseholdMemberInput,
+  type HouseholdMember,
+} from "../features/household/domain/household-member";
 import { renderLegalScreen } from "../features/legal/components/legal-screen";
 import {
   hasCurrentTermsAcceptance,
@@ -143,14 +132,14 @@ const SPLASH_DURATION_MS = 500;
 export async function startApplication(root: HTMLElement): Promise<void> {
   let sessionKey: CryptoKey | null = null;
   let stopSessionLock: (() => void) | null = null;
-  let selectedProfileId = OWNER_PROFILE_ID;
+  let selectedProfileId = "";
 
   const showTracker = async (
     key: CryptoKey,
     record: VaultRecord,
   ): Promise<void> => {
     sessionKey = key;
-    let familyMembers: FamilyMember[] = [];
+    let familyMembers: HouseholdMember[] = [];
     let familyProfilesAvailable = true;
     const permissionCache = new Map<string, ImmigrationPermission[]>();
     const tripCache = new Map<string, Trip[]>();
@@ -164,7 +153,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const wireAuthenticatedShell = (
-      profile: OwnerProfile,
+      profile: HouseholdMember,
       currentView:
         "Home" | "Family" | "Permissions" | "Trips" | "Documents" | "More",
     ): void => {
@@ -218,26 +207,33 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const profileId = (event.currentTarget as HTMLSelectElement).value;
           if (!isKnownProfileId(profileId, familyMembers)) return;
           selectedProfileId = profileId;
-          if (currentView === "Family") renderFamily(profile, familyMembers);
-          else if (currentView === "Permissions") void showPermissions(profile);
-          else if (currentView === "Trips") void showTrips(profile);
-          else if (currentView === "Documents") void showDocuments(profile);
-          else renderDashboard(profile);
+          const selectedMember = familyMembers.find(
+            ({ id }) => id === profileId,
+          );
+          if (!selectedMember) return;
+          if (currentView === "Family")
+            renderFamily(selectedMember, familyMembers);
+          else if (currentView === "Permissions")
+            void showPermissions(selectedMember);
+          else if (currentView === "Trips") void showTrips(selectedMember);
+          else if (currentView === "Documents")
+            void showDocuments(selectedMember);
+          else renderDashboard(selectedMember);
         });
       stopSessionLock?.();
       stopSessionLock = startSessionLock(lock);
     };
 
-    const renderDashboard = (profile: OwnerProfile): void => {
-      renderApp(root, profile, familyMembers, selectedProfileId);
+    const renderDashboard = (profile: HouseholdMember): void => {
+      renderApp(root, familyMembers, selectedProfileId);
       wireAuthenticatedShell(profile, "Home");
       wireDashboardActions(profile);
       const profileId = selectedProfileId;
       void updateDashboardCalculation(profile, profileId);
     };
 
-    const renderMore = (profile: OwnerProfile): void => {
-      renderMorePage(root, profile, familyMembers.length + 1);
+    const renderMore = (profile: HouseholdMember): void => {
+      renderMorePage(root, familyMembers.length);
       wireAuthenticatedShell(profile, "More");
       const backupDialog =
         root.querySelector<HTMLDialogElement>("#backup-dialog");
@@ -315,7 +311,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           submit.textContent = "Encrypting backup…";
         }
         try {
-          const backupData = await collectBackupData(profile, key);
+          const backupData = await collectBackupData(key);
           const backup = await createEncryptedBackup(backupData, password);
           downloadBackupFile(backup);
           backupForm.reset();
@@ -415,8 +411,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const payload = await decryptAndValidateBackup(encrypted, password);
           const summary = summariseBackup(payload.data);
           reviewedBackup = payload;
-          const owner =
-            restoreForm.querySelector<HTMLElement>("#restore-owner");
           const people =
             restoreForm.querySelector<HTMLElement>("#restore-people");
           const permissions = restoreForm.querySelector<HTMLElement>(
@@ -431,7 +425,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           );
           const exported =
             restoreForm.querySelector<HTMLElement>("#restore-exported");
-          if (owner) owner.textContent = `Household: ${summary.ownerName}`;
           if (people) people.textContent = String(summary.people);
           if (permissions)
             permissions.textContent = String(summary.permissions);
@@ -474,13 +467,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         replaceButton.textContent = "Restoring encrypted data…";
         try {
           await replaceAllLocalData(reviewedBackup.data, key);
-          familyMembers = reviewedBackup.data.familyMembers;
+          familyMembers = reviewedBackup.data.members;
           permissionCache.clear();
           tripCache.clear();
-          selectedProfileId = OWNER_PROFILE_ID;
-          const restoredOwner = reviewedBackup.data.owner;
+          selectedProfileId = familyMembers[0]?.id ?? "";
           restoreDialog?.close();
-          renderMore(restoredOwner);
+          const currentMember = familyMembers[0];
+          if (currentMember) renderMore(currentMember);
           const status = root.querySelector<HTMLElement>("#backup-status");
           if (status)
             status.textContent =
@@ -509,7 +502,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyMembers = [];
           permissionCache.clear();
           tripCache.clear();
-          selectedProfileId = OWNER_PROFILE_ID;
+          selectedProfileId = familyMembers[0]?.id ?? "";
           showLanding(
             "All UrbanFox ILR data and the local PIN were deleted from this browser.",
           );
@@ -554,16 +547,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const renderDocuments = (
-      profile: OwnerProfile,
+      profile: HouseholdMember,
       documents: DocumentMetadata[],
     ): void => {
-      renderDocumentsPage(
-        root,
-        profile,
-        familyMembers,
-        selectedProfileId,
-        documents,
-      );
+      renderDocumentsPage(root, familyMembers, selectedProfileId, documents);
       wireAuthenticatedShell(profile, "Documents");
       const uploadDialog =
         root.querySelector<HTMLDialogElement>("#document-dialog");
@@ -590,10 +577,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             const bytes = await createDocumentPack(files);
             const profileName =
-              selectedProfileId === profile.id
-                ? profile.fullName
-                : (familyMembers.find(({ id }) => id === selectedProfileId)
-                    ?.fullName ?? "UrbanFox");
+              familyMembers.find(({ id }) => id === selectedProfileId)
+                ?.fullName ?? "UrbanFox";
             downloadDocumentPack(bytes, profileName);
             button.textContent = "PDF pack downloaded";
           } catch {
@@ -850,7 +835,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         });
     };
 
-    const showDocuments = async (profile: OwnerProfile): Promise<void> => {
+    const showDocuments = async (profile: HouseholdMember): Promise<void> => {
       try {
         const documents = await getAllDocumentMetadata(key);
         renderDocuments(profile, documents);
@@ -864,7 +849,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       }
     };
 
-    const wireDashboardActions = (profile: OwnerProfile): void => {
+    const wireDashboardActions = (profile: HouseholdMember): void => {
       root
         .querySelector<HTMLButtonElement>("#manage-permissions")
         ?.addEventListener("click", () => void showPermissions(profile));
@@ -892,23 +877,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const member = familyMembers.find(({ id }) => id === profileId);
           if (!profileId || !member) return;
           selectedProfileId = profileId;
-          renderFamily(profile, familyMembers);
-          showFamilyMemberForm(root, member);
+          renderFamily(member, familyMembers);
+          showHouseholdMemberForm(root, member);
         });
       }
     };
 
     const renderFamily = (
-      profile: OwnerProfile,
-      members: FamilyMember[],
+      profile: HouseholdMember,
+      members: HouseholdMember[],
     ): void => {
-      renderFamilyPage(root, profile, members, selectedProfileId);
+      renderFamilyPage(root, members, selectedProfileId);
       wireAuthenticatedShell(profile, "Family");
       const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
       const form = root.querySelector<HTMLFormElement>("#family-form");
       root
         .querySelector<HTMLButtonElement>("#add-family-member")
-        ?.addEventListener("click", () => showFamilyMemberForm(root));
+        ?.addEventListener("click", () => showHouseholdMemberForm(root));
       root
         .querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => dialog?.close());
@@ -923,7 +908,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const profileId = button.dataset.selectProfile;
           if (!profileId || !isKnownProfileId(profileId, members)) return;
           selectedProfileId = profileId;
-          renderFamily(profile, members);
+          const selectedMember = members.find(({ id }) => id === profileId);
+          if (selectedMember) renderFamily(selectedMember, members);
         });
       }
 
@@ -934,7 +920,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const member = members.find(
             ({ id }) => id === button.dataset.editMember,
           );
-          if (member) showFamilyMemberForm(root, member);
+          if (member) showHouseholdMemberForm(root, member);
         });
       }
 
@@ -954,11 +940,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             return;
           const nextMembers = members.filter(({ id }) => id !== member.id);
           try {
-            await saveFamilyMembers(nextMembers, key);
+            await saveHouseholdMembers(nextMembers, key);
             familyMembers = nextMembers;
             if (selectedProfileId === member.id)
-              selectedProfileId = OWNER_PROFILE_ID;
-            renderFamily(profile, nextMembers);
+              selectedProfileId = nextMembers[0]?.id ?? "";
+            const selectedMember =
+              nextMembers.find(({ id }) => id === selectedProfileId) ??
+              nextMembers[0];
+            if (selectedMember) renderFamily(selectedMember, nextMembers);
           } catch {
             const error = root.querySelector<HTMLElement>("#family-page-error");
             if (error) {
@@ -972,8 +961,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
       form?.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const { memberId, input } = readFamilyMemberInput(form);
-        const validationError = validateFamilyMemberInput(input);
+        const { memberId, input } = readHouseholdMemberInput(form);
+        const validationError = validateHouseholdMemberInput(input);
         const error = form.querySelector<HTMLElement>("#family-form-error");
         if (validationError) {
           if (error) {
@@ -984,7 +973,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         }
         const existingMember = members.find(({ id }) => id === memberId);
         const timestamp = new Date().toISOString();
-        const member: FamilyMember = {
+        const member: HouseholdMember = {
           version: 1,
           id: existingMember?.id ?? crypto.randomUUID(),
           ...input,
@@ -1001,12 +990,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
         if (submit) submit.disabled = true;
         try {
-          await saveFamilyMembers(nextMembers, key);
+          await saveHouseholdMembers(nextMembers, key);
           familyMembers = nextMembers;
           familyProfilesAvailable = true;
           if (!existingMember) selectedProfileId = member.id;
           dialog?.close();
-          renderFamily(profile, nextMembers);
+          const selectedMember =
+            nextMembers.find(({ id }) => id === selectedProfileId) ??
+            nextMembers[0];
+          if (selectedMember) renderFamily(selectedMember, nextMembers);
         } catch {
           if (error) {
             error.textContent =
@@ -1018,7 +1010,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       });
     };
 
-    const showFamily = (profile: OwnerProfile): void => {
+    const showFamily = (profile: HouseholdMember): void => {
       renderFamily(profile, familyMembers);
       if (!familyProfilesAvailable) {
         const addMember =
@@ -1034,12 +1026,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const renderPermissions = (
-      profile: OwnerProfile,
+      profile: HouseholdMember,
       permissions: ImmigrationPermission[],
     ): void => {
       renderImmigrationHistoryPage(
         root,
-        profile,
         familyMembers,
         selectedProfileId,
         permissions,
@@ -1164,7 +1155,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       });
     };
 
-    const showPermissions = async (profile: OwnerProfile): Promise<void> => {
+    const showPermissions = async (profile: HouseholdMember): Promise<void> => {
       const cached = permissionCache.get(selectedProfileId);
       if (cached) {
         renderPermissions(profile, cached);
@@ -1190,8 +1181,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       }
     };
 
-    const renderTrips = (profile: OwnerProfile, trips: Trip[]): void => {
-      renderTripsPage(root, profile, familyMembers, selectedProfileId, trips);
+    const renderTrips = (profile: HouseholdMember, trips: Trip[]): void => {
+      renderTripsPage(root, familyMembers, selectedProfileId, trips);
       wireAuthenticatedShell(profile, "Trips");
       const dialog = root.querySelector<HTMLDialogElement>("#trip-dialog");
       const form = root.querySelector<HTMLFormElement>("#trip-form");
@@ -1296,7 +1287,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       });
     };
 
-    const showTrips = async (profile: OwnerProfile): Promise<void> => {
+    const showTrips = async (profile: HouseholdMember): Promise<void> => {
       const cached = tripCache.get(selectedProfileId);
       if (cached) {
         renderTrips(profile, cached);
@@ -1320,7 +1311,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const updateDashboardCalculation = async (
-      profile: OwnerProfile,
+      profile: HouseholdMember,
       profileId: string,
     ): Promise<void> => {
       try {
@@ -1398,27 +1389,34 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     try {
-      const profile = await getOwnerProfile(key);
-      if (profile) {
-        try {
-          familyMembers = await getFamilyMembers(key);
-        } catch {
-          familyMembers = [];
-          familyProfilesAvailable = false;
-        }
+      try {
+        familyMembers = await getHouseholdMembers(key);
+      } catch {
+        familyMembers = [];
+        familyProfilesAvailable = false;
+      }
+
+      const firstMember = familyMembers[0];
+      if (firstMember) {
         if (!isKnownProfileId(selectedProfileId, familyMembers))
-          selectedProfileId = OWNER_PROFILE_ID;
-        renderDashboard(profile);
+          selectedProfileId = firstMember.id;
+        renderDashboard(firstMember);
         return;
       }
-      const form = renderOwnerProfileForm(root);
+
+      const form = renderFirstMemberForm(root);
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const data = new FormData(form);
-        const fullName = String(data.get("fullName") ?? "").trim();
-        const dateOfBirth = String(data.get("dateOfBirth") ?? "");
-        const error = validateOwnerInput(fullName, dateOfBirth);
-        const errorElement = form.querySelector<HTMLElement>("#owner-error");
+        const input = {
+          fullName: String(data.get("fullName") ?? "").trim(),
+          dateOfBirth: String(data.get("dateOfBirth") ?? ""),
+          immigrationRole: String(
+            data.get("immigrationRole") ?? "",
+          ) as HouseholdMember["immigrationRole"],
+        };
+        const error = validateHouseholdMemberInput(input);
+        const errorElement = form.querySelector<HTMLElement>("#member-error");
         if (error) {
           if (errorElement) {
             errorElement.textContent = error;
@@ -1427,21 +1425,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           return;
         }
         const timestamp = new Date().toISOString();
-        const owner: OwnerProfile = {
+        const member: HouseholdMember = {
           version: 1,
-          id: "owner",
-          fullName,
-          dateOfBirth,
+          id: crypto.randomUUID(),
+          ...input,
           createdAt: timestamp,
           updatedAt: timestamp,
         };
         try {
-          await saveOwnerProfile(owner, key);
-          renderDashboard(owner);
+          await saveHouseholdMembers([member], key);
+          familyMembers = [member];
+          familyProfilesAvailable = true;
+          selectedProfileId = member.id;
+          renderDashboard(member);
         } catch {
           if (errorElement) {
             errorElement.textContent =
-              "Your encrypted profile could not be saved.";
+              "This encrypted household member could not be saved.";
             errorElement.hidden = false;
           }
         }
@@ -1472,7 +1472,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           sessionKey = null;
           stopSessionLock?.();
           stopSessionLock = null;
-          selectedProfileId = OWNER_PROFILE_ID;
+          selectedProfileId = "";
           showLanding(
             "The previous local data and PIN were deleted. You can now create a new private space.",
           );

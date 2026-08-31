@@ -1,6 +1,5 @@
 import { APP_NAME } from "../configuration/app-metadata";
-import type { FamilyMember } from "../features/household/domain/family-member";
-import type { OwnerProfile } from "../features/household/domain/owner-profile";
+import type { HouseholdMember } from "../features/household/domain/household-member";
 
 const navigationItems = [
   {
@@ -81,8 +80,7 @@ export function renderAppShell(
 
 export function renderApp(
   root: HTMLElement,
-  owner: OwnerProfile,
-  members: FamilyMember[],
+  members: HouseholdMember[],
   selectedProfileId: string,
 ): void {
   renderAppShell(
@@ -117,10 +115,9 @@ export function renderApp(
 
       <section class="family-member-stack" aria-label="Family members">
         <div id="dashboard-family-list" class="dashboard-family-list"></div>
-
         <button id="manage-family" class="dashboard-add-member glass-panel" type="button">
           <span class="dashboard-add-member-icon" aria-hidden="true">＋</span>
-          <span>Add Family Member</span>
+          <span>Add Household Member</span>
         </button>
       </section>
 
@@ -149,23 +146,7 @@ export function renderApp(
   );
 
   const familyList = root.querySelector<HTMLElement>("#dashboard-family-list");
-  familyList?.append(
-    createDashboardProfileCard(
-      owner.fullName,
-      "Self",
-      "Primary local profile",
-      owner.id,
-      selectedProfileId === owner.id,
-      "primary",
-    ),
-  );
-
   for (const member of members) {
-    const relationship =
-      member.relationship === "spouse-or-partner"
-        ? "Spouse"
-        : member.relationship.charAt(0).toUpperCase() +
-          member.relationship.slice(1);
     const role =
       member.immigrationRole === "main-applicant"
         ? "Main applicant"
@@ -175,11 +156,9 @@ export function renderApp(
     familyList?.append(
       createDashboardProfileCard(
         member.fullName,
-        relationship,
         role,
         member.id,
         selectedProfileId === member.id,
-        "secondary",
       ),
     );
   }
@@ -187,57 +166,37 @@ export function renderApp(
 
 function createDashboardProfileCard(
   name: string,
-  relationship: string,
-  context: string,
+  role: string,
   profileId: string,
   selected: boolean,
-  accent: "primary" | "secondary",
 ): HTMLElement {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = `dashboard-person-card family-overview-member ${accent === "secondary" ? "is-secondary" : ""}`;
+  button.className = "dashboard-person-card family-overview-member";
   if (selected) button.classList.add("is-selected");
-  if (accent === "secondary") {
-    button.dataset.editDashboardMember = profileId;
-    button.setAttribute("aria-label", `Edit ${name}`);
-  } else {
-    button.dataset.selectDashboardProfile = profileId;
-    button.setAttribute(
-      "aria-label",
-      `${selected ? "Viewing" : "View"} ${name}`,
-    );
-  }
+  button.dataset.editDashboardMember = profileId;
+  button.setAttribute("aria-label", `Edit ${name}`);
   button.innerHTML = `
     <span class="dashboard-person-avatar" aria-hidden="true"></span>
     <span class="dashboard-person-copy">
       <span class="dashboard-person-heading"><strong></strong><span class="dashboard-person-badge"></span></span>
-      <small></small>
+      <small>Household member</small>
     </span>
     <span class="dashboard-person-state">
       <span class="dashboard-person-limit-label">Profile</span>
-      <span class="dashboard-person-limit-value"></span>
+      <span class="dashboard-person-limit-value">Edit</span>
       <span class="dashboard-person-progress" aria-hidden="true"><span></span></span>
     </span>
   `;
-
   const avatar = button.querySelector<HTMLElement>(".dashboard-person-avatar");
   const heading = button.querySelector<HTMLElement>("strong");
   const badge = button.querySelector<HTMLElement>(".dashboard-person-badge");
-  const description = button.querySelector<HTMLElement>("small");
-  const state = button.querySelector<HTMLElement>(
-    ".dashboard-person-limit-value",
-  );
   const progress = button.querySelector<HTMLElement>(
     ".dashboard-person-progress span",
   );
-
   if (avatar) avatar.textContent = name.trim().charAt(0).toUpperCase() || "?";
   if (heading) heading.textContent = name;
-  if (badge) badge.textContent = relationship;
-  if (description) description.textContent = context;
-  if (state)
-    state.textContent =
-      accent === "secondary" ? "Edit" : selected ? "Viewing" : "Open";
+  if (badge) badge.textContent = role;
   if (progress) progress.style.width = selected ? "66%" : "25%";
   return button;
 }

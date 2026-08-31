@@ -7,17 +7,19 @@ import {
 } from "./backup-service";
 
 const backupData: BackupData = {
-  owner: {
-    version: 1,
-    id: "owner",
-    fullName: "Encrypted Test Person",
-    dateOfBirth: "1990-01-01",
-    createdAt: "2026-08-30T10:00:00.000Z",
-    updatedAt: "2026-08-30T10:00:00.000Z",
-  },
-  familyMembers: [],
-  permissions: [{ profileId: "owner", records: [] }],
-  trips: [{ profileId: "owner", records: [] }],
+  members: [
+    {
+      version: 1,
+      id: "member-1",
+      fullName: "Encrypted Test Person",
+      dateOfBirth: "1990-01-01",
+      immigrationRole: "dependant",
+      createdAt: "2026-08-30T10:00:00.000Z",
+      updatedAt: "2026-08-30T10:00:00.000Z",
+    },
+  ],
+  permissions: [{ profileId: "member-1", records: [] }],
+  trips: [{ profileId: "member-1", records: [] }],
 };
 
 describe("encrypted backup", () => {
@@ -54,7 +56,7 @@ describe("encrypted backup", () => {
           metadata: {
             version: 1,
             id: "document-1",
-            profileId: "owner",
+            profileId: "member-1",
             displayName: "Passport",
             fileName: "passport.pdf",
             mimeType: "application/pdf",

@@ -1,12 +1,8 @@
 import { DATA_SCHEMA_VERSION } from "../../../configuration/app-metadata";
 import {
-  isFamilyMemberCollection,
-  type FamilyMember,
-} from "../../household/domain/family-member";
-import {
-  isOwnerProfile,
-  type OwnerProfile,
-} from "../../household/domain/owner-profile";
+  isHouseholdMemberCollection,
+  type HouseholdMember,
+} from "../../household/domain/household-member";
 import {
   isImmigrationPermissionCollection,
   type ImmigrationPermission,
@@ -35,8 +31,7 @@ export interface ProfileRecords<T> {
 }
 
 export interface BackupData {
-  owner: OwnerProfile;
-  familyMembers: FamilyMember[];
+  members: HouseholdMember[];
   permissions: ProfileRecords<ImmigrationPermission>[];
   trips: ProfileRecords<Trip>[];
   documents?: BackupDocument[];
@@ -176,14 +171,11 @@ export function isBackupPayload(value: unknown): value is BackupPayload {
     !/^\d+\.\d+\.\d+$/.test(payload.appVersion) ||
     !isIsoTimestamp(payload.exportedAt) ||
     !payload.data ||
-    !isOwnerProfile(payload.data.owner) ||
-    !isFamilyMemberCollection(payload.data.familyMembers)
+    !isHouseholdMemberCollection(payload.data.members) ||
+    payload.data.members.length === 0
   )
     return false;
-  const profileIds = [
-    payload.data.owner.id,
-    ...payload.data.familyMembers.map(({ id }) => id),
-  ];
+  const profileIds = payload.data.members.map(({ id }) => id);
   if (new Set(profileIds).size !== profileIds.length) return false;
   const documents = payload.data.documents;
   const documentsAreValid =

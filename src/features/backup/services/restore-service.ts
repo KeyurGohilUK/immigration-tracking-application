@@ -5,12 +5,10 @@ import {
 import { encryptRecord } from "../../../infrastructure/storage/encrypted-record-store";
 import { base64ToBytes } from "../../../shared/encoding/base64";
 import { createEncryptedDocumentRecord } from "../../documents/data/document-repository";
-import { FAMILY_MEMBERS_RECORD_KEY } from "../../household/data/family-member-repository";
-import { OWNER_PROFILE_RECORD_KEY } from "../../household/data/owner-profile-repository";
+import { HOUSEHOLD_MEMBERS_RECORD_KEY } from "../../household/data/household-member-repository";
 import type { BackupData } from "../domain/backup";
 
 export interface BackupSummary {
-  ownerName: string;
   people: number;
   permissions: number;
   trips: number;
@@ -20,8 +18,7 @@ export interface BackupSummary {
 
 export function summariseBackup(data: BackupData): BackupSummary {
   return {
-    ownerName: data.owner.fullName,
-    people: data.familyMembers.length + 1,
+    people: data.members.length,
     permissions: data.permissions.reduce(
       (total, { records }) => total + records.length,
       0,
@@ -36,35 +33,33 @@ export async function replaceAllLocalData(
   data: BackupData,
   vaultKey: CryptoKey,
 ): Promise<void> {
-  const [owner, familyMembers, permissions, trips, documents] =
-    await Promise.all([
-      encryptRecord(data.owner, vaultKey),
-      encryptRecord(data.familyMembers, vaultKey),
-      Promise.all(
-        data.permissions.map(async ({ profileId, records }) => ({
-          profileId,
-          encrypted: await encryptRecord(records, vaultKey),
-        })),
-      ),
-      Promise.all(
-        data.trips.map(async ({ profileId, records }) => ({
-          profileId,
-          encrypted: await encryptRecord(records, vaultKey),
-        })),
-      ),
-      data.documents === undefined
-        ? Promise.resolve(undefined)
-        : Promise.all(
-            data.documents.map(async ({ metadata, content }) => ({
-              id: metadata.id,
-              encrypted: await createEncryptedDocumentRecord(
-                metadata,
-                base64ToBytes(content),
-                vaultKey,
-              ),
-            })),
-          ),
-    ]);
+  const [members, permissions, trips, documents] = await Promise.all([
+    encryptRecord(data.members, vaultKey),
+    Promise.all(
+      data.permissions.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    Promise.all(
+      data.trips.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    data.documents === undefined
+      ? Promise.resolve(undefined)
+      : Promise.all(
+          data.documents.map(async ({ metadata, content }) => ({
+            id: metadata.id,
+            encrypted: await createEncryptedDocumentRecord(
+              metadata,
+              base64ToBytes(content),
+              vaultKey,
+            ),
+          })),
+        ),
+  ]);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(
@@ -100,8 +95,7 @@ export async function replaceAllLocalData(
       permissionStore.clear();
       tripStore.clear();
       documentStore?.clear();
-      profileStore.put(owner, OWNER_PROFILE_RECORD_KEY);
-      profileStore.put(familyMembers, FAMILY_MEMBERS_RECORD_KEY);
+      profileStore.put(members, HOUSEHOLD_MEMBERS_RECORD_KEY);
       for (const item of permissions)
         permissionStore.put(item.encrypted, item.profileId);
       for (const item of trips) tripStore.put(item.encrypted, item.profileId);
