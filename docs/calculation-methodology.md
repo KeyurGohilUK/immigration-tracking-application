@@ -30,19 +30,30 @@ period to contain non-dependant permission in any combination of:
 The app deliberately does not automate the narrow COVID-era provision in SW
 21.2(i). A user should obtain qualified review if it may apply.
 
+The app also provides a separate recorded timing estimate for a Skilled Worker,
+Health and Care Worker, or Tier 2 (General) dependant partner. It joins only
+consecutive permissions recorded as a dependant on those routes and never
+combines dependant time with main-applicant time. The estimate always requires
+manual confirmation that every dependant grant was linked to the same partner,
+because UrbanFox does not collect or verify partner identity or relationship
+history. It does not assess the lead applicant's settlement status or the other
+relationship requirements in Appendix Skilled Worker.
+
 Official sources:
 
 - [Immigration Rules Appendix Skilled Worker](https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-skilled-worker)
 - [Immigration Rules Appendix Continuous Residence](https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-continuous-residence)
 - [Continuous residence caseworker guidance](https://www.gov.uk/government/publications/continuous-residence-caseworker-guidance/continuous-residence-guidance-accessible-version)
 - [Skilled Worker settlement: time in the UK](https://www.gov.uk/indefinite-leave-to-remain-tier-2-t2-skilled-worker-visa/time-uk)
+- [Skilled Worker settlement: family members](https://www.gov.uk/indefinite-leave-to-remain-tier-2-t2-skilled-worker-visa/family-members)
 
 ## Qualifying-period method
 
-Permissions are calculated independently for the selected profile. Dependant
-permission and permission outside SW 21.2 are excluded. Consecutive qualifying
-records are joined when the next record begins no later than the day after the
-previous record expires. A recorded gap forces manual review because an
+Permissions are calculated independently for the selected profile. The
+main-applicant and dependant engines remain separate. Permission outside the
+applicable route and role is excluded. Consecutive qualifying records are joined
+when the next record begins no later than the day after the previous record
+expires. A recorded gap forces manual review because an
 unrecorded section 3C extension or another official exception may affect it.
 
 For an entry-clearance record with an actual UK arrival date, the recorded
@@ -81,8 +92,10 @@ consecutive-period method.
 The calculation does not assess salary, sponsorship, continued employment,
 suitability, Knowledge of Life in the UK, English language requirements,
 permitted-absence evidence, imprisonment, removal or deportation history, or
-every way continuous residence can be broken. It does not support dependant
-settlement calculations or make a complete ILR pass/fail decision.
+every way continuous residence can be broken. The dependant estimate cannot
+verify same-partner history, relationship requirements, the lead applicant's
+status, or child-dependant rules. It does not make a complete ILR pass/fail
+decision.
 
 The UI shows rule identifiers, the verification date, official links, and an
 explicit warning that rules can change.

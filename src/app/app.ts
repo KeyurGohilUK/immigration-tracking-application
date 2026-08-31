@@ -141,7 +141,7 @@ export function renderApp(
   familyList?.append(
     createDashboardProfileCard(
       owner.fullName,
-      "You · Household owner",
+      "You · Primary local profile",
       owner.id,
       selectedProfileId === owner.id,
     ),

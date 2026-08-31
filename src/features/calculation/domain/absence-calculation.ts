@@ -3,6 +3,7 @@ import {
   type ImmigrationPermission,
 } from "../../immigration/domain/immigration-permission";
 import type { Trip } from "../../travel/domain/trip";
+import { isSkilledWorkerDependantRoute } from "./dependant-qualifying-period-rule";
 import { ABSENCE_RULE, isAbsenceRuleRoute } from "./absence-rule";
 import { isSkilledWorkerQualifyingRoute } from "./qualifying-period-rule";
 
@@ -134,25 +135,25 @@ function findMaximumWindow(absenceDays: number[]): AbsenceWindow | null {
   };
 }
 
-export function calculateRecordedAbsenceCheck({
-  permissions,
-  trips,
-  asOfDate,
-}: AbsenceCalculationInput): AbsenceCheckResult {
+function calculateAbsenceForRole(
+  { permissions, trips, asOfDate }: AbsenceCalculationInput,
+  supportedRole: "main-applicant" | "dependant",
+): AbsenceCheckResult {
   parseDate(asOfDate);
   const qualifyingPermissions = permissions
     .filter(
       ({ route, role }) =>
-        role === ABSENCE_RULE.supportedRole &&
-        isSkilledWorkerQualifyingRoute(route),
+        role === supportedRole &&
+        (supportedRole === "dependant"
+          ? isSkilledWorkerDependantRoute(route)
+          : isSkilledWorkerQualifyingRoute(route)),
     )
     .sort((left, right) =>
       right.permissionStartDate.localeCompare(left.permissionStartDate),
     );
   const latestPermission = permissions
     .filter(
-      ({ route, role }) =>
-        role === ABSENCE_RULE.supportedRole && isAbsenceRuleRoute(route),
+      ({ route, role }) => role === supportedRole && isAbsenceRuleRoute(route),
     )
     .sort((left, right) =>
       right.permissionStartDate.localeCompare(left.permissionStartDate),
@@ -205,4 +206,16 @@ export function calculateRecordedAbsenceCheck({
     maximumWindow,
     issues,
   };
+}
+
+export function calculateRecordedAbsenceCheck(
+  input: AbsenceCalculationInput,
+): AbsenceCheckResult {
+  return calculateAbsenceForRole(input, "main-applicant");
+}
+
+export function calculateRecordedDependantAbsenceCheck(
+  input: AbsenceCalculationInput,
+): AbsenceCheckResult {
+  return calculateAbsenceForRole(input, "dependant");
 }

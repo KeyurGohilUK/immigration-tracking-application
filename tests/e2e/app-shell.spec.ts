@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added ordered, application-ready PDF document packs for each household profile",
+      "Added a separate five-year timing estimate and recorded-absence check for supported Skilled Worker dependants",
     ),
   ).toBeVisible();
   await expect(
@@ -384,7 +384,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await page.getByLabel("Full name").fill("Temporary Family Member");
   await page.getByLabel("Date of birth").fill("2005-06-15");
   await page
-    .getByLabel("Relationship to household owner")
+    .getByLabel("Relationship to primary local profile")
     .selectOption("other");
   await page.getByLabel("Immigration role").selectOption("not-set");
   await page.getByRole("button", { name: "Save family member" }).click();
@@ -561,7 +561,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByLabel("Full name").fill("Freddy Test Dependant");
   await page.getByLabel("Date of birth").fill("2005-06-15");
   await page
-    .getByLabel("Relationship to household owner")
+    .getByLabel("Relationship to primary local profile")
     .selectOption("child");
   await page.getByLabel("Immigration role").selectOption("dependant");
   await page.getByRole("button", { name: "Save family member" }).click();
@@ -711,6 +711,43 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Skilled Worker" }).click();
   await expect(page.getByText("No permissions recorded")).toBeVisible();
+});
+
+test("shows a separate estimate for a primary profile who is a Skilled Worker dependant", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await expect(page.getByText("You · Primary local profile")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Manage immigration history" })
+    .click();
+  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByLabel("Immigration route").selectOption("skilled-worker");
+  await page.getByLabel("Permission held as").selectOption("dependant");
+  await page.getByLabel(/Visa grant date/).fill("2023-12-15");
+  await page.getByLabel("Permission start date").fill("2023-12-15");
+  await page.getByLabel("Permission expiry date").fill("2029-12-31");
+  await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
+  await page.getByRole("button", { name: "Save permission" }).click();
+  await expect(
+    page.getByText("Dependant calculation supported", { exact: true }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "Dashboard" }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "Recorded estimate: 2028-11-17" }),
+  ).toBeVisible();
+  await expect(page.getByText("2023-12-15", { exact: true })).toBeVisible();
+  await expect(page.getByText("2028-12-15", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/same partner; UrbanFox does not store or verify/i),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "31 days at most in one rolling year",
+    }),
+  ).toBeVisible();
 });
 
 test("tracks encrypted trips, open travel, and overlap warnings", async ({

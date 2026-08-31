@@ -25,7 +25,8 @@ export type QualifyingPeriodIssue =
   | "permission-expired"
   | "permission-expires-before-estimated-date"
   | "missing-grant-date"
-  | "pre-2018-permission";
+  | "pre-2018-permission"
+  | "dependant-partner-linkage-not-verified";
 
 export interface QualifyingPeriodResult {
   status: QualifyingPeriodStatus;

@@ -20,7 +20,7 @@ export function renderMorePage(
 
       <section class="profile-summary" aria-labelledby="profile-name">
         <div id="profile-avatar" class="profile-avatar" aria-hidden="true"></div>
-        <div class="profile-summary-copy"><p class="eyebrow">Household owner</p><h2 id="profile-name"></h2><p>Local profile · No online account</p><div class="profile-badges"><span>${householdSize} ${householdSize === 1 ? "person" : "people"}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Encrypted locally</span></div></div>
+        <div class="profile-summary-copy"><p class="eyebrow">Primary local profile</p><h2 id="profile-name"></h2><p>Local profile · No online account</p><div class="profile-badges"><span>${householdSize} ${householdSize === 1 ? "person" : "people"}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Encrypted locally</span></div></div>
       </section>
 
       <div class="more-grid">

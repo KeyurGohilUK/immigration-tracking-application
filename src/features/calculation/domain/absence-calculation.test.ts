@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
 import type { Trip } from "../../travel/domain/trip";
-import { calculateRecordedAbsenceCheck } from "./absence-calculation";
+import {
+  calculateRecordedAbsenceCheck,
+  calculateRecordedDependantAbsenceCheck,
+} from "./absence-calculation";
 
 const permission: ImmigrationPermission = {
   version: 2,
@@ -152,6 +155,16 @@ describe("recorded absence check", () => {
     });
     expect(dependant.status).toBe("unsupported");
     expect(otherRoute.status).toBe("unsupported");
+  });
+
+  it("applies the separate recorded-absence check to a dependant", () => {
+    const result = calculateRecordedDependantAbsenceCheck({
+      permissions: [{ ...permission, role: "dependant" }],
+      trips: [trip("trip-1", "2024-01-01", "2024-01-12")],
+      asOfDate: "2026-08-30",
+    });
+    expect(result.status).toBe("within-recorded-limit");
+    expect(result.maximumRecordedDays).toBe(10);
   });
 
   it("reports missing permission history as incomplete", () => {
