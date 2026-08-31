@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Standardized date fields and dropdowns across the app so they share the same control styling.",
+      "Restyled the add and edit household member form with the Ibiza Sunset Liquid Glass design used on Home.",
     ),
   ).toBeVisible();
   await expect(
@@ -467,17 +467,17 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
   await page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }).click();
-  await expect(page.locator(".family-dialog")).toHaveCSS(
+  await expect(page.locator(".member-profile-dialog")).toHaveCSS(
     "background-color",
-    "rgba(39, 24, 59, 0.94)",
+    "rgba(39, 24, 59, 0.88)",
   );
   await expect(page.getByLabel("Full name")).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.08)",
+    "rgba(21, 6, 41, 0.72)",
   );
   await expect(page.getByLabel("Date of birth")).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.1)",
+    "rgba(21, 6, 41, 0.72)",
   );
   await expect(page.getByLabel("Immigration role")).toHaveCSS(
     "appearance",
@@ -485,11 +485,11 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
   );
   await expect(page.getByLabel("Date of birth")).toHaveCSS(
     "border-radius",
-    "12px",
+    "16px",
   );
   await expect(page.getByLabel("Immigration role")).toHaveCSS(
     "border-radius",
-    "12px",
+    "16px",
   );
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
@@ -618,6 +618,12 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   ).toBeVisible();
   await expect(page.getByText("Private", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Add household member" }).click();
+  await expect(page.locator(".member-profile-header")).toBeVisible();
+  await expect(page.locator(".member-profile-icon")).toBeVisible();
+  await expect(page.locator(".member-profile-save")).toHaveCSS(
+    "background-image",
+    /linear-gradient/,
+  );
   await page.getByLabel("Full name").fill("Freddy Test Dependant");
   await page.getByLabel("Date of birth").fill("2005-06-15");
   await page.getByLabel("Immigration role").selectOption("dependant");
