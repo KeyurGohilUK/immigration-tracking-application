@@ -102,7 +102,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Replaced the Home dashboard with a Family Overview built around the Ibiza Sunset Liquid Glass design.",
+      "Added a Profile theme preference with Light, Dark, and System options.",
     ),
   ).toBeVisible();
   await expect(
