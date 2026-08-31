@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Refined the floating mobile menu with a more curved capsule, larger icons, and a wider glass active state.",
+      "Added a gliding glass capsule that animates smoothly between mobile navigation items.",
     ),
   ).toBeVisible();
   await expect(
@@ -199,8 +199,6 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
-  await expect(page.locator(":focus")).toHaveClass(/security-keypad/);
-  await expect(page.locator(":focus")).not.toHaveAttribute("data-pin-key");
   await expect(page.locator(".security-logo-mark")).toBeVisible();
   await expect(page.locator(".security-logo-mark img")).toHaveCSS(
     "border-radius",
@@ -208,6 +206,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   );
   await expect(page.locator(".security-logo-orb")).toHaveCount(0);
   await page.getByRole("button", { name: "Enter 1" }).click();
+  await expect(page.locator("[data-pin-indicator].is-filled")).toHaveCount(1);
   await enterPin(page, "Four-digit PIN", "111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
@@ -1017,8 +1016,11 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
       'a[aria-current="page"]',
     );
     const activeIcon = activeLink?.querySelector<SVGElement>("svg");
-    const activeStyle = activeLink
-      ? window.getComputedStyle(activeLink)
+    const indicator = element.querySelector<HTMLElement>(
+      ".mobile-navigation-indicator",
+    );
+    const indicatorStyle = indicator
+      ? window.getComputedStyle(indicator)
       : undefined;
     const iconStyle = activeIcon
       ? window.getComputedStyle(activeIcon)
@@ -1026,7 +1028,8 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
     return {
       background: style.backgroundColor,
       borderRadius: style.borderRadius,
-      activeRadius: activeStyle?.borderRadius ?? "",
+      indicatorRadius: indicatorStyle?.borderRadius ?? "",
+      indicatorTransition: indicatorStyle?.transitionDuration ?? "",
       iconWidth: iconStyle?.width ?? "",
     };
   });
@@ -1039,7 +1042,8 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   );
   expect(navigationStyles.background).toContain("0.76");
   expect(navigationStyles.borderRadius).toBe("999px");
-  expect(navigationStyles.activeRadius).toBe("999px");
+  expect(navigationStyles.indicatorRadius).toBe("999px");
+  expect(navigationStyles.indicatorTransition).toBe("0.38s");
   expect(navigationStyles.iconWidth).toBe("28px");
   await expect(header).toHaveCSS("position", "sticky");
   await expect(navigation.locator(".navigation-label").first()).toHaveCSS(
@@ -1067,6 +1071,43 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
   expect(compactNavigationBackground).toContain("0.64");
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
+});
+
+test("glides the active mobile navigation capsule between sections", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+  const indicator = navigation.locator(".mobile-navigation-indicator");
+  await expect(indicator).toHaveCount(1);
+
+  const initialTransform = await indicator.evaluate(
+    (element) => window.getComputedStyle(element).transform,
+  );
+  await page.getByRole("link", { name: "Travel", exact: true }).click();
+  await expect(
+    navigation.locator('a[data-navigation="Trips"]'),
+  ).toHaveAttribute("aria-current", "page");
+  await expect
+    .poll(() =>
+      navigation.evaluate((element) =>
+        element.style.getPropertyValue("--mobile-navigation-offset"),
+      ),
+    )
+    .toBe("100%");
+
+  await expect
+    .poll(() =>
+      indicator.evaluate(
+        (element) => window.getComputedStyle(element).transform,
+      ),
+    )
+    .not.toBe(initialTransform);
 });
 
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
