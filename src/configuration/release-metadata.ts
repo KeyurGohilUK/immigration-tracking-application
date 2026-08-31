@@ -1,6 +1,7 @@
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "2.0.0";
 
 export const RELEASE_NOTES = [
-  "Family-member cards on the Home screen now open the existing edit form directly.",
-  "Opening a member card keeps that person selected for tracking while their profile is edited.",
+  "Removed the special household owner profile so every person now uses the same member model.",
+  "Any household member can be a main applicant, dependant, or have their immigration role left unset.",
+  "Made every Home member card editable and updated profile switching, backups, and local storage for the equal-member structure.",
 ] as const;
