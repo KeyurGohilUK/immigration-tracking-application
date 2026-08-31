@@ -2,6 +2,7 @@ import { renderAppShell } from "../../../app/app";
 import { APP_VERSION } from "../../../configuration/release-metadata";
 import type { OwnerProfile } from "../../household/domain/owner-profile";
 import { renderDeleteDataDialog } from "./delete-data-dialog";
+import { getThemePreference } from "../services/theme-preference";
 
 export function renderMorePage(
   root: HTMLElement,
@@ -52,6 +53,7 @@ export function renderMorePage(
             <div><p class="eyebrow">App and information</p><h2 id="app-settings-title">UrbanFox settings</h2></div>
           </div>
           <div class="settings-list">
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg></span><div><h3>Theme</h3><p>Choose how UrbanFox looks on this device.</p></div><label class="settings-select-label" for="theme-preference"><span class="visually-hidden">Theme preference</span><select id="theme-preference" class="settings-select"><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label></div>
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span><div><h3>Install and updates</h3><p>Version ${APP_VERSION} · Check for a newer cached app.</p></div><button id="open-install-settings" class="settings-row-action" type="button">Open</button></div>
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg></span><div><h3 id="legal-title">Terms, privacy, and licence</h3><p>Review the tracking disclaimer, privacy notice and proprietary licence.</p></div><button id="view-legal" class="settings-row-action" type="button" aria-label="View legal information">View</button></div>
           </div>
@@ -108,7 +110,10 @@ export function renderMorePage(
   );
   const name = root.querySelector<HTMLElement>("#profile-name");
   const avatar = root.querySelector<HTMLElement>("#profile-avatar");
+  const themePreference =
+    root.querySelector<HTMLSelectElement>("#theme-preference");
   if (name) name.textContent = owner.fullName;
   if (avatar)
     avatar.textContent = owner.fullName.trim().charAt(0).toUpperCase() || "?";
+  if (themePreference) themePreference.value = getThemePreference();
 }
