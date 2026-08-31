@@ -6,8 +6,7 @@ import {
   getAllDocumentMetadata,
   getDocumentFile,
 } from "../../documents/data/document-repository";
-import { getFamilyMembers } from "../../household/data/family-member-repository";
-import type { OwnerProfile } from "../../household/domain/owner-profile";
+import { getHouseholdMembers } from "../../household/data/household-member-repository";
 import { getImmigrationPermissions } from "../../immigration/data/immigration-permission-repository";
 import { getTrips } from "../../travel/data/trip-repository";
 import {
@@ -49,11 +48,10 @@ async function deriveBackupKey(
 }
 
 export async function collectBackupData(
-  owner: OwnerProfile,
   vaultKey: CryptoKey,
 ): Promise<BackupData> {
-  const familyMembers = await getFamilyMembers(vaultKey);
-  const profileIds = [owner.id, ...familyMembers.map(({ id }) => id)];
+  const members = await getHouseholdMembers(vaultKey);
+  const profileIds = members.map(({ id }) => id);
   const [permissions, trips, documentMetadata] = await Promise.all([
     Promise.all(
       profileIds.map(async (profileId) => ({
@@ -78,7 +76,7 @@ export async function collectBackupData(
       };
     }),
   );
-  return { owner, familyMembers, permissions, trips, documents };
+  return { members, permissions, trips, documents };
 }
 
 export async function createEncryptedBackup(
