@@ -1,8 +1,6 @@
 {
-  "version": "2.4.0",
+  "version": "2.4.1",
   "notes": [
-    "Added a centre ILR hero destination that brings every household member’s final ILR journey into one view.",
-    "The ILR journey shows qualifying-period progress, earliest estimated application dates, five-year points, and recorded absence status.",
-    "Expanded the floating navigation to five items while keeping the gliding glass capsule animation."
+    "Fixed the ILR journey bottom spacing so final content scrolls fully above the floating navigation."
   ]
 }
