@@ -3,8 +3,7 @@ import {
   populatePersonSwitcher,
   renderPersonSwitcherMarkup,
 } from "../../household/components/person-switcher";
-import type { FamilyMember } from "../../household/domain/family-member";
-import type { OwnerProfile } from "../../household/domain/owner-profile";
+import type { HouseholdMember } from "../../household/domain/household-member";
 import {
   DOCUMENT_CATEGORY_LABELS,
   formatDocumentBytes,
@@ -16,8 +15,7 @@ import {
 
 export function renderDocumentsPage(
   root: HTMLElement,
-  owner: OwnerProfile,
-  members: FamilyMember[],
+  members: HouseholdMember[],
   selectedProfileId: string,
   allDocuments: DocumentMetadata[],
 ): void {
@@ -50,7 +48,7 @@ export function renderDocumentsPage(
     <dialog id="document-dialog" class="family-dialog document-dialog" aria-labelledby="document-form-title"><form id="document-form" class="family-form" novalidate><div class="app-manager-heading family-form-heading"><div><p class="eyebrow">Encrypted local upload</p><h2 id="document-form-title">Add document</h2><p>PDF, JPG, or PNG · Maximum 5 MB</p></div><button class="dialog-close" type="button" aria-label="Close document form">×</button></div><div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file">Document file</label><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance">The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option><option value="address-proof">Address proof</option><option value="other">Other</option></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p><button class="primary-button family-save-button" type="submit">Encrypt and save document</button></form></dialog>
     <dialog id="document-rename-dialog" class="family-dialog document-rename-dialog" aria-labelledby="document-rename-title"><form id="document-rename-form" class="family-form" novalidate><div class="app-manager-heading family-form-heading"><div><p class="eyebrow">Encrypted metadata</p><h2 id="document-rename-title">Rename document</h2></div><button class="dialog-close" type="button" aria-label="Close rename form">×</button></div><input name="documentId" type="hidden" /><div class="family-field"><label for="document-new-name">Document name</label><input id="document-new-name" name="displayName" maxlength="100" required /></div><p id="document-rename-error" class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Save document name</button></form></dialog>`,
   );
-  populatePersonSwitcher(root, owner, members, selectedProfileId);
+  populatePersonSwitcher(root, members, selectedProfileId);
   const list = root.querySelector<HTMLElement>("#document-list");
   if (!list) throw new Error("Documents could not be rendered.");
   if (documents.length === 0) {
