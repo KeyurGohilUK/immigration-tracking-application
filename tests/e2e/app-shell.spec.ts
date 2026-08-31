@@ -17,7 +17,10 @@ async function createLocalProfile(
   await enterPin(page, "Confirm PIN", TEST_PROFILE.pin);
   await page.getByLabel("Full name").fill(TEST_PROFILE.name);
   await page.getByLabel("Date of birth").fill(TEST_PROFILE.dateOfBirth);
-  await page.getByRole("button", { name: "Save local profile" }).click();
+  await page.getByLabel("Immigration role").selectOption("dependant");
+  await page
+    .getByRole("button", { name: "Create household member" })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
@@ -27,7 +30,7 @@ async function createLocalProfile(
     ),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: `Viewing ${TEST_PROFILE.name}` }),
+    page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
 }
 
@@ -102,7 +105,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Family-member cards on the Home screen now open the existing edit form directly.",
+      "Removed the special household owner profile so every person now uses the same member model.",
     ),
   ).toBeVisible();
   await expect(
@@ -171,7 +174,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 5);
+      const request = indexedDB.open("urbanfox-ilr", 6);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -179,7 +182,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
       const request = database
         .transaction("profiles", "readonly")
         .objectStore("profiles")
-        .get("owner");
+        .get("household-members");
       request.onsuccess = () => resolve(JSON.stringify(request.result));
       request.onerror = () => reject(request.error);
     });
@@ -241,7 +244,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 5);
+      const request = indexedDB.open("urbanfox-ilr", 6);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -372,22 +375,19 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   const backup = JSON.parse(backupText) as Record<string, unknown>;
   expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
   expect(backup.version).toBe(1);
-  expect(backup.dataSchemaVersion).toBe(4);
+  expect(backup.dataSchemaVersion).toBe(5);
   expect(backupText).not.toContain(TEST_PROFILE.name);
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
-  await page.getByRole("button", { name: "Add Family Member" }).click();
-  await page.getByRole("button", { name: "Add family member" }).click();
+  await page.getByRole("button", { name: "Add Household Member" }).click();
+  await page.getByRole("button", { name: "Add household member" }).click();
   await page.getByLabel("Full name").fill("Temporary Family Member");
   await page.getByLabel("Date of birth").fill("2005-06-15");
-  await page
-    .getByLabel("Relationship to primary local profile")
-    .selectOption("other");
   await page.getByLabel("Immigration role").selectOption("not-set");
-  await page.getByRole("button", { name: "Save family member" }).click();
+  await page.getByRole("button", { name: "Save household member" }).click();
   await expect(
     page.getByRole("heading", { name: "Temporary Family Member", exact: true }),
   ).toBeVisible();
@@ -419,7 +419,6 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
       },
     )
     .toBe("ready");
-  await expect(page.getByText(`Household: ${TEST_PROFILE.name}`)).toBeVisible();
   await expect(page.locator("#restore-people")).toHaveText("1");
   await expect(page.locator("#restore-permissions")).toHaveText("0");
   await expect(page.locator("#restore-trips")).toHaveText("0");
@@ -432,8 +431,11 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByText("Backup restored successfully", { exact: false }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Family", exact: true }).click();
-  await page.getByRole("button", { name: "Add Family Member" }).click();
-  await expect(page.getByText("No family members added yet")).toBeVisible();
+  await page.getByRole("button", { name: "Add Household Member" }).click();
+  await expect(
+    page.getByRole("heading", { name: TEST_PROFILE.name, level: 3 }),
+  ).toBeVisible();
+  await expect(page.getByText("1 person", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await page.getByRole("button", { name: "View legal information" }).click();
@@ -529,7 +531,7 @@ test("permanently deletes all local application data", async ({ page }) => {
 
   const localData = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 5);
+      const request = indexedDB.open("urbanfox-ilr", 6);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -578,25 +580,21 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Add Family Member" }).click();
+  await page.getByRole("button", { name: "Add Household Member" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Your family" }),
+    page.getByRole("heading", { name: "Your household" }),
   ).toBeVisible();
   await expect(page.getByText("1 person", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Household members" }),
   ).toBeVisible();
   await expect(page.getByText("Private", { exact: true })).toBeVisible();
-  await expect(page.getByText("No family members added yet")).toBeVisible();
-  await page.getByRole("button", { name: "Add family member" }).click();
+  await page.getByRole("button", { name: "Add household member" }).click();
   await page.getByLabel("Full name").fill("Freddy Test Dependant");
   await page.getByLabel("Date of birth").fill("2005-06-15");
-  await page
-    .getByLabel("Relationship to primary local profile")
-    .selectOption("child");
   await page.getByLabel("Immigration role").selectOption("dependant");
-  await page.getByRole("button", { name: "Save family member" }).click();
+  await page.getByRole("button", { name: "Save household member" }).click();
 
   await expect(
     page.getByRole("heading", { name: "Freddy Test Dependant", level: 3 }),
@@ -612,22 +610,22 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: `View ${TEST_PROFILE.name}` }).click();
-  await expect(
-    page.getByRole("button", { name: `Viewing ${TEST_PROFILE.name}` }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: `Select ${TEST_PROFILE.name}` }).click();
+  await expect(page.locator("#selected-person-name")).toHaveText(
+    TEST_PROFILE.name,
+  );
   await page
     .getByRole("button", { name: "Edit Freddy Test Dependant" })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Edit family member" }),
+    page.getByRole("heading", { name: "Edit household member" }),
   ).toBeVisible();
   await expect(page.getByLabel("Full name")).toHaveValue(
     "Freddy Test Dependant",
   );
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 5);
+      const request = indexedDB.open("urbanfox-ilr", 6);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -635,7 +633,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
       const request = database
         .transaction("profiles", "readonly")
         .objectStore("profiles")
-        .get("family-members");
+        .get("household-members");
       request.onsuccess = () => resolve(JSON.stringify(request.result));
       request.onerror = () => reject(request.error);
     });
@@ -644,7 +642,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   expect(storedFamily).toContain("ciphertext");
 
   await page.getByLabel("Full name").fill("Freddy Test Child");
-  await page.getByRole("button", { name: "Save family member" }).click();
+  await page.getByRole("button", { name: "Save household member" }).click();
   await expect(
     page.getByRole("heading", { name: "Freddy Test Child", level: 3 }),
   ).toBeVisible();
@@ -654,7 +652,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Child" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Add Family Member" }).click();
+  await page.getByRole("button", { name: "Add Household Member" }).click();
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Child",
   );
@@ -662,7 +660,9 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
   await expect(page.getByText("No family members added yet")).toBeVisible();
-  await expect(page.getByLabel("Tracking profile")).toHaveValue("owner");
+  await expect(page.locator("#selected-person-name")).toHaveText(
+    TEST_PROFILE.name,
+  );
 });
 
 test("tracks encrypted immigration permissions without claiming eligibility", async ({
@@ -704,9 +704,12 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
     "2026-12-31",
   );
   await expect(page.getByText(/qualifying period on Dashboard/i)).toBeVisible();
-  const storedPermission = await page.evaluate(async () => {
+  const permissionProfileId = await page
+    .getByLabel("Tracking profile")
+    .inputValue();
+  const storedPermission = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 5);
+      const request = indexedDB.open("urbanfox-ilr", 6);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -714,11 +717,11 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
       const request = database
         .transaction("permissions", "readonly")
         .objectStore("permissions")
-        .get("owner");
+        .get(profileId);
       request.onsuccess = () => resolve(JSON.stringify(request.result));
       request.onerror = () => reject(request.error);
     });
-  });
+  }, permissionProfileId);
   expect(storedPermission).not.toContain("skilled-worker");
   expect(storedPermission).toContain("ciphertext");
 
@@ -817,9 +820,10 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("Manual review flagged")).toBeVisible();
   await expect(page.getByText("8", { exact: true })).toBeVisible();
-  const storedTrip = await page.evaluate(async () => {
+  const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
+  const storedTrip = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 5);
+      const request = indexedDB.open("urbanfox-ilr", 6);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -827,11 +831,11 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
       const request = database
         .transaction("trips", "readonly")
         .objectStore("trips")
-        .get("owner");
+        .get(profileId);
       request.onsuccess = () => resolve(JSON.stringify(request.result));
       request.onerror = () => reject(request.error);
     });
-  });
+  }, tripProfileId);
   expect(storedTrip).not.toContain("India");
   expect(storedTrip).toContain("ciphertext");
 
