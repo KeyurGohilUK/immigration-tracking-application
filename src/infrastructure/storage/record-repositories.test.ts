@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { saveFamilyMembers } from "../../features/household/data/family-member-repository";
-import { saveOwnerProfile } from "../../features/household/data/owner-profile-repository";
-import type { FamilyMember } from "../../features/household/domain/family-member";
-import type { OwnerProfile } from "../../features/household/domain/owner-profile";
+import { saveHouseholdMembers } from "../../features/household/data/household-member-repository";
+import type { HouseholdMember } from "../../features/household/domain/household-member";
 import { saveImmigrationPermissions } from "../../features/immigration/data/immigration-permission-repository";
 import type { ImmigrationPermission } from "../../features/immigration/domain/immigration-permission";
 import { saveTrips } from "../../features/travel/data/trip-repository";
@@ -12,31 +10,19 @@ const key = {} as CryptoKey;
 const timestamp = "2026-08-30T10:00:00.000Z";
 
 describe("encrypted repository save boundaries", () => {
-  it("rejects invalid owner and family records before encryption", async () => {
-    const owner: OwnerProfile = {
+  it("rejects invalid household members before encryption", async () => {
+    const member: HouseholdMember = {
       version: 1,
-      id: "owner",
-      fullName: "Owner",
-      dateOfBirth: "1990-01-01",
-      createdAt: timestamp,
-      updatedAt: "not-a-timestamp",
-    };
-    const member: FamilyMember = {
-      version: 1,
-      id: "family-1",
-      fullName: "Family member",
+      id: "member-1",
+      fullName: "Household member",
       dateOfBirth: "2000-01-01",
-      relationship: "other",
       immigrationRole: "not-set",
       createdAt: timestamp,
       updatedAt: "not-a-timestamp",
     };
 
-    await expect(saveOwnerProfile(owner, key)).rejects.toThrow(
-      "Owner profile is invalid",
-    );
-    await expect(saveFamilyMembers([member], key)).rejects.toThrow(
-      "Family profiles are invalid",
+    await expect(saveHouseholdMembers([member], key)).rejects.toThrow(
+      "Household members are invalid",
     );
   });
 
@@ -44,7 +30,7 @@ describe("encrypted repository save boundaries", () => {
     const permission: ImmigrationPermission = {
       version: 2,
       id: "permission-1",
-      profileId: "family-1",
+      profileId: "member-1",
       route: "skilled-worker",
       otherRouteName: "",
       role: "main-applicant",
@@ -58,7 +44,7 @@ describe("encrypted repository save boundaries", () => {
     const trip: Trip = {
       version: 1,
       id: "trip-1",
-      profileId: "owner",
+      profileId: "member-1",
       departureDate: "2024-01-01",
       returnDate: "2024-01-10",
       destination: "India",
@@ -69,11 +55,11 @@ describe("encrypted repository save boundaries", () => {
     };
 
     await expect(
-      saveImmigrationPermissions("owner", [permission], key),
+      saveImmigrationPermissions("member-1", [permission], key),
     ).rejects.toThrow("Immigration permissions are invalid");
     await expect(
       saveTrips(
-        "owner",
+        "member-1",
         [
           trip,
           {
