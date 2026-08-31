@@ -3556,7 +3556,7 @@ p {
 }
 
 .mobile-navigation {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .mobile-navigation a[aria-current="page"],
@@ -3613,7 +3613,7 @@ p {
   top: var(--mobile-navigation-padding-y);
   bottom: var(--mobile-navigation-padding-y);
   left: var(--mobile-navigation-padding-x);
-  width: calc((100% - (2 * var(--mobile-navigation-padding-x))) / 4);
+  width: calc((100% - (2 * var(--mobile-navigation-padding-x))) / 5);
   border-radius: 999px;
   background: linear-gradient(
     145deg,
@@ -3638,6 +3638,55 @@ p {
 
 .mobile-navigation a[aria-current="page"] svg {
   transform: scale(1.06);
+}
+
+.mobile-navigation a[data-navigation="ILR"] {
+  min-height: 4rem;
+  color: #ffffff;
+}
+
+.mobile-navigation a[data-navigation="ILR"]::before {
+  position: absolute;
+  z-index: -1;
+  width: 3.15rem;
+  height: 3.15rem;
+  border-radius: 999px;
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.55rem 1.25rem rgb(238 9 121 / 24%),
+    0 0 1.4rem rgb(255 106 0 / 14%);
+  content: "";
+}
+
+.mobile-navigation a[data-navigation="ILR"] svg {
+  width: 1.9rem;
+  height: 1.9rem;
+  color: #ffffff;
+  transform: translateY(-0.05rem);
+}
+
+.mobile-navigation a[data-navigation="ILR"][aria-current="page"] svg {
+  transform: translateY(-0.05rem) scale(1.08);
+}
+
+.mobile-navigation.is-scroll-compact a[data-navigation="ILR"] {
+  min-height: 3.55rem;
+}
+
+.mobile-navigation.is-scroll-compact a[data-navigation="ILR"]::before {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+.mobile-navigation.is-scroll-compact a[data-navigation="ILR"] svg {
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.desktop-navigation a[data-navigation="ILR"] {
+  color: #ffffff;
+  background: var(--ibiza-gradient);
+  box-shadow: 0 0.4rem 1rem rgb(238 9 121 / 16%);
 }
 
 .mobile-navigation.is-scroll-compact {
@@ -3757,6 +3806,265 @@ html[data-theme="dark"] .mobile-navigation a[aria-current="page"] {
 @media (min-width: 48rem) {
   .family-dashboard {
     padding: 2.5rem max(2rem, calc((100vw - 80rem) / 2)) 4rem;
+  }
+}
+
+/* Final ILR journey */
+.ilr-main {
+  display: grid;
+  width: min(100%, 72rem);
+  gap: 1.25rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 7.5rem;
+}
+
+.ilr-hero,
+.ilr-journey-panel,
+.ilr-member-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+  backdrop-filter: blur(24px) saturate(135%);
+}
+
+.ilr-hero {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  min-height: 20rem;
+  padding: 2rem 1.25rem;
+  border-radius: 2rem;
+  text-align: center;
+}
+
+.ilr-hero-glow {
+  position: absolute;
+  top: -6rem;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgb(238 9 121 / 18%),
+    rgb(255 106 0 / 16%)
+  );
+  filter: blur(3.5rem);
+  pointer-events: none;
+}
+
+.ilr-hero-icon {
+  position: relative;
+  display: grid;
+  width: 4.5rem;
+  height: 4.5rem;
+  place-items: center;
+  border-radius: 1.4rem;
+  color: #ffffff;
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.8rem 1.8rem rgb(238 9 121 / 22%),
+    0 0 2rem rgb(255 106 0 / 14%);
+}
+
+.ilr-hero-icon svg {
+  width: 2.25rem;
+  height: 2.25rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.ilr-hero h1 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  letter-spacing: -0.045em;
+}
+
+.ilr-hero > p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.6;
+}
+
+.ilr-hero-summary {
+  display: grid;
+  width: min(100%, 36rem);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.ilr-hero-summary > div {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.8rem 0.6rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  background: var(--glass-surface-strong);
+}
+
+.ilr-hero-summary strong {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.45rem;
+}
+
+.ilr-hero-summary span {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+.ilr-journey-panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1.1rem;
+  border-radius: 1.5rem;
+}
+
+.ilr-member-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.ilr-member-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1.4rem;
+}
+
+.ilr-member-card.requires-review {
+  border-color: rgb(255 106 0 / 28%);
+}
+
+.ilr-member-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.ilr-member-avatar {
+  display: grid;
+  width: 3.2rem;
+  height: 3.2rem;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--ibiza-gradient);
+  box-shadow: 0 0.45rem 1rem rgb(238 9 121 / 18%);
+  font-weight: 800;
+}
+
+.ilr-member-heading h2,
+.ilr-member-heading p {
+  margin: 0;
+}
+
+.ilr-member-role {
+  color: var(--colour-text-muted);
+  font-size: 0.8rem;
+}
+
+.ilr-member-status {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  color: var(--colour-text);
+  background: var(--glass-surface-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.ilr-progress-track {
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--colour-surface-strong);
+}
+
+.ilr-progress-track span {
+  display: block;
+  min-width: 0.18rem;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ibiza-gradient);
+  box-shadow: 0 0 1rem rgb(238 9 121 / 22%);
+}
+
+.ilr-member-dates {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ilr-member-dates > div {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: var(--glass-surface-strong);
+}
+
+.ilr-member-dates span {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+}
+
+.ilr-member-dates strong {
+  font-size: 0.88rem;
+}
+
+.ilr-member-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ilr-member-checks span {
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: var(--glass-surface-strong);
+  font-size: 0.7rem;
+}
+
+.ilr-notice {
+  border-radius: 1.5rem;
+}
+
+html[data-theme="dark"] .ilr-hero,
+html[data-theme="dark"] .ilr-journey-panel,
+html[data-theme="dark"] .ilr-member-card {
+  background: rgb(255 255 255 / 7%);
+}
+
+@media (min-width: 48rem) {
+  .ilr-main {
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  .ilr-member-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ilr-member-status {
+    grid-column: auto;
+    justify-self: end;
+  }
+
+  .ilr-member-heading {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .ilr-member-dates {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

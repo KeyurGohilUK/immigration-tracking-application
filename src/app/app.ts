@@ -13,6 +13,11 @@ const navigationItems = [
     icon: '<path d="m3 11 18-7-7 18-2.5-8.5ZM11.5 13.5 21 4" />',
   },
   {
+    id: "ILR",
+    label: "ILR",
+    icon: '<path d="M12 3 5 7v5c0 4.4 2.7 7.5 7 9 4.3-1.5 7-4.6 7-9V7Z" /><path d="m8.5 12 2.2 2.2 4.8-5" />',
+  },
+  {
     id: "Documents",
     label: "Documents",
     icon: '<path d="M6 3h9l4 4v14H6Z" /><path d="M15 3v5h4M9 12h7M9 16h7" />',

@@ -1,7 +1,7 @@
-export const APP_VERSION = "2.3.1";
+export const APP_VERSION = "2.4.0";
 
 export const RELEASE_NOTES = [
-  "Added a gliding glass capsule that animates smoothly between mobile navigation items.",
-  "Fixed the security keypad so the very first on-screen number tap responds immediately on iPhone.",
-  "Kept the larger curved mobile menu and icon sizing from the previous release.",
+  "Added a centre ILR hero destination that brings every household member’s final ILR journey into one view.",
+  "The ILR journey shows qualifying-period progress, earliest estimated application dates, five-year points, and recorded absence status.",
+  "Expanded the floating navigation to five items while keeping the gliding glass capsule animation.",
 ] as const;
