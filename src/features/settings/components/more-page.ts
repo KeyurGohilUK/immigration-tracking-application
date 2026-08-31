@@ -1,12 +1,10 @@
 import { renderAppShell } from "../../../app/app";
 import { APP_VERSION } from "../../../configuration/release-metadata";
-import type { OwnerProfile } from "../../household/domain/owner-profile";
 import { renderDeleteDataDialog } from "./delete-data-dialog";
 import { getThemePreference } from "../services/theme-preference";
 
 export function renderMorePage(
   root: HTMLElement,
-  owner: OwnerProfile,
   householdSize: number,
 ): void {
   renderAppShell(
@@ -20,8 +18,8 @@ export function renderMorePage(
       </header>
 
       <section class="profile-summary" aria-labelledby="profile-name">
-        <div id="profile-avatar" class="profile-avatar" aria-hidden="true"></div>
-        <div class="profile-summary-copy"><p class="eyebrow">Primary local profile</p><h2 id="profile-name"></h2><p>Local profile · No online account</p><div class="profile-badges"><span>${householdSize} ${householdSize === 1 ? "person" : "people"}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Encrypted locally</span></div></div>
+        <div id="profile-avatar" class="profile-avatar" aria-hidden="true">⌂</div>
+        <div class="profile-summary-copy"><p class="eyebrow">Local household</p><h2 id="profile-name">Household profiles</h2><p>No online account · No app owner</p><div class="profile-badges"><span>${householdSize} ${householdSize === 1 ? "person" : "people"}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Encrypted locally</span></div></div>
       </section>
 
       <div class="more-grid">
@@ -97,7 +95,6 @@ export function renderMorePage(
         <section id="restore-summary" class="restore-summary" aria-labelledby="restore-summary-title" hidden>
           <p class="eyebrow">Validated backup</p>
           <h3 id="restore-summary-title">Review before replacing data</h3>
-          <p id="restore-owner"></p>
           <dl class="restore-counts"><div><dt>People</dt><dd id="restore-people"></dd></div><div><dt>Permissions</dt><dd id="restore-permissions"></dd></div><div><dt>Trips</dt><dd id="restore-trips"></dd></div><div><dt>Documents</dt><dd id="restore-documents"></dd></div></dl>
           <p id="restore-exported"></p>
           <p id="restore-replacement-guidance" class="local-data-banner"><strong>This replaces current local records.</strong> Create a fresh backup first if you may need the data currently on this device.</p>
@@ -108,12 +105,7 @@ export function renderMorePage(
     </dialog>
     ${renderDeleteDataDialog("unlocked")}`,
   );
-  const name = root.querySelector<HTMLElement>("#profile-name");
-  const avatar = root.querySelector<HTMLElement>("#profile-avatar");
   const themePreference =
     root.querySelector<HTMLSelectElement>("#theme-preference");
-  if (name) name.textContent = owner.fullName;
-  if (avatar)
-    avatar.textContent = owner.fullName.trim().charAt(0).toUpperCase() || "?";
   if (themePreference) themePreference.value = getThemePreference();
 }
