@@ -1,7 +1,7 @@
-export const APP_VERSION = "0.20.0";
+export const APP_VERSION = "0.21.0";
 
 export const RELEASE_NOTES = [
-  "Replaced the Home dashboard with a Family Overview built around the Ibiza Sunset Liquid Glass design.",
-  "Merged household profile selection into family member cards and removed the duplicate Family item from primary navigation.",
-  "Connected the household status panel to the selected profile's recorded absence calculation while preserving existing travel, immigration, document, and local-security workflows.",
+  "Added a Profile theme preference with Light, Dark, and System options.",
+  "Theme choice is stored locally and System follows the device colour-scheme preference.",
+  "Added app-wide dark Liquid Glass theme tokens while keeping Light as the default for existing installs.",
 ] as const;
