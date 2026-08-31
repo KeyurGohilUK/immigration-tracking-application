@@ -39,7 +39,9 @@ function resolvePrimaryNavigationId(
 
 function getPrimaryNavigationIndex(activeNavigation: NavigationId): number {
   const resolvedNavigation = resolvePrimaryNavigationId(activeNavigation);
-  const index = navigationItems.findIndex(({ id }) => id === resolvedNavigation);
+  const index = navigationItems.findIndex(
+    ({ id }) => id === resolvedNavigation,
+  );
   return Math.max(index, 0);
 }
 
