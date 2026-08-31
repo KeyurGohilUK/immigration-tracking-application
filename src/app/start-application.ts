@@ -207,11 +207,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const profileId = (event.currentTarget as HTMLSelectElement).value;
           if (!isKnownProfileId(profileId, familyMembers)) return;
           selectedProfileId = profileId;
-          if (currentView === "Family") renderFamily(profile, familyMembers);
-          else if (currentView === "Permissions") void showPermissions(profile);
-          else if (currentView === "Trips") void showTrips(profile);
-          else if (currentView === "Documents") void showDocuments(profile);
-          else renderDashboard(profile);
+          const selectedMember = familyMembers.find(({ id }) => id === profileId);
+          if (!selectedMember) return;
+          if (currentView === "Family")
+            renderFamily(selectedMember, familyMembers);
+          else if (currentView === "Permissions")
+            void showPermissions(selectedMember);
+          else if (currentView === "Trips") void showTrips(selectedMember);
+          else if (currentView === "Documents") void showDocuments(selectedMember);
+          else renderDashboard(selectedMember);
         });
       stopSessionLock?.();
       stopSessionLock = startSessionLock(lock);
@@ -575,10 +579,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             const bytes = await createDocumentPack(files);
             const profileName =
-              selectedProfileId === profile.id
-                ? profile.fullName
-                : (familyMembers.find(({ id }) => id === selectedProfileId)
-                    ?.fullName ?? "UrbanFox");
+              familyMembers.find(({ id }) => id === selectedProfileId)
+                ?.fullName ?? "UrbanFox";
             downloadDocumentPack(bytes, profileName);
             button.textContent = "PDF pack downloaded";
           } catch {
@@ -877,7 +879,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const member = familyMembers.find(({ id }) => id === profileId);
           if (!profileId || !member) return;
           selectedProfileId = profileId;
-          renderFamily(profile, familyMembers);
+          renderFamily(member, familyMembers);
           showHouseholdMemberForm(root, member);
         });
       }
@@ -908,7 +910,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const profileId = button.dataset.selectProfile;
           if (!profileId || !isKnownProfileId(profileId, members)) return;
           selectedProfileId = profileId;
-          renderFamily(profile, members);
+          const selectedMember = members.find(({ id }) => id === profileId);
+          if (selectedMember) renderFamily(selectedMember, members);
         });
       }
 
@@ -942,8 +945,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             await saveHouseholdMembers(nextMembers, key);
             familyMembers = nextMembers;
             if (selectedProfileId === member.id)
-              selectedProfileId = familyMembers[0]?.id ?? "";
-            renderFamily(profile, nextMembers);
+              selectedProfileId = nextMembers[0]?.id ?? "";
+            const selectedMember =
+              nextMembers.find(({ id }) => id === selectedProfileId) ??
+              nextMembers[0];
+            if (selectedMember) renderFamily(selectedMember, nextMembers);
           } catch {
             const error = root.querySelector<HTMLElement>("#family-page-error");
             if (error) {
@@ -991,7 +997,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyProfilesAvailable = true;
           if (!existingMember) selectedProfileId = member.id;
           dialog?.close();
-          renderFamily(profile, nextMembers);
+          const selectedMember =
+            nextMembers.find(({ id }) => id === selectedProfileId) ??
+            nextMembers[0];
+          if (selectedMember) renderFamily(selectedMember, nextMembers);
         } catch {
           if (error) {
             error.textContent =
@@ -1464,7 +1473,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           sessionKey = null;
           stopSessionLock?.();
           stopSessionLock = null;
-          selectedProfileId = familyMembers[0]?.id ?? "";
+          selectedProfileId = "";
           showLanding(
             "The previous local data and PIN were deleted. You can now create a new private space.",
           );
