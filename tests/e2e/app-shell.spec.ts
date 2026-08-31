@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the special household owner profile so every person now uses the same member model.",
+      "Fixed the household member editor so dialogs and form controls use proper dark surfaces and readable text.",
     ),
   ).toBeVisible();
   await expect(
