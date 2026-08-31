@@ -141,7 +141,9 @@ export function showHouseholdMemberForm(
   const title = form.querySelector<HTMLElement>("#family-form-title");
   const error = form.querySelector<HTMLElement>("#family-form-error");
   if (title)
-    title.textContent = member ? "Edit household member" : "Add household member";
+    title.textContent = member
+      ? "Edit household member"
+      : "Add household member";
   if (error) {
     error.textContent = "";
     error.hidden = true;
