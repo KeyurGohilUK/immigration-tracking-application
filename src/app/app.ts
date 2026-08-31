@@ -200,7 +200,10 @@ function createDashboardProfileCard(
   button.className = `dashboard-person-card family-overview-member ${accent === "secondary" ? "is-secondary" : ""}`;
   if (selected) button.classList.add("is-selected");
   button.dataset.selectDashboardProfile = profileId;
-  button.setAttribute("aria-label", `${selected ? "Viewing" : "View"} ${name}`);
+  button.setAttribute(
+    "aria-label",
+    `${selected ? "Viewing" : "View"} ${name}`,
+  );
   button.innerHTML = `
     <span class="dashboard-person-avatar" aria-hidden="true"></span>
     <span class="dashboard-person-copy">
@@ -214,12 +217,18 @@ function createDashboardProfileCard(
     </span>
   `;
 
-  const avatar = button.querySelector<HTMLElement>(".dashboard-person-avatar");
+  const avatar = button.querySelector<HTMLElement>(
+    ".dashboard-person-avatar",
+  );
   const heading = button.querySelector<HTMLElement>("strong");
   const badge = button.querySelector<HTMLElement>(".dashboard-person-badge");
   const description = button.querySelector<HTMLElement>("small");
-  const state = button.querySelector<HTMLElement>(".dashboard-person-limit-value");
-  const progress = button.querySelector<HTMLElement>(".dashboard-person-progress span");
+  const state = button.querySelector<HTMLElement>(
+    ".dashboard-person-limit-value",
+  );
+  const progress = button.querySelector<HTMLElement>(
+    ".dashboard-person-progress span",
+  );
 
   if (avatar) avatar.textContent = name.trim().charAt(0).toUpperCase() || "?";
   if (heading) heading.textContent = name;
