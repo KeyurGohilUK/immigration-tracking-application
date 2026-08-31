@@ -101,6 +101,30 @@ import {
   type VaultRecord,
 } from "../features/security/services/vault-crypto";
 import { getUkCalendarDate } from "../shared/date/uk-calendar-date";
+import {
+  readDocumentRenameForm,
+  readDocumentUploadForm,
+  renderDocumentsPage,
+  showDocumentRenameForm,
+  showDocumentUploadForm,
+  suggestDocumentName,
+} from "../features/documents/components/documents-page";
+import {
+  deleteDocument,
+  getAllDocumentMetadata,
+  getDocumentFile,
+  saveDocument,
+  saveDocumentMetadataBatch,
+} from "../features/documents/data/document-repository";
+import {
+  MAXIMUM_DOCUMENTS_PER_PROFILE,
+  MAXIMUM_TOTAL_DOCUMENT_BYTES,
+  resolveDocumentMimeType,
+  validateDocumentName,
+  validateDocumentSignature,
+  validateDocumentUploadInput,
+  type DocumentMetadata,
+} from "../features/documents/domain/document";
 
 const SPLASH_DURATION_MS = 500;
 
@@ -129,7 +153,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const wireAuthenticatedShell = (
       profile: OwnerProfile,
-      currentView: "Home" | "Family" | "Permissions" | "Trips" | "More",
+      currentView:
+        "Home" | "Family" | "Permissions" | "Trips" | "Documents" | "More",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -162,6 +187,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             void showTrips(profile);
           });
         }
+        if (destination === "Documents") {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            void showDocuments(profile);
+          });
+        }
         if (destination === "More") {
           link.addEventListener("click", (event) => {
             event.preventDefault();
@@ -178,6 +209,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (currentView === "Family") renderFamily(profile, familyMembers);
           else if (currentView === "Permissions") void showPermissions(profile);
           else if (currentView === "Trips") void showTrips(profile);
+          else if (currentView === "Documents") void showDocuments(profile);
           else renderDashboard(profile);
         });
       stopSessionLock?.();
@@ -449,6 +481,323 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           );
         },
       });
+    };
+
+    const showDocumentPageError = (message: string): void => {
+      const error = root.querySelector<HTMLElement>("#document-page-error");
+      if (!error) return;
+      error.textContent = message;
+      error.hidden = false;
+    };
+
+    const downloadDecryptedDocument = async (
+      documentId: string,
+      openInNewTab: boolean,
+    ): Promise<void> => {
+      const preview = openInNewTab
+        ? window.open("about:blank", "_blank", "noopener")
+        : null;
+      try {
+        const document = await getDocumentFile(documentId, key);
+        const blob = new Blob([document.bytes], {
+          type: document.metadata.mimeType,
+        });
+        const url = URL.createObjectURL(blob);
+        if (openInNewTab && preview) preview.location.href = url;
+        else {
+          const link = window.document.createElement("a");
+          link.href = url;
+          link.download = document.metadata.fileName;
+          link.click();
+        }
+        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } catch {
+        preview?.close();
+        showDocumentPageError(
+          "The document could not be decrypted. Your stored file is unchanged.",
+        );
+      }
+    };
+
+    const renderDocuments = (
+      profile: OwnerProfile,
+      documents: DocumentMetadata[],
+    ): void => {
+      renderDocumentsPage(
+        root,
+        profile,
+        familyMembers,
+        selectedProfileId,
+        documents,
+      );
+      wireAuthenticatedShell(profile, "Documents");
+      const uploadDialog =
+        root.querySelector<HTMLDialogElement>("#document-dialog");
+      const uploadForm = root.querySelector<HTMLFormElement>("#document-form");
+      const renameDialog = root.querySelector<HTMLDialogElement>(
+        "#document-rename-dialog",
+      );
+      const renameForm = root.querySelector<HTMLFormElement>(
+        "#document-rename-form",
+      );
+      root
+        .querySelector<HTMLButtonElement>("#add-document")
+        ?.addEventListener("click", () => showDocumentUploadForm(root));
+      uploadDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => uploadDialog.close());
+      renameDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => renameDialog.close());
+      uploadDialog?.addEventListener("click", (event) => {
+        if (event.target === uploadDialog) uploadDialog.close();
+      });
+      renameDialog?.addEventListener("click", (event) => {
+        if (event.target === renameDialog) renameDialog.close();
+      });
+      uploadForm
+        ?.querySelector<HTMLInputElement>("#document-file")
+        ?.addEventListener("change", (event) => {
+          const file = (event.currentTarget as HTMLInputElement).files?.[0];
+          const name = uploadForm.elements.namedItem(
+            "displayName",
+          ) as HTMLInputElement;
+          if (file && !name.value.trim())
+            name.value = suggestDocumentName(file.name);
+        });
+      uploadForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const error = uploadForm.querySelector<HTMLElement>(
+          "#document-form-error",
+        );
+        const { displayName, category, file } =
+          readDocumentUploadForm(uploadForm);
+        const mimeType = file
+          ? resolveDocumentMimeType(file.name, file.type)
+          : null;
+        const validationError = file
+          ? validateDocumentUploadInput({
+              displayName,
+              category,
+              fileName: file.name,
+              mimeType: mimeType ?? file.type,
+              size: file.size,
+            })
+          : "Choose a PDF, JPG, or PNG file.";
+        if (validationError || !file || !mimeType) {
+          if (error) {
+            error.textContent =
+              validationError ?? "Choose a PDF, JPG, or PNG file.";
+            error.hidden = false;
+          }
+          return;
+        }
+        const profileDocuments = documents.filter(
+          ({ profileId }) => profileId === selectedProfileId,
+        );
+        const totalBytes = documents.reduce(
+          (total, document) => total + document.size,
+          0,
+        );
+        if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
+          if (error) {
+            error.textContent =
+              "This profile already has the maximum of 25 documents.";
+            error.hidden = false;
+          }
+          return;
+        }
+        if (totalBytes + file.size > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
+          if (error) {
+            error.textContent =
+              "Document storage would exceed the 50 MB app limit.";
+            error.hidden = false;
+          }
+          return;
+        }
+        if (navigator.storage?.estimate) {
+          const estimate = await navigator.storage.estimate();
+          if (
+            estimate.quota &&
+            (estimate.usage ?? 0) + file.size + 1024 > estimate.quota * 0.95
+          ) {
+            if (error) {
+              error.textContent =
+                "This browser does not have enough local storage for that document.";
+              error.hidden = false;
+            }
+            return;
+          }
+        }
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const signatureError = validateDocumentSignature(mimeType, bytes);
+        if (signatureError) {
+          if (error) {
+            error.textContent = signatureError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const timestamp = new Date().toISOString();
+        const metadata: DocumentMetadata = {
+          version: 1,
+          id: crypto.randomUUID(),
+          profileId: selectedProfileId,
+          displayName,
+          fileName: file.name.trim(),
+          mimeType,
+          size: file.size,
+          category,
+          sortOrder:
+            profileDocuments.reduce(
+              (maximum, document) => Math.max(maximum, document.sortOrder),
+              -1,
+            ) + 1,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        };
+        const submit = uploadForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveDocument(metadata, bytes, key);
+          uploadDialog?.close();
+          await showDocuments(profile);
+        } catch {
+          if (error) {
+            error.textContent =
+              "The document could not be encrypted and saved. No partial file was stored.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-open-document]",
+      ))
+        button.addEventListener("click", () => {
+          const documentId = button.dataset.documentId;
+          if (documentId) void downloadDecryptedDocument(documentId, true);
+        });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-download-document]",
+      ))
+        button.addEventListener("click", () => {
+          const documentId = button.dataset.documentId;
+          if (documentId) void downloadDecryptedDocument(documentId, false);
+        });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-rename-document]",
+      ))
+        button.addEventListener("click", () => {
+          const document = documents.find(
+            ({ id }) => id === button.dataset.documentId,
+          );
+          if (document) showDocumentRenameForm(root, document);
+        });
+      renameForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { documentId, displayName } = readDocumentRenameForm(renameForm);
+        const error = renameForm.querySelector<HTMLElement>(
+          "#document-rename-error",
+        );
+        const validationError = validateDocumentName(displayName);
+        const current = documents.find(({ id }) => id === documentId);
+        if (validationError || !current) {
+          if (error) {
+            error.textContent = validationError ?? "Document is unavailable.";
+            error.hidden = false;
+          }
+          return;
+        }
+        try {
+          await saveDocumentMetadataBatch(
+            [{ ...current, displayName, updatedAt: new Date().toISOString() }],
+            key,
+          );
+          renameDialog?.close();
+          await showDocuments(profile);
+        } catch {
+          if (error) {
+            error.textContent = "The document name could not be updated.";
+            error.hidden = false;
+          }
+        }
+      });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-move-document]",
+      ))
+        button.addEventListener("click", async () => {
+          const ordered = documents
+            .filter(({ profileId }) => profileId === selectedProfileId)
+            .sort((left, right) => left.sortOrder - right.sortOrder);
+          const index = ordered.findIndex(
+            ({ id }) => id === button.dataset.documentId,
+          );
+          const targetIndex =
+            button.dataset.moveDocument === "up" ? index - 1 : index + 1;
+          if (index < 0 || targetIndex < 0 || targetIndex >= ordered.length)
+            return;
+          const currentDocument = ordered[index];
+          const targetDocument = ordered[targetIndex];
+          if (!currentDocument || !targetDocument) return;
+          ordered[index] = targetDocument;
+          ordered[targetIndex] = currentDocument;
+          const timestamp = new Date().toISOString();
+          try {
+            await saveDocumentMetadataBatch(
+              ordered.map((document, sortOrder) => ({
+                ...document,
+                sortOrder,
+                updatedAt: timestamp,
+              })),
+              key,
+            );
+            await showDocuments(profile);
+          } catch {
+            showDocumentPageError(
+              "The document order could not be changed. Your files are unchanged.",
+            );
+          }
+        });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-delete-document]",
+      ))
+        button.addEventListener("click", async () => {
+          const document = documents.find(
+            ({ id }) => id === button.dataset.documentId,
+          );
+          if (
+            !document ||
+            !window.confirm(
+              `Delete ${document.displayName} from encrypted local storage? This cannot be undone.`,
+            )
+          )
+            return;
+          try {
+            await deleteDocument(document.id);
+            await showDocuments(profile);
+          } catch {
+            showDocumentPageError(
+              "The document could not be deleted. Your stored file is unchanged.",
+            );
+          }
+        });
+    };
+
+    const showDocuments = async (profile: OwnerProfile): Promise<void> => {
+      try {
+        const documents = await getAllDocumentMetadata(key);
+        renderDocuments(profile, documents);
+      } catch {
+        renderDocuments(profile, []);
+        const add = root.querySelector<HTMLButtonElement>("#add-document");
+        if (add) add.disabled = true;
+        showDocumentPageError(
+          "Encrypted document storage could not be opened on this device.",
+        );
+      }
     };
 
     const wireDashboardActions = (profile: OwnerProfile): void => {

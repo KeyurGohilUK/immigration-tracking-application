@@ -31,9 +31,11 @@ malformed identifiers, non-canonical timestamps or text, records updated before
 creation, mixed profile associations, duplicate identifiers, impossible dates,
 and overlapping travel records before IndexedDB is changed.
 
-IndexedDB schema version 4 adds the `trips` store without rewriting or deleting
-the existing `security`, `profiles`, or `permissions` stores. Every decrypted
-domain record also carries its own version and is rejected if its structure,
+IndexedDB schema version 5 adds the `documents` store without rewriting or
+deleting the existing `security`, `profiles`, `permissions`, or `trips` stores.
+Document metadata and file bytes are encrypted separately with the unlocked
+vault key, and files are decrypted only when opened or downloaded. Every
+decrypted domain record also carries its own version and is rejected if its structure,
 version, profile association, date ordering, or identifier uniqueness is
 invalid. Version 1 immigration-permission records are migrated in memory to
 version 2 with an empty grant date, so existing encrypted history remains

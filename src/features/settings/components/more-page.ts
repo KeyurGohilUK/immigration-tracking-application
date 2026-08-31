@@ -40,7 +40,7 @@ export function renderMorePage(
             <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span>
             <div><p class="eyebrow">Data safety</p><h2 id="backup-title">Backup and restore</h2></div>
           </div>
-          <p>Download all current household records as one password-protected file. The backup password is separate from your four-digit PIN.</p>
+          <p>Download current household tracker records as one password-protected file. Document files are not yet included, so keep their originals safely. The backup password is separate from your four-digit PIN.</p>
           <div class="more-action-group"><button id="create-backup" class="primary-button more-action" type="button">Create encrypted backup</button><button id="restore-backup" class="secondary-button more-action" type="button">Restore encrypted backup</button></div>
           <p id="backup-status" class="more-card-status" role="status"></p>
           <p class="field-guidance">Keep each backup file and its password somewhere safe and separate.</p>
@@ -98,7 +98,7 @@ export function renderMorePage(
           <p id="restore-owner"></p>
           <dl class="restore-counts"><div><dt>People</dt><dd id="restore-people"></dd></div><div><dt>Permissions</dt><dd id="restore-permissions"></dd></div><div><dt>Trips</dt><dd id="restore-trips"></dd></div></dl>
           <p id="restore-exported"></p>
-          <p class="local-data-banner"><strong>This replaces all current household records.</strong> Create a fresh backup first if you may need the data currently on this device.</p>
+          <p class="local-data-banner"><strong>This replaces current household tracker records.</strong> Document files are not included in the backup and remain unchanged. Create a fresh backup first if you may need the tracker data currently on this device.</p>
           <label class="checkbox-field" for="restore-confirmation"><input id="restore-confirmation" type="checkbox" /><span><strong>I understand this replaces my current local records</strong></span></label>
           <button id="replace-local-data" class="primary-button" type="button" disabled>Replace local data</button>
         </section>

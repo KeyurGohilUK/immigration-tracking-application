@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Replaced More with a responsive Liquid Glass Profile and Settings experience",
+      "Added per-profile encrypted local PDF, JPG, and PNG document storage",
     ),
   ).toBeVisible();
   await expect(
@@ -172,7 +172,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 4);
+      const request = indexedDB.open("urbanfox-ilr", 5);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -208,6 +208,75 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
     0,
   );
   await expect(page.locator(".pin-digit")).toHaveCount(4);
+});
+
+test("stores and manages encrypted documents for a profile", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Documents" }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "Documents", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("No documents added yet")).toBeVisible();
+
+  await page.getByRole("button", { name: "Add document" }).click();
+  const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
+  await addDocumentDialog.getByLabel("Document file").setInputFiles({
+    name: "council-tax.png",
+    mimeType: "image/png",
+    buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]),
+  });
+  await addDocumentDialog
+    .getByLabel("Document name")
+    .fill("Council tax statement");
+  await addDocumentDialog.getByLabel("Category").selectOption("address-proof");
+  await page.getByRole("button", { name: "Encrypt and save document" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Council tax statement" }),
+  ).toBeVisible();
+
+  const storedDocument = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 5);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("documents", "readonly")
+        .objectStore("documents")
+        .getAll();
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  });
+  expect(storedDocument).toContain("ciphertext");
+  expect(storedDocument).not.toContain("Council tax statement");
+  expect(storedDocument).not.toContain("council-tax.png");
+
+  const downloadPromise = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Download Council tax statement" })
+    .click();
+  expect((await downloadPromise).suggestedFilename()).toBe("council-tax.png");
+
+  await page
+    .getByRole("button", { name: "Rename Council tax statement" })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Rename document" })
+    .getByLabel("Document name")
+    .fill("Council tax bill");
+  await page.getByRole("button", { name: "Save document name" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Council tax bill" }),
+  ).toBeVisible();
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete Council tax bill" }).click();
+  await expect(page.getByText("No documents added yet")).toBeVisible();
 });
 
 test("resets local data safely when the PIN is forgotten", async ({ page }) => {
@@ -422,11 +491,17 @@ test("permanently deletes all local application data", async ({ page }) => {
 
   const localData = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 4);
+      const request = indexedDB.open("urbanfox-ilr", 5);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
-    const storeNames = ["security", "profiles", "permissions", "trips"];
+    const storeNames = [
+      "security",
+      "profiles",
+      "permissions",
+      "trips",
+      "documents",
+    ];
     const transaction = database.transaction(storeNames, "readonly");
     const counts = await Promise.all(
       storeNames.map(
@@ -444,7 +519,10 @@ test("permanently deletes all local application data", async ({ page }) => {
       termsAcceptance: localStorage.getItem("urbanfox-ilr:terms-acceptance"),
     };
   });
-  expect(localData).toEqual({ counts: [0, 0, 0, 0], termsAcceptance: null });
+  expect(localData).toEqual({
+    counts: [0, 0, 0, 0, 0],
+    termsAcceptance: null,
+  });
 
   await page.reload();
   await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
@@ -503,7 +581,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByRole("link", { name: "Family" }).click();
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 4);
+      const request = indexedDB.open("urbanfox-ilr", 5);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -582,7 +660,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(page.getByText(/qualifying period on Dashboard/i)).toBeVisible();
   const storedPermission = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 4);
+      const request = indexedDB.open("urbanfox-ilr", 5);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -656,7 +734,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await expect(page.getByText("8", { exact: true })).toBeVisible();
   const storedTrip = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 4);
+      const request = indexedDB.open("urbanfox-ilr", 5);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });

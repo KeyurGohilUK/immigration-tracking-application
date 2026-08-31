@@ -26,7 +26,7 @@ export function renderLegalScreen(
           </section>
           <section id="privacy"><h2>Privacy and local data</h2>
             <p>The app uses no online account or application database. Information is stored locally in your browser. Clearing browser data, uninstalling the app, losing the device, or forgetting the PIN may permanently remove access.</p>
-            <p>No analytics or advertising trackers are included. Future backup files may contain sensitive personal information; you are responsible for storing them securely.</p>
+            <p>No analytics or advertising trackers are included. Profile records and uploaded document files are encrypted and stored locally in this browser. Current JSON backups do not include document files. You are responsible for retaining originals and storing downloaded backups securely.</p>
           </section>
           <section id="about"><h2>About</h2><p>Freddy the Urban Fox guides users through ${APP_NAME}, but Freddy’s guidance is not legal advice. Always verify information using official sources.</p></section>
           <section id="licence"><h2>Licence</h2><p>Copyright © 2026 Keyur Gohil. All rights reserved. Public repository visibility does not grant permission to use, copy, modify, redistribute, republish, fork, clone, or independently deploy the software. See the repository LICENSE for the complete notice.</p></section>
