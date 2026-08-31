@@ -193,7 +193,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const renderMore = (profile: OwnerProfile): void => {
-      renderMorePage(root);
+      renderMorePage(root, profile, familyMembers.length + 1);
       wireAuthenticatedShell(profile, "More");
       const backupDialog =
         root.querySelector<HTMLDialogElement>("#backup-dialog");
@@ -213,6 +213,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#lock-from-more")
         ?.addEventListener("click", lock);
+      root
+        .querySelector<HTMLButtonElement>("#open-install-settings")
+        ?.addEventListener("click", () =>
+          document
+            .querySelector<HTMLButtonElement>(".app-manager-trigger")
+            ?.click(),
+        );
       root
         .querySelector<HTMLButtonElement>("#view-legal")
         ?.addEventListener("click", () =>

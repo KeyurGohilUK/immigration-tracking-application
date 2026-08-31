@@ -24,8 +24,8 @@ const navigationItems = [
   },
   {
     id: "More",
-    label: "More",
-    icon: '<circle cx="5" cy="12" r="1" fill="currentColor" /><circle cx="12" cy="12" r="1" fill="currentColor" /><circle cx="19" cy="12" r="1" fill="currentColor" />',
+    label: "Profile",
+    icon: '<circle cx="12" cy="8" r="3" /><path d="M5 20c0-4.2 2.8-6.5 7-6.5s7 2.3 7 6.5" />',
   },
 ] as const;
 
