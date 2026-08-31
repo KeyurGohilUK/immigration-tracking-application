@@ -3386,6 +3386,21 @@ html[data-theme="dark"] .top-bar {
   background: rgb(26 11 46 / 78%);
 }
 
+html[data-theme="dark"] .mobile-navigation {
+  border-color: rgb(255 255 255 / 14%);
+  background: rgb(26 11 46 / 82%);
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 32%);
+}
+
+html[data-theme="dark"] .mobile-navigation.is-scroll-compact {
+  background: rgb(26 11 46 / 72%);
+  box-shadow: 0 0.5rem 1.4rem rgb(0 0 0 / 26%);
+}
+
+html[data-theme="dark"] .mobile-navigation a:not([aria-current="page"]) {
+  color: rgb(237 220 255 / 72%);
+}
+
 html[data-theme="dark"] .permission-card-content,
 html[data-theme="dark"] .timeline-entry-content,
 html[data-theme="dark"] .family-card,

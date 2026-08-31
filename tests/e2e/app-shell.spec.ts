@@ -102,7 +102,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Introduced the new Ibiza Sunset fox as the UrbanFox app logo.",
+      "Improved the floating mobile navigation in dark mode with a darker Liquid Glass surface.",
     ),
   ).toBeVisible();
   await expect(
