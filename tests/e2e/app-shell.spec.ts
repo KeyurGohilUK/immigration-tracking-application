@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the initial selected-looking keypad state and enlarged the fox logo without the outer circle.",
+      "Refined the floating mobile menu with a more curved capsule, larger icons, and a wider glass active state.",
     ),
   ).toBeVisible();
   await expect(
@@ -202,6 +202,10 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(":focus")).toHaveClass(/security-keypad/);
   await expect(page.locator(":focus")).not.toHaveAttribute("data-pin-key");
   await expect(page.locator(".security-logo-mark")).toBeVisible();
+  await expect(page.locator(".security-logo-mark img")).toHaveCSS(
+    "border-radius",
+    "24px",
+  );
   await expect(page.locator(".security-logo-orb")).toHaveCount(0);
   await page.getByRole("button", { name: "Enter 1" }).click();
   await enterPin(page, "Four-digit PIN", "111");
@@ -1009,9 +1013,21 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   }));
   const navigationStyles = await navigation.evaluate((element) => {
     const style = window.getComputedStyle(element);
+    const activeLink = element.querySelector<HTMLElement>(
+      'a[aria-current="page"]',
+    );
+    const activeIcon = activeLink?.querySelector<SVGElement>("svg");
+    const activeStyle = activeLink
+      ? window.getComputedStyle(activeLink)
+      : undefined;
+    const iconStyle = activeIcon
+      ? window.getComputedStyle(activeIcon)
+      : undefined;
     return {
       background: style.backgroundColor,
       borderRadius: style.borderRadius,
+      activeRadius: activeStyle?.borderRadius ?? "",
+      iconWidth: iconStyle?.width ?? "",
     };
   });
 
@@ -1021,8 +1037,10 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect((navigationBox?.y ?? 0) + (navigationBox?.height ?? 0)).toBeLessThan(
     viewport.height,
   );
-  expect(navigationStyles.background).toContain("0.72");
-  expect(navigationStyles.borderRadius).not.toBe("0px");
+  expect(navigationStyles.background).toContain("0.76");
+  expect(navigationStyles.borderRadius).toBe("999px");
+  expect(navigationStyles.activeRadius).toBe("999px");
+  expect(navigationStyles.iconWidth).toBe("28px");
   await expect(header).toHaveCSS("position", "sticky");
   await expect(navigation.locator(".navigation-label").first()).toHaveCSS(
     "position",
@@ -1036,7 +1054,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   await expect(navigation).toHaveClass(/is-scroll-compact/);
   await expect(navigation).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.54)",
+    "rgba(255, 255, 255, 0.64)",
   );
 
   const compactNavigationBox = await navigation.boundingBox();
@@ -1047,7 +1065,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
 
   expect(compactNavigationBox?.width).toBeLessThan(navigationBox?.width ?? 0);
   expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
-  expect(compactNavigationBackground).toContain("0.54");
+  expect(compactNavigationBackground).toContain("0.64");
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 

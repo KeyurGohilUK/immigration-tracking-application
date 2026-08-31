@@ -447,6 +447,7 @@ body {
 .security-logo-mark img {
   width: 7rem;
   height: 7rem;
+  border-radius: 1.5rem;
   object-fit: contain;
   filter: drop-shadow(0 0.8rem 1.5rem rgb(0 0 0 / 34%));
 }
@@ -3563,6 +3564,105 @@ p {
   color: #ffffff;
   background: var(--ibiza-gradient);
   box-shadow: 0 0.4rem 1.15rem rgb(238 9 121 / 16%);
+}
+
+/* Curved floating mobile navigation */
+.mobile-navigation {
+  min-height: 4.75rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 76%);
+  box-shadow:
+    0 0.8rem 2.2rem rgb(0 0 0 / 16%),
+    inset 0 1px 0 rgb(255 255 255 / 58%);
+}
+
+.mobile-navigation a {
+  min-height: 3.65rem;
+  margin: 0 0.15rem;
+  border-radius: 999px;
+  transition:
+    min-height 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.mobile-navigation svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  stroke-width: 1.9;
+  transition:
+    width 180ms ease,
+    height 180ms ease,
+    transform 180ms ease;
+}
+
+.mobile-navigation a[aria-current="page"] {
+  color: var(--colour-text);
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 72%),
+    rgb(255 255 255 / 42%)
+  );
+  box-shadow:
+    0 0.45rem 1.2rem rgb(0 0 0 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 72%),
+    0 0 1.1rem rgb(238 9 121 / 10%);
+}
+
+.mobile-navigation a[aria-current="page"] svg {
+  transform: scale(1.06);
+}
+
+.mobile-navigation.is-scroll-compact {
+  right: 1.5rem;
+  left: 1.5rem;
+  max-width: 28rem;
+  min-height: 4.15rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 64%);
+  box-shadow:
+    0 0.55rem 1.5rem rgb(0 0 0 / 13%),
+    inset 0 1px 0 rgb(255 255 255 / 46%);
+}
+
+.mobile-navigation.is-scroll-compact a {
+  min-height: 3.3rem;
+}
+
+.mobile-navigation.is-scroll-compact svg {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+html[data-theme="dark"] .mobile-navigation {
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(26 11 46 / 86%);
+  box-shadow:
+    0 0.85rem 2.3rem rgb(0 0 0 / 36%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+html[data-theme="dark"] .mobile-navigation.is-scroll-compact {
+  background: rgb(26 11 46 / 78%);
+  box-shadow:
+    0 0.6rem 1.6rem rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+html[data-theme="dark"] .mobile-navigation a[aria-current="page"] {
+  color: #ffffff;
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 24%),
+    rgb(255 255 255 / 13%)
+  );
+  box-shadow:
+    0 0.5rem 1.35rem rgb(0 0 0 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 18%),
+    0 0 1.2rem rgb(238 9 121 / 18%);
 }
 
 @keyframes family-dashboard-shimmer {
