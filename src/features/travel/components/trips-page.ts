@@ -4,14 +4,12 @@ import {
   populatePersonSwitcher,
   renderPersonSwitcherMarkup,
 } from "../../household/components/person-switcher";
-import type { FamilyMember } from "../../household/domain/family-member";
-import type { OwnerProfile } from "../../household/domain/owner-profile";
+import type { HouseholdMember } from "../../household/domain/household-member";
 import type { Trip, TripInput } from "../domain/trip";
 
 export function renderTripsPage(
   root: HTMLElement,
-  owner: OwnerProfile,
-  members: FamilyMember[],
+  members: HouseholdMember[],
   selectedProfileId: string,
   trips: Trip[],
 ): void {
@@ -29,7 +27,7 @@ export function renderTripsPage(
     `<main id="main-content" class="record-main travel-main"><section class="record-heading travel-heading" aria-labelledby="trips-title"><div><p class="eyebrow">Selected profile</p><h1 id="trips-title">Travel timeline</h1><p>Review actual departures and returns in one chronological view. Open trips remain editable until the person returns.</p></div><div class="record-heading-actions single-action"><button id="add-trip" class="primary-button compact-button" type="button"><span aria-hidden="true">＋</span> Add trip</button></div></section>${renderPersonSwitcherMarkup()}<section class="travel-summary-grid" aria-label="Recorded travel summary"><article class="travel-summary-card"><p class="eyebrow">Recorded complete days</p><p class="travel-summary-value">${recordedDays}<span> days</span></p><small>Across completed trips for this profile</small></article><article class="travel-summary-card"><p class="eyebrow">Travel records</p><p class="travel-summary-value">${trips.length}<span> ${trips.length === 1 ? "trip" : "trips"}</span></p><small>Stored locally and encrypted</small></article></section><aside class="notice compact-notice" aria-labelledby="trip-warning-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="trip-warning-title">Tracking only—not legal advice</h2><p>These all-time totals are organisational. The official rolling absence calculation remains on Dashboard; exceptional absences need qualified manual review.</p></div></aside><section class="timeline-panel" aria-labelledby="trip-list-title"><div class="section-heading"><div><p class="eyebrow">Chronological record</p><h2 id="trip-list-title">Timeline</h2></div><span id="trip-count" class="step-count"></span></div><div id="trip-list" class="record-list travel-timeline"></div></section><p id="trip-page-error" class="form-error" role="alert" hidden></p></main><dialog id="trip-dialog" class="family-dialog" aria-labelledby="trip-form-title"><form id="trip-form" class="family-form" novalidate><div class="app-manager-heading"><div><p class="eyebrow">Encrypted local record</p><h2 id="trip-form-title">Add trip</h2></div><button class="dialog-close" type="button" aria-label="Close trip form">×</button></div><input name="tripId" type="hidden" /><label for="trip-departure">UK departure date</label><input id="trip-departure" name="departureDate" type="date" required /><label for="trip-return">UK return date <span class="optional-label">Optional while outside the UK</span></label><input id="trip-return" name="returnDate" type="date" /><label for="trip-destination">Destination</label><input id="trip-destination" name="destination" maxlength="100" required /><label for="trip-notes">Notes <span class="optional-label">Optional</span></label><textarea id="trip-notes" name="notes" maxlength="500" rows="3"></textarea><label class="checkbox-field" for="exceptional-absence"><input id="exceptional-absence" name="exceptionalAbsence" type="checkbox" /><span><strong>Flag for manual review</strong><small>This may be a permitted or exceptional absence and supporting evidence may be required.</small></span></label><p id="trip-form-error" class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Save trip</button></form></dialog>`,
   );
 
-  populatePersonSwitcher(root, owner, members, selectedProfileId);
+  populatePersonSwitcher(root, members, selectedProfileId);
   const list = root.querySelector<HTMLElement>("#trip-list");
   const count = root.querySelector<HTMLElement>("#trip-count");
   if (!list || !count) throw new Error("Trips page could not be rendered.");
