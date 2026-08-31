@@ -3227,12 +3227,7 @@ p {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    #ee0979 0%,
-    #ff6a00 50%,
-    #ee0979 100%
-  );
+  background: linear-gradient(90deg, #ee0979 0%, #ff6a00 50%, #ee0979 100%);
   background-size: 200% 100%;
   animation: family-dashboard-shimmer 2s linear infinite;
 }
