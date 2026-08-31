@@ -34,22 +34,22 @@ export async function replaceAllLocalData(
   vaultKey: CryptoKey,
 ): Promise<void> {
   const [members, permissions, trips, documents] = await Promise.all([
-      encryptRecord(data.members, vaultKey),
-      Promise.all(
+    encryptRecord(data.members, vaultKey),
+    Promise.all(
         data.permissions.map(async ({ profileId, records }) => ({
           profileId,
           encrypted: await encryptRecord(records, vaultKey),
         })),
-      ),
-      Promise.all(
-        data.trips.map(async ({ profileId, records }) => ({
+    ),
+    Promise.all(
+      data.trips.map(async ({ profileId, records }) => ({
           profileId,
           encrypted: await encryptRecord(records, vaultKey),
         })),
-      ),
-      data.documents === undefined
-        ? Promise.resolve(undefined)
-        : Promise.all(
+    ),
+    data.documents === undefined
+      ? Promise.resolve(undefined)
+      : Promise.all(
             data.documents.map(async ({ metadata, content }) => ({
               id: metadata.id,
               encrypted: await createEncryptedDocumentRecord(
@@ -58,8 +58,8 @@ export async function replaceAllLocalData(
                 vaultKey,
               ),
             })),
-          ),
-    ]);
+        ),
+  ]);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(
