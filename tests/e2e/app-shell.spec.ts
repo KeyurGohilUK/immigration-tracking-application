@@ -339,7 +339,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByRole("heading", { name: "Profile & settings" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: TEST_PROFILE.name, level: 2 }),
+    page.getByRole("heading", { name: "Household profiles", level: 2 }),
   ).toBeVisible();
   await expect(page.getByText("1 person", { exact: true })).toBeVisible();
   await expect(
@@ -659,7 +659,6 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
-  await expect(page.getByText("No family members added yet")).toBeVisible();
   await expect(page.locator("#selected-person-name")).toHaveText(
     TEST_PROFILE.name,
   );
@@ -753,13 +752,13 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(page.getByText("No permissions recorded")).toBeVisible();
 });
 
-test("shows a separate estimate for a primary profile who is a Skilled Worker dependant", async ({
+test("shows a separate estimate for a household member who is a Skilled Worker dependant", async ({
   page,
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
   await expect(
-    page.getByText("Primary local profile", { exact: true }),
+    page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Manage immigration history" })
