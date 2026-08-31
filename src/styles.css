@@ -437,38 +437,18 @@ body {
   text-align: center;
 }
 
-.security-logo-orb {
-  position: relative;
+.security-logo-mark {
   display: grid;
-  width: 6rem;
-  height: 6rem;
+  width: 7.75rem;
+  height: 7.75rem;
   place-items: center;
-  overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 5%);
-  box-shadow: 0 1.25rem 2.5rem rgb(0 0 0 / 40%);
-  -webkit-backdrop-filter: blur(1.5rem);
-  backdrop-filter: blur(1.5rem);
 }
 
-.security-logo-orb::before {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--ibiza-gradient);
-  content: "";
-  opacity: 0.08;
-}
-
-.security-logo-orb img {
-  position: relative;
-  z-index: 1;
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 1.25rem;
-  object-fit: cover;
-  filter: drop-shadow(0 0.45rem 0.8rem rgb(0 0 0 / 30%));
+.security-logo-mark img {
+  width: 7rem;
+  height: 7rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.8rem 1.5rem rgb(0 0 0 / 34%));
 }
 
 .security-keypad-copy {
@@ -542,6 +522,10 @@ body {
   width: min(100%, 17.5rem);
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
+  outline: none;
+}
+
+.security-keypad:focus {
   outline: none;
 }
 
@@ -651,14 +635,14 @@ body {
     gap: 1rem;
   }
 
-  .security-logo-orb {
-    width: 4.75rem;
-    height: 4.75rem;
+  .security-logo-mark {
+    width: 6rem;
+    height: 6rem;
   }
 
-  .security-logo-orb img {
-    width: 3.5rem;
-    height: 3.5rem;
+  .security-logo-mark img {
+    width: 5.5rem;
+    height: 5.5rem;
   }
 
   .security-keypad {
