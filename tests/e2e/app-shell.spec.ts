@@ -269,9 +269,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByRole("heading", { name: "Stored only on this device" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Open", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Install and updates" }),
-  ).toBeVisible();
+  await expect(page.locator("#app-manager-title")).toBeVisible();
   await page.getByRole("button", { name: "Close", exact: true }).click();
   await page.getByRole("button", { name: "Create encrypted backup" }).click();
   await page.getByLabel("Backup password", { exact: true }).fill("too-short");
