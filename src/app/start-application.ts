@@ -1396,10 +1396,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         familyProfilesAvailable = false;
       }
 
-      if (familyMembers.length > 0) {
+      const firstMember = familyMembers[0];
+      if (firstMember) {
         if (!isKnownProfileId(selectedProfileId, familyMembers))
-          selectedProfileId = familyMembers[0].id;
-        renderDashboard(familyMembers[0]);
+          selectedProfileId = firstMember.id;
+        renderDashboard(firstMember);
         return;
       }
 
