@@ -1,6 +1,7 @@
 {
-  "version": "2.2.3",
+  "version": "2.3.0",
   "notes": [
+    "Refined the floating mobile menu with a more curved capsule, larger icons, and a wider glass active state.",
     "Kept the enlarged security logo free of the outer circle while restoring softly rounded corners."
   ]
 }
