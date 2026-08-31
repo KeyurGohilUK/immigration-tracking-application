@@ -477,7 +477,7 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
   );
   await expect(page.getByLabel("Date of birth")).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.1)",
+    "rgba(21, 6, 41, 0.72)",
   );
   await expect(page.getByLabel("Immigration role")).toHaveCSS(
     "appearance",
