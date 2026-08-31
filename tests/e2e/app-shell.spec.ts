@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the special household owner profile so every person now uses the same member model.",
+      "Fixed the household member editor so dialogs and form controls use proper dark surfaces and readable text.",
     ),
   ).toBeVisible();
   await expect(
@@ -464,6 +464,19 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("dark");
+
+  await page.getByRole("link", { name: "Family", exact: true }).click();
+  await page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }).click();
+  await expect(page.locator(".family-dialog")).toHaveCSS(
+    "background-color",
+    "rgba(39, 24, 59, 0.94)",
+  );
+  await expect(page.getByLabel("Full name")).toHaveCSS(
+    "background-color",
+    "rgba(255, 255, 255, 0.08)",
+  );
+  await page.getByRole("button", { name: "Close family form" }).click();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await theme.selectOption("system");
   await expect
