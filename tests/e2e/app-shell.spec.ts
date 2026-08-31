@@ -505,7 +505,9 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
       document.getElementById(id)?.getBoundingClientRect().height ?? 0,
     );
   });
-  expect(Math.max(...memberControlHeights) - Math.min(...memberControlHeights)).toBeLessThanOrEqual(1);
+  expect(
+    Math.max(...memberControlHeights) - Math.min(...memberControlHeights),
+  ).toBeLessThanOrEqual(1);
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
