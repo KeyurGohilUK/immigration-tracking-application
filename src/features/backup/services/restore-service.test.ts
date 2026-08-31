@@ -24,6 +24,8 @@ describe("backup restore summary", () => {
       people: 3,
       permissions: 2,
       trips: 3,
+      documents: 0,
+      includesDocuments: false,
     });
   });
 });

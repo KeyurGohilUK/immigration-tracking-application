@@ -125,6 +125,10 @@ import {
   validateDocumentUploadInput,
   type DocumentMetadata,
 } from "../features/documents/domain/document";
+import {
+  createDocumentPack,
+  downloadDocumentPack,
+} from "../features/documents/services/document-pack-service";
 
 const SPLASH_DURATION_MS = 500;
 
@@ -373,7 +377,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (file.size === 0 || file.size > MAXIMUM_BACKUP_FILE_BYTES) {
           if (error) {
             error.textContent =
-              "The backup file must be between 1 byte and 10 MB.";
+              "The backup file must be between 1 byte and 140 MB.";
             error.hidden = false;
           }
           return;
@@ -405,6 +409,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           );
           const trips =
             restoreForm.querySelector<HTMLElement>("#restore-trips");
+          const documents =
+            restoreForm.querySelector<HTMLElement>("#restore-documents");
+          const replacementGuidance = restoreForm.querySelector<HTMLElement>(
+            "#restore-replacement-guidance",
+          );
           const exported =
             restoreForm.querySelector<HTMLElement>("#restore-exported");
           if (owner) owner.textContent = `Household: ${summary.ownerName}`;
@@ -412,6 +421,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (permissions)
             permissions.textContent = String(summary.permissions);
           if (trips) trips.textContent = String(summary.trips);
+          if (documents)
+            documents.textContent = summary.includesDocuments
+              ? String(summary.documents)
+              : "Not in legacy backup";
+          if (replacementGuidance)
+            replacementGuidance.innerHTML = summary.includesDocuments
+              ? "<strong>This replaces current local tracker records and documents.</strong> Create a fresh backup first if you may need the data currently on this device."
+              : "<strong>This legacy backup replaces tracker records only.</strong> Existing local documents remain unchanged.";
           if (exported)
             exported.textContent = `Exported: ${new Date(payload.exportedAt).toLocaleString("en-GB")}`;
           if (restoreSummary) restoreSummary.hidden = false;
@@ -432,7 +449,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (!reviewedBackup || !restoreConfirmation?.checked) return;
         if (
           !window.confirm(
-            "Replace all household, permission, and trip records on this device with this backup?",
+            reviewedBackup.data.documents === undefined
+              ? "Replace household, permission, and trip records with this legacy backup? Existing documents will remain unchanged."
+              : "Replace all household, permission, trip, and document records on this device with this backup?",
           )
         )
           return;
@@ -540,6 +559,36 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const renameForm = root.querySelector<HTMLFormElement>(
         "#document-rename-form",
       );
+      root
+        .querySelector<HTMLButtonElement>("#download-document-pack")
+        ?.addEventListener("click", async (event) => {
+          const button = event.currentTarget as HTMLButtonElement;
+          const selectedDocuments = documents
+            .filter(({ profileId }) => profileId === selectedProfileId)
+            .sort((left, right) => left.sortOrder - right.sortOrder);
+          if (selectedDocuments.length === 0) return;
+          button.disabled = true;
+          button.textContent = "Creating PDF…";
+          try {
+            const files = await Promise.all(
+              selectedDocuments.map(({ id }) => getDocumentFile(id, key)),
+            );
+            const bytes = await createDocumentPack(files);
+            const profileName =
+              selectedProfileId === profile.id
+                ? profile.fullName
+                : (familyMembers.find(({ id }) => id === selectedProfileId)
+                    ?.fullName ?? "UrbanFox");
+            downloadDocumentPack(bytes, profileName);
+            button.textContent = "PDF pack downloaded";
+          } catch {
+            button.disabled = false;
+            button.textContent = "⇩ Download PDF pack";
+            showDocumentPageError(
+              "The PDF pack could not be created. Check that every stored file can be opened.",
+            );
+          }
+        });
       root
         .querySelector<HTMLButtonElement>("#add-document")
         ?.addEventListener("click", () => showDocumentUploadForm(root));

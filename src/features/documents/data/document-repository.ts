@@ -21,7 +21,7 @@ interface EncryptedDocumentFile {
   ciphertext: ArrayBuffer;
 }
 
-interface EncryptedDocumentRecord {
+export interface EncryptedDocumentRecord {
   version: 1;
   metadata: EncryptedRecord;
   file: EncryptedDocumentFile;
@@ -73,6 +73,22 @@ async function encryptFile(
     initializationVector: bytesToHex(initializationVector),
     ciphertext,
   };
+}
+
+export async function createEncryptedDocumentRecord(
+  metadata: DocumentMetadata,
+  bytes: Uint8Array<ArrayBuffer>,
+  key: CryptoKey,
+): Promise<EncryptedDocumentRecord> {
+  if (!isDocumentMetadata(metadata) || bytes.byteLength !== metadata.size)
+    throw new Error("Document metadata is invalid.");
+  const signatureError = validateDocumentSignature(metadata.mimeType, bytes);
+  if (signatureError) throw new Error(signatureError);
+  const [encryptedMetadata, encryptedFile] = await Promise.all([
+    encryptRecord(metadata, key),
+    encryptFile(bytes, key),
+  ]);
+  return { version: 1, metadata: encryptedMetadata, file: encryptedFile };
 }
 
 async function decryptFile(
@@ -156,19 +172,7 @@ export async function saveDocument(
   bytes: Uint8Array<ArrayBuffer>,
   key: CryptoKey,
 ): Promise<void> {
-  if (!isDocumentMetadata(metadata) || bytes.byteLength !== metadata.size)
-    throw new Error("Document metadata is invalid.");
-  const signatureError = validateDocumentSignature(metadata.mimeType, bytes);
-  if (signatureError) throw new Error(signatureError);
-  const [encryptedMetadata, encryptedFile] = await Promise.all([
-    encryptRecord(metadata, key),
-    encryptFile(bytes, key),
-  ]);
-  const record: EncryptedDocumentRecord = {
-    version: 1,
-    metadata: encryptedMetadata,
-    file: encryptedFile,
-  };
+  const record = await createEncryptedDocumentRecord(metadata, bytes, key);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(

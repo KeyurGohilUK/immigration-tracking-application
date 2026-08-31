@@ -2726,6 +2726,11 @@ p {
   gap: 1rem;
 }
 
+.document-heading-actions {
+  display: grid;
+  gap: 0.55rem;
+}
+
 .documents-profile-picker,
 .document-summary-card,
 .documents-panel,
@@ -2875,6 +2880,10 @@ p {
 
   .documents-main {
     width: min(100%, 64rem);
+  }
+
+  .document-heading-actions {
+    grid-template-columns: repeat(2, auto);
   }
 }
 

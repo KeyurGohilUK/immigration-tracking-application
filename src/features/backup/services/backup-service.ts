@@ -1,6 +1,11 @@
 import { APP_VERSION } from "../../../configuration/release-metadata";
 import { DATA_SCHEMA_VERSION } from "../../../configuration/app-metadata";
 import { bytesToHex, hexToBytes } from "../../../shared/encoding/hex";
+import { bytesToBase64 } from "../../../shared/encoding/base64";
+import {
+  getAllDocumentMetadata,
+  getDocumentFile,
+} from "../../documents/data/document-repository";
 import { getFamilyMembers } from "../../household/data/family-member-repository";
 import type { OwnerProfile } from "../../household/domain/owner-profile";
 import { getImmigrationPermissions } from "../../immigration/data/immigration-permission-repository";
@@ -49,7 +54,7 @@ export async function collectBackupData(
 ): Promise<BackupData> {
   const familyMembers = await getFamilyMembers(vaultKey);
   const profileIds = [owner.id, ...familyMembers.map(({ id }) => id)];
-  const [permissions, trips] = await Promise.all([
+  const [permissions, trips, documentMetadata] = await Promise.all([
     Promise.all(
       profileIds.map(async (profileId) => ({
         profileId,
@@ -62,8 +67,18 @@ export async function collectBackupData(
         records: await getTrips(profileId, vaultKey),
       })),
     ),
+    getAllDocumentMetadata(vaultKey),
   ]);
-  return { owner, familyMembers, permissions, trips };
+  const documents = await Promise.all(
+    documentMetadata.map(async ({ id }) => {
+      const document = await getDocumentFile(id, vaultKey);
+      return {
+        metadata: document.metadata,
+        content: bytesToBase64(document.bytes),
+      };
+    }),
+  );
+  return { owner, familyMembers, permissions, trips, documents };
 }
 
 export async function createEncryptedBackup(

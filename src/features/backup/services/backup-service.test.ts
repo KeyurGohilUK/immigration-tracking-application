@@ -46,6 +46,37 @@ describe("encrypted backup", () => {
     expect(payload.exportedAt).toBe("2026-08-30T12:00:00.000Z");
   });
 
+  it("encrypts document content and restores it inside the payload", async () => {
+    const data: BackupData = {
+      ...backupData,
+      documents: [
+        {
+          metadata: {
+            version: 1,
+            id: "document-1",
+            profileId: "owner",
+            displayName: "Passport",
+            fileName: "passport.pdf",
+            mimeType: "application/pdf",
+            size: 5,
+            category: "passport",
+            sortOrder: 0,
+            createdAt: "2026-08-30T10:00:00.000Z",
+            updatedAt: "2026-08-30T10:00:00.000Z",
+          },
+          content: btoa("%PDF-"),
+        },
+      ],
+    };
+    const password = "a-secure-backup-password";
+    const backup = await createEncryptedBackup(data, password);
+
+    expect(JSON.stringify(backup)).not.toContain("passport.pdf");
+    expect((await decryptAndValidateBackup(backup, password)).data).toEqual(
+      data,
+    );
+  });
+
   it("rejects an incorrect backup password", async () => {
     const backup = await createEncryptedBackup(
       backupData,

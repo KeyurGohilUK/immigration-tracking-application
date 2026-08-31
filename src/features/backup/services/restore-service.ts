@@ -3,6 +3,8 @@ import {
   openAppDatabase,
 } from "../../../infrastructure/storage/app-database";
 import { encryptRecord } from "../../../infrastructure/storage/encrypted-record-store";
+import { base64ToBytes } from "../../../shared/encoding/base64";
+import { createEncryptedDocumentRecord } from "../../documents/data/document-repository";
 import { FAMILY_MEMBERS_RECORD_KEY } from "../../household/data/family-member-repository";
 import { OWNER_PROFILE_RECORD_KEY } from "../../household/data/owner-profile-repository";
 import type { BackupData } from "../domain/backup";
@@ -12,6 +14,8 @@ export interface BackupSummary {
   people: number;
   permissions: number;
   trips: number;
+  documents: number;
+  includesDocuments: boolean;
 }
 
 export function summariseBackup(data: BackupData): BackupSummary {
@@ -23,6 +27,8 @@ export function summariseBackup(data: BackupData): BackupSummary {
       0,
     ),
     trips: data.trips.reduce((total, { records }) => total + records.length, 0),
+    documents: data.documents?.length ?? 0,
+    includesDocuments: data.documents !== undefined,
   };
 }
 
@@ -30,22 +36,35 @@ export async function replaceAllLocalData(
   data: BackupData,
   vaultKey: CryptoKey,
 ): Promise<void> {
-  const [owner, familyMembers, permissions, trips] = await Promise.all([
-    encryptRecord(data.owner, vaultKey),
-    encryptRecord(data.familyMembers, vaultKey),
-    Promise.all(
-      data.permissions.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
-    Promise.all(
-      data.trips.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
-  ]);
+  const [owner, familyMembers, permissions, trips, documents] =
+    await Promise.all([
+      encryptRecord(data.owner, vaultKey),
+      encryptRecord(data.familyMembers, vaultKey),
+      Promise.all(
+        data.permissions.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      Promise.all(
+        data.trips.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      data.documents === undefined
+        ? Promise.resolve(undefined)
+        : Promise.all(
+            data.documents.map(async ({ metadata, content }) => ({
+              id: metadata.id,
+              encrypted: await createEncryptedDocumentRecord(
+                metadata,
+                base64ToBytes(content),
+                vaultKey,
+              ),
+            })),
+          ),
+    ]);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(
@@ -53,6 +72,7 @@ export async function replaceAllLocalData(
         DATABASE_STORES.profiles,
         DATABASE_STORES.permissions,
         DATABASE_STORES.trips,
+        ...(documents ? [DATABASE_STORES.documents] : []),
       ],
       "readwrite",
     );
@@ -61,6 +81,9 @@ export async function replaceAllLocalData(
       DATABASE_STORES.permissions,
     );
     const tripStore = transaction.objectStore(DATABASE_STORES.trips);
+    const documentStore = documents
+      ? transaction.objectStore(DATABASE_STORES.documents)
+      : null;
     transaction.oncomplete = () => {
       database.close();
       resolve();
@@ -76,11 +99,14 @@ export async function replaceAllLocalData(
       profileStore.clear();
       permissionStore.clear();
       tripStore.clear();
+      documentStore?.clear();
       profileStore.put(owner, OWNER_PROFILE_RECORD_KEY);
       profileStore.put(familyMembers, FAMILY_MEMBERS_RECORD_KEY);
       for (const item of permissions)
         permissionStore.put(item.encrypted, item.profileId);
       for (const item of trips) tripStore.put(item.encrypted, item.profileId);
+      for (const item of documents ?? [])
+        documentStore?.put(item.encrypted, item.id);
     } catch {
       transaction.abort();
     }
