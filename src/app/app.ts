@@ -56,7 +56,7 @@ export function renderAppShell(
     <div class="app-shell">
       <header class="top-bar">
         <a class="wordmark" href="#home" aria-label="${APP_NAME} home">
-          <span class="wordmark-mark" aria-hidden="true">UF</span>
+          <img class="wordmark-logo" src="./brand-logo.png" alt="" />
           <span>${APP_NAME}</span>
         </a>
         ${renderNavigation("desktop-navigation", activeNavigation)}
@@ -235,7 +235,7 @@ function createDashboardProfileCard(
 export function renderSplash(root: HTMLElement): void {
   root.innerHTML = `
     <main class="splash-screen" aria-label="UrbanFox ILR is starting">
-      <span class="splash-mark" aria-hidden="true">UF</span>
+      <img class="splash-logo" src="./brand-logo.png" alt="" />
       <p class="eyebrow">Freddy the Urban Fox</p>
       <h1>${APP_NAME}</h1>
       <p>Preparing your private space…</p>

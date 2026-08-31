@@ -97,7 +97,7 @@ export function renderPinScreen(
     <div class="security-shell">
       <header class="public-header">
         <span class="wordmark">
-          <span class="wordmark-mark" aria-hidden="true">UF</span>
+          <img class="wordmark-logo" src="./brand-logo.png" alt="" />
           <span>${APP_NAME}</span>
         </span>
       </header>

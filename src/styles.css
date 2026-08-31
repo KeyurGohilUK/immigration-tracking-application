@@ -58,17 +58,14 @@ body {
   text-align: center;
 }
 
-.splash-mark {
-  display: grid;
+.splash-logo {
+  display: block;
   width: 5rem;
   height: 5rem;
   margin: 0 auto 1.25rem;
-  place-items: center;
   border-radius: 1.5rem;
-  color: var(--colour-on-strong);
-  background: var(--colour-strong);
-  font-size: 1.5rem;
-  font-weight: 800;
+  object-fit: cover;
+  box-shadow: 0 0.75rem 2rem rgb(238 9 121 / 18%);
 }
 
 .splash-screen h1 {
@@ -546,16 +543,20 @@ a:focus-visible {
   text-decoration: none;
 }
 
-.wordmark-mark {
-  display: grid;
+.wordmark-logo {
+  display: block;
   width: 2rem;
   height: 2rem;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--colour-on-strong);
-  background: var(--colour-strong);
-  font-size: 0.7rem;
-  letter-spacing: -0.04em;
+  flex: 0 0 auto;
+  border-radius: 0.65rem;
+  object-fit: cover;
+}
+
+.freddy-hero-logo {
+  width: min(13rem, 58vw);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 2.5rem;
 }
 
 .icon-button {

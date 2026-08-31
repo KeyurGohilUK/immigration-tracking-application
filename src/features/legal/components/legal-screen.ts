@@ -7,7 +7,7 @@ export function renderLegalScreen(
 ): void {
   root.innerHTML = `
     <div class="legal-shell">
-      <header class="public-header"><span class="wordmark"><span class="wordmark-mark" aria-hidden="true">UF</span><span>${APP_NAME}</span></span></header>
+      <header class="public-header"><span class="wordmark"><img class="wordmark-logo" src="./brand-logo.png" alt="" /><span>${APP_NAME}</span></span></header>
       <main class="legal-main">
         <header class="legal-heading">
           <p class="eyebrow">Please read carefully</p>
