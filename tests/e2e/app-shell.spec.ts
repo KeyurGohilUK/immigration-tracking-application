@@ -610,7 +610,9 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: `Select ${TEST_PROFILE.name}` }).click();
+  await page
+    .getByRole("button", { name: `Select ${TEST_PROFILE.name}` })
+    .click();
   await expect(page.locator("#selected-person-name")).toHaveText(
     TEST_PROFILE.name,
   );
