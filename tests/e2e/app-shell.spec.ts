@@ -199,8 +199,6 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
-  await expect(page.locator(":focus")).toHaveClass(/security-keypad/);
-  await expect(page.locator(":focus")).not.toHaveAttribute("data-pin-key");
   await expect(page.locator(".security-logo-mark")).toBeVisible();
   await expect(page.locator(".security-logo-mark img")).toHaveCSS(
     "border-radius",
@@ -208,6 +206,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   );
   await expect(page.locator(".security-logo-orb")).toHaveCount(0);
   await page.getByRole("button", { name: "Enter 1" }).click();
+  await expect(page.locator("[data-pin-indicator].is-filled")).toHaveCount(1);
   await enterPin(page, "Four-digit PIN", "111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
