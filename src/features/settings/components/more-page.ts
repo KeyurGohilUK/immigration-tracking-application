@@ -3,10 +3,7 @@ import { APP_VERSION } from "../../../configuration/release-metadata";
 import { renderDeleteDataDialog } from "./delete-data-dialog";
 import { getThemePreference } from "../services/theme-preference";
 
-export function renderMorePage(
-  root: HTMLElement,
-  householdSize: number,
-): void {
+export function renderMorePage(root: HTMLElement, householdSize: number): void {
   renderAppShell(
     root,
     "More",
