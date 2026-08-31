@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added a centre ILR hero destination that brings every household member’s final ILR journey into one view.",
+      "Fixed the ILR journey bottom spacing so final content scrolls fully above the floating navigation.",
     ),
   ).toBeVisible();
   await expect(
@@ -1071,6 +1071,32 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
   expect(compactNavigationBackground).toContain("0.64");
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
+});
+
+test("keeps final ILR journey content above the floating mobile menu", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+
+  const notice = page.getByRole("heading", {
+    name: "Estimate only—not an eligibility decision",
+  });
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+
+  await notice.scrollIntoViewIfNeeded();
+  const noticeBox = await notice.boundingBox();
+  const navigationBox = await navigation.boundingBox();
+
+  expect(noticeBox).not.toBeNull();
+  expect(navigationBox).not.toBeNull();
+  expect((noticeBox?.y ?? 0) + (noticeBox?.height ?? 0)).toBeLessThanOrEqual(
+    navigationBox?.y ?? 0,
+  );
 });
 
 test("opens the centre ILR hero journey for the household", async ({
