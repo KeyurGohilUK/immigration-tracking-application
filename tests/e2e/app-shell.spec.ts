@@ -19,13 +19,12 @@ async function createLocalProfile(
   await page.getByLabel("Date of birth").fill(TEST_PROFILE.dateOfBirth);
   await page.getByRole("button", { name: "Save local profile" }).click();
   await expect(
-    page.getByRole("heading", { name: "Household ILR overview" }),
+    page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
   await expect(
-    page.getByText(`Welcome back, ${TEST_PROFILE.name}.`),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Household profiles" }),
+    page.getByText(
+      "Track your household's progress towards Indefinite Leave to Remain.",
+    ),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: `Viewing ${TEST_PROFILE.name}` }),
@@ -103,7 +102,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added a separate five-year timing estimate and recorded-absence check for supported Skilled Worker dependants",
+      "Replaced the Home dashboard with a Family Overview built around the Ibiza Sunset Liquid Glass design.",
     ),
   ).toBeVisible();
   await expect(
@@ -197,7 +196,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
 
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
-    page.getByRole("heading", { name: "Household ILR overview" }),
+    page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
 
   await page.reload();
@@ -380,6 +379,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
+  await page.getByRole("button", { name: "Add Family Member" }).click();
   await page.getByRole("button", { name: "Add family member" }).click();
   await page.getByLabel("Full name").fill("Temporary Family Member");
   await page.getByLabel("Date of birth").fill("2005-06-15");
@@ -432,6 +432,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByText("Backup restored successfully", { exact: false }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Family", exact: true }).click();
+  await page.getByRole("button", { name: "Add Family Member" }).click();
   await expect(page.getByText("No family members added yet")).toBeVisible();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
@@ -546,7 +547,10 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page.getByRole("link", { name: "Family" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Family Overview" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Add Family Member" }).click();
 
   await expect(
     page.getByRole("heading", { name: "Your family" }),
@@ -576,18 +580,18 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
     "Freddy Test Dependant",
   );
 
-  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
-  await expect(page.locator("#selected-person-name")).toHaveText(
-    "Freddy Test Dependant",
-  );
-  await page.getByLabel("Tracking profile").selectOption("owner");
-  await expect(page.locator("#selected-person-name")).toHaveText(
-    TEST_PROFILE.name,
-  );
+  await page.getByRole("link", { name: "Family", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Viewing Freddy Test Dependant" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: `View ${TEST_PROFILE.name}` }).click();
+  await expect(
+    page.getByRole("button", { name: `Viewing ${TEST_PROFILE.name}` }),
+  ).toBeVisible();
   await page
-    .getByLabel("Tracking profile")
-    .selectOption({ label: "Freddy Test Dependant" });
-  await page.getByRole("link", { name: "Family" }).click();
+    .getByRole("button", { name: "View Freddy Test Dependant" })
+    .click();
+  await page.getByRole("button", { name: "Add Family Member" }).click();
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 5);
@@ -617,7 +621,10 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
-  await page.getByRole("link", { name: "Family" }).click();
+  await expect(
+    page.getByRole("button", { name: "Viewing Freddy Test Child" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Add Family Member" }).click();
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Child",
   );
@@ -718,7 +725,9 @@ test("shows a separate estimate for a primary profile who is a Skilled Worker de
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await expect(page.getByText("You · Primary local profile")).toBeVisible();
+  await expect(
+    page.getByText("Primary local profile", { exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Manage immigration history" })
     .click();
@@ -734,7 +743,7 @@ test("shows a separate estimate for a primary profile who is a Skilled Worker de
     page.getByText("Dependant calculation supported", { exact: true }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Dashboard" }).first().click();
+  await page.getByRole("link", { name: "Family" }).first().click();
   await expect(
     page.getByRole("heading", { name: "Recorded estimate: 2028-11-17" }),
   ).toBeVisible();
@@ -852,7 +861,7 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   await page.getByLabel("Permission expiry date").fill("2028-01-01");
   await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
   await page.getByRole("button", { name: "Save permission" }).click();
-  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
+  await page.getByRole("link", { name: "Family", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Earliest estimated application: 2026-12-04",
@@ -868,7 +877,7 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   await page.getByLabel(/UK return date/).fill("2024-07-01");
   await page.getByLabel("Destination").fill("Test destination");
   await page.getByRole("button", { name: "Save trip" }).click();
-  await page.getByRole("link", { name: "Dashboard", exact: true }).click();
+  await page.getByRole("link", { name: "Family", exact: true }).click();
 
   await expect(page.getByText("Potential limit issue")).toBeVisible();
   await expect(
@@ -970,7 +979,7 @@ test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
   await expect(
     page
       .getByRole("navigation", { name: "Primary navigation" })
-      .getByText("Dashboard", { exact: true }),
+      .getByText("Family", { exact: true }),
   ).toBeVisible();
 
   await page.getByRole("main").evaluate((main) => {
