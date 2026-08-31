@@ -249,9 +249,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       void updateDashboardCalculation(profile, profileId);
     };
 
-    const showIlrJourney = async (
-      profile: HouseholdMember,
-    ): Promise<void> => {
+    const showIlrJourney = async (profile: HouseholdMember): Promise<void> => {
       const asOfDate = getUkCalendarDate();
       const journeys = await Promise.all(
         familyMembers.map(async (member): Promise<IlrJourneyMember> => {
