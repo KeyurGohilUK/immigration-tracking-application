@@ -52,11 +52,14 @@ function renderNavigation(
   const resolvedNavigation = resolvePrimaryNavigationId(activeNavigation);
   const isMobile = className.includes("mobile-navigation");
   const indicator = isMobile
-    ? `<span class="mobile-navigation-indicator" aria-hidden="true" style="--mobile-navigation-offset: ${previousMobileNavigationIndex * 100}%"></span>`
+    ? '<span class="mobile-navigation-indicator" aria-hidden="true"></span>'
+    : "";
+  const navigationStyle = isMobile
+    ? `style="--mobile-navigation-offset: ${previousMobileNavigationIndex * 100}%"`
     : "";
 
   return `
-    <nav class="primary-navigation ${className}" aria-label="Primary navigation">
+    <nav class="primary-navigation ${className}" aria-label="Primary navigation" ${navigationStyle}>
       ${indicator}
       ${navigationItems
         .map(
