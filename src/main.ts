@@ -5,7 +5,10 @@ import {
   registerServiceWorker,
 } from "./features/install/services/install-prompt";
 import { initialiseReleaseManager } from "./features/install/services/release-manager";
+import { initialiseTheme } from "./features/settings/services/theme-preference";
 import "./styles.css";
+
+initialiseTheme();
 
 const root = document.querySelector<HTMLElement>("#app");
 
