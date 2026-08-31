@@ -725,7 +725,9 @@ test("shows a separate estimate for a primary profile who is a Skilled Worker de
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await expect(\n    page.getByText("Primary local profile", { exact: true }),\n  ).toBeVisible();
+  await expect(
+    page.getByText("Primary local profile", { exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Manage immigration history" })
     .click();
