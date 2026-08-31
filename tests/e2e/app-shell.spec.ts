@@ -451,6 +451,34 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("persists light, dark, and system theme preferences", async ({ page }) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+
+  const theme = page.getByLabel("Theme preference");
+  await expect(theme).toHaveValue("light");
+
+  await theme.selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
+    .toBe("dark");
+
+  await theme.selectOption("system");
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
+    .toBe("system");
+
+  await theme.selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+
+  await page.reload();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await expect(page.getByLabel("Theme preference")).toHaveValue("light");
+});
+
 test("permanently deletes all local application data", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
