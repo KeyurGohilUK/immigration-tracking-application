@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Redesigned the unlock screen with an Ibiza Sunset Liquid Glass PIN keypad.",
+      "Stopped the on-screen PIN keypad from opening the iPhone system keyboard while entering digits.",
     ),
   ).toBeVisible();
   await expect(
@@ -199,7 +199,9 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
-  await enterPin(page, "Four-digit PIN", "1111");
+  await page.getByRole("button", { name: "Enter 1" }).click();
+  await expect(page.locator(":focus")).toHaveAttribute("data-pin-key", "1");
+  await enterPin(page, "Four-digit PIN", "111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
