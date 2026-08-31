@@ -501,8 +501,8 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
       "family-date-of-birth",
       "family-immigration-role",
     ];
-    return ids.map((id) =>
-      document.getElementById(id)?.getBoundingClientRect().height ?? 0,
+    return ids.map(
+      (id) => document.getElementById(id)?.getBoundingClientRect().height ?? 0,
     );
   });
   expect(
