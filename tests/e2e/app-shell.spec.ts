@@ -18,9 +18,7 @@ async function createLocalProfile(
   await page.getByLabel("Full name").fill(TEST_PROFILE.name);
   await page.getByLabel("Date of birth").fill(TEST_PROFILE.dateOfBirth);
   await page.getByLabel("Immigration role").selectOption("dependant");
-  await page
-    .getByRole("button", { name: "Create household member" })
-    .click();
+  await page.getByRole("button", { name: "Create household member" }).click();
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
@@ -708,24 +706,21 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   const permissionProfileId = await page
     .getByLabel("Tracking profile")
     .inputValue();
-  const storedPermission = await page.evaluate(
-    async (profileId) => {
-      const database = await new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open("urbanfox-ilr", 6);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-      return new Promise<string>((resolve, reject) => {
-        const request = database
-          .transaction("permissions", "readonly")
-          .objectStore("permissions")
-          .get(profileId);
-        request.onsuccess = () => resolve(JSON.stringify(request.result));
-        request.onerror = () => reject(request.error);
-      });
-    },
-    permissionProfileId,
-  );
+  const storedPermission = await page.evaluate(async (profileId) => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 6);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("permissions", "readonly")
+        .objectStore("permissions")
+        .get(profileId);
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  }, permissionProfileId);
   expect(storedPermission).not.toContain("skilled-worker");
   expect(storedPermission).toContain("ciphertext");
 
@@ -824,27 +819,22 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("Manual review flagged")).toBeVisible();
   await expect(page.getByText("8", { exact: true })).toBeVisible();
-  const tripProfileId = await page
-    .getByLabel("Tracking profile")
-    .inputValue();
-  const storedTrip = await page.evaluate(
-    async (profileId) => {
-      const database = await new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open("urbanfox-ilr", 6);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-      return new Promise<string>((resolve, reject) => {
-        const request = database
-          .transaction("trips", "readonly")
-          .objectStore("trips")
-          .get(profileId);
-        request.onsuccess = () => resolve(JSON.stringify(request.result));
-        request.onerror = () => reject(request.error);
-      });
-    },
-    tripProfileId,
-  );
+  const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
+  const storedTrip = await page.evaluate(async (profileId) => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 6);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<string>((resolve, reject) => {
+      const request = database
+        .transaction("trips", "readonly")
+        .objectStore("trips")
+        .get(profileId);
+      request.onsuccess = () => resolve(JSON.stringify(request.result));
+      request.onerror = () => reject(request.error);
+    });
+  }, tripProfileId);
   expect(storedTrip).not.toContain("India");
   expect(storedTrip).toContain("ciphertext");
 
