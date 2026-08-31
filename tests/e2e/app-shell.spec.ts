@@ -37,6 +37,13 @@ async function enterPin(
   label: string,
   pin: string,
 ): Promise<void> {
+  if (label === "Four-digit PIN") {
+    for (const digit of pin) {
+      await page.getByRole("button", { name: `Enter ${digit}` }).click();
+    }
+    return;
+  }
+
   for (const [index, digit] of [...pin].entries()) {
     await page.getByLabel(`${label} digit ${index + 1}`).fill(digit);
   }
@@ -103,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed the dark-mode household member dropdown on iPhone and matched the date field height to the other controls.",
+      "Redesigned the unlock screen with an Ibiza Sunset Liquid Glass PIN keypad.",
     ),
   ).toBeVisible();
   await expect(
@@ -130,9 +137,9 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
   ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Reset local data" }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Forgot PIN?" })).toHaveCount(
+    0,
+  );
 });
 
 test("keeps the legal action inside the desktop viewport", async ({
@@ -190,7 +197,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await page.getByRole("button", { name: "Lock app" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Unlock your private space" }),
+    page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
   await enterPin(page, "Four-digit PIN", "1111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
@@ -202,12 +209,14 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
 
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: "Unlock your private space" }),
+    page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Get started" })).toHaveCount(
     0,
   );
   await expect(page.locator(".pin-digit")).toHaveCount(4);
+  await expect(page.locator(".security-keypad-key")).toHaveCount(10);
+  await expect(page.locator("[data-pin-indicator]")).toHaveCount(4);
 });
 
 test("stores and manages encrypted documents for a profile", async ({
@@ -293,10 +302,8 @@ test("resets local data safely when the PIN is forgotten", async ({ page }) => {
   await createLocalProfile(page);
   await page.getByRole("button", { name: "Lock app" }).click();
 
-  await expect(
-    page.getByRole("heading", { name: "Forgot your PIN?" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Reset local data" }).click();
+  await expect(page.getByRole("button", { name: "Forgot PIN?" })).toBeVisible();
+  await page.getByRole("button", { name: "Forgot PIN?" }).click();
   await expect(
     page.getByRole("heading", { name: "Reset this private space?" }),
   ).toBeVisible();
@@ -447,7 +454,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
 
   await page.getByRole("button", { name: "Lock now" }).click();
   await expect(
-    page.getByRole("heading", { name: "Unlock your private space" }),
+    page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
 });
 
