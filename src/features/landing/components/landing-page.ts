@@ -5,7 +5,7 @@ export function renderLandingPage(root: HTMLElement): void {
     <div class="public-shell">
       <header class="public-header">
         <a class="wordmark" href="#" aria-label="${APP_NAME} home">
-          <span class="wordmark-mark" aria-hidden="true">UF</span>
+          <img class="wordmark-logo" src="./brand-logo.png" alt="" />
           <span>${APP_NAME}</span>
         </a>
       </header>
@@ -26,8 +26,8 @@ export function renderLandingPage(root: HTMLElement): void {
             <small class="storage-note">No online account or database is used.</small>
           </div>
 
-          <div class="freddy-hero" aria-label="Freddy the Urban Fox artwork is coming soon">
-            <span aria-hidden="true">F</span>
+          <div class="freddy-hero" aria-label="Freddy the Urban Fox">
+            <img class="freddy-hero-logo" src="./brand-logo.png" alt="" />
             <p>Hi, I’m Freddy. I’ll help you keep track.</p>
           </div>
         </section>

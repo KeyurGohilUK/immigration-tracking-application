@@ -1,11 +1,14 @@
 const CACHE_PREFIX = "urbanfox-shell";
-const CACHE_VERSION = "0.21.0";
+const CACHE_VERSION = "1.0.0";
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icon.svg",
+  "./brand-logo.png",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {

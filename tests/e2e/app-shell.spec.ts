@@ -95,14 +95,14 @@ test("shows install and update controls in every device header", async ({
   await expect(
     page.getByRole("dialog", { name: "Install and updates" }),
   ).toBeVisible();
-  await expect(page.getByText("Installed")).toBeVisible();
+  await expect(page.getByText("Installed", { exact: true })).toBeVisible();
   await expect(page.getByText("Latest", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Download updates" }),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added a Profile theme preference with Light, Dark, and System options.",
+      "Introduced the new Ibiza Sunset fox as the UrbanFox app logo.",
     ),
   ).toBeVisible();
   await expect(
