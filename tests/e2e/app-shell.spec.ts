@@ -744,7 +744,9 @@ test("shows a separate estimate for a primary profile who is a Skilled Worker de
     page.getByText(/same partner; UrbanFox does not store or verify/i),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "No complete absence days recorded" }),
+    page.getByRole("heading", {
+      name: "31 days at most in one rolling year",
+    }),
   ).toBeVisible();
 });
 
