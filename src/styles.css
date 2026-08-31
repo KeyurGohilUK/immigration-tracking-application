@@ -3351,3 +3351,110 @@ p {
     padding: 2.5rem max(2rem, calc((100vw - 80rem) / 2)) 4rem;
   }
 }
+
+
+html[data-theme="dark"] {
+  --colour-canvas: #1a0b2e;
+  --colour-surface: #231437;
+  --colour-surface-strong: #322346;
+  --colour-border: #5b3f46;
+  --colour-text-muted: #e3bdc5;
+  --colour-text: #eddcff;
+  --colour-strong: #ffb1c5;
+  --colour-on-strong: #65002f;
+  --colour-danger: #ffb4ab;
+  --colour-danger-hover: #ff8a80;
+  --colour-danger-surface: rgb(147 0 10 / 32%);
+  --colour-on-danger: #690005;
+  --glass-surface: rgb(255 255 255 / 8%);
+  --glass-surface-strong: rgb(255 255 255 / 12%);
+  --glass-border: rgb(255 255 255 / 14%);
+  --glass-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 28%);
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .public-shell {
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+}
+
+html[data-theme="dark"] .public-header,
+html[data-theme="dark"] .top-bar {
+  background: rgb(26 11 46 / 78%);
+}
+
+html[data-theme="dark"] .permission-card-content,
+html[data-theme="dark"] .timeline-entry-content,
+html[data-theme="dark"] .family-card,
+html[data-theme="dark"] .document-card,
+html[data-theme="dark"] .more-card,
+html[data-theme="dark"] .profile-summary,
+html[data-theme="dark"] .setup-card,
+html[data-theme="dark"] .notice {
+  background: rgb(255 255 255 / 8%);
+}
+
+html[data-theme="dark"] {
+  --ibiza-primary: #ffb1c5;
+  --ibiza-surface: #1a0b2e;
+  --ibiza-surface-container: #27183b;
+  --ibiza-surface-high: #322346;
+  --ibiza-text: #eddcff;
+  --ibiza-text-muted: #e3bdc5;
+  --ibiza-outline: #5b3f46;
+}
+
+html[data-theme="dark"] .glass-panel,
+html[data-theme="dark"] .glass-panel-floating,
+html[data-theme="dark"] .family-dashboard .setup-card,
+html[data-theme="dark"] .family-dashboard .notice,
+html[data-theme="dark"] .family-overview-member {
+  border-color: rgb(255 255 255 / 14%);
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 12%),
+    rgb(255 255 255 / 6%)
+  );
+  box-shadow: 0 1rem 2.8rem rgb(0 0 0 / 26%);
+}
+
+html[data-theme="dark"] .family-dashboard {
+  background:
+    radial-gradient(circle at 8% 10%, rgb(238 9 121 / 18%), transparent 24rem),
+    radial-gradient(circle at 92% 15%, rgb(255 106 0 / 14%), transparent 22rem);
+}
+
+html[data-theme="dark"] .dashboard-person-badge,
+html[data-theme="dark"] .dashboard-person-progress {
+  background: rgb(255 255 255 / 10%);
+}
+
+html[data-theme="dark"] .family-dashboard .secondary-button,
+html[data-theme="dark"] .settings-select {
+  border-color: rgb(255 255 255 / 16%);
+  color: var(--colour-text);
+  background: rgb(255 255 255 / 9%);
+}
+
+.settings-select-label {
+  min-width: 7.5rem;
+}
+
+.settings-select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.45rem 2rem 0.45rem 0.7rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  color: var(--colour-text);
+  background: var(--glass-surface-strong);
+  font: inherit;
+}
+
+.settings-select:focus-visible {
+  outline: 2px solid var(--ibiza-primary);
+  outline-offset: 2px;
+}
