@@ -303,9 +303,9 @@ test("resets local data safely when the PIN is forgotten", async ({ page }) => {
   await page.getByRole("button", { name: "Lock app" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Forgot your PIN?" }),
+    page.getByRole("button", { name: "Forgot PIN?" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Reset local data" }).click();
+  await page.getByRole("button", { name: "Forgot PIN?" }).click();
   await expect(
     page.getByRole("heading", { name: "Reset this private space?" }),
   ).toBeVisible();
