@@ -3815,10 +3815,7 @@ html[data-theme="dark"] .mobile-navigation a[aria-current="page"] {
   width: min(100%, 72rem);
   gap: 1.25rem;
   margin: 0 auto;
-  padding:
-    1rem
-    1rem
-    calc(10rem + env(safe-area-inset-bottom));
+  padding: 1rem 1rem calc(10rem + env(safe-area-inset-bottom));
 }
 
 .ilr-hero,
