@@ -135,7 +135,8 @@ function initialiseUnlockKeypad(form: HTMLFormElement): void {
   };
 
   const deleteDigit = (): void => {
-    const index = inputs.findLastIndex(({ value }) => value.length > 0);
+    let index = inputs.length - 1;
+    while (index >= 0 && !inputs[index]?.value) index -= 1;
     const input = inputs[index];
     if (!input) return;
     input.value = "";
