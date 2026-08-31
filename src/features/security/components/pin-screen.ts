@@ -99,7 +99,7 @@ function renderUnlockKeypad(): string {
     .join("");
 
   return `
-    <div class="security-keypad" aria-label="PIN keypad">
+    <div class="security-keypad" aria-label="PIN keypad" tabindex="0">
       ${buttons}
       <span class="security-keypad-spacer" aria-hidden="true"></span>
       <button class="security-keypad-key" type="button" data-pin-key="0" aria-label="Enter 0"><span>0</span></button>
@@ -212,7 +212,7 @@ export function renderPinScreen(
         <div class="security-ambient-glow security-ambient-glow-secondary" aria-hidden="true"></div>
         <main class="security-main security-keypad-main">
           <section class="security-keypad-screen" aria-labelledby="pin-title">
-            <div class="security-logo-orb" aria-hidden="true">
+            <div class="security-logo-mark" aria-hidden="true">
               <img src="./brand-logo.png" alt="" />
             </div>
             <div class="security-keypad-copy">
@@ -248,7 +248,7 @@ export function renderPinScreen(
     form.querySelector<HTMLInputElement>('[data-pin-digit="pin"]')?.focus();
   } else {
     initialiseUnlockKeypad(form);
-    form.querySelector<HTMLButtonElement>("[data-pin-key]")?.focus();
+    form.querySelector<HTMLElement>(".security-keypad")?.focus();
   }
 
   return form;
@@ -271,8 +271,8 @@ export function clearPinInputs(form: HTMLFormElement, name = "pin"): void {
   const valueInput = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
   if (valueInput) valueInput.value = "";
   updateUnlockIndicators(form);
-  const keypadButton = form.querySelector<HTMLButtonElement>("[data-pin-key]");
-  if (keypadButton) keypadButton.focus();
+  const keypad = form.querySelector<HTMLElement>(".security-keypad");
+  if (keypad) keypad.focus();
   else
     form.querySelector<HTMLInputElement>(`[data-pin-digit="${name}"]`)?.focus();
 }
