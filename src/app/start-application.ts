@@ -884,6 +884,18 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           renderDashboard(profile);
         });
       }
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-dashboard-member]",
+      )) {
+        button.addEventListener("click", () => {
+          const profileId = button.dataset.editDashboardMember;
+          const member = familyMembers.find(({ id }) => id === profileId);
+          if (!profileId || !member) return;
+          selectedProfileId = profileId;
+          renderFamily(profile, familyMembers);
+          showFamilyMemberForm(root, member);
+        });
+      }
     };
 
     const renderFamily = (

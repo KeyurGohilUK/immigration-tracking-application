@@ -1,6 +1,6 @@
-export const APP_VERSION = "1.0.1";
+export const APP_VERSION = "1.1.0";
 
 export const RELEASE_NOTES = [
-  "Improved the floating mobile navigation in dark mode with a darker Liquid Glass surface.",
-  "Increased contrast for inactive navigation icons while keeping the selected Ibiza gradient treatment.",
+  "Family-member cards on the Home screen now open the existing edit form directly.",
+  "Opening a member card keeps that person selected for tracking while their profile is edited.",
 ] as const;

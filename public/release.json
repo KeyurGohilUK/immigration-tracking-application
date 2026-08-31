@@ -1,7 +1,7 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "notes": [
-    "Improved the floating mobile navigation in dark mode with a darker Liquid Glass surface.",
-    "Increased contrast for inactive navigation icons while keeping the selected Ibiza gradient treatment."
+    "Family-member cards on the Home screen now open the existing edit form directly.",
+    "Opening a member card keeps that person selected for tracking while their profile is edited."
   ]
 }
