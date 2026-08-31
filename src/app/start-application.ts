@@ -126,6 +126,10 @@ import {
   createDocumentPack,
   downloadDocumentPack,
 } from "../features/documents/services/document-pack-service";
+import {
+  renderIlrJourneyPage,
+  type IlrJourneyMember,
+} from "../features/ilr/components/ilr-journey-page";
 
 const SPLASH_DURATION_MS = 500;
 
@@ -155,7 +159,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const wireAuthenticatedShell = (
       profile: HouseholdMember,
       currentView:
-        "Home" | "Family" | "Permissions" | "Trips" | "Documents" | "More",
+        | "Home"
+        | "Family"
+        | "Permissions"
+        | "Trips"
+        | "ILR"
+        | "Documents"
+        | "More",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -188,6 +198,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             void showTrips(profile);
           });
         }
+        if (destination === "ILR") {
+          link.addEventListener("click", (event) => {
+            event.preventDefault();
+            void showIlrJourney(profile);
+          });
+        }
         if (destination === "Documents") {
           link.addEventListener("click", (event) => {
             event.preventDefault();
@@ -216,6 +232,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           else if (currentView === "Permissions")
             void showPermissions(selectedMember);
           else if (currentView === "Trips") void showTrips(selectedMember);
+          else if (currentView === "ILR") void showIlrJourney(selectedMember);
           else if (currentView === "Documents")
             void showDocuments(selectedMember);
           else renderDashboard(selectedMember);
@@ -230,6 +247,61 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       wireDashboardActions(profile);
       const profileId = selectedProfileId;
       void updateDashboardCalculation(profile, profileId);
+    };
+
+    const showIlrJourney = async (
+      profile: HouseholdMember,
+    ): Promise<void> => {
+      const asOfDate = getUkCalendarDate();
+      const journeys = await Promise.all(
+        familyMembers.map(async (member): Promise<IlrJourneyMember> => {
+          let permissions = permissionCache.get(member.id);
+          let trips = tripCache.get(member.id);
+          try {
+            if (!permissions)
+              permissions = await getImmigrationPermissions(member.id, key);
+          } catch {
+            permissions = [];
+          }
+          try {
+            if (!trips) trips = await getTrips(member.id, key);
+          } catch {
+            trips = [];
+          }
+          permissionCache.set(member.id, permissions);
+          tripCache.set(member.id, trips);
+
+          const latestPermission = [...permissions].sort((left, right) =>
+            right.permissionStartDate.localeCompare(left.permissionStartDate),
+          )[0];
+          const isDependant =
+            latestPermission?.role === "dependant" ||
+            member.immigrationRole === "dependant";
+          const absenceInput = {
+            permissions,
+            trips,
+            asOfDate,
+          };
+
+          return {
+            member,
+            period: isDependant
+              ? calculateSkilledWorkerDependantQualifyingPeriod(
+                  permissions,
+                  asOfDate,
+                )
+              : calculateSkilledWorkerQualifyingPeriod({
+                  permissions,
+                  asOfDate,
+                }),
+            absence: isDependant
+              ? calculateRecordedDependantAbsenceCheck(absenceInput)
+              : calculateRecordedAbsenceCheck(absenceInput),
+          };
+        }),
+      );
+      renderIlrJourneyPage(root, journeys, asOfDate);
+      wireAuthenticatedShell(profile, "ILR");
     };
 
     const renderMore = (profile: HouseholdMember): void => {
