@@ -248,7 +248,6 @@ export function renderPinScreen(
     form.querySelector<HTMLInputElement>('[data-pin-digit="pin"]')?.focus();
   } else {
     initialiseUnlockKeypad(form);
-    form.querySelector<HTMLElement>(".security-keypad")?.focus();
   }
 
   return form;
