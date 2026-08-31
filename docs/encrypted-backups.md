@@ -18,13 +18,14 @@ never stored and is separate from the four-digit local PIN.
 Users must keep the backup file and password safe and separate. UrbanFox cannot
 recover a forgotten backup password.
 
-Document files are not included in the current JSON backup format. Users must
-retain their original document files separately. Restoring a JSON backup
-replaces tracker records only and leaves locally stored documents unchanged.
+New backups include document metadata and file content inside the encrypted
+payload. Users should still retain original evidence files separately. Legacy
+backups without a `documents` collection remain valid; restoring one replaces
+tracker records only and leaves locally stored documents unchanged.
 
 ## Restore safety
 
-Restore accepts JSON files no larger than 10 MB. Before decrypting or changing
+Restore accepts JSON files no larger than 140 MB. Before decrypting or changing
 local data, UrbanFox validates the wrapper format, schema, algorithms,
 encryption parameters, and password. It then validates the encrypted payload,
 owner and family profiles, profile identifiers, immigration permissions, trips,

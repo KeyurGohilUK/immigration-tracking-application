@@ -1,7 +1,7 @@
-export const APP_VERSION = "0.17.0";
+export const APP_VERSION = "0.18.0";
 
 export const RELEASE_NOTES = [
-  "Added per-profile encrypted local PDF, JPG, and PNG document storage.",
-  "Added document categories, opening, downloading, renaming, reordering, deletion, and storage limits.",
-  "Added clear guidance that document files are not yet included in JSON backups and originals must be retained.",
+  "Added ordered, application-ready PDF document packs for each household profile.",
+  "Added uploaded document files to encrypted backup and restore while preserving legacy backup compatibility.",
+  "Added document counts, restore guidance, integrity checks, and safer PDF filenames.",
 ] as const;

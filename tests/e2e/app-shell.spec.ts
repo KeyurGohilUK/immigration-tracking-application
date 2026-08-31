@@ -103,7 +103,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added per-profile encrypted local PDF, JPG, and PNG document storage",
+      "Added ordered, application-ready PDF document packs for each household profile",
     ),
   ).toBeVisible();
   await expect(
@@ -226,7 +226,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await addDocumentDialog.getByLabel("Document file").setInputFiles({
     name: "council-tax.png",
     mimeType: "image/png",
-    buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]),
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
   });
   await addDocumentDialog
     .getByLabel("Document name")
@@ -261,6 +264,12 @@ test("stores and manages encrypted documents for a profile", async ({
     .getByRole("button", { name: "Download Council tax statement" })
     .click();
   expect((await downloadPromise).suggestedFilename()).toBe("council-tax.png");
+
+  const packDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download PDF pack" }).click();
+  expect((await packDownloadPromise).suggestedFilename()).toBe(
+    "Urban-Fox-Test-User-ILR-Document-Pack.pdf",
+  );
 
   await page
     .getByRole("button", { name: "Rename Council tax statement" })

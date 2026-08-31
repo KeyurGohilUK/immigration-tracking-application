@@ -12,12 +12,22 @@ import {
   type ImmigrationPermission,
 } from "../../immigration/domain/immigration-permission";
 import { isTripCollection, type Trip } from "../../travel/domain/trip";
+import {
+  isDocumentMetadata,
+  MAXIMUM_TOTAL_DOCUMENT_BYTES,
+  type DocumentMetadata,
+} from "../../documents/domain/document";
 
 export const BACKUP_FORMAT = "urbanfox-ilr-encrypted-backup";
 export const BACKUP_VERSION = 1;
 export const BACKUP_PASSWORD_MINIMUM_LENGTH = 12;
 export const BACKUP_KEY_DERIVATION_ITERATIONS = 600_000;
-export const MAXIMUM_BACKUP_FILE_BYTES = 10 * 1024 * 1024;
+export const MAXIMUM_BACKUP_FILE_BYTES = 140 * 1024 * 1024;
+
+export interface BackupDocument {
+  metadata: DocumentMetadata;
+  content: string;
+}
 
 export interface ProfileRecords<T> {
   profileId: string;
@@ -29,6 +39,7 @@ export interface BackupData {
   familyMembers: FamilyMember[];
   permissions: ProfileRecords<ImmigrationPermission>[];
   trips: ProfileRecords<Trip>[];
+  documents?: BackupDocument[];
 }
 
 export interface BackupPayload {
@@ -80,6 +91,29 @@ function isHexOfLength(value: unknown, bytes: number): value is string {
     value.length === bytes * 2 &&
     /^[0-9a-f]+$/i.test(value)
   );
+}
+
+function isBackupDocument(
+  value: unknown,
+  profileIds: string[],
+): value is BackupDocument {
+  if (!value || typeof value !== "object") return false;
+  const document = value as Partial<BackupDocument>;
+  if (
+    !isDocumentMetadata(document.metadata) ||
+    !profileIds.includes(document.metadata.profileId) ||
+    typeof document.content !== "string" ||
+    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(
+      document.content,
+    )
+  )
+    return false;
+  const padding = document.content.endsWith("==")
+    ? 2
+    : document.content.endsWith("=")
+      ? 1
+      : 0;
+  return (document.content.length * 3) / 4 - padding === document.metadata.size;
 }
 
 export function isEncryptedBackupFile(
@@ -151,12 +185,29 @@ export function isBackupPayload(value: unknown): value is BackupPayload {
     ...payload.data.familyMembers.map(({ id }) => id),
   ];
   if (new Set(profileIds).size !== profileIds.length) return false;
+  const documents = payload.data.documents;
+  const documentsAreValid =
+    documents === undefined ||
+    (Array.isArray(documents) &&
+      documents.length <= profileIds.length * 25 &&
+      documents.every((document) => isBackupDocument(document, profileIds)) &&
+      new Set(documents.map(({ metadata }) => metadata.id)).size ===
+        documents.length &&
+      documents.reduce(
+        (total, document) => total + document.metadata.size,
+        0,
+      ) <= MAXIMUM_TOTAL_DOCUMENT_BYTES);
   return (
     hasExactlyExpectedProfiles(
       payload.data.permissions,
       profileIds,
       isImmigrationPermissionCollection,
     ) &&
-    hasExactlyExpectedProfiles(payload.data.trips, profileIds, isTripCollection)
+    hasExactlyExpectedProfiles(
+      payload.data.trips,
+      profileIds,
+      isTripCollection,
+    ) &&
+    documentsAreValid
   );
 }
