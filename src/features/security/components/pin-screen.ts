@@ -88,52 +88,152 @@ function initialisePinInputs(
   });
 }
 
+function renderUnlockKeypad(): string {
+  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  const buttons = keys
+    .map(
+      (digit) =>
+        `<button class="security-keypad-key" type="button" data-pin-key="${digit}" aria-label="Enter ${digit}"><span>${digit}</span></button>`,
+    )
+    .join("");
+
+  return `
+    <div class="security-keypad" aria-label="PIN keypad">
+      ${buttons}
+      <span class="security-keypad-spacer" aria-hidden="true"></span>
+      <button class="security-keypad-key" type="button" data-pin-key="0" aria-label="Enter 0"><span>0</span></button>
+      <button class="security-keypad-backspace" type="button" data-pin-backspace aria-label="Delete last PIN digit">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-6-6Z"/><path d="m13 10 4 4M17 10l-4 4"/></svg>
+      </button>
+    </div>
+  `;
+}
+
+function updateUnlockIndicators(form: HTMLFormElement): void {
+  const inputs = Array.from(
+    form.querySelectorAll<HTMLInputElement>('[data-pin-digit="pin"]'),
+  );
+  const indicators = Array.from(
+    form.querySelectorAll<HTMLElement>("[data-pin-indicator]"),
+  );
+  indicators.forEach((indicator, index) => {
+    indicator.classList.toggle("is-filled", Boolean(inputs[index]?.value));
+  });
+}
+
+function initialiseUnlockKeypad(form: HTMLFormElement): void {
+  const inputs = Array.from(
+    form.querySelectorAll<HTMLInputElement>('[data-pin-digit="pin"]'),
+  );
+
+  const enterDigit = (digit: string): void => {
+    const input = inputs.find(({ value }) => value.length === 0);
+    if (!input) return;
+    input.value = digit;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    updateUnlockIndicators(form);
+  };
+
+  const deleteDigit = (): void => {
+    const index = inputs.findLastIndex(({ value }) => value.length > 0);
+    const input = inputs[index];
+    if (!input) return;
+    input.value = "";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    updateUnlockIndicators(form);
+  };
+
+  for (const button of form.querySelectorAll<HTMLButtonElement>(
+    "[data-pin-key]",
+  )) {
+    button.addEventListener("click", () => {
+      const digit = button.dataset.pinKey;
+      if (digit) enterDigit(digit);
+    });
+  }
+
+  form
+    .querySelector<HTMLButtonElement>("[data-pin-backspace]")
+    ?.addEventListener("click", deleteDigit);
+
+  const keypad = form.querySelector<HTMLElement>(".security-keypad");
+  keypad?.addEventListener("keydown", (event) => {
+    if (/^[0-9]$/.test(event.key)) {
+      event.preventDefault();
+      enterDigit(event.key);
+    } else if (event.key === "Backspace") {
+      event.preventDefault();
+      deleteDigit();
+    }
+  });
+}
+
 export function renderPinScreen(
   root: HTMLElement,
   mode: PinScreenMode,
 ): HTMLFormElement {
   const creating = mode === "create";
-  root.innerHTML = `
-    <div class="security-shell">
-      <header class="public-header">
-        <span class="wordmark">
-          <img class="wordmark-logo" src="./brand-logo.png" alt="" />
-          <span>${APP_NAME}</span>
-        </span>
-      </header>
-      <main class="security-main">
-        <section class="security-card" aria-labelledby="pin-title">
-          <p class="eyebrow">Local privacy</p>
-          <h1 id="pin-title">${creating ? "Create your four-digit PIN" : "Unlock your private space"}</h1>
-          <p>
-            ${creating ? "Your PIN will lock information stored on this device." : "Enter your PIN to access information stored on this device."}
-          </p>
-          <form id="pin-form" class="pin-form" novalidate>
-            ${renderPinInputs("pin", creating ? "Choose PIN" : "Four-digit PIN")}
-            ${creating ? renderPinInputs("confirmPin", "Confirm PIN") : ""}
-            <p id="pin-error" class="form-error" role="alert" hidden></p>
-            <button class="primary-button" type="submit">${creating ? "Create private space" : "Unlock"}</button>
-          </form>
-          <aside class="pin-guidance" aria-label="PIN security information">
-            <strong>Important</strong>
-            <p>A four-digit PIN helps prevent casual access, but it is not equivalent to your device encryption or a strong password.</p>
-            <p>There is no PIN recovery. A forgotten PIN will require deleting local data and restoring a backup.</p>
-          </aside>
-          ${
-            creating
-              ? ""
-              : `<aside class="pin-reset danger-zone" aria-labelledby="pin-reset-title">
-                  <p class="eyebrow">Danger Zone</p>
-                  <h2 id="pin-reset-title">Forgot your PIN?</h2>
-                  <p>The PIN cannot be recovered. Reset only if you accept losing these local records or already have an encrypted backup and its password.</p>
-                  <button id="forgot-pin-reset" class="secondary-button danger-button" type="button">Reset local data</button>
-                </aside>`
-          }
-        </section>
-      </main>
-      ${creating ? "" : renderDeleteDataDialog("locked")}
-    </div>
-  `;
+
+  if (creating) {
+    root.innerHTML = `
+      <div class="security-shell">
+        <header class="public-header">
+          <span class="wordmark">
+            <img class="wordmark-logo" src="./brand-logo.png" alt="" />
+            <span>${APP_NAME}</span>
+          </span>
+        </header>
+        <main class="security-main">
+          <section class="security-card" aria-labelledby="pin-title">
+            <p class="eyebrow">Local privacy</p>
+            <h1 id="pin-title">Create your four-digit PIN</h1>
+            <p>Your PIN will lock information stored on this device.</p>
+            <form id="pin-form" class="pin-form" novalidate>
+              ${renderPinInputs("pin", "Choose PIN")}
+              ${renderPinInputs("confirmPin", "Confirm PIN")}
+              <p id="pin-error" class="form-error" role="alert" hidden></p>
+              <button class="primary-button" type="submit">Create private space</button>
+            </form>
+            <aside class="pin-guidance" aria-label="PIN security information">
+              <strong>Important</strong>
+              <p>A four-digit PIN helps prevent casual access, but it is not equivalent to your device encryption or a strong password.</p>
+              <p>There is no PIN recovery. A forgotten PIN will require deleting local data and restoring a backup.</p>
+            </aside>
+          </section>
+        </main>
+      </div>
+    `;
+  } else {
+    root.innerHTML = `
+      <div class="security-shell security-keypad-shell">
+        <div class="security-ambient-glow security-ambient-glow-primary" aria-hidden="true"></div>
+        <div class="security-ambient-glow security-ambient-glow-secondary" aria-hidden="true"></div>
+        <main class="security-main security-keypad-main">
+          <section class="security-keypad-screen" aria-labelledby="pin-title">
+            <div class="security-logo-orb" aria-hidden="true">
+              <img src="./brand-logo.png" alt="" />
+            </div>
+            <div class="security-keypad-copy">
+              <h1 id="pin-title">Enter Security PIN</h1>
+              <p>Please enter your 4-digit security code to continue.</p>
+            </div>
+            <form id="pin-form" class="pin-form security-keypad-form" novalidate>
+              <div class="security-hidden-pin-inputs">
+                ${renderPinInputs("pin", "Four-digit PIN")}
+              </div>
+              <div class="security-pin-indicators" aria-hidden="true">
+                ${Array.from({ length: 4 }, (_, index) => `<span data-pin-indicator="${index}"></span>`).join("")}
+              </div>
+              ${renderUnlockKeypad()}
+              <p id="pin-error" class="form-error security-keypad-error" role="alert" hidden></p>
+              <button id="forgot-pin-reset" class="security-forgot-pin" type="button">Forgot PIN?</button>
+            </form>
+          </section>
+        </main>
+        ${renderDeleteDataDialog("locked")}
+      </div>
+    `;
+  }
 
   const form = root.querySelector<HTMLFormElement>("#pin-form");
   if (!form) {
@@ -141,8 +241,13 @@ export function renderPinScreen(
   }
 
   initialisePinInputs(form, "pin", !creating);
-  if (creating) initialisePinInputs(form, "confirmPin", true);
-  form.querySelector<HTMLInputElement>('[data-pin-digit="pin"]')?.focus();
+  if (creating) {
+    initialisePinInputs(form, "confirmPin", true);
+    form.querySelector<HTMLInputElement>('[data-pin-digit="pin"]')?.focus();
+  } else {
+    initialiseUnlockKeypad(form);
+    form.querySelector<HTMLButtonElement>("[data-pin-key]")?.focus();
+  }
 
   return form;
 }
@@ -163,7 +268,11 @@ export function clearPinInputs(form: HTMLFormElement, name = "pin"): void {
   }
   const valueInput = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
   if (valueInput) valueInput.value = "";
-  form.querySelector<HTMLInputElement>(`[data-pin-digit="${name}"]`)?.focus();
+  updateUnlockIndicators(form);
+  const keypadButton = form.querySelector<HTMLButtonElement>("[data-pin-key]");
+  if (keypadButton) keypadButton.focus();
+  else
+    form.querySelector<HTMLInputElement>(`[data-pin-digit="${name}"]`)?.focus();
 }
 
 export function setPinFormBusy(form: HTMLFormElement, busy: boolean): void {
