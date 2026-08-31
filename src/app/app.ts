@@ -27,16 +27,39 @@ const navigationItems = [
 export type NavigationId =
   (typeof navigationItems)[number]["id"] | "Family" | "Permissions";
 
+let previousMobileNavigationIndex = 0;
+
+function resolvePrimaryNavigationId(
+  activeNavigation: NavigationId,
+): (typeof navigationItems)[number]["id"] {
+  if (activeNavigation === "Family" || activeNavigation === "Permissions")
+    return "Home";
+  return activeNavigation;
+}
+
+function getPrimaryNavigationIndex(activeNavigation: NavigationId): number {
+  const resolvedNavigation = resolvePrimaryNavigationId(activeNavigation);
+  const index = navigationItems.findIndex(({ id }) => id === resolvedNavigation);
+  return Math.max(index, 0);
+}
+
 function renderNavigation(
   className: string,
   activeNavigation: NavigationId,
 ): string {
+  const resolvedNavigation = resolvePrimaryNavigationId(activeNavigation);
+  const isMobile = className.includes("mobile-navigation");
+  const indicator = isMobile
+    ? `<span class="mobile-navigation-indicator" aria-hidden="true" style="--mobile-navigation-offset: ${previousMobileNavigationIndex * 100}%"></span>`
+    : "";
+
   return `
     <nav class="primary-navigation ${className}" aria-label="Primary navigation">
+      ${indicator}
       ${navigationItems
         .map(
           ({ id, label, icon }) => `
-            <a href="#${id.toLowerCase()}" data-navigation="${id}" ${id === activeNavigation ? 'aria-current="page"' : ""}>
+            <a href="#${id.toLowerCase()}" data-navigation="${id}" ${id === resolvedNavigation ? 'aria-current="page"' : ""}>
               <svg aria-hidden="true" viewBox="0 0 24 24">${icon}</svg>
               <span class="navigation-label">${label}</span>
             </a>`,
@@ -75,6 +98,26 @@ export function renderAppShell(
       ${renderNavigation("mobile-navigation", activeNavigation)}
     </div>
   `;
+  const targetNavigationIndex = getPrimaryNavigationIndex(activeNavigation);
+  const mobileNavigation =
+    root.querySelector<HTMLElement>(".mobile-navigation");
+  if (mobileNavigation) {
+    previousMobileNavigationIndex = Math.max(
+      Math.min(previousMobileNavigationIndex, navigationItems.length - 1),
+      0,
+    );
+    mobileNavigation.style.setProperty(
+      "--mobile-navigation-offset",
+      `${previousMobileNavigationIndex * 100}%`,
+    );
+    previousMobileNavigationIndex = targetNavigationIndex;
+    requestAnimationFrame(() => {
+      mobileNavigation.style.setProperty(
+        "--mobile-navigation-offset",
+        `${targetNavigationIndex * 100}%`,
+      );
+    });
+  }
   window.scrollTo({ top: 0, left: 0 });
 }
 
