@@ -54,7 +54,8 @@ function initialisePinInputs(
       const error = form.querySelector<HTMLElement>("#pin-error");
       if (error) error.hidden = true;
       input.value = input.value.replace(/\D/g, "").slice(-1);
-      if (input.value) inputs[index + 1]?.focus();
+      if (input.value && !form.classList.contains("security-keypad-form"))
+        inputs[index + 1]?.focus();
       updateValue();
     });
 
