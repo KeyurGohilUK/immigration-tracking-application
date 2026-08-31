@@ -466,9 +466,7 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
     .toBe("dark");
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
-  await page
-    .getByRole("button", { name: `Edit ${TEST_PROFILE.name}` })
-    .click();
+  await page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }).click();
   await expect(page.locator(".family-dialog")).toHaveCSS(
     "background-color",
     "rgba(39, 24, 59, 0.94)",
