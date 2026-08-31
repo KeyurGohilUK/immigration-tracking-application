@@ -60,7 +60,8 @@ function progressForPeriod(
   const start = Date.parse(`${period.qualifyingStartDate}T00:00:00Z`);
   const end = Date.parse(`${period.qualifyingCompletionDate}T00:00:00Z`);
   const current = Date.parse(`${asOfDate}T00:00:00Z`);
-  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return 0;
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+    return 0;
   return Math.max(0, Math.min(100, ((current - start) / (end - start)) * 100));
 }
 
@@ -133,15 +134,19 @@ function createJourneyCard(
     application.textContent = formatDate(period.earliestApplicationDate);
   if (completion)
     completion.textContent = formatDate(period.qualifyingCompletionDate);
-  if (absenceStatus) absenceStatus.textContent = absenceStatusLabel(absence.status);
+  if (absenceStatus)
+    absenceStatus.textContent = absenceStatusLabel(absence.status);
   if (absenceDays)
     absenceDays.textContent = `${absence.maximumRecordedDays} recorded days in the highest 12-month window`;
 
   if (
     ["manual-review", "unsupported", "incomplete"].includes(period.status) ||
-    ["manual-review", "unsupported", "incomplete", "potentially-over-limit"].includes(
-      absence.status,
-    )
+    [
+      "manual-review",
+      "unsupported",
+      "incomplete",
+      "potentially-over-limit",
+    ].includes(absence.status)
   )
     card.classList.add("requires-review");
 
@@ -159,9 +164,12 @@ export function renderIlrJourneyPage(
   const reviewsNeeded = journeys.filter(
     ({ period, absence }) =>
       ["manual-review", "unsupported", "incomplete"].includes(period.status) ||
-      ["manual-review", "unsupported", "incomplete", "potentially-over-limit"].includes(
-        absence.status,
-      ),
+      [
+        "manual-review",
+        "unsupported",
+        "incomplete",
+        "potentially-over-limit",
+      ].includes(absence.status),
   ).length;
 
   renderAppShell(
@@ -206,5 +214,6 @@ export function renderIlrJourneyPage(
 
   const list = root.querySelector<HTMLElement>("#ilr-member-list");
   if (!list) throw new Error("ILR journey list could not be rendered.");
-  for (const journey of journeys) list.append(createJourneyCard(journey, asOfDate));
+  for (const journey of journeys)
+    list.append(createJourneyCard(journey, asOfDate));
 }
