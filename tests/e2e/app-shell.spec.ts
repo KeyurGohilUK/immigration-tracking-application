@@ -222,13 +222,16 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(page.getByText("No documents added yet")).toBeVisible();
 
   await page.getByRole("button", { name: "Add document" }).click();
-  await page.getByLabel("Document file").setInputFiles({
+  const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
+  await addDocumentDialog.getByLabel("Document file").setInputFiles({
     name: "council-tax.png",
     mimeType: "image/png",
     buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]),
   });
-  await page.getByLabel("Document name").fill("Council tax statement");
-  await page.getByLabel("Category").selectOption("address-proof");
+  await addDocumentDialog
+    .getByLabel("Document name")
+    .fill("Council tax statement");
+  await addDocumentDialog.getByLabel("Category").selectOption("address-proof");
   await page.getByRole("button", { name: "Encrypt and save document" }).click();
   await expect(
     page.getByRole("heading", { name: "Council tax statement" }),
@@ -262,7 +265,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await page
     .getByRole("button", { name: "Rename Council tax statement" })
     .click();
-  await page.getByLabel("Document name").fill("Council tax bill");
+  await page
+    .getByRole("dialog", { name: "Rename document" })
+    .getByLabel("Document name")
+    .fill("Council tax bill");
   await page.getByRole("button", { name: "Save document name" }).click();
   await expect(
     page.getByRole("heading", { name: "Council tax bill" }),
