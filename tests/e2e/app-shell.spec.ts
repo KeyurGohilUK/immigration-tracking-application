@@ -102,7 +102,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Improved the floating mobile navigation in dark mode with a darker Liquid Glass surface.",
+      "Family-member cards on the Home screen now open the existing edit form directly.",
     ),
   ).toBeVisible();
   await expect(
@@ -610,16 +610,21 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Viewing Freddy Test Dependant" }),
+    page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
   ).toBeVisible();
   await page.getByRole("button", { name: `View ${TEST_PROFILE.name}` }).click();
   await expect(
     page.getByRole("button", { name: `Viewing ${TEST_PROFILE.name}` }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "View Freddy Test Dependant" })
+    .getByRole("button", { name: "Edit Freddy Test Dependant" })
     .click();
-  await page.getByRole("button", { name: "Add Family Member" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Edit family member" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Full name")).toHaveValue(
+    "Freddy Test Dependant",
+  );
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 5);
@@ -638,9 +643,6 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   expect(storedFamily).not.toContain("Freddy Test Dependant");
   expect(storedFamily).toContain("ciphertext");
 
-  await page
-    .getByRole("button", { name: "Edit Freddy Test Dependant" })
-    .click();
   await page.getByLabel("Full name").fill("Freddy Test Child");
   await page.getByRole("button", { name: "Save family member" }).click();
   await expect(
@@ -650,7 +652,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
-    page.getByRole("button", { name: "Viewing Freddy Test Child" }),
+    page.getByRole("button", { name: "Edit Freddy Test Child" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Add Family Member" }).click();
   await expect(page.locator("#selected-person-name")).toHaveText(
