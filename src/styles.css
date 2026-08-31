@@ -2898,7 +2898,6 @@ p {
   }
 }
 
-
 /* Ibiza Sunset Liquid Glass — family home */
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Manrope:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap");
 
@@ -2912,7 +2911,11 @@ p {
   --ibiza-text: #231437;
   --ibiza-text-muted: #5b3f46;
   --ibiza-outline: #e3bdc5;
-  --ibiza-gradient: linear-gradient(135deg, var(--ibiza-pink), var(--ibiza-orange));
+  --ibiza-gradient: linear-gradient(
+    135deg,
+    var(--ibiza-pink),
+    var(--ibiza-orange)
+  );
 }
 
 .family-dashboard {
@@ -2953,7 +2956,11 @@ p {
 .family-dashboard .setup-card,
 .family-dashboard .notice {
   border: 1px solid rgb(255 255 255 / 70%);
-  background: linear-gradient(145deg, rgb(255 255 255 / 78%), rgb(255 247 255 / 56%));
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 78%),
+    rgb(255 247 255 / 56%)
+  );
   box-shadow: 0 1rem 2.8rem rgb(182 0 90 / 9%);
   -webkit-backdrop-filter: blur(24px) saturate(145%);
   backdrop-filter: blur(24px) saturate(145%);
@@ -3104,7 +3111,11 @@ p {
   border: 1px solid rgb(255 255 255 / 72%);
   border-radius: 1.5rem;
   color: var(--ibiza-text);
-  background: linear-gradient(145deg, rgb(255 255 255 / 76%), rgb(246 233 255 / 56%));
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 76%),
+    rgb(246 233 255 / 56%)
+  );
   box-shadow: 0 0.8rem 2.1rem rgb(182 0 90 / 7%);
   text-align: left;
   -webkit-backdrop-filter: blur(24px) saturate(145%);
@@ -3216,7 +3227,12 @@ p {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #ee0979 0%, #ff6a00 50%, #ee0979 100%);
+  background: linear-gradient(
+    90deg,
+    #ee0979 0%,
+    #ff6a00 50%,
+    #ee0979 100%
+  );
   background-size: 200% 100%;
   animation: family-dashboard-shimmer 2s linear infinite;
 }
@@ -3285,8 +3301,12 @@ p {
 }
 
 @keyframes family-dashboard-shimmer {
-  from { background-position: 100% 0; }
-  to { background-position: -100% 0; }
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
 }
 
 @media (max-width: 47.99rem) {
