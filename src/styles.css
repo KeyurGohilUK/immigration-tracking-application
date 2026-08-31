@@ -3844,8 +3844,12 @@ html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
 
 .member-profile-form .member-profile-control select {
   padding-right: 2.75rem;
-  background-image: none;
   cursor: pointer;
+}
+
+html[data-theme] .member-profile-form .member-profile-select-control select {
+  background-image: none;
+  background-repeat: no-repeat;
 }
 
 .member-profile-select-control::after {
