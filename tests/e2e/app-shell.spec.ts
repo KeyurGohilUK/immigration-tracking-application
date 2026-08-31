@@ -216,7 +216,9 @@ test("stores and manages encrypted documents for a profile", async ({
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Documents" }).first().click();
-  await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Documents", exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("No documents added yet")).toBeVisible();
 
   await page.getByRole("button", { name: "Add document" }).click();
@@ -511,7 +513,10 @@ test("permanently deletes all local application data", async ({ page }) => {
       termsAcceptance: localStorage.getItem("urbanfox-ilr:terms-acceptance"),
     };
   });
-  expect(localData).toEqual({ counts: [0, 0, 0, 0], termsAcceptance: null });
+  expect(localData).toEqual({
+    counts: [0, 0, 0, 0, 0],
+    termsAcceptance: null,
+  });
 
   await page.reload();
   await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
