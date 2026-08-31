@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added a gliding glass capsule that animates smoothly between mobile navigation items.",
+      "Added a centre ILR hero destination that brings every household member’s final ILR journey into one view.",
     ),
   ).toBeVisible();
   await expect(
@@ -1073,6 +1073,27 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 
+test("opens the centre ILR hero journey for the household", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  const ilrLinks = page.getByRole("link", { name: "ILR", exact: true });
+  await expect(ilrLinks.first()).toBeVisible();
+  await ilrLinks.first().click();
+
+  await expect(
+    page.getByRole("heading", { name: "Your ILR journey" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Final ILR timeline" }),
+  ).toBeVisible();
+  await expect(page.getByText(TEST_PROFILE.name)).toBeVisible();
+  await expect(page.getByText("Setup incomplete")).toBeVisible();
+  await expect(page.getByText("Not available yet").first()).toBeVisible();
+});
+
 test("glides the active mobile navigation capsule between sections", async ({
   page,
 }, testInfo) => {
@@ -1108,6 +1129,17 @@ test("glides the active mobile navigation capsule between sections", async ({
       ),
     )
     .not.toBe(initialTransform);
+
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+  await expect
+    .poll(() =>
+      page
+        .getByRole("navigation", { name: "Primary navigation" })
+        .evaluate((element) =>
+          element.style.getPropertyValue("--mobile-navigation-offset"),
+        ),
+    )
+    .toBe("200%");
 });
 
 test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
