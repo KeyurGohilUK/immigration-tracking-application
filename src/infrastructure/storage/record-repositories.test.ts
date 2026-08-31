@@ -30,7 +30,7 @@ describe("encrypted repository save boundaries", () => {
     const permission: ImmigrationPermission = {
       version: 2,
       id: "permission-1",
-      profileId: "member-1",
+      profileId: "member-2",
       route: "skilled-worker",
       otherRouteName: "",
       role: "main-applicant",
