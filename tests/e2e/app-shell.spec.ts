@@ -1104,7 +1104,9 @@ test("glides the active mobile navigation capsule between sections", async ({
 
   await expect
     .poll(() =>
-      indicator.evaluate((element) => window.getComputedStyle(element).transform),
+      indicator.evaluate(
+        (element) => window.getComputedStyle(element).transform,
+      ),
     )
     .not.toBe(initialTransform);
 });
