@@ -137,9 +137,9 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
   ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Forgot PIN?" }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Forgot PIN?" })).toHaveCount(
+    0,
+  );
 });
 
 test("keeps the legal action inside the desktop viewport", async ({
