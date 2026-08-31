@@ -1,61 +1,65 @@
 import { renderAppShell } from "../../../app/app";
 import { APP_VERSION } from "../../../configuration/release-metadata";
+import type { OwnerProfile } from "../../household/domain/owner-profile";
 import { renderDeleteDataDialog } from "./delete-data-dialog";
 
-export function renderMorePage(root: HTMLElement): void {
+export function renderMorePage(
+  root: HTMLElement,
+  owner: OwnerProfile,
+  householdSize: number,
+): void {
   renderAppShell(
     root,
     "More",
-    `<main id="main-content" class="more-main">
-      <header class="more-heading">
+    `<main id="main-content" class="more-main profile-main">
+      <header class="more-heading profile-heading">
         <p class="eyebrow">Your private space</p>
-        <h1>More</h1>
-        <p>Manage this device, review important information, and keep your local records safe.</p>
+        <h1>Profile & settings</h1>
+        <p>Manage this local household, device security, backups, and app information.</p>
       </header>
 
+      <section class="profile-summary" aria-labelledby="profile-name">
+        <div id="profile-avatar" class="profile-avatar" aria-hidden="true"></div>
+        <div class="profile-summary-copy"><p class="eyebrow">Household owner</p><h2 id="profile-name"></h2><p>Local profile · No online account</p><div class="profile-badges"><span>${householdSize} ${householdSize === 1 ? "person" : "people"}</span><span><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Encrypted locally</span></div></div>
+      </section>
+
       <div class="more-grid">
-        <section class="more-card" aria-labelledby="local-data-title">
-          <div class="more-card-heading">
-            <span class="more-card-icon" aria-hidden="true">⌂</span>
-            <div><p class="eyebrow">Data and privacy</p><h2 id="local-data-title">Stored only on this device</h2></div>
+        <section class="more-card settings-group" aria-labelledby="privacy-settings-title">
+          <div class="more-card-heading settings-group-heading">
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+            <div><p class="eyebrow">Privacy and security</p><h2 id="privacy-settings-title">Protect this device</h2></div>
           </div>
-          <p>Your household, permission, and travel records are stored in this browser and encrypted while the app is locked.</p>
-          <p class="local-data-banner"><strong>No online account or app database.</strong> Clearing browser data, uninstalling the app, or losing this device can remove your records.</p>
+          <div class="settings-list">
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4Z"/><path d="M8 7V5h8v2M8 12h8"/></svg></span><div><h3 id="local-data-title">Stored only on this device</h3><p>Encrypted while UrbanFox is locked; there is no online app database.</p></div><span class="settings-state">Local</span></div>
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><div><h3>App lock</h3><p>Require the four-digit PIN before records can be viewed again.</p></div><button id="lock-from-more" class="settings-row-action" type="button">Lock now</button></div>
+          </div>
         </section>
 
-        <section class="more-card" aria-labelledby="backup-title">
+        <section class="more-card backup-card" aria-labelledby="backup-title">
           <div class="more-card-heading">
-            <span class="more-card-icon" aria-hidden="true">⇩</span>
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span>
             <div><p class="eyebrow">Data safety</p><h2 id="backup-title">Backup and restore</h2></div>
           </div>
           <p>Download all current household records as one password-protected file. The backup password is separate from your four-digit PIN.</p>
-          <button id="create-backup" class="primary-button more-action" type="button">Create encrypted backup</button>
-          <button id="restore-backup" class="secondary-button more-action" type="button">Restore encrypted backup</button>
+          <div class="more-action-group"><button id="create-backup" class="primary-button more-action" type="button">Create encrypted backup</button><button id="restore-backup" class="secondary-button more-action" type="button">Restore encrypted backup</button></div>
           <p id="backup-status" class="more-card-status" role="status"></p>
           <p class="field-guidance">Keep each backup file and its password somewhere safe and separate.</p>
         </section>
 
-        <section class="more-card" aria-labelledby="security-title">
-          <div class="more-card-heading">
-            <span class="more-card-icon" aria-hidden="true">⌑</span>
-            <div><p class="eyebrow">Security</p><h2 id="security-title">Lock this private space</h2></div>
+        <section class="more-card settings-group app-settings-card" aria-labelledby="app-settings-title">
+          <div class="more-card-heading settings-group-heading">
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span>
+            <div><p class="eyebrow">App and information</p><h2 id="app-settings-title">UrbanFox settings</h2></div>
           </div>
-          <p>Lock UrbanFox before handing your device to someone else. Your four-digit PIN will be required to reopen it.</p>
-          <button id="lock-from-more" class="secondary-button more-action" type="button">Lock now</button>
-        </section>
-
-        <section class="more-card" aria-labelledby="legal-title">
-          <div class="more-card-heading">
-            <span class="more-card-icon" aria-hidden="true">i</span>
-            <div><p class="eyebrow">Important information</p><h2 id="legal-title">Terms, privacy, and licence</h2></div>
+          <div class="settings-list">
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span><div><h3>Install and updates</h3><p>Version ${APP_VERSION} · Check for a newer cached app.</p></div><button id="open-install-settings" class="settings-row-action" type="button">Open</button></div>
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg></span><div><h3 id="legal-title">Terms, privacy, and licence</h3><p>Review the tracking disclaimer, privacy notice and proprietary licence.</p></div><button id="view-legal" class="settings-row-action" type="button" aria-label="View legal information">View</button></div>
           </div>
-          <p>Review the tracking-only disclaimer, local privacy notice, app information, and proprietary licence.</p>
-          <button id="view-legal" class="secondary-button more-action" type="button">View legal information</button>
         </section>
 
         <section class="more-card danger-zone" aria-labelledby="delete-data-title">
           <div class="more-card-heading">
-            <span class="more-card-icon" aria-hidden="true">×</span>
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg></span>
             <div><p class="eyebrow">Danger Zone</p><h2 id="delete-data-title">Delete all local data</h2></div>
           </div>
           <p>Permanently remove this household, every family member, permission and trip, the local PIN, and Terms acceptance from this browser.</p>
@@ -64,7 +68,7 @@ export function renderMorePage(root: HTMLElement): void {
         </section>
       </div>
 
-      <p class="more-version">UrbanFox ILR version ${APP_VERSION}</p>
+      <p class="more-version">UrbanFox ILR ${APP_VERSION} · Local-first household tracker</p>
     </main>
     <dialog id="backup-dialog" class="family-dialog" aria-labelledby="backup-dialog-title">
       <form id="backup-form" class="family-form" novalidate>
@@ -102,4 +106,9 @@ export function renderMorePage(root: HTMLElement): void {
     </dialog>
     ${renderDeleteDataDialog("unlocked")}`,
   );
+  const name = root.querySelector<HTMLElement>("#profile-name");
+  const avatar = root.querySelector<HTMLElement>("#profile-avatar");
+  if (name) name.textContent = owner.fullName;
+  if (avatar)
+    avatar.textContent = owner.fullName.trim().charAt(0).toUpperCase() || "?";
 }

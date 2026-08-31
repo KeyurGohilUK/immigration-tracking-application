@@ -97,13 +97,13 @@ test("shows install and update controls in every device header", async ({
     page.getByRole("dialog", { name: "Install and updates" }),
   ).toBeVisible();
   await expect(page.getByText("Installed")).toBeVisible();
-  await expect(page.getByText("Latest")).toBeVisible();
+  await expect(page.getByText("Latest", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Download updates" }),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Redesigned Immigration History as a responsive Liquid Glass permission timeline",
+      "Replaced More with a responsive Liquid Glass Profile and Settings experience",
     ),
   ).toBeVisible();
   await expect(
@@ -246,19 +246,31 @@ test("resets local data safely when the PIN is forgotten", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("exports and restores an encrypted backup from More", async ({ page }) => {
+test("manages the local profile and encrypted backups", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
 
   await expect(
     page.getByText("On this device", { exact: true }),
   ).toBeAttached();
-  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
 
-  await expect(page.getByRole("heading", { name: "More" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Profile & settings" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: TEST_PROFILE.name, level: 2 }),
+  ).toBeVisible();
+  await expect(page.getByText("1 person", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Encrypted locally", { exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Stored only on this device" }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Open", exact: true }).click();
+  await expect(page.locator("#app-manager-title")).toBeVisible();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
   await page.getByRole("button", { name: "Create encrypted backup" }).click();
   await page.getByLabel("Backup password", { exact: true }).fill("too-short");
   await page.getByLabel("Confirm backup password").fill("too-short");
@@ -302,7 +314,7 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
     page.getByRole("heading", { name: "Temporary Family Member", exact: true }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
   await page.getByLabel("Encrypted backup file").setInputFiles({
     name: "urbanfox-ilr-backup.json",
@@ -343,14 +355,16 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
   ).toBeVisible();
   await page.getByRole("link", { name: "Family", exact: true }).click();
   await expect(page.getByText("No family members added yet")).toBeVisible();
-  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await page.getByRole("button", { name: "View legal information" }).click();
   await expect(
     page.getByRole("heading", { name: "Terms and privacy" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
-  await expect(page.getByRole("heading", { name: "More" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Profile & settings" }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Lock now" }).click();
   await expect(
@@ -361,7 +375,7 @@ test("exports and restores an encrypted backup from More", async ({ page }) => {
 test("permanently deletes all local application data", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page.getByRole("link", { name: "More", exact: true }).click();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Delete all local data" }),
   ).toBeVisible();
