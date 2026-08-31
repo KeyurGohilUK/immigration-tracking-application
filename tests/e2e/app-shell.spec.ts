@@ -485,11 +485,11 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
   );
   await expect(page.getByLabel("Date of birth")).toHaveCSS(
     "border-radius",
-    "12px",
+    "16px",
   );
   await expect(page.getByLabel("Immigration role")).toHaveCSS(
     "border-radius",
-    "12px",
+    "16px",
   );
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
