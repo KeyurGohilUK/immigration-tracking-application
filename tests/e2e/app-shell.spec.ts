@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added automated accessibility audits and visual theme regression coverage for the Ibiza light/dark design system.",
+      "Redesigned Documents as a Liquid Glass Document Vault with applicant switching, vault progress, category overview, and a prominent PDF pack action.",
     ),
   ).toBeVisible();
   await expect(
@@ -239,11 +239,23 @@ test("stores and manages encrypted documents for a profile", async ({
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page.getByRole("link", { name: "Documents" }).first().click();
+  await page.getByRole("link", { name: "Vault" }).first().click();
   await expect(
-    page.getByRole("heading", { name: "Documents", exact: true }),
+    page.getByRole("heading", { name: "Document Vault", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("No documents added yet")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Identity & Immigration" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Address History" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Final Application Documents" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Download PDF pack" }),
+  ).toBeDisabled();
 
   await page.getByRole("button", { name: "Add document" }).click();
   const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
@@ -264,6 +276,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(
     page.getByRole("heading", { name: "Council tax statement" }),
   ).toBeVisible();
+  const addressRow = page
+    .locator(".vault-category-row")
+    .filter({ hasText: "Address History" });
+  await expect(addressRow.getByText("COMPLETE")).toBeVisible();
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {

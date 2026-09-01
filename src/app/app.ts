@@ -20,7 +20,7 @@ const navigationItems = [
   },
   {
     id: "Documents",
-    label: "Documents",
+    label: "Vault",
     icon: '<path d="M6 3h9l4 4v14H6Z" /><path d="M15 3v5h4M9 12h7M9 16h7" />',
   },
   {

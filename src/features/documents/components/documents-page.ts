@@ -38,11 +38,13 @@ export function renderDocumentsPage(
   renderAppShell(
     root,
     "Documents",
-    `<main id="main-content" class="record-main documents-main">
-      <section class="record-heading documents-heading" aria-labelledby="documents-title"><div><p class="eyebrow">Encrypted local files</p><h1 id="documents-title">Documents</h1><p>Keep each person’s supporting files separate and available on this device.</p></div><div class="record-heading-actions document-heading-actions"><button id="download-document-pack" class="secondary-button compact-button" type="button" ${documents.length === 0 ? "disabled" : ""}><span aria-hidden="true">⇩</span> Download PDF pack</button><button id="add-document" class="primary-button compact-button" type="button"><span aria-hidden="true">＋</span> Add document</button></div></section>
-      <section class="documents-profile-picker" aria-label="Choose a profile for documents">${renderPersonSwitcherMarkup()}</section>
-      <section class="document-summary-grid" aria-label="Local document summary"><article class="document-summary-card"><p class="eyebrow">Selected profile</p><p class="document-summary-value"><span id="document-count">${documents.length}</span><small>${documents.length === 1 ? "document" : "documents"}</small></p><p>Up to 25 encrypted files per person</p></article><article class="document-summary-card"><p class="eyebrow">Document storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
-      <aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups now include documents</h2><p>New encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
+    `<main id="main-content" class="record-main documents-main document-vault-main">
+      <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true">▣</span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div><div class="record-heading-actions document-heading-actions"><button id="add-document" class="vault-add-button" type="button"><span aria-hidden="true">＋</span> Add document</button></div></section>
+      <section class="documents-profile-picker vault-profile-picker" aria-label="Choose a profile for documents">${renderVaultMemberStrip(members, selectedProfileId)}<div class="documents-profile-select">${renderPersonSwitcherMarkup()}</div></section>
+      <section class="document-summary-grid vault-summary-grid" aria-label="Local document summary"><article class="document-summary-card vault-readiness-card"><p class="eyebrow">Selected profile</p><div class="vault-readiness-line"><p class="document-summary-value"><span id="document-count">${documents.length}</span><small>${documents.length === 1 ? "document" : "documents"}</small></p><span class="vault-ready-label">${documents.length > 0 ? "In progress" : "To do"}</span></div><div class="vault-readiness-track" aria-hidden="true"><span style="--vault-readiness-progress: ${Math.min(100, documents.length * 12)}%"></span></div><p>Build this applicant’s evidence pack section by section.</p></article><article class="document-summary-card vault-storage-card"><p class="eyebrow">Encrypted storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
+      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(documents)}</section>
+<section class="vault-download-panel"><button id="download-document-pack" class="vault-download-button" type="button" ${documents.length === 0 ? "disabled" : ""}><span aria-hidden="true">⇩</span> Download PDF pack</button></section>
+<aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups include documents</h2><p>Encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
       <section class="documents-panel" aria-labelledby="document-list-title"><div class="section-heading"><div><p class="eyebrow">Selected profile</p><h2 id="document-list-title">Document collection</h2></div></div><div id="document-list" class="document-list"></div></section>
       <p id="document-page-error" class="form-error" role="alert" hidden></p>
     </main>
@@ -77,6 +79,7 @@ export function renderDocumentsPage(
     })}`,
   );
   populatePersonSwitcher(root, members, selectedProfileId);
+  wireVaultMemberStrip(root);
   const list = root.querySelector<HTMLElement>("#document-list");
   if (!list) throw new Error("Documents could not be rendered.");
   if (documents.length === 0) {
@@ -94,6 +97,118 @@ export function renderDocumentsPage(
   );
 }
 
+const vaultCategoryRows = [
+  {
+    label: "Identity & Immigration",
+    detail: "Passport and immigration evidence",
+    icon: "⌾",
+    categories: ["passport", "immigration-evidence"] as DocumentCategory[],
+  },
+  {
+    label: "Address History",
+    detail: "Proof of address and residence history",
+    icon: "⌂",
+    categories: ["address-proof"] as DocumentCategory[],
+  },
+  {
+    label: "Employment",
+    detail: "Employer letters and contracts",
+    icon: "▣",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Salary & Tax",
+    detail: "Payslips, P60s and tax evidence",
+    icon: "£",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Travel & Absences",
+    detail: "Travel evidence supporting your timeline",
+    icon: "✈",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Life in the UK & English",
+    detail: "Test and English-language evidence",
+    icon: "◇",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Family / Dependants",
+    detail: "Relationship and dependant evidence",
+    icon: "♟",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Final Application Documents",
+    detail: "Final forms and submission evidence",
+    icon: "▤",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Additional Documents",
+    detail: "Anything else supporting the application",
+    icon: "＋",
+    categories: ["other"] as DocumentCategory[],
+  },
+] as const;
+
+function renderVaultCategoryRows(documents: DocumentMetadata[]): string {
+  return vaultCategoryRows
+    .map((row) => {
+      const count = documents.filter((document) =>
+        row.categories.includes(document.category),
+      ).length;
+      const complete = count > 0;
+      const emphasis =
+        row.label === "Employment"
+          ? " is-warm"
+          : row.label === "Salary & Tax"
+            ? " is-attention"
+            : "";
+      return `<article class="vault-category-row${complete ? " is-active" : ""}${emphasis}"><span class="vault-category-icon" aria-hidden="true">${row.icon}</span><div><h2>${row.label}</h2><p>${complete ? `${count} stored · ${row.detail}` : row.detail}</p></div><span class="vault-category-status">${complete ? "COMPLETE" : "TO DO"}</span><span class="vault-category-state" aria-hidden="true">${complete ? "✓" : "○"}</span></article>`;
+    })
+    .join("");
+}
+function renderVaultMemberStrip(
+  members: HouseholdMember[],
+  selectedProfileId: string,
+): string {
+  return `<div class="vault-profile-rail" role="list">${members
+    .map((member) => {
+      const selected = member.id === selectedProfileId;
+      const initial = member.fullName.trim().charAt(0).toUpperCase() || "?";
+      const firstName =
+        member.fullName.trim().split(/\s+/)[0] || member.fullName;
+      return `<button class="vault-profile-chip${selected ? " is-selected" : ""}" type="button" data-vault-profile="${member.id}" ${selected ? 'aria-current="true"' : ""}><span class="vault-profile-avatar" aria-hidden="true">${initial}</span><span>${escapeVaultLabel(firstName)}</span></button>`;
+    })
+    .join("")}</div>`;
+}
+
+function wireVaultMemberStrip(root: HTMLElement): void {
+  const select = root.querySelector<HTMLSelectElement>("#active-person");
+  if (!select) return;
+  for (const button of root.querySelectorAll<HTMLButtonElement>(
+    "[data-vault-profile]",
+  )) {
+    button.addEventListener("click", () => {
+      const profileId = button.dataset.vaultProfile;
+      if (!profileId || profileId === select.value) return;
+      select.value = profileId;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  }
+}
+
+function escapeVaultLabel(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 function createDocumentCard(
   document: DocumentMetadata,
   isFirst: boolean,
