@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed the ILR hero menu highlight so the Ibiza orange treatment aligns with the moving active capsule.",
+      "Reduced the floating menu height so the selected ILR state reads as a proper capsule instead of a large rounded block.",
     ),
   ).toBeVisible();
   await expect(
@@ -1112,6 +1112,15 @@ test("opens the centre ILR hero journey for the household", async ({
     "color",
     "rgb(255, 255, 255)",
   );
+
+  if (testInfo.project.name === "mobile-chromium") {
+    const navigationBox = await navigation.boundingBox();
+    const indicatorBox = await indicator.boundingBox();
+    expect(navigationBox).not.toBeNull();
+    expect(indicatorBox).not.toBeNull();
+    expect(navigationBox?.height ?? 0).toBeLessThanOrEqual(72);
+    expect(indicatorBox?.width ?? 0).toBeGreaterThan(indicatorBox?.height ?? 0);
+  }
 
   await expect(
     page.getByRole("heading", { name: "Your ILR journey" }),
