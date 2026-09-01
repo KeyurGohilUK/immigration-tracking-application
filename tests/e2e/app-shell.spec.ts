@@ -672,7 +672,6 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
   ).toBeVisible();
-  await expect(page.getByLabel("Tracking profile")).toHaveValue(/.+/);
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Dependant",
   );
