@@ -1,6 +1,41 @@
 :root {
-  color: #111111;
-  background: #ffffff;
+  --ibiza-pink: #ee0979;
+  --ibiza-orange: #ff6a00;
+  --ibiza-primary: #b6005a;
+  --ibiza-surface: #fff7ff;
+  --ibiza-surface-container: #f6e9ff;
+  --ibiza-surface-high: #f2e3ff;
+  --ibiza-text: #231437;
+  --ibiza-text-muted: #5b3f46;
+  --ibiza-outline: #e3bdc5;
+  --ibiza-gradient: linear-gradient(
+    135deg,
+    var(--ibiza-pink),
+    var(--ibiza-orange)
+  );
+  --colour-canvas: var(--ibiza-surface);
+  --colour-surface: var(--ibiza-surface-container);
+  --colour-surface-strong: var(--ibiza-surface-high);
+  --colour-border: var(--ibiza-outline);
+  --colour-text-muted: var(--ibiza-text-muted);
+  --colour-text: var(--ibiza-text);
+  --colour-strong: var(--ibiza-primary);
+  --colour-on-strong: #ffffff;
+  --colour-danger: #9a341f;
+  --colour-danger-hover: #7a2818;
+  --colour-danger-surface: rgb(255 236 232 / 82%);
+  --colour-on-danger: #ffffff;
+  --glass-surface: rgb(255 247 255 / 68%);
+  --glass-surface-strong: rgb(255 247 255 / 84%);
+  --glass-border: rgb(182 0 90 / 14%);
+  --glass-shadow:
+    0 0.8rem 2.4rem rgb(182 0 90 / 8%),
+    inset 0 1px 0 rgb(255 255 255 / 68%);
+  --radius-small: 0.75rem;
+  --radius-medium: 1.25rem;
+  --radius-large: 1.75rem;
+  color: var(--colour-text);
+  background: var(--colour-canvas);
   font-family:
     Inter,
     ui-sans-serif,
@@ -10,25 +45,6 @@
     sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --colour-canvas: #ffffff;
-  --colour-surface: #f7f7f5;
-  --colour-surface-strong: #efefed;
-  --colour-border: #d8d8d4;
-  --colour-text-muted: #62625e;
-  --colour-text: #111111;
-  --colour-strong: #000000;
-  --colour-on-strong: #ffffff;
-  --colour-danger: #9a341f;
-  --colour-danger-hover: #7a2818;
-  --colour-danger-surface: rgb(255 246 243 / 82%);
-  --colour-on-danger: #ffffff;
-  --glass-surface: rgb(255 255 255 / 68%);
-  --glass-surface-strong: rgb(255 255 255 / 82%);
-  --glass-border: rgb(17 17 17 / 14%);
-  --glass-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 7%);
-  --radius-small: 0.75rem;
-  --radius-medium: 1.25rem;
-  --radius-large: 1.75rem;
 }
 
 * {
@@ -47,6 +63,11 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0;
+  color: var(--colour-text);
+  background:
+    radial-gradient(circle at 10% 8%, rgb(238 9 121 / 7%), transparent 26rem),
+    radial-gradient(circle at 90% 12%, rgb(255 106 0 / 6%), transparent 24rem),
+    var(--colour-canvas);
 }
 
 .splash-screen {
@@ -86,7 +107,7 @@ body {
   align-items: center;
   padding: 0.75rem max(1.25rem, calc((100vw - 72rem) / 2));
   border-bottom: 1px solid var(--colour-border);
-  background: rgb(255 255 255 / 82%);
+  background: rgb(255 247 255 / 82%);
   -webkit-backdrop-filter: blur(1rem) saturate(140%);
   backdrop-filter: blur(1rem) saturate(140%);
 }
@@ -120,10 +141,12 @@ body {
   min-width: 10rem;
   margin-top: 1.5rem;
   padding: 0 1.25rem;
-  border: 2px solid #000000;
+  border: 0;
   color: #ffffff;
-  background: #000000;
-  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 18%);
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.65rem 1.5rem rgb(238 9 121 / 20%),
+    0 0 1.4rem rgb(255 106 0 / 10%);
   opacity: 1;
 }
 
@@ -202,7 +225,7 @@ body {
   padding: 0.85rem;
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-small);
-  background: rgb(255 255 255 / 96%);
+  background: rgb(255 247 255 / 96%);
 }
 .legal-content {
   display: grid;
@@ -665,11 +688,13 @@ a {
   margin-left: auto;
   padding: 0;
   place-items: center;
-  border: 2px solid #000000;
+  border: 1px solid rgb(238 9 121 / 20%);
   border-radius: 50%;
   color: #ffffff;
-  background: #000000;
-  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 18%);
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.45rem 1.2rem rgb(238 9 121 / 20%),
+    inset 0 1px 0 rgb(255 255 255 / 24%);
 }
 
 .header-actions .app-manager-trigger {
@@ -791,7 +816,7 @@ a:focus-visible {
   min-height: 4.5rem;
   padding: max(0.75rem, env(safe-area-inset-top)) 1.25rem 0.75rem;
   border-bottom: 1px solid var(--colour-border);
-  background: rgb(255 255 255 / 82%);
+  background: rgb(255 247 255 / 82%);
   -webkit-backdrop-filter: blur(1rem) saturate(140%);
   backdrop-filter: blur(1rem) saturate(140%);
   transition:
@@ -2548,15 +2573,16 @@ p {
   min-height: 2.75rem;
   border: 0;
   border-radius: var(--radius-small);
-  color: var(--colour-on-strong);
-  background: var(--colour-strong);
+  color: #ffffff;
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.5rem 1.25rem rgb(238 9 121 / 16%),
+    0 0 1rem rgb(255 106 0 / 8%);
   font-weight: 750;
 }
 
 .primary-button.landing-action {
   width: auto;
-  color: #ffffff;
-  background: #000000;
 }
 
 .desktop-navigation {
@@ -3174,23 +3200,6 @@ p {
 
 /* Ibiza Sunset Liquid Glass — family home */
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Manrope:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap");
-
-:root {
-  --ibiza-pink: #ee0979;
-  --ibiza-orange: #ff6a00;
-  --ibiza-primary: #b6005a;
-  --ibiza-surface: #fff7ff;
-  --ibiza-surface-container: #f6e9ff;
-  --ibiza-surface-high: #f2e3ff;
-  --ibiza-text: #231437;
-  --ibiza-text-muted: #5b3f46;
-  --ibiza-outline: #e3bdc5;
-  --ibiza-gradient: linear-gradient(
-    135deg,
-    var(--ibiza-pink),
-    var(--ibiza-orange)
-  );
-}
 
 .family-dashboard {
   width: min(100%, 80rem);
