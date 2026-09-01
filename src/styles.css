@@ -3570,8 +3570,9 @@ p {
 .mobile-navigation {
   --mobile-navigation-offset: 0%;
   --mobile-navigation-padding-x: 0.6rem;
-  --mobile-navigation-padding-y: 0.45rem;
-  min-height: 4.75rem;
+  --mobile-navigation-padding-y: 0.35rem;
+  --mobile-navigation-indicator-inset-y: 0.45rem;
+  min-height: 4.25rem;
   padding: var(--mobile-navigation-padding-y) var(--mobile-navigation-padding-x);
   border-radius: 999px;
   isolation: isolate;
@@ -3582,7 +3583,7 @@ p {
 }
 
 .mobile-navigation a {
-  min-height: 3.65rem;
+  min-height: 3.2rem;
   margin: 0 0.15rem;
   border-radius: 999px;
   transition:
@@ -3610,8 +3611,8 @@ p {
 .mobile-navigation-indicator {
   position: absolute;
   z-index: 0;
-  top: var(--mobile-navigation-padding-y);
-  bottom: var(--mobile-navigation-padding-y);
+  top: var(--mobile-navigation-indicator-inset-y);
+  bottom: var(--mobile-navigation-indicator-inset-y);
   left: var(--mobile-navigation-padding-x);
   width: calc((100% - (2 * var(--mobile-navigation-padding-x))) / 5);
   border-radius: 999px;
@@ -3641,13 +3642,13 @@ p {
 }
 
 .mobile-navigation a[data-navigation="ILR"] {
-  min-height: 4rem;
+  min-height: 3.4rem;
   color: var(--ibiza-primary);
 }
 
 .mobile-navigation a[data-navigation="ILR"] svg {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 1.85rem;
+  height: 1.85rem;
   transform: translateY(-0.05rem);
 }
 
@@ -3668,7 +3669,7 @@ p {
 }
 
 .mobile-navigation.is-scroll-compact a[data-navigation="ILR"] {
-  min-height: 3.55rem;
+  min-height: 3.05rem;
 }
 
 .mobile-navigation.is-scroll-compact a[data-navigation="ILR"] svg {
@@ -3690,11 +3691,12 @@ p {
 
 .mobile-navigation.is-scroll-compact {
   --mobile-navigation-padding-x: 0.55rem;
-  --mobile-navigation-padding-y: 0.35rem;
+  --mobile-navigation-padding-y: 0.3rem;
+  --mobile-navigation-indicator-inset-y: 0.38rem;
   right: 1.5rem;
   left: 1.5rem;
   max-width: 28rem;
-  min-height: 4.15rem;
+  min-height: 3.75rem;
   padding: var(--mobile-navigation-padding-y) var(--mobile-navigation-padding-x);
   border-radius: 999px;
   background: rgb(255 255 255 / 64%);
@@ -3704,7 +3706,7 @@ p {
 }
 
 .mobile-navigation.is-scroll-compact a {
-  min-height: 3.3rem;
+  min-height: 2.9rem;
 }
 
 .mobile-navigation.is-scroll-compact svg {
