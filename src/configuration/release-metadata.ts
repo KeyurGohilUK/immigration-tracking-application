@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.3.0";
+export const APP_VERSION = "3.4.0";
 
 export const RELEASE_NOTES = [
-  "Added a real Document Vault taxonomy and readiness engine with expandable evidence checklists, section-aware uploads, and stronger frontend maintenance standards.",
+  "Added the encrypted structured Address History foundation for Document Vault, including route-aware required periods and gap/overlap checks.",
 ] as const;
