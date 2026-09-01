@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed dropdown rendering across the app by removing the tiled custom arrow background and using the browser’s native select indicator, including iPhone/iPad Safari.",
+      "Redesigned Travel Timeline with Ibiza Sunset bento cards, rolling 180-day absence status, ILR estimate, and richer recent-trip cards.",
     ),
   ).toBeVisible();
   await expect(
@@ -855,11 +855,12 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await page.getByRole("link", { name: "Travel", exact: true }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Travel timeline" }),
+    page.getByRole("heading", { name: "Travel Timeline" }),
   ).toBeVisible();
-  await expect(page.getByText("Recorded complete days")).toBeVisible();
+  await expect(page.getByText("Absence Limit")).toBeVisible();
+  await expect(page.getByText("Recorded travel")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Timeline", exact: true }),
+    page.getByRole("heading", { name: "Recent Travel", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("No trips recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add trip" }).click();
@@ -873,8 +874,8 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await expect(
     page.getByRole("heading", { name: "India", level: 3 }),
   ).toBeVisible();
-  await expect(page.getByText("Manual review flagged")).toBeVisible();
-  await expect(page.getByText("8", { exact: true })).toBeVisible();
+  await expect(page.getByText("Manual review", { exact: true })).toBeVisible();
+  await expect(page.getByText("8 Days", { exact: true })).toBeVisible();
   const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
   const storedTrip = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -907,14 +908,14 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await page.getByRole("button", { name: "Edit trip to India" }).click();
   await page.getByLabel(/UK return date/).fill("2024-02-12");
   await page.getByRole("button", { name: "Save trip" }).click();
-  await expect(page.getByText("2024-02-12")).toBeVisible();
+  await expect(page.getByText(/12 Feb 2024/)).toBeVisible();
 
   await page.getByRole("button", { name: "Add trip" }).click();
   await page.getByLabel("UK departure date").fill("2025-01-01");
   await page.getByLabel("Destination").fill("Canada");
   await page.getByRole("button", { name: "Save trip" }).click();
   await expect(page.getByText("Open trip", { exact: true })).toBeVisible();
-  await expect(page.getByText("Pending return")).toBeVisible();
+  await expect(page.getByText(/Still away/)).toBeVisible();
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
