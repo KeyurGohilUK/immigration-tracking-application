@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added a real Document Vault taxonomy and readiness engine with expandable evidence checklists, section-aware uploads, and stronger frontend maintenance standards.",
+      "Added the encrypted structured Address History foundation for Document Vault, including route-aware required periods and gap/overlap checks.",
     ),
   ).toBeVisible();
   await expect(
@@ -442,7 +442,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   const backup = JSON.parse(backupText) as Record<string, unknown>;
   expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
   expect(backup.version).toBe(1);
-  expect(backup.dataSchemaVersion).toBe(5);
+  expect(backup.dataSchemaVersion).toBe(6);
   expect(backupText).not.toContain(TEST_PROFILE.name);
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
