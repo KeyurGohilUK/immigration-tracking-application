@@ -40,7 +40,7 @@ export function renderDocumentsPage(
     "Documents",
     `<main id="main-content" class="record-main documents-main">
       <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true">▣</span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div><div class="record-heading-actions document-heading-actions"><button id="add-document" class="vault-add-button" type="button"><span aria-hidden="true">＋</span> Add document</button></div></section>
-      <section class="documents-profile-picker" aria-label="Choose a profile for documents">${renderPersonSwitcherMarkup()}</section>
+      <section class="documents-profile-picker vault-profile-picker" aria-label="Choose a profile for documents">${renderVaultMemberStrip(members, selectedProfileId)}<div class="documents-profile-select">${renderPersonSwitcherMarkup()}</div></section>
       <section class="document-summary-grid vault-summary-grid" aria-label="Local document summary"><article class="document-summary-card vault-readiness-card"><p class="eyebrow">Selected profile</p><div class="vault-readiness-line"><p class="document-summary-value"><span id="document-count">${documents.length}</span><small>${documents.length === 1 ? "document" : "documents"}</small></p><span class="vault-ready-label">${documents.length > 0 ? "In progress" : "To do"}</span></div><div class="vault-readiness-track" aria-hidden="true"><span style="--vault-readiness-progress: ${Math.min(100, documents.length * 12)}%"></span></div><p>Build this applicant’s evidence pack section by section.</p></article><article class="document-summary-card vault-storage-card"><p class="eyebrow">Encrypted storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
       <section class="vault-category-list" aria-label="Document Vault categories">
   <article class="vault-category-row is-active"><span class="vault-category-icon" aria-hidden="true">⌾</span><div><h2>Identity & Immigration</h2><p>Passport and immigration evidence</p></div><span class="vault-category-status">READY</span><span class="vault-category-state" aria-hidden="true">✓</span></article>
@@ -89,6 +89,7 @@ export function renderDocumentsPage(
     })}`,
   );
   populatePersonSwitcher(root, members, selectedProfileId);
+  wireVaultMemberStrip(root);
   const list = root.querySelector<HTMLElement>("#document-list");
   if (!list) throw new Error("Documents could not be rendered.");
   if (documents.length === 0) {
@@ -106,6 +107,41 @@ export function renderDocumentsPage(
   );
 }
 
+function renderVaultMemberStrip(
+  members: HouseholdMember[],
+  selectedProfileId: string,
+): string {
+  return `<div class="vault-profile-rail" role="list">${members
+    .map((member) => {
+      const selected = member.id === selectedProfileId;
+      const initial = member.fullName.trim().charAt(0).toUpperCase() || "?";
+      const firstName = member.fullName.trim().split(/\s+/)[0] || member.fullName;
+      return `<button class="vault-profile-chip${selected ? " is-selected" : ""}" type="button" data-vault-profile="${member.id}" ${selected ? 'aria-current="true"' : ""}><span class="vault-profile-avatar" aria-hidden="true">${initial}</span><span>${escapeVaultLabel(firstName)}</span></button>`;
+    })
+    .join("")}</div>`;
+}
+
+function wireVaultMemberStrip(root: HTMLElement): void {
+  const select = root.querySelector<HTMLSelectElement>("#active-person");
+  if (!select) return;
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-vault-profile]")) {
+    button.addEventListener("click", () => {
+      const profileId = button.dataset.vaultProfile;
+      if (!profileId || profileId === select.value) return;
+      select.value = profileId;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  }
+}
+
+function escapeVaultLabel(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 function createDocumentCard(
   document: DocumentMetadata,
   isFirst: boolean,
