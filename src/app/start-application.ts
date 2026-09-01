@@ -749,7 +749,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             )
           )
             return;
-          const nextEntries = addressHistory.filter(({ id }) => id !== entry.id);
+          const nextEntries = addressHistory.filter(
+            ({ id }) => id !== entry.id,
+          );
           try {
             await saveAddressHistory(selectedProfileId, nextEntries, key);
             addressHistoryCache.set(selectedProfileId, nextEntries);
