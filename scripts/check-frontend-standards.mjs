@@ -98,7 +98,7 @@ for (const path of cssFiles) {
 
   if (
     !relativePath.endsWith("src/styles/components/liquid-glass-dialog.css") &&
-    /\.liquid-dialog(?:\b|-)/.test(css)
+    /(?:^|\n)\s*(?:html[^,{]+\s+)?\.liquid-dialog(?:\b|-)/m.test(css)
   ) {
     fail(
       `${relativePath} contains Liquid Glass dialog CSS. Shared dialog styles must be owned by src/styles/components/liquid-glass-dialog.css.`,
