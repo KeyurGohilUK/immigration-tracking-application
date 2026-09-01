@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Improved dark-theme readability for the Household Status label and icon on the Family Overview card.",
+      "Fixed dropdown rendering across the app by removing the tiled custom arrow background and using the browser’s native select indicator, including iPhone/iPad Safari.",
     ),
   ).toBeVisible();
   await expect(
@@ -473,6 +473,7 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
 
   const theme = page.getByLabel("Theme preference");
   await expect(theme).toHaveValue("light");
+  await expect(theme).toHaveCSS("background-image", "none");
 
   await theme.selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
