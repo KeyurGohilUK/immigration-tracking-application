@@ -1,0 +1,108 @@
+.public-shell {
+  min-height: 100vh;
+  background: var(--colour-canvas);
+}
+
+.public-header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  padding: 0.75rem max(1.25rem, calc((100vw - 72rem) / 2));
+  border-bottom: 1px solid var(--colour-border);
+  background: rgb(255 247 255 / 82%);
+  -webkit-backdrop-filter: blur(1rem) saturate(140%);
+  backdrop-filter: blur(1rem) saturate(140%);
+}
+
+.landing-main {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.landing-hero {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.landing-copy h1 {
+  max-width: 13ch;
+  font-size: clamp(2.5rem, 10vw, 5rem);
+}
+
+.landing-introduction {
+  max-width: 52ch;
+  font-size: 1.05rem;
+}
+
+.landing-action {
+  appearance: none;
+  width: auto;
+  min-width: 10rem;
+  margin-top: 1.5rem;
+  padding: 0 1.25rem;
+  border: 0;
+  color: #ffffff;
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.65rem 1.5rem rgb(238 9 121 / 20%),
+    0 0 1.4rem rgb(255 106 0 / 10%);
+  opacity: 1;
+}
+
+.storage-note {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--colour-text-muted);
+}
+
+.freddy-hero {
+  display: grid;
+  min-height: 17rem;
+  place-content: center;
+  padding: 2rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-large);
+  background: var(--colour-surface);
+  text-align: center;
+}
+
+.freddy-hero > span {
+  display: grid;
+  width: 7rem;
+  height: 7rem;
+  margin: 0 auto 1rem;
+  place-items: center;
+  border: 1px dashed var(--colour-text-muted);
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.landing-notice {
+  margin-top: 1rem;
+}
+
+.public-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  padding: 1.25rem;
+  border-top: 1px solid var(--colour-border);
+}
+
+.public-footer button,
+.legal-navigation a {
+  border: 0;
+  color: var(--colour-text-muted);
+  background: transparent;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
