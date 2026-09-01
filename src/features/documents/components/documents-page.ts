@@ -225,11 +225,18 @@ function documentNode<K extends keyof HTMLElementTagNameMap>(
   return element;
 }
 
-export function showDocumentUploadForm(root: HTMLElement): void {
+export function showDocumentUploadForm(
+  root: HTMLElement,
+  category?: DocumentCategory,
+): void {
   const dialog = root.querySelector<HTMLDialogElement>("#document-dialog");
   const form = root.querySelector<HTMLFormElement>("#document-form");
   if (!dialog || !form) throw new Error("Document form is unavailable.");
   form.reset();
+  const categorySelect = form.elements.namedItem(
+    "category",
+  ) as HTMLSelectElement | null;
+  if (category && categorySelect) categorySelect.value = category;
   const error = form.querySelector<HTMLElement>("#document-form-error");
   if (error) {
     error.textContent = "";
