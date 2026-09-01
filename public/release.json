@@ -1,6 +1,6 @@
 {
-  "version": "3.5.0",
+  "version": "3.5.1",
   "notes": [
-    "Added the Address History Liquid Glass workflow with structured address editing, timeline gap checks, linked proof uploads, and readiness based on recorded coverage."
+    "Fixed iPhone date and month controls so form fields stay within Liquid Glass modals."
   ]
 }

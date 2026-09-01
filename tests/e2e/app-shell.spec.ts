@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added the Address History Liquid Glass workflow with structured address editing, timeline gap checks, linked proof uploads, and readiness based on recorded coverage.",
+      "Fixed iPhone date and month controls so form fields stay within Liquid Glass modals.",
     ),
   ).toBeVisible();
   await expect(
@@ -267,6 +267,26 @@ test("stores and manages encrypted documents for a profile", async ({
       .locator('[data-vault-section="final-application"]')
       .getByText("Required later"),
   ).toBeVisible();
+
+  const addressSection = page.locator('[data-vault-section="address-history"]');
+  await addressSection.locator("summary").click();
+  await addressSection.getByRole("button", { name: "Add document" }).click();
+  const addressDialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(addressDialog).toBeVisible();
+  for (const label of ["Start month", "End month"]) {
+    const inputBox = await addressDialog.getByLabel(label).boundingBox();
+    const dialogBox = await addressDialog.boundingBox();
+    expect(inputBox).not.toBeNull();
+    expect(dialogBox).not.toBeNull();
+    if (!inputBox || !dialogBox) continue;
+    expect(inputBox.x).toBeGreaterThanOrEqual(dialogBox.x);
+    expect(inputBox.x + inputBox.width).toBeLessThanOrEqual(
+      dialogBox.x + dialogBox.width + 1,
+    );
+  }
+  await addressDialog
+    .getByRole("button", { name: "Close address history" })
+    .click();
 
   const identitySection = page.locator(
     '[data-vault-section="identity-immigration"]',

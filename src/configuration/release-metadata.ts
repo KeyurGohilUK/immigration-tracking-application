@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.5.0";
+export const APP_VERSION = "3.5.1";
 
 export const RELEASE_NOTES = [
-  "Added the Address History Liquid Glass workflow with structured address editing, timeline gap checks, linked proof uploads, and readiness based on recorded coverage.",
+  "Fixed iPhone date and month controls so form fields stay within Liquid Glass modals.",
 ] as const;
