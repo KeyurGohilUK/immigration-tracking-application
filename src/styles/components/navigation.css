@@ -105,7 +105,7 @@
   padding: var(--mobile-navigation-padding-y) var(--mobile-navigation-padding-x);
   border-radius: 999px;
   isolation: isolate;
-  background: rgb(255 247 255 / 78%);
+  background: var(--ibiza-glass-medium);
   box-shadow:
     0 0.8rem 2.2rem rgb(0 0 0 / 16%),
     inset 0 1px 0 rgb(255 255 255 / 58%);
@@ -215,7 +215,7 @@
 .desktop-navigation.is-hero-active a[data-navigation="ILR"] {
   color: #ffffff;
   background: var(--ibiza-gradient);
-  box-shadow: 0 0.4rem 1rem rgb(238 9 121 / 16%);
+  box-shadow: 0 0.4rem 1rem var(--ibiza-glow-pink-soft);
 }
 
 .mobile-navigation.is-scroll-compact {
@@ -228,7 +228,7 @@
   min-height: 3.75rem;
   padding: var(--mobile-navigation-padding-y) var(--mobile-navigation-padding-x);
   border-radius: 999px;
-  background: rgb(255 247 255 / 68%);
+  background: var(--ibiza-glass-soft);
   box-shadow:
     0 0.55rem 1.5rem rgb(0 0 0 / 13%),
     inset 0 1px 0 rgb(255 255 255 / 46%);
