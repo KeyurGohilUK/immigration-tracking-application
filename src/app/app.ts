@@ -31,14 +31,14 @@ const navigationItems = [
 ] as const;
 
 export type NavigationId =
-  (typeof navigationItems)[number]["id"] | "Family" | "Permissions";
+  (typeof navigationItems)[number]["id"] | "Permissions";
 
 let previousMobileNavigationIndex = 0;
 
 function resolvePrimaryNavigationId(
   activeNavigation: NavigationId,
 ): (typeof navigationItems)[number]["id"] {
-  if (activeNavigation === "Family" || activeNavigation === "Permissions")
+  if (activeNavigation === "Permissions")
     return "Home";
   return activeNavigation;
 }
