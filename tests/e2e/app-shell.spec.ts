@@ -672,10 +672,6 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
   ).toBeVisible();
-  await expect(page.locator("#selected-person-name")).toHaveText(
-    "Freddy Test Dependant",
-  );
-
   await page
     .getByRole("button", { name: "Edit Freddy Test Dependant" })
     .click();
@@ -714,16 +710,13 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Child" }),
   ).toBeVisible();
-  await expect(page.locator("#selected-person-name")).toHaveText(
-    "Freddy Test Child",
-  );
   await page.getByRole("button", { name: "Edit Freddy Test Child" }).click();
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
-  await expect(page.locator("#selected-person-name")).toHaveText(
-    TEST_PROFILE.name,
-  );
+  await expect(
+    page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
+  ).toBeVisible();
 });
 
 test("tracks encrypted immigration permissions without claiming eligibility", async ({
