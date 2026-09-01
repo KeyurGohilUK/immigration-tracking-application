@@ -42,7 +42,7 @@
   display: flex;
   gap: 0.55rem;
   align-items: baseline;
-  margin: 0.35rem 0 !important;
+  margin: 0.35rem 0;
   font-size: clamp(1.75rem, 7vw, 2.5rem);
   font-weight: 800;
   color: var(--colour-text);
@@ -163,16 +163,5 @@
 
   .document-heading-actions {
     grid-template-columns: repeat(2, auto);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
   }
 }
