@@ -675,9 +675,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const lifeEnglishDialog = root.querySelector<HTMLDialogElement>(
         "#life-english-dialog",
       );
-      const lifeEnglishForm = root.querySelector<HTMLFormElement>(
-        "#life-english-form",
-      );
+      const lifeEnglishForm =
+        root.querySelector<HTMLFormElement>("#life-english-form");
       root
         .querySelector<HTMLButtonElement>("#download-document-pack")
         ?.addEventListener("click", async (event) => {
@@ -1168,14 +1167,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const hasCachedLifeEnglish = lifeEnglishCache.has(selectedProfileId);
         const [documents, permissions, addressHistory, lifeEnglish] =
           await Promise.all([
-          getAllDocumentMetadata(key),
-          cachedPermissions ??
-            getImmigrationPermissions(selectedProfileId, key),
-          cachedAddressHistory ?? getAddressHistory(selectedProfileId, key),
-          hasCachedLifeEnglish
-            ? Promise.resolve(lifeEnglishCache.get(selectedProfileId) ?? null)
-            : getLifeEnglishRecord(selectedProfileId, key),
-        ]);
+            getAllDocumentMetadata(key),
+            cachedPermissions ??
+              getImmigrationPermissions(selectedProfileId, key),
+            cachedAddressHistory ?? getAddressHistory(selectedProfileId, key),
+            hasCachedLifeEnglish
+              ? Promise.resolve(lifeEnglishCache.get(selectedProfileId) ?? null)
+              : getLifeEnglishRecord(selectedProfileId, key),
+          ]);
         permissionCache.set(selectedProfileId, permissions);
         addressHistoryCache.set(selectedProfileId, addressHistory);
         lifeEnglishCache.set(selectedProfileId, lifeEnglish);
