@@ -6,6 +6,13 @@ html[data-theme="dark"] {
   --ibiza-text: #eddcff;
   --ibiza-text-muted: #e3bdc5;
   --ibiza-outline: #5b3f46;
+  --ibiza-glass-soft: rgb(255 255 255 / 8%);
+  --ibiza-glass-medium: rgb(255 255 255 / 10%);
+  --ibiza-glass-strong: rgb(255 255 255 / 12%);
+  --ibiza-glass-highlight: rgb(255 255 255 / 8%);
+  --ibiza-border-soft: rgb(255 255 255 / 14%);
+  --ibiza-glow-pink-soft: rgb(238 9 121 / 22%);
+  --ibiza-glow-orange-soft: rgb(255 106 0 / 14%);
   --colour-canvas: var(--ibiza-surface);
   --colour-surface: #231437;
   --colour-surface-strong: var(--ibiza-surface-high);
@@ -18,9 +25,9 @@ html[data-theme="dark"] {
   --colour-danger-hover: #ff8a80;
   --colour-danger-surface: rgb(147 0 10 / 32%);
   --colour-on-danger: #690005;
-  --glass-surface: rgb(255 255 255 / 8%);
-  --glass-surface-strong: rgb(255 255 255 / 12%);
-  --glass-border: rgb(255 255 255 / 14%);
+  --glass-surface: var(--ibiza-glass-soft);
+  --glass-surface-strong: var(--ibiza-glass-strong);
+  --glass-border: var(--ibiza-border-soft);
   --glass-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 28%);
   color: var(--colour-text);
   color-scheme: dark;
