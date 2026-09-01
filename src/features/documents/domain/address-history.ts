@@ -150,7 +150,7 @@ export function calculateAddressHistoryCoverage(
     if (!covered.has(month) && gapStart === null) gapStart = month;
     const closesGap =
       gapStart !== null && (covered.has(month) || month === end);
-    if (closesGap) {
+    if (closesGap && gapStart !== null) {
       const gapEnd = covered.has(month) ? month - 1 : month;
       gaps.push(formatMonthRange(gapStart, gapEnd));
       gapStart = null;
