@@ -107,6 +107,12 @@ import {
   suggestDocumentName,
 } from "../features/documents/components/documents-page";
 import {
+  readAddressHistoryForm,
+  resetAddressHistoryForm,
+  showAddressHistoryForm,
+  syncAddressEndState,
+} from "../features/documents/components/address-history-dialog";
+import {
   deleteDocument,
   getAllDocumentMetadata,
   getDocumentFile,
@@ -126,6 +132,17 @@ import {
   createDocumentPack,
   downloadDocumentPack,
 } from "../features/documents/services/document-pack-service";
+import {
+  getAddressHistory,
+  saveAddressHistory,
+} from "../features/documents/data/address-history-repository";
+import {
+  calculateAddressHistoryCoverage,
+  getRequiredAddressHistoryMonths,
+  validateAddressHistoryCollection,
+  validateAddressHistoryInput,
+  type AddressHistoryEntry,
+} from "../features/documents/domain/address-history";
 import { getDefaultCategoryForSection } from "../features/documents/domain/document-vault";
 import {
   renderIlrJourneyPage,
@@ -148,6 +165,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     let familyProfilesAvailable = true;
     const permissionCache = new Map<string, ImmigrationPermission[]>();
     const tripCache = new Map<string, Trip[]>();
+    const addressHistoryCache = new Map<string, AddressHistoryEntry[]>();
 
     const lock = (): void => {
       if (!sessionKey) return;
