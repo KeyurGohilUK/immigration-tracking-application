@@ -70,10 +70,7 @@ describe("address history", () => {
 
   it("finds gaps across a five-year history", () => {
     const result = calculateAddressHistoryCoverage(
-      [
-        entry("one", "2021-09", "2023-12"),
-        entry("two", "2024-02", "", true),
-      ],
+      [entry("one", "2021-09", "2023-12"), entry("two", "2024-02", "", true)],
       60,
       "2026-09",
     );
