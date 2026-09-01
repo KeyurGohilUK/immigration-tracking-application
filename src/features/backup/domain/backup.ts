@@ -9,6 +9,10 @@ import {
 } from "../../immigration/domain/immigration-permission";
 import { isTripCollection, type Trip } from "../../travel/domain/trip";
 import {
+  isAddressHistoryCollection,
+  type AddressHistoryEntry,
+} from "../../documents/domain/address-history";
+import {
   isDocumentMetadata,
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   type DocumentMetadata,
@@ -34,6 +38,7 @@ export interface BackupData {
   members: HouseholdMember[];
   permissions: ProfileRecords<ImmigrationPermission>[];
   trips: ProfileRecords<Trip>[];
+  addressHistory: ProfileRecords<AddressHistoryEntry>[];
   documents?: BackupDocument[];
 }
 
@@ -199,6 +204,11 @@ export function isBackupPayload(value: unknown): value is BackupPayload {
       payload.data.trips,
       profileIds,
       isTripCollection,
+    ) &&
+    hasExactlyExpectedProfiles(
+      payload.data.addressHistory,
+      profileIds,
+      isAddressHistoryCollection,
     ) &&
     documentsAreValid
   );
