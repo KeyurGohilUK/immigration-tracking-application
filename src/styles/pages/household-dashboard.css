@@ -364,14 +364,3 @@
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
-
-.mobile-navigation {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.mobile-navigation a[aria-current="page"],
-.desktop-navigation a[aria-current="page"] {
-  color: #ffffff;
-  background: var(--ibiza-gradient);
-  box-shadow: 0 0.4rem 1.15rem rgb(238 9 121 / 16%);
-}
