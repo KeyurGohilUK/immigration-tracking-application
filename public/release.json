@@ -1,6 +1,8 @@
 {
-  "version": "2.4.3",
+  "version": "2.5.0",
   "notes": [
-    "Improved dark-theme readability for the Household Status label and icon on the Family Overview card."
+    "Improved dark-theme readability for the Household Status label and icon on the Family Overview card.",
+    "Removed the duplicate Your household page so Add Household Member now opens the member form directly from Home.",
+    "Kept member editing and deletion on the Home page so household management stays in one place."
   ]
 }
