@@ -304,10 +304,7 @@ test("stores and manages encrypted documents for a profile", async ({
   await lifeEnglishDialog
     .getByLabel("UAN / reference number")
     .fill("UAN-TEST-123");
-  await lifeEnglishDialog
-    .getByLabel("Status")
-    .nth(1)
-    .selectOption("met");
+  await lifeEnglishDialog.getByLabel("Status").nth(1).selectOption("met");
   await lifeEnglishDialog
     .getByLabel("Evidence type")
     .fill("Approved qualification");
@@ -316,9 +313,7 @@ test("stores and manages encrypted documents for a profile", async ({
     .fill("ENG-TEST-456");
   await lifeEnglishDialog.getByRole("button", { name: "Save details" }).click();
   await expect(
-    page
-      .locator('[data-vault-section="life-english"]')
-      .getByText("Complete"),
+    page.locator('[data-vault-section="life-english"]').getByText("Complete"),
   ).toBeVisible();
 
   const identitySection = page.locator(
