@@ -248,7 +248,7 @@ export const DOCUMENT_VAULT_SECTIONS: readonly DocumentVaultSectionDefinition[] 
           id: "additional",
           label: "Additional supporting evidence",
           guidance: "Store any other evidence that supports the application.",
-          categories: ["other", "additional-document"],
+          categories: ["additional-document", "other"],
           priority: "recommended",
         },
       ],
@@ -345,8 +345,12 @@ function calculateSectionProgress(
 }
 
 export function getDefaultCategoryForSection(
-  sectionId: DocumentVaultSectionId,
+  sectionId: string,
 ): DocumentCategory | null {
+  if (
+    !DOCUMENT_VAULT_SECTION_IDS.includes(sectionId as DocumentVaultSectionId)
+  )
+    return null;
   const section = DOCUMENT_VAULT_SECTIONS.find(({ id }) => id === sectionId);
   const requirement = section?.requirements.find(
     ({ categories }) => categories.length > 0,
