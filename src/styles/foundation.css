@@ -3060,6 +3060,7 @@ p {
 
 .document-storage-track span {
   display: block;
+  width: var(--document-storage-progress, 0%);
   min-width: 0.2rem;
   height: 100%;
   border-radius: inherit;
