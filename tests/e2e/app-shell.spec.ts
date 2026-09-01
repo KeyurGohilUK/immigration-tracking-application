@@ -240,6 +240,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   await page.getByRole("button", { name: "Add document" }).click();
   const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
+  await expect(addDocumentDialog).toHaveClass(/liquid-dialog/);
   await addDocumentDialog.getByLabel("Document file").setInputFiles({
     name: "council-tax.png",
     mimeType: "image/png",
@@ -365,6 +366,9 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await expect(page.locator("#app-manager-title")).toBeVisible();
   await page.getByRole("button", { name: "Close", exact: true }).click();
   await page.getByRole("button", { name: "Create encrypted backup" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Create a backup" }),
+  ).toHaveClass(/liquid-dialog/);
   await page.getByLabel("Backup password", { exact: true }).fill("too-short");
   await page.getByLabel("Confirm backup password").fill("too-short");
   await page.getByRole("button", { name: "Download encrypted backup" }).click();
@@ -406,6 +410,9 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
 
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Restore a backup" }),
+  ).toHaveClass(/liquid-dialog/);
   await page.getByLabel("Encrypted backup file").setInputFiles({
     name: "urbanfox-ilr-backup.json",
     mimeType: "application/json",
@@ -656,6 +663,9 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Add household member" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("dialog", { name: "Add household member" }),
+  ).toHaveClass(/liquid-dialog/);
   await expect(page.locator(".member-profile-header")).toBeVisible();
   await expect(page.locator(".member-profile-icon")).toBeVisible();
   await expect(page.locator(".member-profile-save")).toHaveCSS(
@@ -740,6 +750,9 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   );
   await expect(page.getByText("No permissions recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add permission" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Add immigration permission" }),
+  ).toHaveClass(/liquid-dialog/);
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2023-12-15");
@@ -864,6 +877,9 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("No trips recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add trip" }).click();
+  await expect(page.getByRole("dialog", { name: "Add trip" })).toHaveClass(
+    /liquid-dialog/,
+  );
   await page.evaluate(() =>
     document.documentElement.setAttribute("data-theme", "dark"),
   );
