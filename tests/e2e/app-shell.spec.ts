@@ -272,9 +272,7 @@ test("stores and manages encrypted documents for a profile", async ({
     '[data-vault-section="identity-immigration"]',
   );
   await identitySection.locator("summary").click();
-  await identitySection
-    .getByRole("button", { name: "Add document" })
-    .click();
+  await identitySection.getByRole("button", { name: "Add document" }).click();
   const sectionDocumentDialog = page.getByRole("dialog", {
     name: "Add document",
   });
