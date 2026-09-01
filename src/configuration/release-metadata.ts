@@ -1,5 +1,5 @@
-export const APP_VERSION = "2.6.1";
+export const APP_VERSION = "2.7.0";
 
 export const RELEASE_NOTES = [
-  "Restyled the Add Trip modal to match the Ibiza Sunset dark Liquid Glass member editor and fixed inconsistent form-field widths on mobile.",
+  "Standardised every app modal on one shared Ibiza Sunset Dark Liquid Glass dialog component for consistent layout, fields, close controls, mobile scrolling, and actions.",
 ] as const;

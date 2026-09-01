@@ -1,5 +1,6 @@
 import { renderAppShell } from "../../../app/app";
 import { calculateCompleteAbsenceDays } from "../../../shared/date/absence-days";
+import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import {
   populatePersonSwitcher,
   renderPersonSwitcherMarkup,
@@ -139,64 +140,32 @@ export function renderTripsPage(
       <p id="trip-page-error" class="form-error" role="alert" hidden></p>
     </main>
 
-    <dialog id="trip-dialog" class="family-dialog member-profile-dialog trip-profile-dialog" aria-labelledby="trip-form-title">
-      <form id="trip-form" class="family-form member-profile-form trip-profile-form" novalidate>
-        <button class="dialog-close member-profile-close trip-profile-close" type="button" aria-label="Close trip form">×</button>
-        <div class="member-profile-header trip-profile-header">
-          <div class="member-profile-icon trip-profile-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4 16h16M7 16l2-6 4 3 3-7 2 10"/><path d="M15.5 5.5 18 3m0 0h-3m3 0v3"/></svg>
-          </div>
-          <p class="eyebrow">Encrypted local record</p>
-          <h2 id="trip-form-title">Add trip</h2>
-          <p>Record this journey for the selected household member. Dates are used in the rolling absence calculation.</p>
-        </div>
-        <input name="tripId" type="hidden" />
+    ${renderLiquidGlassDialog({
+      id: "trip-dialog",
+      labelledBy: "trip-form-title",
+      formId: "trip-form",
+      eyebrow: "Encrypted local record",
+      title: "Add trip",
+      subtitle:
+        "Record this journey for the selected household member. Dates are used in the rolling absence calculation.",
+      iconSvg:
+        '<svg viewBox="0 0 24 24"><path d="M4 16h16M7 16l2-6 4 3 3-7 2 10"/><path d="M15.5 5.5 18 3m0 0h-3m3 0v3"/></svg>',
+      body: `<input name="tripId" type="hidden" />
         <div class="member-profile-fields trip-profile-fields">
-          <div class="member-profile-field">
-            <label for="trip-departure">UK departure date</label>
-            <div class="member-profile-control">
-              <span class="member-profile-control-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 3v5M16 3v5M4 10h16"/></svg>
-              </span>
-              <input id="trip-departure" name="departureDate" type="date" required />
-            </div>
-          </div>
-          <div class="member-profile-field">
-            <label for="trip-return">UK return date <span class="optional-label">Optional while outside the UK</span></label>
-            <div class="member-profile-control">
-              <span class="member-profile-control-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 3v5M16 3v5M4 10h16"/></svg>
-              </span>
-              <input id="trip-return" name="returnDate" type="date" />
-            </div>
-          </div>
-          <div class="member-profile-field">
-            <label for="trip-destination">Destination</label>
-            <div class="member-profile-control">
-              <span class="member-profile-control-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg>
-              </span>
-              <input id="trip-destination" name="destination" maxlength="100" required />
-            </div>
-          </div>
-          <div class="member-profile-field">
-            <label for="trip-notes">Notes <span class="optional-label">Optional</span></label>
-            <div class="member-profile-control trip-notes-control">
-              <span class="member-profile-control-icon trip-notes-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-              </span>
-              <textarea id="trip-notes" name="notes" maxlength="500" rows="3"></textarea>
-            </div>
-          </div>
+          <div class="member-profile-field"><label for="trip-departure">UK departure date</label><div class="member-profile-control"><span class="member-profile-control-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 3v5M16 3v5M4 10h16"/></svg></span><input id="trip-departure" name="departureDate" type="date" required /></div></div>
+          <div class="member-profile-field"><label for="trip-return">UK return date <span class="optional-label">Optional while outside the UK</span></label><div class="member-profile-control"><span class="member-profile-control-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 3v5M16 3v5M4 10h16"/></svg></span><input id="trip-return" name="returnDate" type="date" /></div></div>
+          <div class="member-profile-field"><label for="trip-destination">Destination</label><div class="member-profile-control"><span class="member-profile-control-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg></span><input id="trip-destination" name="destination" maxlength="100" required /></div></div>
+          <div class="member-profile-field"><label for="trip-notes">Notes <span class="optional-label">Optional</span></label><div class="member-profile-control trip-notes-control"><span class="member-profile-control-icon trip-notes-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><textarea id="trip-notes" name="notes" maxlength="500" rows="3"></textarea></div></div>
         </div>
-        <label class="checkbox-field trip-review-card" for="exceptional-absence">
-          <input id="exceptional-absence" name="exceptionalAbsence" type="checkbox" />
-          <span><strong>Flag for manual review</strong><small>This may be a permitted or exceptional absence and supporting evidence may be required.</small></span>
-        </label>
-        <p id="trip-form-error" class="form-error" role="alert" hidden></p>
-        <button class="primary-button family-save-button member-profile-save trip-profile-save" type="submit"><span>Save trip</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-      </form>
-    </dialog>`,
+        <label class="checkbox-field trip-review-card" for="exceptional-absence"><input id="exceptional-absence" name="exceptionalAbsence" type="checkbox" /><span><strong>Flag for manual review</strong><small>This may be a permitted or exceptional absence and supporting evidence may be required.</small></span></label>
+        <p id="trip-form-error" class="form-error" role="alert" hidden></p>`,
+      actions:
+        '<button class="primary-button family-save-button member-profile-save trip-profile-save" type="submit"><span>Save trip</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>',
+      dialogClass: "member-profile-dialog trip-profile-dialog",
+      formClass: "member-profile-form trip-profile-form",
+      headerClass: "member-profile-header trip-profile-header",
+      closeLabel: "Close trip form",
+    })}`,
   );
 
   const profilePill = root.querySelector<HTMLElement>("#travel-profile-pill");
