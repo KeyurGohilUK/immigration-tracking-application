@@ -40,25 +40,25 @@ export async function replaceAllLocalData(
 ): Promise<void> {
   const [members, permissions, trips, addressHistory, documents] =
     await Promise.all([
-    encryptRecord(data.members, vaultKey),
-    Promise.all(
-      data.permissions.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
-    Promise.all(
-      data.trips.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
-    Promise.all(
-      data.addressHistory.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
+      encryptRecord(data.members, vaultKey),
+      Promise.all(
+        data.permissions.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      Promise.all(
+        data.trips.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      Promise.all(
+        data.addressHistory.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
       data.documents === undefined
         ? Promise.resolve(undefined)
         : Promise.all(
