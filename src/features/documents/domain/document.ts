@@ -7,6 +7,17 @@ export const DOCUMENT_CATEGORIES = [
   "passport",
   "immigration-evidence",
   "address-proof",
+  "employer-letter",
+  "employment-contract",
+  "payslip",
+  "tax-document",
+  "travel-evidence",
+  "life-in-uk",
+  "english-language",
+  "relationship-evidence",
+  "application-form",
+  "declaration-consent",
+  "additional-document",
   "other",
 ] as const;
 
@@ -49,7 +60,18 @@ export const DOCUMENT_CATEGORY_LABELS: Record<DocumentCategory, string> = {
   passport: "Passport",
   "immigration-evidence": "Immigration evidence",
   "address-proof": "Address proof",
-  other: "Other",
+  "employer-letter": "Employer letter",
+  "employment-contract": "Employment contract",
+  payslip: "Payslip",
+  "tax-document": "Tax document",
+  "travel-evidence": "Travel evidence",
+  "life-in-uk": "Life in the UK evidence",
+  "english-language": "English-language evidence",
+  "relationship-evidence": "Relationship evidence",
+  "application-form": "Application form",
+  "declaration-consent": "Declaration or consent",
+  "additional-document": "Additional supporting document",
+  other: "Other (legacy)",
 };
 
 export function validateDocumentUploadInput(
