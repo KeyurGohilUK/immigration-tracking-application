@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added automated accessibility audits and visual theme regression coverage for the Ibiza light/dark design system.",
+      "Redesigned Documents as a Liquid Glass Document Vault with applicant switching, vault progress, category overview, and a prominent PDF pack action.",
     ),
   ).toBeVisible();
   await expect(
