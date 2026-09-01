@@ -6,9 +6,7 @@ import {
   type LifeInUkStatus,
 } from "../domain/life-english";
 
-export function renderLifeEnglishDialog(
-  record: LifeEnglishRecord | null,
-): string {
+export function renderLifeEnglishDialog(): string {
   return renderLiquidGlassDialog({
     id: "life-english-dialog",
     labelledBy: "life-english-title",
