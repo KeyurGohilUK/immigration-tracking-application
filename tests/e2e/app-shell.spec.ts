@@ -1123,7 +1123,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   await expect(navigation).toHaveClass(/is-scroll-compact/);
   await expect(navigation).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.64)",
+    "rgba(255, 247, 255, 0.68)",
   );
 
   const compactNavigationBox = await navigation.boundingBox();
@@ -1134,7 +1134,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
 
   expect(compactNavigationBox?.width).toBeLessThan(navigationBox?.width ?? 0);
   expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
-  expect(compactNavigationBackground).toContain("0.64");
+  expect(compactNavigationBackground).toBe("rgba(255, 247, 255, 0.68)");
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 
