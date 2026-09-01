@@ -667,7 +667,11 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
     page.getByRole("dialog", { name: "Add household member" }),
   ).toHaveClass(/liquid-dialog/);
   await expect(page.locator(".member-profile-header")).toBeVisible();
-  await expect(page.locator(".member-profile-icon")).toBeVisible();
+  await expect(
+    page.getByRole("dialog", { name: "Add household member" }).locator(
+      ".liquid-dialog-icon",
+    ),
+  ).toBeVisible();
   await expect(page.locator(".member-profile-save")).toHaveCSS(
     "background-image",
     /linear-gradient/,
