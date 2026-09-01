@@ -81,7 +81,9 @@ export function showAddressHistoryForm(
   root: HTMLElement,
   entry?: AddressHistoryEntry,
 ): void {
-  const dialog = root.querySelector<HTMLDialogElement>("#address-history-dialog");
+  const dialog = root.querySelector<HTMLDialogElement>(
+    "#address-history-dialog",
+  );
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form);
