@@ -37,6 +37,7 @@ import {
   readTripInput,
   renderTripsPage,
   showTripForm,
+  type TravelOverview,
 } from "../features/travel/components/trips-page";
 import { getTrips, saveTrips } from "../features/travel/data/trip-repository";
 import {
@@ -1195,8 +1196,41 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       }
     };
 
+    const buildTravelOverview = (
+      trips: Trip[],
+      permissions: ImmigrationPermission[],
+    ): TravelOverview => {
+      const asOfDate = getUkCalendarDate();
+      const latestPermission = [...permissions].sort((left, right) =>
+        right.permissionStartDate.localeCompare(left.permissionStartDate),
+      )[0];
+      const isDependant = latestPermission?.role === "dependant";
+      const input = { permissions, trips, asOfDate };
+      const absence = isDependant
+        ? calculateRecordedDependantAbsenceCheck(input)
+        : calculateRecordedAbsenceCheck(input);
+      const period = isDependant
+        ? calculateSkilledWorkerDependantQualifyingPeriod(permissions, asOfDate)
+        : calculateSkilledWorkerQualifyingPeriod({ permissions, asOfDate });
+      return {
+        maximumRecordedDays: permissions.length
+          ? absence.maximumRecordedDays
+          : null,
+        absenceStatus: permissions.length ? absence.status : null,
+        earliestApplicationDate: period.earliestApplicationDate,
+        asOfDate,
+      };
+    };
+
     const renderTrips = (profile: HouseholdMember, trips: Trip[]): void => {
-      renderTripsPage(root, familyMembers, selectedProfileId, trips);
+      const permissions = permissionCache.get(selectedProfileId) ?? [];
+      renderTripsPage(
+        root,
+        familyMembers,
+        selectedProfileId,
+        trips,
+        buildTravelOverview(trips, permissions),
+      );
       wireAuthenticatedShell(profile, "Trips");
       const dialog = root.querySelector<HTMLDialogElement>("#trip-dialog");
       const form = root.querySelector<HTMLFormElement>("#trip-form");
@@ -1302,14 +1336,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const showTrips = async (profile: HouseholdMember): Promise<void> => {
-      const cached = tripCache.get(selectedProfileId);
-      if (cached) {
-        renderTrips(profile, cached);
-        return;
-      }
       try {
-        const trips = await getTrips(selectedProfileId, key);
+        const cachedTrips = tripCache.get(selectedProfileId);
+        const cachedPermissions = permissionCache.get(selectedProfileId);
+        const [trips, permissions] = await Promise.all([
+          cachedTrips ?? getTrips(selectedProfileId, key),
+          cachedPermissions ?? getImmigrationPermissions(selectedProfileId, key),
+        ]);
         tripCache.set(selectedProfileId, trips);
+        permissionCache.set(selectedProfileId, permissions);
         renderTrips(profile, trips);
       } catch {
         renderTrips(profile, []);
