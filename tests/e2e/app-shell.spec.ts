@@ -70,18 +70,16 @@ test("shows the anonymous landing page without tracker controls", async ({
   await expect(page.getByRole("button", { name: "Lock app" })).toHaveCount(0);
 
   const getStartedButton = page.getByRole("button", { name: "Get started" });
-  const buttonColours = await getStartedButton.evaluate((button) => {
+  const buttonTheme = await getStartedButton.evaluate((button) => {
     const style = window.getComputedStyle(button);
     return {
-      background: style.backgroundColor,
+      backgroundImage: style.backgroundImage,
       text: style.color,
     };
   });
 
-  expect(buttonColours).toEqual({
-    background: "rgb(0, 0, 0)",
-    text: "rgb(255, 255, 255)",
-  });
+  expect(buttonTheme.backgroundImage).toContain("linear-gradient");
+  expect(buttonTheme.text).toBe("rgb(255, 255, 255)");
 });
 
 test("shows install and update controls in every device header", async ({
@@ -119,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Refactored frontend styling into ordered CSS modules and added automated HTML/CSS coding-standard checks with documented frontend rules.",
+      "Replaced the legacy black-and-white light theme with the Ibiza Sunset Liquid Glass palette across the app, including navigation, actions, browser chrome, and PWA colours.",
     ),
   ).toBeVisible();
   await expect(
