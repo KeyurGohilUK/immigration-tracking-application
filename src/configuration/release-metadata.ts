@@ -1,5 +1,5 @@
-export const APP_VERSION = "2.7.3";
+export const APP_VERSION = "2.8.0";
 
 export const RELEASE_NOTES = [
-  "Restored the centre ILR hero menu accent colour in dark mode when the ILR tab is not selected.",
+  "Refactored frontend styling into ordered CSS modules and added automated HTML/CSS coding-standard checks with documented frontend rules.",
 ] as const;
