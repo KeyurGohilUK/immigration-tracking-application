@@ -91,5 +91,9 @@ describe("Document Vault readiness", () => {
       "address-proof",
     );
     expect(getDefaultCategoryForSection("salary-tax")).toBe("payslip");
+    expect(getDefaultCategoryForSection("additional")).toBe(
+      "additional-document",
+    );
+    expect(getDefaultCategoryForSection("unknown-section")).toBeNull();
   });
 });
