@@ -321,7 +321,12 @@ function calculateSectionProgress(
 
   let status: DocumentVaultStatus;
   if (allLater) status = "required-later";
-  else if (required.length > 0 && completedRequired === required.length)
+  else if (
+    (required.length > 0 && completedRequired === required.length) ||
+    (required.length === 0 &&
+      requirements.length > 0 &&
+      requirements.every(({ complete }) => complete))
+  )
     status = "complete";
   else if (section.attentionWhenIncomplete && required.length > 0)
     status = "needs-attention";
