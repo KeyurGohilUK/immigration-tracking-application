@@ -21,9 +21,26 @@ function fail(message) {
 
 const stylesheetEntry = await readFile(join(root, "src/styles.css"), "utf8");
 const expectedImports = [
-  '@import "./styles/foundation.css";',
+  '@import "./styles/tokens-base.css";',
+  '@import "./styles/pages/public.css";',
+  '@import "./styles/pages/legal.css";',
+  '@import "./styles/pages/security.css";',
+  '@import "./styles/components/install-manager.css";',
+  '@import "./styles/components/app-shell.css";',
+  '@import "./styles/pages/dashboard.css";',
+  '@import "./styles/components/forms.css";',
+  '@import "./styles/pages/records.css";',
+  '@import "./styles/components/dialog-compat.css";',
+  '@import "./styles/pages/setup.css";',
+  '@import "./styles/pages/documents.css";',
+  '@import "./styles/pages/household-dashboard.css";',
   '@import "./styles/components/navigation.css";',
-  '@import "./styles/application.css";',
+  '@import "./styles/pages/household.css";',
+  '@import "./styles/pages/ilr.css";',
+  '@import "./styles/theme-dark.css";',
+  '@import "./styles/components/form-controls.css";',
+  '@import "./styles/pages/member-editor.css";',
+  '@import "./styles/pages/travel.css";',
   '@import "./styles/components/liquid-glass-dialog.css";',
 ];
 const entryLines = stylesheetEntry
@@ -44,32 +61,56 @@ const tsFiles = sourceFiles.filter((path) => extname(path) === ".ts");
 let importantCount = 0;
 for (const path of cssFiles) {
   const css = await readFile(path, "utf8");
-  importantCount += (css.match(/!important\b/g) ?? []).length;
+  const count = (css.match(/!important\b/g) ?? []).length;
+  importantCount += count;
 
-  if (
-    path.endsWith("navigation.css") ||
-    path.endsWith("liquid-glass-dialog.css")
-  ) {
-    if (/!important\b/.test(css)) {
-      fail(
-        `${relative(root, path)} must not introduce !important; resolve component specificity through the shared design system.`,
-      );
-    }
+  if (count > 0 && !path.endsWith("tokens-base.css")) {
+    fail(
+      `${relative(root, path)} contains !important. Only the central reduced-motion accessibility override may use it.`,
+    );
   }
 }
 
-const legacyImportantBudget = 5;
-if (importantCount > legacyImportantBudget) {
+if (importantCount !== 4) {
   fail(
-    `CSS contains ${importantCount} !important declarations; the existing migration budget is ${legacyImportantBudget}. Do not add new ones while legacy styles are being reduced.`,
+    `CSS must contain exactly the four reduced-motion accessibility !important declarations; found ${importantCount}.`,
   );
 }
 
 for (const path of cssFiles) {
   const css = await readFile(path, "utf8");
+  const relativePath = relative(root, path);
+
   if (/#000000\b|#111111\b/i.test(css)) {
     fail(
-      `${relative(root, path)} contains a retired legacy black light-theme colour. Use Ibiza Sunset design tokens instead.`,
+      `${relativePath} contains a retired legacy black light-theme colour. Use Ibiza Sunset design tokens instead.`,
+    );
+  }
+
+  if (
+    !relativePath.endsWith("src/styles/components/navigation.css") &&
+    /\.(?:mobile-navigation|desktop-navigation|primary-navigation)\b/.test(css)
+  ) {
+    fail(
+      `${relativePath} contains primary-navigation CSS. Navigation styles must be owned by src/styles/components/navigation.css.`,
+    );
+  }
+
+  if (
+    !relativePath.endsWith("src/styles/components/liquid-glass-dialog.css") &&
+    /(?:^|\n)\s*(?:html[^,{]+\s+)?\.liquid-dialog(?:\b|-)/m.test(css)
+  ) {
+    fail(
+      `${relativePath} contains Liquid Glass dialog CSS. Shared dialog styles must be owned by src/styles/components/liquid-glass-dialog.css.`,
+    );
+  }
+
+  if (
+    relativePath.endsWith("src/styles/foundation.css") ||
+    relativePath.endsWith("src/styles/application.css")
+  ) {
+    fail(
+      `${relativePath} is a retired catch-all stylesheet. Put rules in a focused component or page module.`,
     );
   }
 }

@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Replaced the legacy black-and-white light theme with the Ibiza Sunset Liquid Glass palette across the app, including navigation, actions, browser chrome, and PWA colours.",
+      "Completed the CSS architecture cleanup with focused page/component modules, shared Ibiza tokens, retired catch-all styles, and automated component-ownership checks.",
     ),
   ).toBeVisible();
   await expect(

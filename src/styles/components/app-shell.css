@@ -1,0 +1,129 @@
+.app-shell {
+  display: block;
+  width: min(100%, 32rem);
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  overflow: visible;
+  background: var(--colour-canvas);
+  box-shadow: 0 0 3rem rgb(0 0 0 / 8%);
+}
+
+.top-bar {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 4.5rem;
+  padding: max(0.75rem, env(safe-area-inset-top)) 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--colour-border);
+  background: rgb(255 247 255 / 82%);
+  -webkit-backdrop-filter: blur(1rem) saturate(140%);
+  backdrop-filter: blur(1rem) saturate(140%);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.top-bar.is-scrolled {
+  background: rgb(255 255 255 / 74%);
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 8%);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.wordmark-logo {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border-radius: 0.65rem;
+  object-fit: cover;
+}
+
+.freddy-hero-logo {
+  width: min(13rem, 58vw);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 2.5rem;
+}
+
+.icon-button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 50%;
+  color: var(--colour-text);
+  background: var(--colour-canvas);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.device-storage-indicator {
+  display: inline-flex;
+  min-width: 2rem;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  background: rgb(255 255 255 / 58%);
+}
+
+.device-storage-indicator svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.device-storage-indicator > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.install-button {
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 0;
+  border-radius: var(--radius-small);
+  color: var(--colour-on-strong);
+  background: var(--colour-strong);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.install-button[hidden] {
+  display: none;
+}
+
+.icon-button:disabled,
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

@@ -1,0 +1,56 @@
+@keyframes family-dashboard-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .family-dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-top: 1rem;
+  }
+
+  .family-dashboard-heading,
+  .household-status-card,
+  .family-member-stack,
+  .family-dashboard-absence,
+  .family-dashboard .dashboard-notice {
+    grid-column: 1;
+  }
+
+  .household-status-card {
+    min-height: 19rem;
+    padding: 1.25rem;
+  }
+
+  .family-overview-member {
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 6.5rem;
+    padding: 1rem;
+  }
+
+  .family-overview-member .dashboard-person-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .family-overview-member .dashboard-person-state {
+    grid-column: 1 / -1;
+    padding-left: 4.5rem;
+  }
+
+  .family-dashboard .dashboard-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 48rem) {
+  .family-dashboard {
+    padding: 2.5rem max(2rem, calc((100vw - 80rem) / 2)) 4rem;
+  }
+}
