@@ -1,6 +1,6 @@
 {
-  "version": "2.6.0",
+  "version": "2.6.1",
   "notes": [
-    "Redesigned Travel Timeline with Ibiza Sunset bento cards, rolling 180-day absence status, ILR estimate, and richer recent-trip cards."
+    "Restyled the Add Trip modal to match the Ibiza Sunset dark Liquid Glass member editor and fixed inconsistent form-field widths on mobile."
   ]
 }
