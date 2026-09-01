@@ -9,6 +9,7 @@ import {
 import { getHouseholdMembers } from "../../household/data/household-member-repository";
 import { getImmigrationPermissions } from "../../immigration/data/immigration-permission-repository";
 import { getTrips } from "../../travel/data/trip-repository";
+import { getAddressHistory } from "../../documents/data/address-history-repository";
 import {
   BACKUP_FORMAT,
   BACKUP_KEY_DERIVATION_ITERATIONS,
@@ -52,21 +53,28 @@ export async function collectBackupData(
 ): Promise<BackupData> {
   const members = await getHouseholdMembers(vaultKey);
   const profileIds = members.map(({ id }) => id);
-  const [permissions, trips, documentMetadata] = await Promise.all([
-    Promise.all(
-      profileIds.map(async (profileId) => ({
-        profileId,
-        records: await getImmigrationPermissions(profileId, vaultKey),
-      })),
-    ),
-    Promise.all(
-      profileIds.map(async (profileId) => ({
-        profileId,
-        records: await getTrips(profileId, vaultKey),
-      })),
-    ),
-    getAllDocumentMetadata(vaultKey),
-  ]);
+  const [permissions, trips, addressHistory, documentMetadata] =
+    await Promise.all([
+      Promise.all(
+        profileIds.map(async (profileId) => ({
+          profileId,
+          records: await getImmigrationPermissions(profileId, vaultKey),
+        })),
+      ),
+      Promise.all(
+        profileIds.map(async (profileId) => ({
+          profileId,
+          records: await getTrips(profileId, vaultKey),
+        })),
+      ),
+      Promise.all(
+        profileIds.map(async (profileId) => ({
+          profileId,
+          records: await getAddressHistory(profileId, vaultKey),
+        })),
+      ),
+      getAllDocumentMetadata(vaultKey),
+    ]);
   const documents = await Promise.all(
     documentMetadata.map(async ({ id }) => {
       const document = await getDocumentFile(id, vaultKey);
@@ -76,7 +84,7 @@ export async function collectBackupData(
       };
     }),
   );
-  return { members, permissions, trips, documents };
+  return { members, permissions, trips, addressHistory, documents };
 }
 
 export async function createEncryptedBackup(

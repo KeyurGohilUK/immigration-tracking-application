@@ -13,6 +13,7 @@ export interface BackupSummary {
   permissions: number;
   trips: number;
   documents: number;
+  addresses: number;
   includesDocuments: boolean;
 }
 
@@ -25,6 +26,10 @@ export function summariseBackup(data: BackupData): BackupSummary {
     ),
     trips: data.trips.reduce((total, { records }) => total + records.length, 0),
     documents: data.documents?.length ?? 0,
+    addresses: data.addressHistory.reduce(
+      (total, { records }) => total + records.length,
+      0,
+    ),
     includesDocuments: data.documents !== undefined,
   };
 }
@@ -33,33 +38,40 @@ export async function replaceAllLocalData(
   data: BackupData,
   vaultKey: CryptoKey,
 ): Promise<void> {
-  const [members, permissions, trips, documents] = await Promise.all([
-    encryptRecord(data.members, vaultKey),
-    Promise.all(
-      data.permissions.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
-    Promise.all(
-      data.trips.map(async ({ profileId, records }) => ({
-        profileId,
-        encrypted: await encryptRecord(records, vaultKey),
-      })),
-    ),
-    data.documents === undefined
-      ? Promise.resolve(undefined)
-      : Promise.all(
-          data.documents.map(async ({ metadata, content }) => ({
-            id: metadata.id,
-            encrypted: await createEncryptedDocumentRecord(
-              metadata,
-              base64ToBytes(content),
-              vaultKey,
-            ),
-          })),
-        ),
-  ]);
+  const [members, permissions, trips, addressHistory, documents] =
+    await Promise.all([
+      encryptRecord(data.members, vaultKey),
+      Promise.all(
+        data.permissions.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      Promise.all(
+        data.trips.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      Promise.all(
+        data.addressHistory.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      data.documents === undefined
+        ? Promise.resolve(undefined)
+        : Promise.all(
+            data.documents.map(async ({ metadata, content }) => ({
+              id: metadata.id,
+              encrypted: await createEncryptedDocumentRecord(
+                metadata,
+                base64ToBytes(content),
+                vaultKey,
+              ),
+            })),
+          ),
+    ]);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(
@@ -67,6 +79,7 @@ export async function replaceAllLocalData(
         DATABASE_STORES.profiles,
         DATABASE_STORES.permissions,
         DATABASE_STORES.trips,
+        DATABASE_STORES.addressHistory,
         ...(documents ? [DATABASE_STORES.documents] : []),
       ],
       "readwrite",
@@ -76,6 +89,9 @@ export async function replaceAllLocalData(
       DATABASE_STORES.permissions,
     );
     const tripStore = transaction.objectStore(DATABASE_STORES.trips);
+    const addressHistoryStore = transaction.objectStore(
+      DATABASE_STORES.addressHistory,
+    );
     const documentStore = documents
       ? transaction.objectStore(DATABASE_STORES.documents)
       : null;
@@ -94,11 +110,14 @@ export async function replaceAllLocalData(
       profileStore.clear();
       permissionStore.clear();
       tripStore.clear();
+      addressHistoryStore.clear();
       documentStore?.clear();
       profileStore.put(members, HOUSEHOLD_MEMBERS_RECORD_KEY);
       for (const item of permissions)
         permissionStore.put(item.encrypted, item.profileId);
       for (const item of trips) tripStore.put(item.encrypted, item.profileId);
+      for (const item of addressHistory)
+        addressHistoryStore.put(item.encrypted, item.profileId);
       for (const item of documents ?? [])
         documentStore?.put(item.encrypted, item.id);
     } catch {

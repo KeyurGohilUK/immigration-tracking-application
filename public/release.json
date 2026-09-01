@@ -1,6 +1,6 @@
 {
-  "version": "3.3.0",
+  "version": "3.4.0",
   "notes": [
-    "Added a real Document Vault taxonomy and readiness engine with expandable evidence checklists, section-aware uploads, and stronger frontend maintenance standards."
+    "Added the encrypted structured Address History foundation for Document Vault, including route-aware required periods and gap/overlap checks."
   ]
 }

@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added a real Document Vault taxonomy and readiness engine with expandable evidence checklists, section-aware uploads, and stronger frontend maintenance standards.",
+      "Added the encrypted structured Address History foundation for Document Vault, including route-aware required periods and gap/overlap checks.",
     ),
   ).toBeVisible();
   await expect(
@@ -186,7 +186,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 6);
+      const request = indexedDB.open("urbanfox-ilr", 7);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -310,7 +310,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 6);
+      const request = indexedDB.open("urbanfox-ilr", 7);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -442,7 +442,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   const backup = JSON.parse(backupText) as Record<string, unknown>;
   expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
   expect(backup.version).toBe(1);
-  expect(backup.dataSchemaVersion).toBe(5);
+  expect(backup.dataSchemaVersion).toBe(6);
   expect(backupText).not.toContain(TEST_PROFILE.name);
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
@@ -656,7 +656,7 @@ test("permanently deletes all local application data", async ({ page }) => {
 
   const localData = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 6);
+      const request = indexedDB.open("urbanfox-ilr", 7);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -760,7 +760,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   );
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 6);
+      const request = indexedDB.open("urbanfox-ilr", 7);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -843,7 +843,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
     .inputValue();
   const storedPermission = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 6);
+      const request = indexedDB.open("urbanfox-ilr", 7);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -991,7 +991,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
   const storedTrip = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 6);
+      const request = indexedDB.open("urbanfox-ilr", 7);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
