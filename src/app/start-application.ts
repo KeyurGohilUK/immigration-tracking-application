@@ -1341,7 +1341,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const cachedPermissions = permissionCache.get(selectedProfileId);
         const [trips, permissions] = await Promise.all([
           cachedTrips ?? getTrips(selectedProfileId, key),
-          cachedPermissions ?? getImmigrationPermissions(selectedProfileId, key),
+          cachedPermissions ??
+            getImmigrationPermissions(selectedProfileId, key),
         ]);
         tripCache.set(selectedProfileId, trips);
         permissionCache.set(selectedProfileId, permissions);
