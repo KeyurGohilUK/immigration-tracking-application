@@ -119,7 +119,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed shared pop-up dialogs so they stay centred in the visible viewport even when the page is scrolled.",
+      "Restored the centre ILR hero menu accent colour in dark mode when the ILR tab is not selected.",
     ),
   ).toBeVisible();
   await expect(
@@ -1159,6 +1159,12 @@ test("opens the centre ILR hero journey for the household", async ({
 
   const ilrLinks = page.getByRole("link", { name: "ILR", exact: true });
   await expect(ilrLinks.first()).toBeVisible();
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "dark"),
+  );
+  await expect(
+    navigation.locator('a[data-navigation="ILR"]:not([aria-current="page"])'),
+  ).toHaveCSS("color", "rgb(255, 177, 197)");
   await ilrLinks.first().click();
 
   await expect(navigation).toHaveClass(/is-hero-active/);
