@@ -14,6 +14,7 @@ export function renderHouseholdMemberDialogMarkup(): string {
     title: "Add household member",
     subtitle:
       "Add this person’s details to keep their ILR tracking separate and accurate.",
+    subtitleId: "family-form-subtitle",
     iconSvg:
       '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c0-3.2 2.2-5.2 5.5-5.2s5.5 2 5.5 5.2"/><path d="M17 7v6M14 10h6"/></svg>',
     body: `<input id="family-member-id" name="memberId" type="hidden" />
