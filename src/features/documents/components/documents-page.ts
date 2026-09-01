@@ -42,17 +42,7 @@ export function renderDocumentsPage(
       <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true">▣</span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div><div class="record-heading-actions document-heading-actions"><button id="add-document" class="vault-add-button" type="button"><span aria-hidden="true">＋</span> Add document</button></div></section>
       <section class="documents-profile-picker vault-profile-picker" aria-label="Choose a profile for documents">${renderVaultMemberStrip(members, selectedProfileId)}<div class="documents-profile-select">${renderPersonSwitcherMarkup()}</div></section>
       <section class="document-summary-grid vault-summary-grid" aria-label="Local document summary"><article class="document-summary-card vault-readiness-card"><p class="eyebrow">Selected profile</p><div class="vault-readiness-line"><p class="document-summary-value"><span id="document-count">${documents.length}</span><small>${documents.length === 1 ? "document" : "documents"}</small></p><span class="vault-ready-label">${documents.length > 0 ? "In progress" : "To do"}</span></div><div class="vault-readiness-track" aria-hidden="true"><span style="--vault-readiness-progress: ${Math.min(100, documents.length * 12)}%"></span></div><p>Build this applicant’s evidence pack section by section.</p></article><article class="document-summary-card vault-storage-card"><p class="eyebrow">Encrypted storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
-      <section class="vault-category-list" aria-label="Document Vault categories">
-  <article class="vault-category-row is-active"><span class="vault-category-icon" aria-hidden="true">⌾</span><div><h2>Identity & Immigration</h2><p>Passport and immigration evidence</p></div><span class="vault-category-status">READY</span><span class="vault-category-state" aria-hidden="true">✓</span></article>
-  <article class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">⌂</span><div><h2>Address History</h2><p>Proof of address and residence history</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-  <article class="vault-category-row is-warm"><span class="vault-category-icon" aria-hidden="true">▣</span><div><h2>Employment</h2><p>Employer letters and contracts</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-  <article class="vault-category-row is-attention"><span class="vault-category-icon" aria-hidden="true">£</span><div><h2>Salary & Tax</h2><p>Payslips, P60s and tax evidence</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">△</span></article>
-  <article class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">✈</span><div><h2>Travel & Absences</h2><p>Travel evidence supporting your timeline</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-  <article class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">◇</span><div><h2>Life in the UK & English</h2><p>Test and English-language evidence</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-  <article class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">♟</span><div><h2>Family / Dependants</h2><p>Relationship and dependant evidence</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-  <article class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">▤</span><div><h2>Final Application Documents</h2><p>Final forms and submission evidence</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-  <article class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">＋</span><div><h2>Additional Documents</h2><p>Anything else supporting the application</p></div><span class="vault-category-status">TO DO</span><span class="vault-category-state" aria-hidden="true">○</span></article>
-</section>
+      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(documents)}</section>
 <section class="vault-download-panel"><button id="download-document-pack" class="vault-download-button" type="button" ${documents.length === 0 ? "disabled" : ""}><span aria-hidden="true">⇩</span> Download PDF pack</button></section>
 <aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups include documents</h2><p>Encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
       <section class="documents-panel" aria-labelledby="document-list-title"><div class="section-heading"><div><p class="eyebrow">Selected profile</p><h2 id="document-list-title">Document collection</h2></div></div><div id="document-list" class="document-list"></div></section>
@@ -107,6 +97,30 @@ export function renderDocumentsPage(
   );
 }
 
+const vaultCategoryRows = [
+  { label: "Identity & Immigration", detail: "Passport and immigration evidence", icon: "⌾", categories: ["passport", "immigration-evidence"] as DocumentCategory[] },
+  { label: "Address History", detail: "Proof of address and residence history", icon: "⌂", categories: ["address-proof"] as DocumentCategory[] },
+  { label: "Employment", detail: "Employer letters and contracts", icon: "▣", categories: [] as DocumentCategory[] },
+  { label: "Salary & Tax", detail: "Payslips, P60s and tax evidence", icon: "£", categories: [] as DocumentCategory[] },
+  { label: "Travel & Absences", detail: "Travel evidence supporting your timeline", icon: "✈", categories: [] as DocumentCategory[] },
+  { label: "Life in the UK & English", detail: "Test and English-language evidence", icon: "◇", categories: [] as DocumentCategory[] },
+  { label: "Family / Dependants", detail: "Relationship and dependant evidence", icon: "♟", categories: [] as DocumentCategory[] },
+  { label: "Final Application Documents", detail: "Final forms and submission evidence", icon: "▤", categories: [] as DocumentCategory[] },
+  { label: "Additional Documents", detail: "Anything else supporting the application", icon: "＋", categories: ["other"] as DocumentCategory[] },
+] as const;
+
+function renderVaultCategoryRows(documents: DocumentMetadata[]): string {
+  return vaultCategoryRows
+    .map((row) => {
+      const count = documents.filter((document) =>
+        row.categories.includes(document.category),
+      ).length;
+      const complete = count > 0;
+      const emphasis = row.label === "Employment" ? " is-warm" : row.label === "Salary & Tax" ? " is-attention" : "";
+      return `<article class="vault-category-row${complete ? " is-active" : ""}${emphasis}"><span class="vault-category-icon" aria-hidden="true">${row.icon}</span><div><h2>${row.label}</h2><p>${complete ? `${count} stored · ${row.detail}` : row.detail}</p></div><span class="vault-category-status">${complete ? "COMPLETE" : "TO DO"}</span><span class="vault-category-state" aria-hidden="true">${complete ? "✓" : "○"}</span></article>`;
+    })
+    .join("");
+}
 function renderVaultMemberStrip(
   members: HouseholdMember[],
   selectedProfileId: string,
