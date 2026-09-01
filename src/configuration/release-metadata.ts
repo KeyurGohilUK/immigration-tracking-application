@@ -1,6 +1,5 @@
-export const APP_VERSION = "2.4.2";
+export const APP_VERSION = "2.4.3";
 
 export const RELEASE_NOTES = [
-  "Reduced the floating menu height so the selected ILR state reads as a proper capsule instead of a large rounded block.",
-  "Kept the larger navigation icons while tightening the hero item and compact-scroll proportions.",
+  "Improved dark-theme readability for the Household Status label and icon on the Family Overview card.",
 ] as const;
