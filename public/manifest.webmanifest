@@ -4,8 +4,8 @@
   "description": "A local-only UK indefinite leave to remain tracking tool.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#fff7ff",
+  "theme_color": "#fff7ff",
   "lang": "en-GB",
   "orientation": "any",
   "icons": [

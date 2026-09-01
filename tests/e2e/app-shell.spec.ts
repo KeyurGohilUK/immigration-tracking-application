@@ -70,18 +70,16 @@ test("shows the anonymous landing page without tracker controls", async ({
   await expect(page.getByRole("button", { name: "Lock app" })).toHaveCount(0);
 
   const getStartedButton = page.getByRole("button", { name: "Get started" });
-  const buttonColours = await getStartedButton.evaluate((button) => {
+  const buttonTheme = await getStartedButton.evaluate((button) => {
     const style = window.getComputedStyle(button);
     return {
-      background: style.backgroundColor,
+      backgroundImage: style.backgroundImage,
       text: style.color,
     };
   });
 
-  expect(buttonColours).toEqual({
-    background: "rgb(0, 0, 0)",
-    text: "rgb(255, 255, 255)",
-  });
+  expect(buttonTheme.backgroundImage).toContain("linear-gradient");
+  expect(buttonTheme.text).toBe("rgb(255, 255, 255)");
 });
 
 test("shows install and update controls in every device header", async ({
@@ -119,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Refactored frontend styling into ordered CSS modules and added automated HTML/CSS coding-standard checks with documented frontend rules.",
+      "Replaced the legacy black-and-white light theme with the Ibiza Sunset Liquid Glass palette across the app, including navigation, actions, browser chrome, and PWA colours.",
     ),
   ).toBeVisible();
   await expect(
@@ -1107,7 +1105,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect((navigationBox?.y ?? 0) + (navigationBox?.height ?? 0)).toBeLessThan(
     viewport.height,
   );
-  expect(navigationStyles.background).toContain("0.76");
+  expect(navigationStyles.background).toBe("rgba(255, 247, 255, 0.78)");
   expect(navigationStyles.borderRadius).toBe("999px");
   expect(navigationStyles.indicatorRadius).toBe("999px");
   expect(navigationStyles.indicatorTransition).toBe("0.38s");
@@ -1125,7 +1123,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   await expect(navigation).toHaveClass(/is-scroll-compact/);
   await expect(navigation).toHaveCSS(
     "background-color",
-    "rgba(255, 255, 255, 0.64)",
+    "rgba(255, 247, 255, 0.68)",
   );
 
   const compactNavigationBox = await navigation.boundingBox();
@@ -1136,7 +1134,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
 
   expect(compactNavigationBox?.width).toBeLessThan(navigationBox?.width ?? 0);
   expect(compactNavigationBox?.height).toBeLessThan(navigationBox?.height ?? 0);
-  expect(compactNavigationBackground).toContain("0.64");
+  expect(compactNavigationBackground).toBe("rgba(255, 247, 255, 0.68)");
   expect(scrolledHeaderBox?.y).toBeLessThanOrEqual(1);
 });
 

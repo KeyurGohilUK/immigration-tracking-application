@@ -8,7 +8,7 @@
   padding: var(--mobile-navigation-padding-y) var(--mobile-navigation-padding-x);
   border-radius: 999px;
   isolation: isolate;
-  background: rgb(255 255 255 / 76%);
+  background: rgb(255 247 255 / 78%);
   box-shadow:
     0 0.8rem 2.2rem rgb(0 0 0 / 16%),
     inset 0 1px 0 rgb(255 255 255 / 58%);
@@ -50,8 +50,8 @@
   border-radius: 999px;
   background: linear-gradient(
     145deg,
-    rgb(255 255 255 / 72%),
-    rgb(255 255 255 / 42%)
+    rgb(255 247 255 / 86%),
+    rgb(246 233 255 / 66%)
   );
   box-shadow:
     0 0.45rem 1.2rem rgb(0 0 0 / 10%),
@@ -131,7 +131,7 @@
   min-height: 3.75rem;
   padding: var(--mobile-navigation-padding-y) var(--mobile-navigation-padding-x);
   border-radius: 999px;
-  background: rgb(255 255 255 / 64%);
+  background: rgb(255 247 255 / 68%);
   box-shadow:
     0 0.55rem 1.5rem rgb(0 0 0 / 13%),
     inset 0 1px 0 rgb(255 255 255 / 46%);

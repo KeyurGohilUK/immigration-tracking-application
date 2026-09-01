@@ -65,6 +65,15 @@ if (importantCount > legacyImportantBudget) {
   );
 }
 
+for (const path of cssFiles) {
+  const css = await readFile(path, "utf8");
+  if (/#000000\b|#111111\b/i.test(css)) {
+    fail(
+      `${relative(root, path)} contains a retired legacy black light-theme colour. Use Ibiza Sunset design tokens instead.`,
+    );
+  }
+}
+
 for (const path of tsFiles) {
   const source = await readFile(path, "utf8");
   const relativePath = relative(root, path);
