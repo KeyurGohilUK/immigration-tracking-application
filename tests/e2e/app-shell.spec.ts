@@ -256,8 +256,36 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(
     page.getByRole("button", { name: "Download PDF pack" }),
   ).toBeDisabled();
+  await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
+  await expect(
+    page
+      .locator('[data-vault-section="salary-tax"]')
+      .getByText("Needs attention"),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator('[data-vault-section="final-application"]')
+      .getByText("Required later"),
+  ).toBeVisible();
 
-  await page.getByRole("button", { name: "Add document" }).click();
+  const identitySection = page.locator(
+    '[data-vault-section="identity-immigration"]',
+  );
+  await identitySection.locator("summary").click();
+  await identitySection
+    .getByRole("button", { name: "Add document" })
+    .click();
+  const sectionDocumentDialog = page.getByRole("dialog", {
+    name: "Add document",
+  });
+  await expect(sectionDocumentDialog.getByLabel("Category")).toHaveValue(
+    "passport",
+  );
+  await sectionDocumentDialog
+    .getByRole("button", { name: "Close document form" })
+    .click();
+
+  await page.getByRole("button", { name: "Add document" }).first().click();
   const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
   await expect(addDocumentDialog).toHaveClass(/liquid-dialog/);
   await addDocumentDialog.getByLabel("Document file").setInputFiles({
@@ -279,7 +307,8 @@ test("stores and manages encrypted documents for a profile", async ({
   const addressRow = page
     .locator(".vault-category-row")
     .filter({ hasText: "Address History" });
-  await expect(addressRow.getByText("COMPLETE")).toBeVisible();
+  await expect(addressRow.getByText("Complete")).toBeVisible();
+  await expect(page.locator("#vault-readiness-percent")).toHaveText("17%");
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
