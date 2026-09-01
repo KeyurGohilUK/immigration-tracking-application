@@ -86,7 +86,9 @@ export function showHouseholdMemberForm(
   if (deleteButton) {
     deleteButton.hidden = !member || !canDelete;
     deleteButton.dataset.memberId = member?.id ?? "";
-    deleteButton.textContent = member ? `Delete ${member.fullName}` : "Delete member";
+    deleteButton.textContent = member
+      ? `Delete ${member.fullName}`
+      : "Delete member";
   }
   if (member) {
     const memberId = form.elements.namedItem("memberId") as HTMLInputElement;
