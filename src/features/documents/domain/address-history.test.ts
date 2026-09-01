@@ -6,7 +6,9 @@ import {
   validateAddressHistoryInput,
   type AddressHistoryEntry,
 } from "./address-history";
-import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
+import type {
+  ImmigrationPermission,
+} from "../../immigration/domain/immigration-permission";
 
 const timestamp = "2026-09-01T12:00:00.000Z";
 
