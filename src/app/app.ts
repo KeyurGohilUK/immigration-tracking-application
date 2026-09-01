@@ -38,8 +38,7 @@ let previousMobileNavigationIndex = 0;
 function resolvePrimaryNavigationId(
   activeNavigation: NavigationId,
 ): (typeof navigationItems)[number]["id"] {
-  if (activeNavigation === "Permissions")
-    return "Home";
+  if (activeNavigation === "Permissions") return "Home";
   return activeNavigation;
 }
 
