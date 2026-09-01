@@ -126,6 +126,7 @@ import {
   createDocumentPack,
   downloadDocumentPack,
 } from "../features/documents/services/document-pack-service";
+import { getDefaultCategoryForSection } from "../features/documents/domain/document-vault";
 import {
   renderIlrJourneyPage,
   type IlrJourneyMember,
@@ -648,6 +649,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#add-document")
         ?.addEventListener("click", () => showDocumentUploadForm(root));
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-add-vault-section]",
+      )) {
+        button.addEventListener("click", () => {
+          const sectionId = button.dataset.addVaultSection;
+          const category = sectionId
+            ? getDefaultCategoryForSection(sectionId)
+            : null;
+          showDocumentUploadForm(root, category ?? undefined);
+        });
+      }
       uploadDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => uploadDialog.close());

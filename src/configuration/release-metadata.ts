@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.2.0";
+export const APP_VERSION = "3.3.0";
 
 export const RELEASE_NOTES = [
-  "Redesigned Documents as a Liquid Glass Document Vault with applicant switching, vault progress, category overview, and a prominent PDF pack action.",
+  "Added a real Document Vault taxonomy and readiness engine with expandable evidence checklists, section-aware uploads, and stronger frontend maintenance standards.",
 ] as const;

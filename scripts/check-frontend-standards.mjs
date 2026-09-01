@@ -80,6 +80,13 @@ if (importantCount !== 4) {
 for (const path of cssFiles) {
   const css = await readFile(path, "utf8");
   const relativePath = relative(root, path);
+  const lineCount = css.split("\n").length;
+
+  if (lineCount > 1200) {
+    fail(
+      `${relativePath} has ${lineCount} lines. Split CSS modules before they exceed the 1,200-line maintenance limit.`,
+    );
+  }
 
   if (/#000000\b|#111111\b/i.test(css)) {
     fail(

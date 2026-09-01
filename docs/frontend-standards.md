@@ -14,6 +14,7 @@ UrbanFox ILR uses semantic HTML, accessible native controls, and an Ibiza Sunset
 - Do not add raw `<dialog>` markup in feature code. Use `src/shared/components/liquid-glass-dialog.ts` so behaviour, accessibility, viewport positioning, and theme treatment remain consistent.
 - Avoid inline presentation styles. Runtime layout values may be passed through CSS custom properties only.
 - Never interpolate untrusted user content into HTML strings. Use DOM properties such as `textContent` for user-controlled values.
+- Keep domain rules such as readiness/status calculations outside rendering components. UI components consume typed domain results rather than duplicating business logic.
 
 ## CSS architecture
 
@@ -47,6 +48,7 @@ Do not recreate catch-all files such as `foundation.css` or `application.css`. W
 - Do not add `!important`. The only allowed uses are the four declarations in the central reduced-motion accessibility override.
 - Avoid duplicate feature-specific copies of common controls, cards, dialogs, navigation, or buttons.
 - Keep responsive rules with the component they modify.
+- Keep each CSS module below 1,200 lines. Split by page or shared component before a module becomes another catch-all stylesheet.
 - Preserve reduced-motion behaviour for animated interactions.
 
 ## Verification
