@@ -53,7 +53,9 @@ async function auditVisibleAccessibility(page: Page): Promise<void> {
 
     const mains = [...document.querySelectorAll("main")].filter(visible);
     if (mains.length !== 1)
-      issues.push(`Expected exactly one visible main landmark; found ${mains.length}`);
+      issues.push(
+        `Expected exactly one visible main landmark; found ${mains.length}`,
+      );
 
     for (const image of document.querySelectorAll<HTMLImageElement>("img")) {
       if (visible(image) && !image.hasAttribute("alt"))
