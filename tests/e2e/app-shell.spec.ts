@@ -100,9 +100,18 @@ test("shows install and update controls in every device header", async ({
     (headerBox?.y ?? 0) + (headerBox?.height ?? 0),
   );
   await trigger.click();
-  await expect(
-    page.getByRole("dialog", { name: "Install and updates" }),
-  ).toBeVisible();
+  const installDialog = page.getByRole("dialog", {
+    name: "Install and updates",
+  });
+  await expect(installDialog).toBeVisible();
+  await expect(installDialog).toHaveClass(/liquid-dialog/);
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "dark"),
+  );
+  await expect(installDialog).toHaveCSS(
+    "background-color",
+    "rgba(39, 24, 59, 0.88)",
+  );
   await expect(page.getByText("Installed", { exact: true })).toBeVisible();
   await expect(page.getByText("Latest", { exact: true })).toBeVisible();
   await expect(
@@ -110,7 +119,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Standardised every app modal on one shared Ibiza Sunset Dark Liquid Glass dialog component for consistent layout, fields, close controls, mobile scrolling, and actions.",
+      "Updated Install and Updates to use the shared Ibiza Sunset Dark Liquid Glass dialog, matching the rest of the app.",
     ),
   ).toBeVisible();
   await expect(
