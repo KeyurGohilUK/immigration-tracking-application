@@ -264,11 +264,7 @@
   margin: 0.7rem 0;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(
-    in srgb,
-    var(--ibiza-surface-high) 74%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--ibiza-surface-high) 74%, transparent);
 }
 
 .vault-readiness-track span,
@@ -323,7 +319,8 @@
 
 .vault-category-row.is-warm::before {
   background: var(--ibiza-orange);
-  box-shadow: 0 0 0.9rem color-mix(in srgb, var(--ibiza-orange) 40%, transparent);
+  box-shadow: 0 0 0.9rem
+    color-mix(in srgb, var(--ibiza-orange) 40%, transparent);
 }
 
 .vault-category-row.is-attention {
@@ -350,11 +347,7 @@
   border: 1px solid var(--glass-border);
   border-radius: 50%;
   color: var(--ibiza-primary);
-  background: color-mix(
-    in srgb,
-    var(--ibiza-surface-high) 72%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--ibiza-surface-high) 72%, transparent);
   font-weight: 900;
 }
 
@@ -454,11 +447,7 @@
   border: 1px solid var(--ibiza-border-soft);
   border-radius: 0.9rem;
   color: var(--ibiza-primary);
-  background: color-mix(
-    in srgb,
-    var(--ibiza-surface-high) 72%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--ibiza-surface-high) 72%, transparent);
 }
 
 .document-type-icon svg {
