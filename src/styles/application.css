@@ -1182,6 +1182,7 @@ html[data-theme="dark"]
 
 .travel-progress span {
   display: block;
+  width: var(--travel-absence-progress, 0%);
   height: 100%;
   border-radius: inherit;
   background: var(--ibiza-gradient);
