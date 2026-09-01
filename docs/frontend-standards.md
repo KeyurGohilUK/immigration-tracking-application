@@ -28,7 +28,9 @@ When a component becomes genuinely reusable, move its styles from `application.c
 
 ## Design system rules
 
+- Ibiza Sunset Liquid Glass is the single visual system for both light and dark themes. The legacy black-and-white light palette is retired.
 - Use existing colour, spacing, radius, glass, and Ibiza variables before adding literals.
+- Light-theme foundation colours must flow from the Ibiza tokens in `foundation.css`; do not reintroduce `#000000` or `#111111` as UI colours.
 - Dark-theme behaviour should be expressed through shared variables or the owning component stylesheet, not scattered overrides.
 - Prefer low-specificity class selectors. Do not use IDs for styling.
 - Do not add `!important`. Five legacy declarations remain temporarily; the automated check prevents that number from increasing, and shared navigation/dialog modules allow none.
