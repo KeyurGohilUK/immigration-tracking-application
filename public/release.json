@@ -1,6 +1,6 @@
 {
-  "version": "2.7.0",
+  "version": "2.7.1",
   "notes": [
-    "Standardised every app modal on one shared Ibiza Sunset Dark Liquid Glass dialog component for consistent layout, fields, close controls, mobile scrolling, and actions."
+    "Updated Install and Updates to use the shared Ibiza Sunset Dark Liquid Glass dialog, matching the rest of the app."
   ]
 }
