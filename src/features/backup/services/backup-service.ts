@@ -53,7 +53,8 @@ export async function collectBackupData(
 ): Promise<BackupData> {
   const members = await getHouseholdMembers(vaultKey);
   const profileIds = members.map(({ id }) => id);
-  const [permissions, trips, addressHistory, documentMetadata] = await Promise.all([
+  const [permissions, trips, addressHistory, documentMetadata] =
+    await Promise.all([
     Promise.all(
       profileIds.map(async (profileId) => ({
         profileId,
@@ -72,8 +73,8 @@ export async function collectBackupData(
         records: await getAddressHistory(profileId, vaultKey),
       })),
     ),
-    getAllDocumentMetadata(vaultKey),
-  ]);
+      getAllDocumentMetadata(vaultKey),
+    ]);
   const documents = await Promise.all(
     documentMetadata.map(async ({ id }) => {
       const document = await getDocumentFile(id, vaultKey);
