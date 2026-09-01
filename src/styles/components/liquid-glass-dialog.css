@@ -154,6 +154,17 @@
   color: var(--ibiza-text-muted);
 }
 
+.liquid-dialog-form .family-form-fields,
+.liquid-dialog-form .family-field {
+  min-width: 0;
+}
+
+.liquid-dialog-form input[type="date"],
+.liquid-dialog-form input[type="month"] {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .liquid-dialog-form input:not([type="checkbox"]),
 .liquid-dialog-form select,
 .liquid-dialog-form textarea {
