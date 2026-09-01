@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Redesigned Travel Timeline with Ibiza Sunset bento cards, rolling 180-day absence status, ILR estimate, and richer recent-trip cards.",
+      "Restyled the Add Trip modal to match the Ibiza Sunset dark Liquid Glass member editor and fixed inconsistent form-field widths on mobile.",
     ),
   ).toBeVisible();
   await expect(
@@ -864,6 +864,36 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("No trips recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add trip" }).click();
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "dark"),
+  );
+  await expect(page.locator(".trip-profile-dialog")).toHaveCSS(
+    "background-color",
+    "rgba(39, 24, 59, 0.88)",
+  );
+  await expect(page.locator(".trip-profile-form")).toHaveCSS(
+    "overflow-y",
+    "auto",
+  );
+  await expect(page.getByLabel("Destination")).toHaveCSS(
+    "box-sizing",
+    "border-box",
+  );
+  const tripFieldWidths = await page.evaluate(() => {
+    const ids = [
+      "trip-departure",
+      "trip-return",
+      "trip-destination",
+      "trip-notes",
+    ];
+    return ids.map((id) =>
+      Math.round(
+        document.getElementById(id)?.getBoundingClientRect().width ?? 0,
+      ),
+    );
+  });
+  expect(new Set(tripFieldWidths).size).toBe(1);
+  expect(tripFieldWidths[0]).toBeGreaterThan(0);
   await page.getByLabel("UK departure date").fill("2024-02-01");
   await page.getByLabel(/UK return date/).fill("2024-02-10");
   await page.getByLabel("Destination").fill("India");
