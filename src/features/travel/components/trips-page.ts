@@ -91,7 +91,7 @@ export function renderTripsPage(
               <span>/ ${ROLLING_ABSENCE_LIMIT} days</span>
             </p>
             <div class="travel-progress" aria-label="Recorded rolling absence usage">
-              <span style="width: ${progress.toFixed(1)}%"></span>
+              <span style="--travel-absence-progress: ${progress.toFixed(1)}%"></span>
             </div>
             <p class="travel-stat-copy">${getAbsenceStatusCopy(overview?.absenceStatus ?? null)}</p>
           </article>
