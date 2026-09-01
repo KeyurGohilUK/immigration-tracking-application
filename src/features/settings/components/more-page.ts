@@ -1,4 +1,5 @@
 import { renderAppShell } from "../../../app/app";
+import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import { APP_VERSION } from "../../../configuration/release-metadata";
 import { renderDeleteDataDialog } from "./delete-data-dialog";
 import { getThemePreference } from "../services/theme-preference";
@@ -67,28 +68,42 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
 
       <p class="more-version">UrbanFox ILR ${APP_VERSION} · Local-first household tracker</p>
     </main>
-    <dialog id="backup-dialog" class="family-dialog" aria-labelledby="backup-dialog-title">
-      <form id="backup-form" class="family-form" novalidate>
-        <div class="app-manager-heading"><div><p class="eyebrow">Encrypted download</p><h2 id="backup-dialog-title">Create a backup</h2></div><button class="dialog-close" type="button" aria-label="Close backup form">×</button></div>
-        <p id="backup-guidance">Use a unique password with at least 12 characters. UrbanFox cannot recover this password or open the backup without it.</p>
+    ${renderLiquidGlassDialog({
+      id: "backup-dialog",
+      labelledBy: "backup-dialog-title",
+      formId: "backup-form",
+      eyebrow: "Encrypted download",
+      title: "Create a backup",
+      subtitle:
+        "Use a unique password with at least 12 characters. UrbanFox cannot recover this password or open the backup without it.",
+      iconSvg:
+        '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 19h14"/></svg>',
+      body: `<p id="backup-guidance" class="sr-only">Use a unique password with at least 12 characters.</p>
         <label for="backup-password">Backup password</label>
         <input id="backup-password" name="password" type="password" minlength="12" autocomplete="new-password" aria-describedby="backup-guidance" required />
         <label for="backup-password-confirmation">Confirm backup password</label>
         <input id="backup-password-confirmation" name="confirmation" type="password" minlength="12" autocomplete="new-password" required />
-        <p id="backup-form-error" class="form-error" role="alert" hidden></p>
-        <button class="primary-button" type="submit">Download encrypted backup</button>
-      </form>
-    </dialog>
-    <dialog id="restore-dialog" class="family-dialog" aria-labelledby="restore-dialog-title">
-      <form id="restore-form" class="family-form" novalidate>
-        <div class="app-manager-heading"><div><p class="eyebrow">Replace-only restore</p><h2 id="restore-dialog-title">Restore a backup</h2></div><button class="dialog-close" type="button" aria-label="Close restore form">×</button></div>
-        <p id="restore-guidance">Choose an UrbanFox encrypted JSON backup and enter its separate backup password. Nothing changes until you review and confirm.</p>
+        <p id="backup-form-error" class="form-error" role="alert" hidden></p>`,
+      actions:
+        '<button class="primary-button liquid-dialog-save" type="submit">Download encrypted backup</button>',
+      closeLabel: "Close backup form",
+    })}
+    ${renderLiquidGlassDialog({
+      id: "restore-dialog",
+      labelledBy: "restore-dialog-title",
+      formId: "restore-form",
+      eyebrow: "Replace-only restore",
+      title: "Restore a backup",
+      subtitle:
+        "Choose an UrbanFox encrypted JSON backup and enter its separate backup password. Nothing changes until you review and confirm.",
+      iconSvg:
+        '<svg viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5"/><path d="M5 5h14"/></svg>',
+      body: `<p id="restore-guidance" class="sr-only">Choose an encrypted backup and enter its password.</p>
         <label for="restore-file">Encrypted backup file</label>
         <input id="restore-file" name="backupFile" type="file" accept="application/json,.json" aria-describedby="restore-guidance" required />
         <label for="restore-password">Restore backup password</label>
         <input id="restore-password" name="password" type="password" minlength="12" autocomplete="current-password" required />
         <p id="restore-form-error" class="form-error" role="alert" hidden></p>
-        <button id="review-backup" class="primary-button" type="submit">Review backup</button>
         <section id="restore-summary" class="restore-summary" aria-labelledby="restore-summary-title" hidden>
           <p class="eyebrow">Validated backup</p>
           <h3 id="restore-summary-title">Review before replacing data</h3>
@@ -97,9 +112,11 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
           <p id="restore-replacement-guidance" class="local-data-banner"><strong>This replaces current local records.</strong> Create a fresh backup first if you may need the data currently on this device.</p>
           <label class="checkbox-field" for="restore-confirmation"><input id="restore-confirmation" type="checkbox" /><span><strong>I understand this replaces my current local records</strong></span></label>
           <button id="replace-local-data" class="primary-button" type="button" disabled>Replace local data</button>
-        </section>
-      </form>
-    </dialog>
+        </section>`,
+      actions:
+        '<button id="review-backup" class="primary-button liquid-dialog-save" type="submit">Review backup</button>',
+      closeLabel: "Close restore form",
+    })}
     ${renderDeleteDataDialog("unlocked")}`,
   );
   const themePreference =
