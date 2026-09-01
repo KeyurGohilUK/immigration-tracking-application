@@ -213,6 +213,6 @@ test("keeps the mobile navigation visual contract stable", async ({
   );
   await expect(navigation).toHaveCSS(
     "background-color",
-    "rgba(26, 11, 46, 0.82)",
+    "rgba(26, 11, 46, 0.86)",
   );
 });
