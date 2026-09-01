@@ -1,5 +1,6 @@
-export const APP_VERSION = "2.4.1";
+export const APP_VERSION = "2.4.2";
 
 export const RELEASE_NOTES = [
-  "Fixed the ILR hero menu highlight so the Ibiza orange treatment aligns with the moving active capsule.",
+  "Reduced the floating menu height so the selected ILR state reads as a proper capsule instead of a large rounded block.",
+  "Kept the larger navigation icons while tightening the hero item and compact-scroll proportions.",
 ] as const;
