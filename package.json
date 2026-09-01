@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --write src/features/documents/components/documents-page.ts src/styles/pages/documents.css && git diff -- src/features/documents/components/documents-page.ts src/styles/pages/documents.css && exit 1",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "check:release": "node scripts/check-release-version.mjs",
     "test:unit": "vitest run",
