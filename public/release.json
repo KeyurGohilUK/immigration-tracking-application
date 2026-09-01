@@ -1,6 +1,6 @@
 {
-  "version": "3.1.1",
+  "version": "3.2.0",
   "notes": [
-    "Added automated accessibility audits and visual theme regression coverage for the Ibiza light/dark design system."
+    "Redesigned Documents as a Liquid Glass Document Vault with applicant switching, vault progress, category overview, and a prominent PDF pack action."
   ]
 }
