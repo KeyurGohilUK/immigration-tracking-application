@@ -98,15 +98,60 @@ export function renderDocumentsPage(
 }
 
 const vaultCategoryRows = [
-  { label: "Identity & Immigration", detail: "Passport and immigration evidence", icon: "⌾", categories: ["passport", "immigration-evidence"] as DocumentCategory[] },
-  { label: "Address History", detail: "Proof of address and residence history", icon: "⌂", categories: ["address-proof"] as DocumentCategory[] },
-  { label: "Employment", detail: "Employer letters and contracts", icon: "▣", categories: [] as DocumentCategory[] },
-  { label: "Salary & Tax", detail: "Payslips, P60s and tax evidence", icon: "£", categories: [] as DocumentCategory[] },
-  { label: "Travel & Absences", detail: "Travel evidence supporting your timeline", icon: "✈", categories: [] as DocumentCategory[] },
-  { label: "Life in the UK & English", detail: "Test and English-language evidence", icon: "◇", categories: [] as DocumentCategory[] },
-  { label: "Family / Dependants", detail: "Relationship and dependant evidence", icon: "♟", categories: [] as DocumentCategory[] },
-  { label: "Final Application Documents", detail: "Final forms and submission evidence", icon: "▤", categories: [] as DocumentCategory[] },
-  { label: "Additional Documents", detail: "Anything else supporting the application", icon: "＋", categories: ["other"] as DocumentCategory[] },
+  {
+    label: "Identity & Immigration",
+    detail: "Passport and immigration evidence",
+    icon: "⌾",
+    categories: ["passport", "immigration-evidence"] as DocumentCategory[],
+  },
+  {
+    label: "Address History",
+    detail: "Proof of address and residence history",
+    icon: "⌂",
+    categories: ["address-proof"] as DocumentCategory[],
+  },
+  {
+    label: "Employment",
+    detail: "Employer letters and contracts",
+    icon: "▣",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Salary & Tax",
+    detail: "Payslips, P60s and tax evidence",
+    icon: "£",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Travel & Absences",
+    detail: "Travel evidence supporting your timeline",
+    icon: "✈",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Life in the UK & English",
+    detail: "Test and English-language evidence",
+    icon: "◇",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Family / Dependants",
+    detail: "Relationship and dependant evidence",
+    icon: "♟",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Final Application Documents",
+    detail: "Final forms and submission evidence",
+    icon: "▤",
+    categories: [] as DocumentCategory[],
+  },
+  {
+    label: "Additional Documents",
+    detail: "Anything else supporting the application",
+    icon: "＋",
+    categories: ["other"] as DocumentCategory[],
+  },
 ] as const;
 
 function renderVaultCategoryRows(documents: DocumentMetadata[]): string {
@@ -116,7 +161,12 @@ function renderVaultCategoryRows(documents: DocumentMetadata[]): string {
         row.categories.includes(document.category),
       ).length;
       const complete = count > 0;
-      const emphasis = row.label === "Employment" ? " is-warm" : row.label === "Salary & Tax" ? " is-attention" : "";
+      const emphasis =
+        row.label === "Employment"
+          ? " is-warm"
+          : row.label === "Salary & Tax"
+            ? " is-attention"
+            : "";
       return `<article class="vault-category-row${complete ? " is-active" : ""}${emphasis}"><span class="vault-category-icon" aria-hidden="true">${row.icon}</span><div><h2>${row.label}</h2><p>${complete ? `${count} stored · ${row.detail}` : row.detail}</p></div><span class="vault-category-status">${complete ? "COMPLETE" : "TO DO"}</span><span class="vault-category-state" aria-hidden="true">${complete ? "✓" : "○"}</span></article>`;
     })
     .join("");
@@ -129,7 +179,8 @@ function renderVaultMemberStrip(
     .map((member) => {
       const selected = member.id === selectedProfileId;
       const initial = member.fullName.trim().charAt(0).toUpperCase() || "?";
-      const firstName = member.fullName.trim().split(/\s+/)[0] || member.fullName;
+      const firstName =
+        member.fullName.trim().split(/\s+/)[0] || member.fullName;
       return `<button class="vault-profile-chip${selected ? " is-selected" : ""}" type="button" data-vault-profile="${member.id}" ${selected ? 'aria-current="true"' : ""}><span class="vault-profile-avatar" aria-hidden="true">${initial}</span><span>${escapeVaultLabel(firstName)}</span></button>`;
     })
     .join("")}</div>`;
@@ -138,7 +189,9 @@ function renderVaultMemberStrip(
 function wireVaultMemberStrip(root: HTMLElement): void {
   const select = root.querySelector<HTMLSelectElement>("#active-person");
   if (!select) return;
-  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-vault-profile]")) {
+  for (const button of root.querySelectorAll<HTMLButtonElement>(
+    "[data-vault-profile]",
+  )) {
     button.addEventListener("click", () => {
       const profileId = button.dataset.vaultProfile;
       if (!profileId || profileId === select.value) return;
