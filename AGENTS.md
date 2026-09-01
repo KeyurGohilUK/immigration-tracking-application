@@ -61,6 +61,7 @@ tests/
 - Use comments only to explain non-obvious reasoning or constraints.
 - Remove unused code and imports.
 - Follow accessibility, semantic HTML, and responsive-design standards.
+- Follow `docs/frontend-standards.md` for HTML structure, CSS architecture, shared dialogs, theme rules, and frontend verification.
 
 ## Security and dependencies
 

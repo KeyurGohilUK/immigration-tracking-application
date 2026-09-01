@@ -1,6 +1,6 @@
 {
-  "version": "2.7.3",
+  "version": "2.8.0",
   "notes": [
-    "Restored the centre ILR hero menu accent colour in dark mode when the ILR tab is not selected."
+    "Refactored frontend styling into ordered CSS modules and added automated HTML/CSS coding-standard checks with documented frontend rules."
   ]
 }
