@@ -4169,6 +4169,19 @@ html[data-theme="dark"] .family-dashboard {
     radial-gradient(circle at 92% 15%, rgb(255 106 0 / 14%), transparent 22rem);
 }
 
+html[data-theme="dark"] .household-status-label h2 {
+  color: var(--ibiza-primary);
+}
+
+html[data-theme="dark"] .household-status-icon {
+  border-color: rgb(255 177 197 / 42%);
+  color: var(--ibiza-primary);
+  background: rgb(255 177 197 / 14%);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 4%),
+    0 0 1.1rem rgb(238 9 121 / 22%);
+}
+
 html[data-theme="dark"] .dashboard-person-badge,
 html[data-theme="dark"] .dashboard-person-progress {
   background: rgb(255 255 255 / 10%);
