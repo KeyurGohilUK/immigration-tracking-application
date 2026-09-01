@@ -79,9 +79,38 @@ if (importantCount !== 4) {
 
 for (const path of cssFiles) {
   const css = await readFile(path, "utf8");
+  const relativePath = relative(root, path);
+
   if (/#000000\b|#111111\b/i.test(css)) {
     fail(
-      `${relative(root, path)} contains a retired legacy black light-theme colour. Use Ibiza Sunset design tokens instead.`,
+      `${relativePath} contains a retired legacy black light-theme colour. Use Ibiza Sunset design tokens instead.`,
+    );
+  }
+
+  if (
+    !relativePath.endsWith("src/styles/components/navigation.css") &&
+    /\.(?:mobile-navigation|desktop-navigation|primary-navigation)\b/.test(css)
+  ) {
+    fail(
+      `${relativePath} contains primary-navigation CSS. Navigation styles must be owned by src/styles/components/navigation.css.`,
+    );
+  }
+
+  if (
+    !relativePath.endsWith("src/styles/components/liquid-glass-dialog.css") &&
+    /\.liquid-dialog(?:\b|-)/.test(css)
+  ) {
+    fail(
+      `${relativePath} contains Liquid Glass dialog CSS. Shared dialog styles must be owned by src/styles/components/liquid-glass-dialog.css.`,
+    );
+  }
+
+  if (
+    relativePath.endsWith("src/styles/foundation.css") ||
+    relativePath.endsWith("src/styles/application.css")
+  ) {
+    fail(
+      `${relativePath} is a retired catch-all stylesheet. Put rules in a focused component or page module.`,
     );
   }
 }
