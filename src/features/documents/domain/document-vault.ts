@@ -1,7 +1,4 @@
-import type {
-  DocumentCategory,
-  DocumentMetadata,
-} from "./document";
+import type { DocumentCategory, DocumentMetadata } from "./document";
 
 export const DOCUMENT_VAULT_SECTION_IDS = [
   "identity-immigration",
@@ -53,14 +50,15 @@ export interface DocumentVaultSectionDefinition {
   requirements: readonly DocumentRequirementDefinition[];
 }
 
-export interface DocumentRequirementProgress
-  extends DocumentRequirementDefinition {
+export interface DocumentRequirementProgress extends DocumentRequirementDefinition {
   documentCount: number;
   complete: boolean;
 }
 
-export interface DocumentVaultSectionProgress
-  extends Omit<DocumentVaultSectionDefinition, "requirements"> {
+export interface DocumentVaultSectionProgress extends Omit<
+  DocumentVaultSectionDefinition,
+  "requirements"
+> {
   status: DocumentVaultStatus;
   completedRequired: number;
   totalRequired: number;
@@ -255,16 +253,14 @@ export const DOCUMENT_VAULT_SECTIONS: readonly DocumentVaultSectionDefinition[] 
     },
   ];
 
-export const DOCUMENT_VAULT_STATUS_LABELS: Record<
-  DocumentVaultStatus,
-  string
-> = {
-  complete: "Complete",
-  partial: "Partial",
-  "needs-attention": "Needs attention",
-  "to-do": "To do",
-  "required-later": "Required later",
-};
+export const DOCUMENT_VAULT_STATUS_LABELS: Record<DocumentVaultStatus, string> =
+  {
+    complete: "Complete",
+    partial: "Partial",
+    "needs-attention": "Needs attention",
+    "to-do": "To do",
+    "required-later": "Required later",
+  };
 
 export function calculateDocumentVaultProgress(
   documents: readonly DocumentMetadata[],
@@ -347,9 +343,7 @@ function calculateSectionProgress(
 export function getDefaultCategoryForSection(
   sectionId: string,
 ): DocumentCategory | null {
-  if (
-    !DOCUMENT_VAULT_SECTION_IDS.includes(sectionId as DocumentVaultSectionId)
-  )
+  if (!DOCUMENT_VAULT_SECTION_IDS.includes(sectionId as DocumentVaultSectionId))
     return null;
   const section = DOCUMENT_VAULT_SECTIONS.find(({ id }) => id === sectionId);
   const requirement = section?.requirements.find(
