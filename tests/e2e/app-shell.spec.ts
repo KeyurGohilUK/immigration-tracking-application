@@ -401,7 +401,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await page.getByLabel("Immigration role").selectOption("not-set");
   await page.getByRole("button", { name: "Save household member" }).click();
   await expect(
-    page.getByRole("heading", { name: "Temporary Family Member", exact: true }),
+    page.getByRole("button", { name: "Edit Temporary Family Member" }),
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Profile", exact: true }).click();
@@ -443,11 +443,12 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByText("Backup restored successfully", { exact: false }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Family", exact: true }).click();
-  await page.getByRole("button", { name: "Add Household Member" }).click();
   await expect(
-    page.getByRole("heading", { name: TEST_PROFILE.name, level: 3 }),
+    page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
-  await expect(page.getByText("1 person", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Edit Temporary Family Member" }),
+  ).toHaveCount(0);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await page.getByRole("button", { name: "View legal information" }).click();
