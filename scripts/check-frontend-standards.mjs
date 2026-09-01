@@ -110,7 +110,7 @@ for (const path of tsFiles) {
 const indexHtml = await readFile(join(root, "index.html"), "utf8");
 const htmlRequirements = [
   [/^<!doctype html>/i, "index.html must declare the HTML5 doctype."],
-  [/<html\s+lang="en-GB">/i, "index.html must declare lang=\"en-GB\"."],
+  [/<html\s+lang="en-GB">/i, 'index.html must declare lang="en-GB".'],
   [
     /<meta\s+name="viewport"[^>]*viewport-fit=cover/i,
     "index.html must keep the responsive viewport metadata including viewport-fit=cover.",
