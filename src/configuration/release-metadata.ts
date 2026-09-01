@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.0.0";
+export const APP_VERSION = "3.1.0";
 
 export const RELEASE_NOTES = [
-  "Replaced the legacy black-and-white light theme with the Ibiza Sunset Liquid Glass palette across the app, including navigation, actions, browser chrome, and PWA colours.",
+  "Completed the CSS architecture cleanup with focused page/component modules, shared Ibiza tokens, retired catch-all styles, and automated component-ownership checks.",
 ] as const;
