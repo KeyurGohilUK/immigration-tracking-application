@@ -718,3 +718,148 @@ html[data-theme="dark"] .vault-readiness-card {
     padding: 0.85rem 1rem;
   }
 }
+
+.address-history-modal {
+  display: grid;
+  gap: 1rem;
+}
+
+.address-coverage-card,
+.address-history-item,
+.address-empty-state {
+  border: 1px solid var(--glass-border);
+  border-radius: 1.1rem;
+  background: color-mix(
+    in srgb,
+    var(--ibiza-surface-container) 54%,
+    transparent
+  );
+}
+
+.address-coverage-card {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem;
+}
+
+.address-coverage-card > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.address-coverage-card strong,
+.address-history-copy strong {
+  color: var(--colour-text);
+}
+
+.address-coverage-card span,
+.address-history-copy small,
+.address-empty-state span {
+  color: var(--colour-text-muted);
+  font-size: 0.76rem;
+}
+
+.address-coverage-card.is-complete {
+  border-color: color-mix(
+    in srgb,
+    var(--ibiza-primary) 38%,
+    var(--glass-border)
+  );
+}
+
+.address-coverage-card.needs-attention {
+  border-color: color-mix(
+    in srgb,
+    var(--ibiza-orange) 46%,
+    var(--glass-border)
+  );
+}
+
+.address-coverage-ok {
+  margin: 0;
+  color: var(--ibiza-primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.address-gap-list {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--colour-text-muted);
+  font-size: 0.75rem;
+}
+
+.address-gap-list ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.address-history-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.address-history-item {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.75rem;
+}
+
+.address-history-copy {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.address-number {
+  color: var(--ibiza-primary);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.address-history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.address-history-actions .member-action {
+  flex: 1 1 auto;
+}
+
+.address-empty-state {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem;
+}
+
+.address-history-fields {
+  align-items: start;
+}
+
+.address-current-toggle {
+  display: flex;
+  min-height: 2.9rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.9rem;
+  background: color-mix(
+    in srgb,
+    var(--ibiza-surface-container) 48%,
+    transparent
+  );
+  color: var(--colour-text);
+  font-weight: 750;
+}
+
+.address-current-toggle input {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.address-history-dialog textarea {
+  resize: vertical;
+}

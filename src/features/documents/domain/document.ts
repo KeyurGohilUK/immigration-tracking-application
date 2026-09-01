@@ -43,6 +43,7 @@ export interface DocumentMetadata {
   mimeType: DocumentMimeType;
   size: number;
   category: DocumentCategory;
+  addressHistoryId?: string;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
@@ -164,6 +165,8 @@ export function isDocumentMetadata(value: unknown): value is DocumentMetadata {
     (document.size ?? 0) >= 1 &&
     (document.size ?? 0) <= MAXIMUM_DOCUMENT_BYTES &&
     DOCUMENT_CATEGORIES.includes(document.category as DocumentCategory) &&
+    (document.addressHistoryId === undefined ||
+      isRecordIdentifier(document.addressHistoryId)) &&
     Number.isInteger(document.sortOrder) &&
     (document.sortOrder ?? -1) >= 0 &&
     (document.sortOrder ?? -1) <= MAXIMUM_DOCUMENTS_PER_PROFILE

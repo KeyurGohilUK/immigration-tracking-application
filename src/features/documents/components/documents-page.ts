@@ -18,12 +18,19 @@ import {
   DOCUMENT_VAULT_STATUS_LABELS,
   type DocumentVaultSectionProgress,
 } from "../domain/document-vault";
+import type {
+  AddressHistoryCoverage,
+  AddressHistoryEntry,
+} from "../domain/address-history";
+import { renderAddressHistoryDialog } from "./address-history-dialog";
 
 export function renderDocumentsPage(
   root: HTMLElement,
   members: HouseholdMember[],
   selectedProfileId: string,
   allDocuments: DocumentMetadata[],
+  addressHistory: readonly AddressHistoryEntry[],
+  addressCoverage: AddressHistoryCoverage,
 ): void {
   const documents = allDocuments
     .filter(({ profileId }) => profileId === selectedProfileId)
@@ -40,7 +47,9 @@ export function renderDocumentsPage(
     100,
     (totalBytes / MAXIMUM_TOTAL_DOCUMENT_BYTES) * 100,
   );
-  const vaultProgress = calculateDocumentVaultProgress(documents);
+  const vaultProgress = calculateDocumentVaultProgress(documents, {
+    addressHistoryComplete: addressCoverage.complete,
+  });
   renderAppShell(
     root,
     "Documents",
@@ -63,12 +72,13 @@ export function renderDocumentsPage(
       subtitle: "PDF, JPG, or PNG · Maximum 5 MB",
       iconSvg:
         '<svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg>',
-      body: `<div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file">Document file</label><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance">The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><optgroup label="Identity & Immigration"><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option></optgroup><optgroup label="Address History"><option value="address-proof">Address proof</option></optgroup><optgroup label="Employment"><option value="employer-letter">Employer letter</option><option value="employment-contract">Employment contract</option></optgroup><optgroup label="Salary & Tax"><option value="payslip">Payslip</option><option value="tax-document">Tax document</option></optgroup><optgroup label="Travel & Absences"><option value="travel-evidence">Travel evidence</option></optgroup><optgroup label="Life in the UK & English"><option value="life-in-uk">Life in the UK evidence</option><option value="english-language">English-language evidence</option></optgroup><optgroup label="Family / Dependants"><option value="relationship-evidence">Relationship evidence</option></optgroup><optgroup label="Final Application Documents"><option value="application-form">Application form</option><option value="declaration-consent">Declaration or consent</option></optgroup><optgroup label="Additional Documents"><option value="additional-document">Additional supporting document</option></optgroup></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
+      body: `<div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file">Document file</label><input name="addressHistoryId" type="hidden" /><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance">The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><optgroup label="Identity & Immigration"><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option></optgroup><optgroup label="Address History"><option value="address-proof">Address proof</option></optgroup><optgroup label="Employment"><option value="employer-letter">Employer letter</option><option value="employment-contract">Employment contract</option></optgroup><optgroup label="Salary & Tax"><option value="payslip">Payslip</option><option value="tax-document">Tax document</option></optgroup><optgroup label="Travel & Absences"><option value="travel-evidence">Travel evidence</option></optgroup><optgroup label="Life in the UK & English"><option value="life-in-uk">Life in the UK evidence</option><option value="english-language">English-language evidence</option></optgroup><optgroup label="Family / Dependants"><option value="relationship-evidence">Relationship evidence</option></optgroup><optgroup label="Final Application Documents"><option value="application-form">Application form</option><option value="declaration-consent">Declaration or consent</option></optgroup><optgroup label="Additional Documents"><option value="additional-document">Additional supporting document</option></optgroup></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
       actions:
         '<button class="primary-button family-save-button liquid-dialog-save" type="submit">Encrypt and save document</button>',
       dialogClass: "document-dialog",
       closeLabel: "Close document form",
     })}
+    ${renderAddressHistoryDialog(addressHistory, addressCoverage)}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
@@ -228,6 +238,7 @@ function documentNode<K extends keyof HTMLElementTagNameMap>(
 export function showDocumentUploadForm(
   root: HTMLElement,
   category?: DocumentCategory,
+  addressHistoryId?: string,
 ): void {
   const dialog = root.querySelector<HTMLDialogElement>("#document-dialog");
   const form = root.querySelector<HTMLFormElement>("#document-form");
@@ -237,6 +248,10 @@ export function showDocumentUploadForm(
     "category",
   ) as HTMLSelectElement | null;
   if (category && categorySelect) categorySelect.value = category;
+  const addressId = form.elements.namedItem(
+    "addressHistoryId",
+  ) as HTMLInputElement | null;
+  if (addressId) addressId.value = addressHistoryId ?? "";
   const error = form.querySelector<HTMLElement>("#document-form-error");
   if (error) {
     error.textContent = "";
@@ -254,6 +269,7 @@ export function suggestDocumentName(fileName: string): string {
 export function readDocumentUploadForm(form: HTMLFormElement): {
   displayName: string;
   category: DocumentCategory;
+  addressHistoryId?: string;
   file: File | null;
 } {
   const data = new FormData(form);
@@ -261,6 +277,7 @@ export function readDocumentUploadForm(form: HTMLFormElement): {
   return {
     displayName: String(data.get("displayName") ?? "").trim(),
     category: String(data.get("category") ?? "") as DocumentCategory,
+    addressHistoryId: String(data.get("addressHistoryId") ?? "") || undefined,
     file: input.files?.[0] ?? null,
   };
 }
