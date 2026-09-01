@@ -5218,3 +5218,157 @@ html[data-theme="dark"] .travel-progress {
     text-align: right;
   }
 }
+
+/* Ibiza Sunset trip editor */
+.trip-profile-dialog {
+  max-height: calc(100dvh - 1.5rem);
+}
+
+.trip-profile-form {
+  max-height: calc(100dvh - 1.5rem);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.trip-profile-header {
+  padding-bottom: 0.15rem;
+}
+
+.trip-profile-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.trip-profile-fields {
+  width: 100%;
+}
+
+.trip-profile-form .member-profile-field,
+.trip-profile-form .member-profile-control {
+  min-width: 0;
+  width: 100%;
+}
+
+.trip-profile-form .member-profile-control input,
+.trip-profile-form .member-profile-control textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.trip-profile-form .member-profile-control input {
+  padding-right: 0.9rem;
+}
+
+.trip-profile-form .member-profile-control input[type="date"] {
+  padding-right: 0.75rem;
+}
+
+.trip-profile-form .member-profile-control textarea {
+  min-height: 7rem;
+  padding: 0.9rem 1rem 0.9rem 3rem;
+  border: 1px solid rgb(91 63 70 / 16%);
+  border-radius: 1rem;
+  color: var(--ibiza-text);
+  background-color: rgb(255 255 255 / 58%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 68%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  resize: vertical;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.trip-notes-control .trip-notes-icon {
+  top: 1rem;
+  transform: none;
+}
+
+.trip-profile-form .member-profile-control textarea:focus {
+  border-color: rgb(238 9 121 / 48%);
+  outline: 0;
+  background-color: rgb(255 255 255 / 72%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 72%),
+    0 0 0 1px rgb(238 9 121 / 22%),
+    0 0 1.15rem rgb(238 9 121 / 10%);
+}
+
+.trip-review-card {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-color: rgb(238 9 121 / 18%);
+  border-radius: 1rem;
+  background: rgb(238 9 121 / 5%);
+}
+
+.trip-review-card strong {
+  color: var(--ibiza-text);
+}
+
+.trip-review-card small {
+  color: var(--ibiza-text-muted);
+  line-height: 1.45;
+}
+
+.trip-profile-save {
+  width: 100%;
+}
+
+html[data-theme="dark"] .trip-profile-form .member-profile-control textarea {
+  border-color: rgb(255 255 255 / 10%);
+  color: var(--ibiza-text);
+  background-color: rgb(21 6 41 / 72%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+html[data-theme="dark"]
+  .trip-profile-form
+  .member-profile-control
+  textarea:focus {
+  border-color: rgb(255 177 197 / 48%);
+  background-color: rgb(26 11 46 / 92%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 0 0 1px rgb(255 177 197 / 18%),
+    0 0 1.25rem rgb(238 9 121 / 18%);
+}
+
+html[data-theme="dark"] .trip-review-card {
+  border-color: rgb(255 106 0 / 28%);
+  background: rgb(255 106 0 / 6%);
+}
+
+@media (max-width: 35.99rem) {
+  .trip-profile-dialog {
+    width: min(calc(100% - 1rem), 34rem);
+    max-height: calc(100dvh - 1rem);
+  }
+
+  .trip-profile-form {
+    max-height: calc(100dvh - 1rem);
+    padding: 1.1rem;
+  }
+
+  .trip-profile-header {
+    padding-right: 2.35rem;
+    padding-left: 2.35rem;
+  }
+
+  .trip-profile-form .member-profile-fields {
+    gap: 0.85rem;
+  }
+
+  .trip-profile-form .member-profile-control input {
+    height: 3.2rem;
+    min-height: 3.2rem;
+  }
+
+  .trip-profile-form .member-profile-control textarea {
+    min-height: 6.25rem;
+  }
+}
