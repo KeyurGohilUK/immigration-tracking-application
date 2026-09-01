@@ -1,5 +1,6 @@
 import { APP_NAME } from "../configuration/app-metadata";
 import type { HouseholdMember } from "../features/household/domain/household-member";
+import { renderHouseholdMemberDialogMarkup } from "../features/household/components/member-profile-dialog";
 
 const navigationItems = [
   {
@@ -196,7 +197,8 @@ export function renderApp(
           <p>Always verify current GOV.UK guidance and obtain qualified advice before applying.</p>
         </div>
       </aside>
-    </main>`,
+    </main>
+    ${renderHouseholdMemberDialogMarkup()}`,
   );
 
   const familyList = root.querySelector<HTMLElement>("#dashboard-family-list");
