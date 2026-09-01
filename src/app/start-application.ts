@@ -159,7 +159,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       profile: HouseholdMember,
       currentView:
         | "Home"
-        | "Family"
         | "Permissions"
         | "Trips"
         | "ILR"
@@ -183,12 +182,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           link.addEventListener("click", (event) => {
             event.preventDefault();
             renderDashboard(profile);
-          });
-        }
-        if (destination === "Family") {
-          link.addEventListener("click", (event) => {
-            event.preventDefault();
-            showFamily(profile);
           });
         }
         if (destination === "Trips") {
@@ -226,9 +219,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             ({ id }) => id === profileId,
           );
           if (!selectedMember) return;
-          if (currentView === "Family")
-            renderFamily(selectedMember, familyMembers);
-          else if (currentView === "Permissions")
+          if (currentView === "Permissions")
             void showPermissions(selectedMember);
           else if (currentView === "Trips") void showTrips(selectedMember);
           else if (currentView === "ILR") void showIlrJourney(selectedMember);
