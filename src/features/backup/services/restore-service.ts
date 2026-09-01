@@ -60,17 +60,17 @@ export async function replaceAllLocalData(
       })),
     ),
       data.documents === undefined
-      ? Promise.resolve(undefined)
-      : Promise.all(
-          data.documents.map(async ({ metadata, content }) => ({
-            id: metadata.id,
-            encrypted: await createEncryptedDocumentRecord(
-              metadata,
-              base64ToBytes(content),
-              vaultKey,
-            ),
-          })),
-        ),
+        ? Promise.resolve(undefined)
+        : Promise.all(
+            data.documents.map(async ({ metadata, content }) => ({
+              id: metadata.id,
+              encrypted: await createEncryptedDocumentRecord(
+                metadata,
+                base64ToBytes(content),
+                vaultKey,
+              ),
+            })),
+          ),
     ]);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
