@@ -29,8 +29,7 @@
   --glass-surface-strong: rgb(255 247 255 / 84%);
   --glass-border: rgb(182 0 90 / 14%);
   --glass-shadow:
-    0 0.8rem 2.4rem rgb(182 0 90 / 8%),
-    inset 0 1px 0 rgb(255 255 255 / 68%);
+    0 0.8rem 2.4rem rgb(182 0 90 / 8%), inset 0 1px 0 rgb(255 255 255 / 68%);
   --radius-small: 0.75rem;
   --radius-medium: 1.25rem;
   --radius-large: 1.75rem;
