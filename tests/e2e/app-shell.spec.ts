@@ -717,9 +717,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Child",
   );
-  await page
-    .getByRole("button", { name: "Edit Freddy Test Child" })
-    .click();
+  await page.getByRole("button", { name: "Edit Freddy Test Child" }).click();
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
