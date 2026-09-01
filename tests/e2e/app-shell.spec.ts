@@ -1105,7 +1105,7 @@ test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({
   expect((navigationBox?.y ?? 0) + (navigationBox?.height ?? 0)).toBeLessThan(
     viewport.height,
   );
-  expect(navigationStyles.background).toContain("0.76");
+  expect(navigationStyles.background).toBe("rgba(255, 247, 255, 0.78)");
   expect(navigationStyles.borderRadius).toBe("999px");
   expect(navigationStyles.indicatorRadius).toBe("999px");
   expect(navigationStyles.indicatorTransition).toBe("0.38s");
