@@ -912,8 +912,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const wireDashboardActions = (profile: HouseholdMember): void => {
       const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
       const form = root.querySelector<HTMLFormElement>("#family-form");
-      const addMember =
-        root.querySelector<HTMLButtonElement>("#manage-family");
+      const addMember = root.querySelector<HTMLButtonElement>("#manage-family");
       if (addMember) addMember.disabled = !familyProfilesAvailable;
 
       root
@@ -922,9 +921,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#manage-trips")
         ?.addEventListener("click", () => void showTrips(profile));
-      addMember?.addEventListener("click", () =>
-        showHouseholdMemberForm(root),
-      );
+      addMember?.addEventListener("click", () => showHouseholdMemberForm(root));
       root
         .querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => dialog?.close());
@@ -1009,9 +1006,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           return;
         }
-        const existingMember = familyMembers.find(
-          ({ id }) => id === memberId,
-        );
+        const existingMember = familyMembers.find(({ id }) => id === memberId);
         const timestamp = new Date().toISOString();
         const member: HouseholdMember = {
           version: 1,
