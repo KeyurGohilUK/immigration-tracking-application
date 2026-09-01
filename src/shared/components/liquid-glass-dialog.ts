@@ -5,6 +5,7 @@ export interface LiquidGlassDialogOptions {
   eyebrow: string;
   title: string;
   subtitle?: string;
+  subtitleId?: string;
   iconSvg?: string;
   body: string;
   actions: string;
@@ -21,6 +22,7 @@ export function renderLiquidGlassDialog({
   eyebrow,
   title,
   subtitle,
+  subtitleId,
   iconSvg,
   body,
   actions,
@@ -46,7 +48,7 @@ export function renderLiquidGlassDialog({
         ${iconSvg ? `<div class="liquid-dialog-icon" aria-hidden="true">${iconSvg}</div>` : ""}
         <p class="eyebrow">${eyebrow}</p>
         <h2 id="${labelledBy}">${title}</h2>
-        ${subtitle ? `<p class="liquid-dialog-subtitle">${subtitle}</p>` : ""}
+        ${subtitle ? `<p${subtitleId ? ` id="${subtitleId}"` : ""} class="liquid-dialog-subtitle">${subtitle}</p>` : ""}
       </div>
       <div class="liquid-dialog-body">
         ${body}
