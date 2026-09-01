@@ -473,6 +473,7 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
 
   const theme = page.getByLabel("Theme preference");
   await expect(theme).toHaveValue("light");
+  await expect(theme).toHaveCSS("background-image", "none");
 
   await theme.selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
