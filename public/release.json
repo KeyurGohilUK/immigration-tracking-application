@@ -1,6 +1,6 @@
 {
-  "version": "3.5.1",
+  "version": "3.6.0",
   "notes": [
-    "Fixed iPhone date and month controls so form fields stay within Liquid Glass modals."
+    "Added structured Life in the UK and English evidence details, including pass date, UAN/reference capture, evidence type, and optional supporting uploads."
   ]
 }
