@@ -46,10 +46,7 @@ export function validateLifeEnglishInput(
     !DATE_PATTERN.test(input.lifeInUkPassedDate)
   )
     return "Enter the Life in the UK pass date.";
-  if (
-    input.lifeInUkStatus !== "passed" &&
-    input.lifeInUkPassedDate.length > 0
-  )
+  if (input.lifeInUkStatus !== "passed" && input.lifeInUkPassedDate.length > 0)
     return "Only record a Life in the UK pass date when the test is marked as passed.";
   if (input.lifeInUkReference.trim().length > 120)
     return "Life in the UK reference must be 120 characters or fewer.";
@@ -102,9 +99,7 @@ export function isLifeEnglishCollection(
   );
 }
 
-export function isLifeInUkComplete(
-  record: LifeEnglishRecord | null,
-): boolean {
+export function isLifeInUkComplete(record: LifeEnglishRecord | null): boolean {
   if (!record || record.lifeInUkStatus === "not-recorded") return false;
   return (
     record.lifeInUkStatus === "exempt" ||
