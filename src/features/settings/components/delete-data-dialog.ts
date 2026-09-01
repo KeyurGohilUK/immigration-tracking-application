@@ -1,3 +1,4 @@
+import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import { deleteAllLocalData } from "../services/local-data-service";
 
 export type DeleteDataContext = "unlocked" | "locked";
@@ -29,17 +30,24 @@ const messages = {
 
 export function renderDeleteDataDialog(context: DeleteDataContext): string {
   const content = messages[context];
-  return `<dialog id="delete-data-dialog" class="family-dialog" aria-labelledby="delete-data-dialog-title">
-    <form id="delete-data-form" class="family-form" novalidate>
-      <div class="app-manager-heading"><div><p class="eyebrow">${content.eyebrow}</p><h2 id="delete-data-dialog-title">${content.title}</h2></div><button class="dialog-close" type="button" aria-label="Close delete data form">×</button></div>
-      <p id="delete-data-guidance">${content.guidance}</p>
+  return renderLiquidGlassDialog({
+    id: "delete-data-dialog",
+    labelledBy: "delete-data-dialog-title",
+    formId: "delete-data-form",
+    eyebrow: content.eyebrow,
+    title: content.title,
+    subtitle: content.guidance,
+    iconSvg:
+      '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>',
+    body: `<p id="delete-data-guidance" class="sr-only">${content.guidance}</p>
       <p class="local-data-banner danger-warning"><strong>This cannot be undone.</strong> ${content.warning}</p>
       <label for="delete-data-confirmation">Type DELETE to confirm</label>
       <input id="delete-data-confirmation" name="confirmationPhrase" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="delete-data-guidance" required />
-      <p id="delete-data-error" class="form-error" role="alert" hidden></p>
-      <button id="confirm-delete-data" class="primary-button danger-button" type="submit">${content.button}</button>
-    </form>
-  </dialog>`;
+      <p id="delete-data-error" class="form-error" role="alert" hidden></p>`,
+    actions: `<button id="confirm-delete-data" class="primary-button danger-button liquid-dialog-save" type="submit">${content.button}</button>`,
+    dialogClass: "danger-liquid-dialog",
+    closeLabel: "Close delete data form",
+  });
 }
 
 interface DeleteDataDialogOptions {
