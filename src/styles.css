@@ -4343,8 +4343,6 @@ html[data-theme="dark"] select:not([multiple]) {
   background-color: rgb(255 255 255 / 10%);
 }
 
-
-
 html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0.82;
 }
