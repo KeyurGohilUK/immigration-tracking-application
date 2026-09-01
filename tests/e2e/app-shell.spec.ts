@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Completed the CSS architecture cleanup with focused page/component modules, shared Ibiza tokens, retired catch-all styles, and automated component-ownership checks.",
+      "Added automated accessibility audits and visual theme regression coverage for the Ibiza light/dark design system.",
     ),
   ).toBeVisible();
   await expect(
