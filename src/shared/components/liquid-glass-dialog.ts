@@ -59,3 +59,14 @@ export function renderLiquidGlassDialog({
     </form>
   </dialog>`;
 }
+
+export function createLiquidGlassDialog(
+  options: LiquidGlassDialogOptions,
+): HTMLDialogElement {
+  const template = document.createElement("template");
+  template.innerHTML = renderLiquidGlassDialog(options).trim();
+  const dialog = template.content.firstElementChild;
+  if (!(dialog instanceof HTMLDialogElement))
+    throw new Error("Liquid Glass dialog could not be created.");
+  return dialog;
+}

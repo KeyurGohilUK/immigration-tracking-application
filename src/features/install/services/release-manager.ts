@@ -2,6 +2,7 @@ import {
   APP_VERSION,
   RELEASE_NOTES,
 } from "../../../configuration/release-metadata";
+import { createLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import type { InstallController } from "./install-prompt";
 
 interface ReleaseManifest {
@@ -58,10 +59,27 @@ export function initialiseReleaseManager(
   trigger.title = "Install and updates";
   trigger.setAttribute("aria-haspopup", "dialog");
 
-  const dialog = document.createElement("dialog");
-  dialog.className = "app-manager-dialog";
-  dialog.setAttribute("aria-labelledby", "app-manager-title");
-  dialog.innerHTML = `<div class="app-manager-heading"><div><p class="eyebrow">UrbanFox ILR</p><h2 id="app-manager-title">Install and updates</h2></div><button class="dialog-close" type="button" aria-label="Close">×</button></div><p id="release-status">Checking latest version…</p><dl class="version-list"><div><dt>Installed</dt><dd>${APP_VERSION}</dd></div><div><dt>Latest</dt><dd id="latest-version">Checking…</dd></div></dl><section><h3>What’s new</h3><ul id="release-notes"></ul></section><div class="app-manager-actions"><button id="install-from-menu" class="secondary-button" type="button">Install app</button><p id="install-guidance" class="storage-note"></p><button id="download-update" class="primary-button" type="button">Download updates</button></div><p id="update-message" class="form-error" role="status"></p>`;
+  const dialog = createLiquidGlassDialog({
+    id: "app-manager-dialog",
+    labelledBy: "app-manager-title",
+    formId: "app-manager-form",
+    eyebrow: "UrbanFox ILR",
+    title: "Install and updates",
+    subtitle:
+      "Manage this device installation and keep UrbanFox ILR on the latest release.",
+    iconSvg:
+      '<svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4"/></svg>',
+    body: `<p id="release-status" class="app-manager-status">Checking latest version…</p>
+      <dl class="version-list"><div><dt>Installed</dt><dd>${APP_VERSION}</dd></div><div><dt>Latest</dt><dd id="latest-version">Checking…</dd></div></dl>
+      <section class="app-manager-release-notes"><h3>What’s new</h3><ul id="release-notes"></ul></section>
+      <p id="install-guidance" class="storage-note"></p>
+      <p id="update-message" class="form-error" role="status"></p>`,
+    actions: `<button id="install-from-menu" class="secondary-button" type="button">Install app</button>
+      <button id="download-update" class="primary-button liquid-dialog-save" type="button">Download updates</button>`,
+    dialogClass: "app-manager-dialog",
+    formClass: "app-manager-form",
+    closeLabel: "Close",
+  });
   document.body.append(dialog);
 
   const placeTrigger = (): void => {
