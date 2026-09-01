@@ -14,7 +14,8 @@
     "check:release": "node scripts/check-release-version.mjs",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run check:release && npm run test:unit && npm run build"
+    "check": "npm run format:check && npm run lint && npm run lint:frontend && npm run typecheck && npm run check:release && npm run test:unit && npm run build",
+    "lint:frontend": "node scripts/check-frontend-standards.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
