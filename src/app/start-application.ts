@@ -126,10 +126,7 @@ import {
   createDocumentPack,
   downloadDocumentPack,
 } from "../features/documents/services/document-pack-service";
-import {
-  getDefaultCategoryForSection,
-  type DocumentVaultSectionId,
-} from "../features/documents/domain/document-vault";
+import { getDefaultCategoryForSection } from "../features/documents/domain/document-vault";
 import {
   renderIlrJourneyPage,
   type IlrJourneyMember,
@@ -656,9 +653,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         "[data-add-vault-section]",
       )) {
         button.addEventListener("click", () => {
-          const sectionId = button.dataset.addVaultSection as
-            | DocumentVaultSectionId
-            | undefined;
+          const sectionId = button.dataset.addVaultSection;
           const category = sectionId
             ? getDefaultCategoryForSection(sectionId)
             : null;
