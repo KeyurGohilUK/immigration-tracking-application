@@ -14,6 +14,7 @@ export interface BackupSummary {
   trips: number;
   documents: number;
   addresses: number;
+  lifeEnglishRecords: number;
   includesDocuments: boolean;
 }
 
@@ -30,6 +31,10 @@ export function summariseBackup(data: BackupData): BackupSummary {
       (total, { records }) => total + records.length,
       0,
     ),
+    lifeEnglishRecords: data.lifeEnglish.reduce(
+      (total, { records }) => total + records.length,
+      0,
+    ),
     includesDocuments: data.documents !== undefined,
   };
 }
@@ -38,7 +43,7 @@ export async function replaceAllLocalData(
   data: BackupData,
   vaultKey: CryptoKey,
 ): Promise<void> {
-  const [members, permissions, trips, addressHistory, documents] =
+  const [members, permissions, trips, addressHistory, lifeEnglish, documents] =
     await Promise.all([
       encryptRecord(data.members, vaultKey),
       Promise.all(
@@ -55,6 +60,12 @@ export async function replaceAllLocalData(
       ),
       Promise.all(
         data.addressHistory.map(async ({ profileId, records }) => ({
+          profileId,
+          encrypted: await encryptRecord(records, vaultKey),
+        })),
+      ),
+      Promise.all(
+        data.lifeEnglish.map(async ({ profileId, records }) => ({
           profileId,
           encrypted: await encryptRecord(records, vaultKey),
         })),
@@ -80,6 +91,7 @@ export async function replaceAllLocalData(
         DATABASE_STORES.permissions,
         DATABASE_STORES.trips,
         DATABASE_STORES.addressHistory,
+        DATABASE_STORES.lifeEnglish,
         ...(documents ? [DATABASE_STORES.documents] : []),
       ],
       "readwrite",
@@ -91,6 +103,9 @@ export async function replaceAllLocalData(
     const tripStore = transaction.objectStore(DATABASE_STORES.trips);
     const addressHistoryStore = transaction.objectStore(
       DATABASE_STORES.addressHistory,
+    );
+    const lifeEnglishStore = transaction.objectStore(
+      DATABASE_STORES.lifeEnglish,
     );
     const documentStore = documents
       ? transaction.objectStore(DATABASE_STORES.documents)
@@ -111,6 +126,7 @@ export async function replaceAllLocalData(
       permissionStore.clear();
       tripStore.clear();
       addressHistoryStore.clear();
+      lifeEnglishStore.clear();
       documentStore?.clear();
       profileStore.put(members, HOUSEHOLD_MEMBERS_RECORD_KEY);
       for (const item of permissions)
@@ -118,6 +134,8 @@ export async function replaceAllLocalData(
       for (const item of trips) tripStore.put(item.encrypted, item.profileId);
       for (const item of addressHistory)
         addressHistoryStore.put(item.encrypted, item.profileId);
+      for (const item of lifeEnglish)
+        lifeEnglishStore.put(item.encrypted, item.profileId);
       for (const item of documents ?? [])
         documentStore?.put(item.encrypted, item.id);
     } catch {
