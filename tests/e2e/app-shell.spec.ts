@@ -244,6 +244,18 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "Document Vault", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("No documents added yet")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Identity & Immigration" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Address History" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Final Application Documents" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Download PDF pack" }),
+  ).toBeDisabled();
 
   await page.getByRole("button", { name: "Add document" }).click();
   const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
@@ -264,6 +276,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(
     page.getByRole("heading", { name: "Council tax statement" }),
   ).toBeVisible();
+  const addressRow = page
+    .getByRole("heading", { name: "Address History" })
+    .locator("..");
+  await expect(addressRow.getByText("COMPLETE")).toBeVisible();
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
