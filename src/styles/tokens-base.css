@@ -8,6 +8,13 @@
   --ibiza-text: #231437;
   --ibiza-text-muted: #5b3f46;
   --ibiza-outline: #e3bdc5;
+  --ibiza-glass-soft: rgb(255 247 255 / 68%);
+  --ibiza-glass-medium: rgb(255 247 255 / 78%);
+  --ibiza-glass-strong: rgb(255 247 255 / 84%);
+  --ibiza-glass-highlight: rgb(255 255 255 / 68%);
+  --ibiza-border-soft: rgb(182 0 90 / 14%);
+  --ibiza-glow-pink-soft: rgb(238 9 121 / 16%);
+  --ibiza-glow-orange-soft: rgb(255 106 0 / 10%);
   --ibiza-gradient: linear-gradient(
     135deg,
     var(--ibiza-pink),
@@ -25,9 +32,9 @@
   --colour-danger-hover: #7a2818;
   --colour-danger-surface: rgb(255 236 232 / 82%);
   --colour-on-danger: #ffffff;
-  --glass-surface: rgb(255 247 255 / 68%);
-  --glass-surface-strong: rgb(255 247 255 / 84%);
-  --glass-border: rgb(182 0 90 / 14%);
+  --glass-surface: var(--ibiza-glass-soft);
+  --glass-surface-strong: var(--ibiza-glass-strong);
+  --glass-border: var(--ibiza-border-soft);
   --glass-shadow:
     0 0.8rem 2.4rem rgb(182 0 90 / 8%), inset 0 1px 0 rgb(255 255 255 / 68%);
   --radius-small: 0.75rem;
