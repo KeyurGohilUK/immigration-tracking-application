@@ -20,10 +20,12 @@ UrbanFox ILR uses semantic HTML, accessible native controls, and an Ibiza Sunset
 `src/styles.css` is an ordered entrypoint only. Do not add rules directly to it.
 
 Shared foundations:
+
 - `src/styles/tokens-base.css`: Ibiza tokens, reset, base document rules, and reduced-motion accessibility.
 - `src/styles/theme-dark.css`: central dark-theme token aliases and shared dark overrides.
 
 Shared components:
+
 - `src/styles/components/app-shell.css`: app shell and top bar.
 - `src/styles/components/install-manager.css`: install/update controls.
 - `src/styles/components/navigation.css`: all desktop/mobile primary navigation behaviour.
