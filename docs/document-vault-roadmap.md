@@ -17,10 +17,10 @@ product roadmap.
 
 ## Pending
 
-- [ ] Finish Address History UI integration: add/edit/delete structured
-      addresses and link proof uploads to a specific address.
-- [ ] Make Address History readiness depend on complete route-required timeline
-      coverage rather than presence of one proof file.
+- [x] Address History UI integration: add/edit/delete structured addresses and
+      link proof uploads to a specific address.
+- [x] Address History readiness depends on complete route-required timeline
+      coverage plus supporting address proof.
 - [ ] Add dedicated requirement-specific Liquid Glass modals for all vault
       sections.
 - [ ] Capture Life in the UK status, pass date, UAN/reference number, and
