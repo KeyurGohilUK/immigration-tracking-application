@@ -66,7 +66,9 @@ describe("Document Vault readiness", () => {
       documentFor("address-proof", 0),
     ]);
 
-    const address = progress.sections.find(({ id }) => id === "address-history");
+    const address = progress.sections.find(
+      ({ id }) => id === "address-history",
+    );
     expect(address?.status).toBe("complete");
     expect(address?.completedRequired).toBe(1);
     expect(progress.readinessPercent).toBe(17);
