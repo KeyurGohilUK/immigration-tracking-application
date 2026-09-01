@@ -61,17 +61,26 @@ describe("Document Vault readiness", () => {
     ).toBe("complete");
   });
 
-  it("counts legacy Address Proof towards the new Address History section", () => {
-    const progress = calculateDocumentVaultProgress([
+  it("requires structured timeline coverage as well as Address Proof", () => {
+    const proofOnly = calculateDocumentVaultProgress([
       documentFor("address-proof", 0),
     ]);
-
-    const address = progress.sections.find(
+    const proofOnlyAddress = proofOnly.sections.find(
       ({ id }) => id === "address-history",
     );
-    expect(address?.status).toBe("complete");
-    expect(address?.completedRequired).toBe(1);
-    expect(progress.readinessPercent).toBe(17);
+    expect(proofOnlyAddress?.status).toBe("to-do");
+    expect(proofOnlyAddress?.completedRequired).toBe(0);
+
+    const complete = calculateDocumentVaultProgress(
+      [documentFor("address-proof", 0)],
+      { addressHistoryComplete: true },
+    );
+    const completeAddress = complete.sections.find(
+      ({ id }) => id === "address-history",
+    );
+    expect(completeAddress?.status).toBe("complete");
+    expect(completeAddress?.completedRequired).toBe(1);
+    expect(complete.readinessPercent).toBe(17);
   });
 
   it("does not make conditional or later evidence reduce readiness", () => {
