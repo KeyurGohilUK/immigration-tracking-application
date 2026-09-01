@@ -62,9 +62,8 @@ import {
 import { renderFirstMemberForm } from "../features/household/components/first-member-form";
 import {
   readHouseholdMemberInput,
-  renderFamilyPage,
   showHouseholdMemberForm,
-} from "../features/household/components/family-page";
+} from "../features/household/components/member-profile-dialog";
 import { isKnownProfileId } from "../features/household/components/person-switcher";
 import {
   getHouseholdMembers,
@@ -920,50 +919,21 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const wireDashboardActions = (profile: HouseholdMember): void => {
+      const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
+      const form = root.querySelector<HTMLFormElement>("#family-form");
+      const addMember =
+        root.querySelector<HTMLButtonElement>("#manage-family");
+      if (addMember) addMember.disabled = !familyProfilesAvailable;
+
       root
         .querySelector<HTMLButtonElement>("#manage-permissions")
         ?.addEventListener("click", () => void showPermissions(profile));
       root
         .querySelector<HTMLButtonElement>("#manage-trips")
         ?.addEventListener("click", () => void showTrips(profile));
-      root
-        .querySelector<HTMLButtonElement>("#manage-family")
-        ?.addEventListener("click", () => showFamily(profile));
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-select-dashboard-profile]",
-      )) {
-        button.addEventListener("click", () => {
-          const profileId = button.dataset.selectDashboardProfile;
-          if (!profileId || !isKnownProfileId(profileId, familyMembers)) return;
-          selectedProfileId = profileId;
-          renderDashboard(profile);
-        });
-      }
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-edit-dashboard-member]",
-      )) {
-        button.addEventListener("click", () => {
-          const profileId = button.dataset.editDashboardMember;
-          const member = familyMembers.find(({ id }) => id === profileId);
-          if (!profileId || !member) return;
-          selectedProfileId = profileId;
-          renderFamily(member, familyMembers);
-          showHouseholdMemberForm(root, member);
-        });
-      }
-    };
-
-    const renderFamily = (
-      profile: HouseholdMember,
-      members: HouseholdMember[],
-    ): void => {
-      renderFamilyPage(root, members, selectedProfileId);
-      wireAuthenticatedShell(profile, "Family");
-      const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
-      const form = root.querySelector<HTMLFormElement>("#family-form");
-      root
-        .querySelector<HTMLButtonElement>("#add-family-member")
-        ?.addEventListener("click", () => showHouseholdMemberForm(root));
+      addMember?.addEventListener("click", () =>
+        showHouseholdMemberForm(root),
+      );
       root
         .querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => dialog?.close());
@@ -972,34 +942,37 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       });
 
       for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-select-profile]",
+        "[data-select-dashboard-profile]",
       )) {
         button.addEventListener("click", () => {
-          const profileId = button.dataset.selectProfile;
-          if (!profileId || !isKnownProfileId(profileId, members)) return;
+          const profileId = button.dataset.selectDashboardProfile;
+          if (!profileId || !isKnownProfileId(profileId, familyMembers)) return;
           selectedProfileId = profileId;
-          const selectedMember = members.find(({ id }) => id === profileId);
-          if (selectedMember) renderFamily(selectedMember, members);
+          const selectedMember = familyMembers.find(
+            ({ id }) => id === profileId,
+          );
+          if (selectedMember) renderDashboard(selectedMember);
         });
       }
 
       for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-edit-member]",
+        "[data-edit-dashboard-member]",
       )) {
         button.addEventListener("click", () => {
-          const member = members.find(
-            ({ id }) => id === button.dataset.editMember,
-          );
-          if (member) showHouseholdMemberForm(root, member);
+          const profileId = button.dataset.editDashboardMember;
+          const member = familyMembers.find(({ id }) => id === profileId);
+          if (!profileId || !member) return;
+          selectedProfileId = profileId;
+          showHouseholdMemberForm(root, member, familyMembers.length > 1);
         });
       }
 
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-delete-member]",
-      )) {
-        button.addEventListener("click", async () => {
-          const member = members.find(
-            ({ id }) => id === button.dataset.deleteMember,
+      root
+        .querySelector<HTMLButtonElement>("#delete-household-member")
+        ?.addEventListener("click", async (event) => {
+          const button = event.currentTarget as HTMLButtonElement;
+          const member = familyMembers.find(
+            ({ id }) => id === button.dataset.memberId,
           );
           if (
             !member ||
@@ -1008,18 +981,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             )
           )
             return;
-          const nextMembers = members.filter(({ id }) => id !== member.id);
+          const nextMembers = familyMembers.filter(
+            ({ id }) => id !== member.id,
+          );
           try {
             await saveHouseholdMembers(nextMembers, key);
             familyMembers = nextMembers;
             if (selectedProfileId === member.id)
               selectedProfileId = nextMembers[0]?.id ?? "";
+            dialog?.close();
             const selectedMember =
               nextMembers.find(({ id }) => id === selectedProfileId) ??
               nextMembers[0];
-            if (selectedMember) renderFamily(selectedMember, nextMembers);
+            if (selectedMember) renderDashboard(selectedMember);
           } catch {
-            const error = root.querySelector<HTMLElement>("#family-page-error");
+            const error = form?.querySelector<HTMLElement>(
+              "#family-form-error",
+            );
             if (error) {
               error.textContent =
                 "The family member could not be deleted. Your existing data is unchanged.";
@@ -1027,7 +1005,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             }
           }
         });
-      }
 
       form?.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -1041,7 +1018,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           return;
         }
-        const existingMember = members.find(({ id }) => id === memberId);
+        const existingMember = familyMembers.find(
+          ({ id }) => id === memberId,
+        );
         const timestamp = new Date().toISOString();
         const member: HouseholdMember = {
           version: 1,
@@ -1051,10 +1030,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           updatedAt: timestamp,
         };
         const nextMembers = existingMember
-          ? members.map((current) =>
+          ? familyMembers.map((current) =>
               current.id === existingMember.id ? member : current,
             )
-          : [...members, member];
+          : [...familyMembers, member];
         const submit = form.querySelector<HTMLButtonElement>(
           'button[type="submit"]',
         );
@@ -1068,7 +1047,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const selectedMember =
             nextMembers.find(({ id }) => id === selectedProfileId) ??
             nextMembers[0];
-          if (selectedMember) renderFamily(selectedMember, nextMembers);
+          if (selectedMember) renderDashboard(selectedMember);
         } catch {
           if (error) {
             error.textContent =
@@ -1078,21 +1057,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (submit) submit.disabled = false;
         }
       });
-    };
-
-    const showFamily = (profile: HouseholdMember): void => {
-      renderFamily(profile, familyMembers);
-      if (!familyProfilesAvailable) {
-        const addMember =
-          root.querySelector<HTMLButtonElement>("#add-family-member");
-        if (addMember) addMember.disabled = true;
-        const error = root.querySelector<HTMLElement>("#family-page-error");
-        if (error) {
-          error.textContent =
-            "Your encrypted family profiles could not be opened.";
-          error.hidden = false;
-        }
-      }
     };
 
     const renderPermissions = (
