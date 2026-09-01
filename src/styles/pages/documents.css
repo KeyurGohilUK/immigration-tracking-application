@@ -319,7 +319,11 @@
 }
 
 .vault-section-card[open] {
-  border-color: color-mix(in srgb, var(--ibiza-primary) 24%, var(--glass-border));
+  border-color: color-mix(
+    in srgb,
+    var(--ibiza-primary) 24%,
+    var(--glass-border)
+  );
 }
 
 .vault-section-card[open] .vault-category-row {
@@ -353,7 +357,6 @@
   background: transparent;
   content: "";
 }
-
 
 .vault-category-icon {
   display: grid;
