@@ -5377,7 +5377,9 @@ html[data-theme="dark"] .trip-review-card {
 
 /* Shared Ibiza Sunset Liquid Glass dialog system */
 .liquid-dialog {
-  position: relative;
+  position: fixed;
+  inset: 0;
+  margin: auto;
   overflow: visible;
   width: min(calc(100% - 2rem), 36rem);
   max-height: calc(100dvh - 2rem);
