@@ -1,5 +1,6 @@
 import { APP_NAME } from "../configuration/app-metadata";
 import type { HouseholdMember } from "../features/household/domain/household-member";
+import { renderHouseholdMemberDialogMarkup } from "../features/household/components/member-profile-dialog";
 
 const navigationItems = [
   {
@@ -30,15 +31,14 @@ const navigationItems = [
 ] as const;
 
 export type NavigationId =
-  (typeof navigationItems)[number]["id"] | "Family" | "Permissions";
+  (typeof navigationItems)[number]["id"] | "Permissions";
 
 let previousMobileNavigationIndex = 0;
 
 function resolvePrimaryNavigationId(
   activeNavigation: NavigationId,
 ): (typeof navigationItems)[number]["id"] {
-  if (activeNavigation === "Family" || activeNavigation === "Permissions")
-    return "Home";
+  if (activeNavigation === "Permissions") return "Home";
   return activeNavigation;
 }
 
@@ -196,7 +196,8 @@ export function renderApp(
           <p>Always verify current GOV.UK guidance and obtain qualified advice before applying.</p>
         </div>
       </aside>
-    </main>`,
+    </main>
+    ${renderHouseholdMemberDialogMarkup()}`,
   );
 
   const familyList = root.querySelector<HTMLElement>("#dashboard-family-list");

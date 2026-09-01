@@ -4615,6 +4615,15 @@ html[data-theme] .member-profile-form .member-profile-select-control select {
   line-height: 1.45;
 }
 
+.member-profile-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.member-profile-actions .danger-button[hidden] {
+  display: none;
+}
+
 .member-profile-save {
   display: inline-flex;
   min-height: 3.5rem;
