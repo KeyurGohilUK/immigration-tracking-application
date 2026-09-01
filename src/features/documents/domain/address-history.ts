@@ -122,7 +122,12 @@ export function calculateAddressHistoryCoverage(
   asOfMonth: string,
 ): AddressHistoryCoverage {
   if (requiredMonths === null)
-    return { requiredMonths: null, coveredMonths: 0, complete: false, gaps: [] };
+    return {
+      requiredMonths: null,
+      coveredMonths: 0,
+      complete: false,
+      gaps: [],
+    };
   if (!MONTH_PATTERN.test(asOfMonth))
     throw new Error("Address-history as-of month is invalid.");
 
