@@ -239,9 +239,9 @@ test("stores and manages encrypted documents for a profile", async ({
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page.getByRole("link", { name: "Documents" }).first().click();
+  await page.getByRole("link", { name: "Vault" }).first().click();
   await expect(
-    page.getByRole("heading", { name: "Documents", exact: true }),
+    page.getByRole("heading", { name: "Document Vault", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("No documents added yet")).toBeVisible();
 
