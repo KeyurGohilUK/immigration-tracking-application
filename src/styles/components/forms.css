@@ -1,0 +1,152 @@
+.family-form .danger-warning {
+  color: var(--colour-danger);
+  font-weight: 700;
+}
+
+.danger-zone .more-card-icon {
+  border-color: var(--colour-danger);
+}
+
+.secondary-button.danger-button,
+.primary-button.danger-button {
+  border: 1px solid var(--colour-danger);
+  color: var(--colour-on-danger);
+  background: var(--colour-danger);
+}
+
+.secondary-button.danger-button:hover,
+.primary-button.danger-button:hover {
+  border-color: var(--colour-danger-hover);
+  background: var(--colour-danger-hover);
+}
+
+.secondary-button.danger-button:focus-visible,
+.primary-button.danger-button:focus-visible {
+  outline-color: var(--colour-danger);
+}
+
+.landing-status {
+  margin: 0.85rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--colour-strong);
+  border-radius: var(--radius-small);
+  color: var(--colour-text);
+  background: var(--colour-surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.restore-summary {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--colour-border);
+}
+
+.restore-summary[hidden] {
+  display: none;
+}
+
+.restore-counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.restore-counts div {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-small);
+  text-align: center;
+}
+
+.restore-counts dt {
+  color: var(--colour-text-muted);
+  font-size: 0.7rem;
+}
+
+.restore-counts dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.more-version {
+  margin: 0.35rem 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.record-heading {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.record-heading h1 {
+  margin-bottom: 0.5rem;
+}
+
+.record-heading-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.record-heading-actions.single-action {
+  grid-template-columns: 1fr;
+}
+
+.record-heading-actions .secondary-button,
+.record-heading-actions .primary-button {
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0 0.65rem;
+  font-size: 0.75rem;
+}
+
+.compact-notice {
+  margin: 0.75rem 0 1rem;
+}
+
+.record-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.travel-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0.9rem 0;
+}
+
+.travel-summary-card {
+  padding: 0.9rem;
+  border-radius: var(--radius-medium);
+}
+
+.travel-summary-value {
+  color: var(--colour-text);
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.travel-summary-value span {
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.travel-summary-card small {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+}
