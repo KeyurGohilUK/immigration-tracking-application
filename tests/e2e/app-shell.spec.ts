@@ -693,12 +693,24 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Edit Freddy Test Dependant" })
-    .click();
+  const editFamilyMember = page.getByRole("button", {
+    name: "Edit Freddy Test Dependant",
+  });
+  await expect(editFamilyMember).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await editFamilyMember.click();
+  const editDialog = page.getByRole("dialog", {
+    name: "Edit household member",
+  });
+  await expect(editDialog).toHaveCSS("position", "fixed");
+  const dialogBox = await editDialog.boundingBox();
+  const viewport = page.viewportSize();
+  expect(dialogBox).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(dialogBox?.y ?? -1).toBeGreaterThanOrEqual(0);
+  expect((dialogBox?.y ?? 0) + (dialogBox?.height ?? 0)).toBeLessThanOrEqual(
+    viewport?.height ?? 0,
+  );
   await expect(
     page.getByRole("heading", { name: "Edit household member" }),
   ).toBeVisible();
