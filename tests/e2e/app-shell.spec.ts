@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed iPhone date and month controls so form fields stay within Liquid Glass modals.",
+      "Added structured Life in the UK and English evidence details, including pass date, UAN/reference capture, evidence type, and optional supporting uploads.",
     ),
   ).toBeVisible();
   await expect(
@@ -186,7 +186,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 7);
+      const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -288,6 +288,39 @@ test("stores and manages encrypted documents for a profile", async ({
     .getByRole("button", { name: "Close address history" })
     .click();
 
+  const lifeEnglishSection = page.locator(
+    '[data-vault-section="life-english"]',
+  );
+  await lifeEnglishSection.locator("summary").click();
+  await lifeEnglishSection
+    .getByRole("button", { name: "Add document" })
+    .click();
+  const lifeEnglishDialog = page.getByRole("dialog", {
+    name: "Life in the UK & English",
+  });
+  await expect(lifeEnglishDialog).toBeVisible();
+  await lifeEnglishDialog.getByLabel("Status").first().selectOption("passed");
+  await lifeEnglishDialog.getByLabel("Passed date").fill("2026-08-20");
+  await lifeEnglishDialog
+    .getByLabel("UAN / reference number")
+    .fill("UAN-TEST-123");
+  await lifeEnglishDialog
+    .getByLabel("Status")
+    .nth(1)
+    .selectOption("met");
+  await lifeEnglishDialog
+    .getByLabel("Evidence type")
+    .fill("Approved qualification");
+  await lifeEnglishDialog
+    .getByLabel("Certificate / reference number")
+    .fill("ENG-TEST-456");
+  await lifeEnglishDialog.getByRole("button", { name: "Save details" }).click();
+  await expect(
+    page
+      .locator('[data-vault-section="life-english"]')
+      .getByText("Complete"),
+  ).toBeVisible();
+
   const identitySection = page.locator(
     '[data-vault-section="identity-immigration"]',
   );
@@ -330,7 +363,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 7);
+      const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -462,7 +495,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   const backup = JSON.parse(backupText) as Record<string, unknown>;
   expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
   expect(backup.version).toBe(1);
-  expect(backup.dataSchemaVersion).toBe(6);
+  expect(backup.dataSchemaVersion).toBe(7);
   expect(backupText).not.toContain(TEST_PROFILE.name);
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
@@ -676,7 +709,7 @@ test("permanently deletes all local application data", async ({ page }) => {
 
   const localData = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 7);
+      const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -780,7 +813,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   );
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 7);
+      const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -863,7 +896,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
     .inputValue();
   const storedPermission = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 7);
+      const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -1011,7 +1044,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
   const storedTrip = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 7);
+      const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
