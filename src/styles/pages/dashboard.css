@@ -399,3 +399,7 @@
 .danger-zone .eyebrow,
 .danger-zone .more-card-icon,
 .more-card .danger-warning,
+.family-form .danger-warning {
+  color: var(--colour-danger);
+  font-weight: 700;
+}
