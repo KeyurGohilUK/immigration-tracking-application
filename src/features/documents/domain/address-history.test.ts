@@ -6,10 +6,6 @@ import {
   validateAddressHistoryInput,
   type AddressHistoryEntry,
 } from "./address-history";
-import type {
-  ImmigrationPermission,
-} from "../../immigration/domain/immigration-permission";
-
 const timestamp = "2026-09-01T12:00:00.000Z";
 
 function entry(
@@ -27,6 +23,23 @@ function entry(
     endMonth,
     isCurrent,
     notes: "",
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+function permission(route: "skilled-worker" | "global-talent") {
+  return {
+    version: 2 as const,
+    id: `permission-${route}`,
+    profileId: "owner",
+    route,
+    otherRouteName: "",
+    role: "main-applicant" as const,
+    grantDate: "2024-01-01",
+    permissionStartDate: "2024-01-01",
+    permissionExpiryDate: "2029-01-01",
+    actualUkArrivalDate: "2024-01-01",
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -78,14 +91,8 @@ describe("address history", () => {
   });
 
   it("uses a route rule instead of a global five-year constant", () => {
-    const skilledWorker = {
-      route: "skilled-worker",
-      permissionStartDate: "2024-01-01",
-    } as ImmigrationPermission;
-    const unsupported = {
-      route: "global-talent",
-      permissionStartDate: "2024-01-01",
-    } as ImmigrationPermission;
+    const skilledWorker = permission("skilled-worker");
+    const unsupported = permission("global-talent");
     expect(getRequiredAddressHistoryMonths([skilledWorker])).toBe(60);
     expect(getRequiredAddressHistoryMonths([unsupported])).toBeNull();
   });
