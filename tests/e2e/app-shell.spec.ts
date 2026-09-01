@@ -396,7 +396,6 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
   await page.getByRole("button", { name: "Add Household Member" }).click();
-  await page.getByRole("button", { name: "Add household member" }).click();
   await page.getByLabel("Full name").fill("Temporary Family Member");
   await page.getByLabel("Date of birth").fill("2005-06-15");
   await page.getByLabel("Immigration role").selectOption("not-set");
@@ -651,13 +650,10 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
 
   await expect(
     page.getByRole("heading", { name: "Your household" }),
-  ).toBeVisible();
-  await expect(page.getByText("1 person", { exact: true })).toBeVisible();
+  ).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Household members" }),
+    page.getByRole("heading", { name: "Add household member" }),
   ).toBeVisible();
-  await expect(page.getByText("Private", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Add household member" }).click();
   await expect(page.locator(".member-profile-header")).toBeVisible();
   await expect(page.locator(".member-profile-icon")).toBeVisible();
   await expect(page.locator(".member-profile-save")).toHaveCSS(
@@ -670,19 +666,16 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByRole("button", { name: "Save household member" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Freddy Test Dependant", level: 3 }),
+    page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
-  await expect(page.getByText("2 people", { exact: true })).toBeVisible();
-  await expect(page.getByText("Selected", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
+  ).toBeVisible();
   await expect(page.getByLabel("Tracking profile")).toHaveValue(/.+/);
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Dependant",
   );
 
-  await page.getByRole("link", { name: "Family", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Edit Freddy Test Dependant" }),
-  ).toBeVisible();
   await page
     .getByRole("button", { name: "Edit Freddy Test Dependant" })
     .click();
@@ -713,7 +706,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await page.getByLabel("Full name").fill("Freddy Test Child");
   await page.getByRole("button", { name: "Save household member" }).click();
   await expect(
-    page.getByRole("heading", { name: "Freddy Test Child", level: 3 }),
+    page.getByRole("button", { name: "Edit Freddy Test Child" }),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Lock app" }).click();
@@ -721,10 +714,12 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Child" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Add Household Member" }).click();
   await expect(page.locator("#selected-person-name")).toHaveText(
     "Freddy Test Child",
   );
+  await page
+    .getByRole("button", { name: "Edit Freddy Test Child" })
+    .click();
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Freddy Test Child" }).click();
