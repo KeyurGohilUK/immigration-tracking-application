@@ -60,7 +60,6 @@ export function renderLiquidGlassDialog({
   </dialog>`;
 }
 
-
 export function createLiquidGlassDialog(
   options: LiquidGlassDialogOptions,
 ): HTMLDialogElement {
