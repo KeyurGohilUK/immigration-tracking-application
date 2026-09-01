@@ -119,7 +119,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Updated Install and Updates to use the shared Ibiza Sunset Dark Liquid Glass dialog, matching the rest of the app.",
+      "Fixed shared pop-up dialogs so they stay centred in the visible viewport even when the page is scrolled.",
     ),
   ).toBeVisible();
   await expect(
