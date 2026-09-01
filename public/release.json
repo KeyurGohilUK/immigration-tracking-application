@@ -1,6 +1,6 @@
 {
-  "version": "2.7.1",
+  "version": "2.7.2",
   "notes": [
-    "Updated Install and Updates to use the shared Ibiza Sunset Dark Liquid Glass dialog, matching the rest of the app."
+    "Fixed shared pop-up dialogs so they stay centred in the visible viewport even when the page is scrolled."
   ]
 }
