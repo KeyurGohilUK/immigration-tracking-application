@@ -24,6 +24,11 @@ describe("backup restore summary", () => {
         { profileId: "member-2", records: [] },
         { profileId: "member-3", records: [] },
       ],
+      lifeEnglish: [
+        { profileId: "member-1", records: [{ profileId: "member-1" }] },
+        { profileId: "member-2", records: [] },
+        { profileId: "member-3", records: [] },
+      ],
     } as unknown as BackupData;
 
     expect(summariseBackup(data)).toEqual({
@@ -32,6 +37,7 @@ describe("backup restore summary", () => {
       trips: 3,
       documents: 0,
       addresses: 1,
+      lifeEnglishRecords: 1,
       includesDocuments: false,
     });
   });
