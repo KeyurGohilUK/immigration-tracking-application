@@ -277,8 +277,8 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "Council tax statement" }),
   ).toBeVisible();
   const addressRow = page
-    .getByRole("heading", { name: "Address History" })
-    .locator("..");
+    .locator(".vault-category-row")
+    .filter({ hasText: "Address History" });
   await expect(addressRow.getByText("COMPLETE")).toBeVisible();
 
   const storedDocument = await page.evaluate(async () => {
