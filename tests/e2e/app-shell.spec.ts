@@ -110,7 +110,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Reduced the floating menu height so the selected ILR state reads as a proper capsule instead of a large rounded block.",
+      "Improved dark-theme readability for the Household Status label and icon on the Family Overview card.",
     ),
   ).toBeVisible();
   await expect(
@@ -481,6 +481,14 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
     .toBe("dark");
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
+  await expect(page.locator(".household-status-label h2")).toHaveCSS(
+    "color",
+    "rgb(255, 177, 197)",
+  );
+  await expect(page.locator(".household-status-icon")).toHaveCSS(
+    "color",
+    "rgb(255, 177, 197)",
+  );
   await page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }).click();
   await expect(page.locator(".member-profile-dialog")).toHaveCSS(
     "background-color",
