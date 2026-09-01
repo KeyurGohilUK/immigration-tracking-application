@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --write src/app/start-application.ts src/features/travel/components/trips-page.ts src/styles.css && git diff -- src/app/start-application.ts src/features/travel/components/trips-page.ts src/styles.css && exit 1",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "check:release": "node scripts/check-release-version.mjs",
     "test:unit": "vitest run",
