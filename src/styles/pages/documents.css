@@ -94,6 +94,77 @@
   padding: 0.7rem 0.9rem;
 }
 
+.vault-profile-picker {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.vault-profile-rail {
+  display: flex;
+  gap: 0.8rem;
+  overflow-x: auto;
+  padding: 0.15rem 0.05rem 0.25rem;
+  scrollbar-width: none;
+}
+
+.vault-profile-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.vault-profile-chip {
+  display: grid;
+  min-width: 3.8rem;
+  gap: 0.35rem;
+  justify-items: center;
+  border: 0;
+  padding: 0;
+  color: var(--colour-text-muted);
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.vault-profile-avatar {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: var(--colour-text);
+  background:
+    radial-gradient(circle at 35% 25%, rgb(255 255 255 / 20%), transparent 36%),
+    color-mix(in srgb, var(--ibiza-surface-high) 82%, transparent);
+  box-shadow:
+    inset 0 1px 0 var(--ibiza-glass-highlight),
+    0 0.45rem 1rem rgb(0 0 0 / 10%);
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.vault-profile-chip.is-selected {
+  color: var(--ibiza-primary);
+}
+
+.vault-profile-chip.is-selected .vault-profile-avatar {
+  border-color: var(--ibiza-pink);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--ibiza-pink) 22%, transparent),
+    0 0 1.2rem color-mix(in srgb, var(--ibiza-pink) 24%, transparent),
+    inset 0 1px 0 var(--ibiza-glass-highlight);
+}
+
+.documents-profile-select {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .documents-profile-picker .person-switcher {
   align-items: center;
 }
