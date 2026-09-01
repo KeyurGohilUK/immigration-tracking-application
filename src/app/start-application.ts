@@ -731,7 +731,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => lifeEnglishDialog.close());
       lifeEnglishDialog?.addEventListener("click", (event) => {
-        if (event.target === lifeEnglishDialog) lifeEnglishDialog.close();
+        if (event.target === lifeEnglishDialog) lifeEnglishDialog?.close();
       });
       lifeEnglishForm
         ?.querySelector<HTMLSelectElement>("#life-status")
@@ -746,13 +746,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       lifeEnglishForm
         ?.querySelector<HTMLButtonElement>("[data-add-life-evidence]")
         ?.addEventListener("click", () => {
-          lifeEnglishDialog.close();
+          lifeEnglishDialog?.close();
           showDocumentUploadForm(root, "life-in-uk");
         });
       lifeEnglishForm
         ?.querySelector<HTMLButtonElement>("[data-add-english-evidence]")
         ?.addEventListener("click", () => {
-          lifeEnglishDialog.close();
+          lifeEnglishDialog?.close();
           showDocumentUploadForm(root, "english-language");
         });
       lifeEnglishForm?.addEventListener("submit", async (event) => {
@@ -784,7 +784,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         try {
           await saveLifeEnglishRecord(selectedProfileId, nextRecord, key);
           lifeEnglishCache.set(selectedProfileId, nextRecord);
-          lifeEnglishDialog.close();
+          lifeEnglishDialog?.close();
           await showDocuments(profile);
         } catch {
           if (error) {
