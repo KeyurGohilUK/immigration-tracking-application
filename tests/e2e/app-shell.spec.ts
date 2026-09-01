@@ -119,7 +119,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Restored the centre ILR hero menu accent colour in dark mode when the ILR tab is not selected.",
+      "Refactored frontend styling into ordered CSS modules and added automated HTML/CSS coding-standard checks with documented frontend rules.",
     ),
   ).toBeVisible();
   await expect(
