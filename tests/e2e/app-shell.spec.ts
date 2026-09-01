@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added the encrypted structured Address History foundation for Document Vault, including route-aware required periods and gap/overlap checks.",
+      "Added the Address History Liquid Glass workflow with structured address editing, timeline gap checks, linked proof uploads, and readiness based on recorded coverage.",
     ),
   ).toBeVisible();
   await expect(
@@ -305,8 +305,8 @@ test("stores and manages encrypted documents for a profile", async ({
   const addressRow = page
     .locator(".vault-category-row")
     .filter({ hasText: "Address History" });
-  await expect(addressRow.getByText("Complete")).toBeVisible();
-  await expect(page.locator("#vault-readiness-percent")).toHaveText("17%");
+  await expect(addressRow.getByText("To do")).toBeVisible();
+  await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
 
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
