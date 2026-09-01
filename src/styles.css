@@ -5584,6 +5584,20 @@ html[data-theme="dark"] .trip-review-card {
   background: rgb(255 106 0 / 10%);
 }
 
+.liquid-dialog-actions > .danger-button,
+.danger-liquid-dialog .liquid-dialog-save {
+  border-color: var(--colour-danger);
+  color: var(--colour-on-danger);
+  background: var(--colour-danger);
+  box-shadow: 0 0.65rem 1.5rem rgb(154 52 31 / 20%);
+}
+
+.liquid-dialog-actions > .danger-button:hover,
+.danger-liquid-dialog .liquid-dialog-save:hover {
+  border-color: var(--colour-danger-hover);
+  background: var(--colour-danger-hover);
+}
+
 html[data-theme="dark"] .liquid-dialog {
   border-color: rgb(255 255 255 / 12%);
   background: rgb(39 24 59 / 88%);
@@ -5615,6 +5629,13 @@ html[data-theme="dark"] .liquid-dialog-icon {
   color: var(--ibiza-primary);
   background: rgb(255 74 143 / 12%);
   box-shadow: 0 0 1rem rgb(238 9 121 / 24%);
+}
+
+html[data-theme="dark"] .danger-liquid-dialog .liquid-dialog-icon {
+  border-color: rgb(255 106 0 / 32%);
+  color: var(--ibiza-secondary);
+  background: rgb(255 106 0 / 10%);
+  box-shadow: 0 0 1rem rgb(255 106 0 / 20%);
 }
 
 html[data-theme="dark"] .liquid-dialog-header .eyebrow {
