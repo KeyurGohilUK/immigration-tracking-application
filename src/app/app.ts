@@ -62,9 +62,10 @@ function renderNavigation(
   const navigationStyle = isMobile
     ? `style="--mobile-navigation-offset: ${previousMobileNavigationIndex * 100}%"`
     : "";
+  const heroClass = resolvedNavigation === "ILR" ? " is-hero-active" : "";
 
   return `
-    <nav class="primary-navigation ${className}" aria-label="Primary navigation" ${navigationStyle}>
+    <nav class="primary-navigation ${className}${heroClass}" aria-label="Primary navigation" ${navigationStyle}>
       ${indicator}
       ${navigationItems
         .map(

@@ -3642,40 +3642,33 @@ p {
 
 .mobile-navigation a[data-navigation="ILR"] {
   min-height: 4rem;
-  color: #ffffff;
-}
-
-.mobile-navigation a[data-navigation="ILR"]::before {
-  position: absolute;
-  z-index: -1;
-  width: 3.15rem;
-  height: 3.15rem;
-  border-radius: 999px;
-  background: var(--ibiza-gradient);
-  box-shadow:
-    0 0.55rem 1.25rem rgb(238 9 121 / 24%),
-    0 0 1.4rem rgb(255 106 0 / 14%);
-  content: "";
+  color: var(--ibiza-primary);
 }
 
 .mobile-navigation a[data-navigation="ILR"] svg {
   width: 1.9rem;
   height: 1.9rem;
-  color: #ffffff;
   transform: translateY(-0.05rem);
+}
+
+.mobile-navigation a[data-navigation="ILR"][aria-current="page"] {
+  color: #ffffff;
 }
 
 .mobile-navigation a[data-navigation="ILR"][aria-current="page"] svg {
   transform: translateY(-0.05rem) scale(1.08);
 }
 
-.mobile-navigation.is-scroll-compact a[data-navigation="ILR"] {
-  min-height: 3.55rem;
+.mobile-navigation.is-hero-active .mobile-navigation-indicator {
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.55rem 1.3rem rgb(238 9 121 / 28%),
+    0 0 1.5rem rgb(255 106 0 / 18%),
+    inset 0 1px 0 rgb(255 255 255 / 22%);
 }
 
-.mobile-navigation.is-scroll-compact a[data-navigation="ILR"]::before {
-  width: 2.8rem;
-  height: 2.8rem;
+.mobile-navigation.is-scroll-compact a[data-navigation="ILR"] {
+  min-height: 3.55rem;
 }
 
 .mobile-navigation.is-scroll-compact a[data-navigation="ILR"] svg {
@@ -3684,6 +3677,12 @@ p {
 }
 
 .desktop-navigation a[data-navigation="ILR"] {
+  color: var(--ibiza-primary);
+  background: transparent;
+  box-shadow: none;
+}
+
+.desktop-navigation.is-hero-active a[data-navigation="ILR"] {
   color: #ffffff;
   background: var(--ibiza-gradient);
   box-shadow: 0 0.4rem 1rem rgb(238 9 121 / 16%);
@@ -3744,6 +3743,16 @@ html[data-theme="dark"] .mobile-navigation a[aria-current="page"] {
   color: #ffffff;
   background: transparent;
   box-shadow: none;
+}
+
+html[data-theme="dark"]
+  .mobile-navigation.is-hero-active
+  .mobile-navigation-indicator {
+  background: var(--ibiza-gradient);
+  box-shadow:
+    0 0.55rem 1.3rem rgb(238 9 121 / 32%),
+    0 0 1.6rem rgb(255 106 0 / 20%),
+    inset 0 1px 0 rgb(255 255 255 / 18%);
 }
 
 @media (prefers-reduced-motion: reduce) {
