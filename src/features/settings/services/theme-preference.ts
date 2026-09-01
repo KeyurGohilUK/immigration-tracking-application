@@ -31,6 +31,11 @@ function applyThemePreference(preference: ThemePreference): void {
       preference === "system" ? (media.matches ? "dark" : "light") : preference;
     document.documentElement.dataset.theme = resolved;
     document.documentElement.style.colorScheme = resolved;
+    const themeColour = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    );
+    if (themeColour)
+      themeColour.content = resolved === "dark" ? "#1a0b2e" : "#fff7ff";
   };
 
   applyResolvedTheme();
