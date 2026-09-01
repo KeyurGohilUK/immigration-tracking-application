@@ -624,8 +624,22 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const renderDocuments = (
       profile: HouseholdMember,
       documents: DocumentMetadata[],
+      addressHistory: AddressHistoryEntry[],
+      requiredAddressMonths: number | null,
     ): void => {
-      renderDocumentsPage(root, familyMembers, selectedProfileId, documents);
+      const addressCoverage = calculateAddressHistoryCoverage(
+        addressHistory,
+        requiredAddressMonths,
+        getUkCalendarDate().slice(0, 7),
+      );
+      renderDocumentsPage(
+        root,
+        familyMembers,
+        selectedProfileId,
+        documents,
+        addressHistory,
+        addressCoverage,
+      );
       wireAuthenticatedShell(profile, "Documents");
       const uploadDialog =
         root.querySelector<HTMLDialogElement>("#document-dialog");
@@ -635,6 +649,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       );
       const renameForm = root.querySelector<HTMLFormElement>(
         "#document-rename-form",
+      );
+      const addressDialog = root.querySelector<HTMLDialogElement>(
+        "#address-history-dialog",
+      );
+      const addressForm = root.querySelector<HTMLFormElement>(
+        "#address-history-form",
       );
       root
         .querySelector<HTMLButtonElement>("#download-document-pack")
@@ -672,12 +692,135 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       )) {
         button.addEventListener("click", () => {
           const sectionId = button.dataset.addVaultSection;
+          if (sectionId === "address-history") {
+            showAddressHistoryForm(root);
+            return;
+          }
           const category = sectionId
             ? getDefaultCategoryForSection(sectionId)
             : null;
           showDocumentUploadForm(root, category ?? undefined);
         });
       }
+      addressDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => addressDialog.close());
+      addressDialog?.addEventListener("click", (event) => {
+        if (event.target === addressDialog) addressDialog.close();
+      });
+      addressForm
+        ?.querySelector<HTMLInputElement>("#address-current")
+        ?.addEventListener("change", () => syncAddressEndState(addressForm));
+      root
+        .querySelector<HTMLButtonElement>("#address-history-reset")
+        ?.addEventListener("click", () => {
+          if (addressForm) resetAddressHistoryForm(addressForm);
+        });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-address]",
+      )) {
+        button.addEventListener("click", () => {
+          const entry = addressHistory.find(
+            ({ id }) => id === button.dataset.editAddress,
+          );
+          if (entry) showAddressHistoryForm(root, entry);
+        });
+      }
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-add-address-proof]",
+      )) {
+        button.addEventListener("click", () => {
+          const addressId = button.dataset.addAddressProof;
+          if (!addressId) return;
+          addressDialog?.close();
+          showDocumentUploadForm(root, "address-proof", addressId);
+        });
+      }
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-delete-address]",
+      )) {
+        button.addEventListener("click", async () => {
+          const addressId = button.dataset.deleteAddress;
+          const entry = addressHistory.find(({ id }) => id === addressId);
+          if (
+            !entry ||
+            !window.confirm(
+              `Delete this address from the recorded timeline? Linked proof documents will remain in the vault.`,
+            )
+          )
+            return;
+          const nextEntries = addressHistory.filter(({ id }) => id !== entry.id);
+          try {
+            await saveAddressHistory(selectedProfileId, nextEntries, key);
+            addressHistoryCache.set(selectedProfileId, nextEntries);
+            await showDocuments(profile);
+          } catch {
+            const error = root.querySelector<HTMLElement>(
+              "#address-history-error",
+            );
+            if (error) {
+              error.textContent =
+                "The address could not be deleted. Your saved timeline is unchanged.";
+              error.hidden = false;
+            }
+          }
+        });
+      }
+      addressForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { addressId, input } = readAddressHistoryForm(addressForm);
+        const error = addressForm.querySelector<HTMLElement>(
+          "#address-history-error",
+        );
+        const validationError = validateAddressHistoryInput(input);
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const existing = addressHistory.find(({ id }) => id === addressId);
+        const timestamp = new Date().toISOString();
+        const entry: AddressHistoryEntry = {
+          version: 1,
+          id: existing?.id ?? crypto.randomUUID(),
+          profileId: selectedProfileId,
+          ...input,
+          createdAt: existing?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        };
+        const nextEntries = existing
+          ? addressHistory.map((current) =>
+              current.id === existing.id ? entry : current,
+            )
+          : [...addressHistory, entry];
+        const collectionError = validateAddressHistoryCollection(nextEntries);
+        if (collectionError) {
+          if (error) {
+            error.textContent = collectionError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const submit = addressForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveAddressHistory(selectedProfileId, nextEntries, key);
+          addressHistoryCache.set(selectedProfileId, nextEntries);
+          addressDialog?.close();
+          await showDocuments(profile);
+        } catch {
+          if (error) {
+            error.textContent =
+              "The encrypted address history could not be saved.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
       uploadDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => uploadDialog.close());
@@ -705,7 +848,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const error = uploadForm.querySelector<HTMLElement>(
           "#document-form-error",
         );
-        const { displayName, category, file } =
+        const { displayName, category, addressHistoryId, file } =
           readDocumentUploadForm(uploadForm);
         const mimeType = file
           ? resolveDocumentMimeType(file.name, file.type)
@@ -783,6 +926,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           mimeType,
           size: file.size,
           category,
+          ...(addressHistoryId ? { addressHistoryId } : {}),
           sortOrder:
             profileDocuments.reduce(
               (maximum, document) => Math.max(maximum, document.sortOrder),
@@ -923,14 +1067,28 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const showDocuments = async (profile: HouseholdMember): Promise<void> => {
       try {
-        const documents = await getAllDocumentMetadata(key);
-        renderDocuments(profile, documents);
+        const cachedPermissions = permissionCache.get(selectedProfileId);
+        const cachedAddressHistory = addressHistoryCache.get(selectedProfileId);
+        const [documents, permissions, addressHistory] = await Promise.all([
+          getAllDocumentMetadata(key),
+          cachedPermissions ??
+            getImmigrationPermissions(selectedProfileId, key),
+          cachedAddressHistory ?? getAddressHistory(selectedProfileId, key),
+        ]);
+        permissionCache.set(selectedProfileId, permissions);
+        addressHistoryCache.set(selectedProfileId, addressHistory);
+        renderDocuments(
+          profile,
+          documents,
+          addressHistory,
+          getRequiredAddressHistoryMonths(permissions),
+        );
       } catch {
-        renderDocuments(profile, []);
+        renderDocuments(profile, [], [], null);
         const add = root.querySelector<HTMLButtonElement>("#add-document");
         if (add) add.disabled = true;
         showDocumentPageError(
-          "Encrypted document storage could not be opened on this device.",
+          "Encrypted Document Vault data could not be opened on this device.",
         );
       }
     };
