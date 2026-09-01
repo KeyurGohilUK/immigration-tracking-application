@@ -262,11 +262,16 @@ export const DOCUMENT_VAULT_STATUS_LABELS: Record<DocumentVaultStatus, string> =
     "required-later": "Required later",
   };
 
+export interface DocumentVaultProgressOptions {
+  addressHistoryComplete?: boolean;
+}
+
 export function calculateDocumentVaultProgress(
   documents: readonly DocumentMetadata[],
+  options: DocumentVaultProgressOptions = {},
 ): DocumentVaultProgress {
   const sections = DOCUMENT_VAULT_SECTIONS.map((section) =>
-    calculateSectionProgress(section, documents),
+    calculateSectionProgress(section, documents, options),
   );
   const totalRequired = sections.reduce(
     (total, section) => total + section.totalRequired,
@@ -294,15 +299,20 @@ export function calculateDocumentVaultProgress(
 function calculateSectionProgress(
   section: DocumentVaultSectionDefinition,
   documents: readonly DocumentMetadata[],
+  options: DocumentVaultProgressOptions,
 ): DocumentVaultSectionProgress {
   const requirements = section.requirements.map((requirement) => {
     const documentCount = documents.filter((document) =>
       requirement.categories.includes(document.category),
     ).length;
+    const complete =
+      section.id === "address-history" && requirement.id === "address-proof"
+        ? options.addressHistoryComplete === true && documentCount > 0
+        : documentCount > 0;
     return {
       ...requirement,
       documentCount,
-      complete: documentCount > 0,
+      complete,
     };
   });
 
