@@ -40,15 +40,19 @@ export function renderTripsPage(
   );
   const selectedMember = members.find(({ id }) => id === selectedProfileId);
   const rollingDays = overview?.maximumRecordedDays ?? null;
-  const progress = rollingDays === null
-    ? 0
-    : Math.min((rollingDays / ROLLING_ABSENCE_LIMIT) * 100, 100);
+  const progress =
+    rollingDays === null
+      ? 0
+      : Math.min((rollingDays / ROLLING_ABSENCE_LIMIT) * 100, 100);
   const eligibilityDate = overview?.earliestApplicationDate
     ? formatDisplayDate(overview.earliestApplicationDate)
     : "Not available yet";
   const daysRemaining =
     overview?.earliestApplicationDate && overview.asOfDate
-      ? calculateDaysBetween(overview.asOfDate, overview.earliestApplicationDate)
+      ? calculateDaysBetween(
+          overview.asOfDate,
+          overview.earliestApplicationDate,
+        )
       : null;
 
   renderAppShell(
@@ -215,7 +219,9 @@ function createTripCard(trip: Trip): HTMLElement {
 
   const heading = card.querySelector<HTMLElement>("h3");
   const badges = card.querySelector<HTMLElement>(".trip-badges");
-  const duration = card.querySelector<HTMLElement>(".travel-entry-duration strong");
+  const duration = card.querySelector<HTMLElement>(
+    ".travel-entry-duration strong",
+  );
   const dates = card.querySelector<HTMLElement>(".travel-entry-duration span");
   const notes = card.querySelector<HTMLElement>(".trip-notes");
   const actions = card.querySelectorAll<HTMLButtonElement>(".member-action");
@@ -225,7 +231,8 @@ function createTripCard(trip: Trip): HTMLElement {
   if (trip.exceptionalAbsence)
     badges?.append(createBadge("Manual review", "requires-review"));
   if (duration)
-    duration.textContent = days === null ? "Open" : `${days} ${days === 1 ? "Day" : "Days"}`;
+    duration.textContent =
+      days === null ? "Open" : `${days} ${days === 1 ? "Day" : "Days"}`;
   if (dates)
     dates.textContent = trip.returnDate
       ? `${formatDisplayDate(trip.departureDate)} – ${formatDisplayDate(trip.returnDate)}`
