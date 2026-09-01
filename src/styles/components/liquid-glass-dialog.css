@@ -15,7 +15,7 @@
     rgb(255 247 255 / 76%)
   );
   box-shadow:
-    0 1.5rem 4.5rem rgb(182 0 90 / 16%),
+    0 1.5rem 4.5rem color-mix(in srgb, var(--ibiza-primary) 16%, transparent),
     inset 0 1px rgb(255 255 255 / 82%);
 }
 
@@ -27,7 +27,7 @@
   background: linear-gradient(
     135deg,
     rgb(238 9 121 / 18%),
-    rgb(255 106 0 / 16%)
+    color-mix(in srgb, var(--ibiza-orange) 16%, transparent)
   );
   filter: blur(1.25rem);
   content: "";
