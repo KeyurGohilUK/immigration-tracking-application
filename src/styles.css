@@ -4130,6 +4130,12 @@ html[data-theme="dark"] .mobile-navigation a:not([aria-current="page"]) {
   color: rgb(237 220 255 / 72%);
 }
 
+html[data-theme="dark"]
+  .mobile-navigation
+  a[data-navigation="ILR"]:not([aria-current="page"]) {
+  color: var(--ibiza-primary);
+}
+
 html[data-theme="dark"] .permission-card-content,
 html[data-theme="dark"] .timeline-entry-content,
 html[data-theme="dark"] .family-card,
