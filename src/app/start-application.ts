@@ -158,12 +158,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const wireAuthenticatedShell = (
       profile: HouseholdMember,
       currentView:
-        | "Home"
-        | "Permissions"
-        | "Trips"
-        | "ILR"
-        | "Documents"
-        | "More",
+        "Home" | "Permissions" | "Trips" | "ILR" | "Documents" | "More",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -983,9 +978,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               nextMembers[0];
             if (selectedMember) renderDashboard(selectedMember);
           } catch {
-            const error = form?.querySelector<HTMLElement>(
-              "#family-form-error",
-            );
+            const error =
+              form?.querySelector<HTMLElement>("#family-form-error");
             if (error) {
               error.textContent =
                 "The family member could not be deleted. Your existing data is unchanged.";
