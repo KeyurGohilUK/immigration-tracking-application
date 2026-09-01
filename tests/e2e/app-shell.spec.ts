@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Redesigned Documents as a Liquid Glass Document Vault with applicant switching, vault progress, category overview, and a prominent PDF pack action.",
+      "Added a real Document Vault taxonomy and readiness engine with expandable evidence checklists, section-aware uploads, and stronger frontend maintenance standards.",
     ),
   ).toBeVisible();
   await expect(
