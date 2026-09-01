@@ -55,24 +55,24 @@ export async function collectBackupData(
   const profileIds = members.map(({ id }) => id);
   const [permissions, trips, addressHistory, documentMetadata] =
     await Promise.all([
-    Promise.all(
-      profileIds.map(async (profileId) => ({
-        profileId,
-        records: await getImmigrationPermissions(profileId, vaultKey),
-      })),
-    ),
-    Promise.all(
-      profileIds.map(async (profileId) => ({
-        profileId,
-        records: await getTrips(profileId, vaultKey),
-      })),
-    ),
-    Promise.all(
-      profileIds.map(async (profileId) => ({
-        profileId,
-        records: await getAddressHistory(profileId, vaultKey),
-      })),
-    ),
+      Promise.all(
+        profileIds.map(async (profileId) => ({
+          profileId,
+          records: await getImmigrationPermissions(profileId, vaultKey),
+        })),
+      ),
+      Promise.all(
+        profileIds.map(async (profileId) => ({
+          profileId,
+          records: await getTrips(profileId, vaultKey),
+        })),
+      ),
+      Promise.all(
+        profileIds.map(async (profileId) => ({
+          profileId,
+          records: await getAddressHistory(profileId, vaultKey),
+        })),
+      ),
       getAllDocumentMetadata(vaultKey),
     ]);
   const documents = await Promise.all(
