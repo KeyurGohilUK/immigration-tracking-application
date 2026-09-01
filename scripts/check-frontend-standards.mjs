@@ -61,7 +61,7 @@ const tsFiles = sourceFiles.filter((path) => extname(path) === ".ts");
 let importantCount = 0;
 for (const path of cssFiles) {
   const css = await readFile(path, "utf8");
-  const count = (css.match(/!important\\b/g) ?? []).length;
+  const count = (css.match(/!important\b/g) ?? []).length;
   importantCount += count;
 
   if (count > 0 && !path.endsWith("tokens-base.css")) {
