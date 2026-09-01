@@ -248,7 +248,9 @@ export function showDocumentUploadForm(
     "category",
   ) as HTMLSelectElement | null;
   if (category && categorySelect) categorySelect.value = category;
-  const addressId = form.elements.namedItem("addressHistoryId") as HTMLInputElement | null;
+  const addressId = form.elements.namedItem(
+    "addressHistoryId",
+  ) as HTMLInputElement | null;
   if (addressId) addressId.value = addressHistoryId ?? "";
   const error = form.querySelector<HTMLElement>("#document-form-error");
   if (error) {
