@@ -1,4 +1,5 @@
 import { renderAppShell } from "../../../app/app";
+import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import {
   populatePersonSwitcher,
   renderPersonSwitcherMarkup,
@@ -45,8 +46,35 @@ export function renderDocumentsPage(
       <section class="documents-panel" aria-labelledby="document-list-title"><div class="section-heading"><div><p class="eyebrow">Selected profile</p><h2 id="document-list-title">Document collection</h2></div></div><div id="document-list" class="document-list"></div></section>
       <p id="document-page-error" class="form-error" role="alert" hidden></p>
     </main>
-    <dialog id="document-dialog" class="family-dialog document-dialog" aria-labelledby="document-form-title"><form id="document-form" class="family-form" novalidate><div class="app-manager-heading family-form-heading"><div><p class="eyebrow">Encrypted local upload</p><h2 id="document-form-title">Add document</h2><p>PDF, JPG, or PNG · Maximum 5 MB</p></div><button class="dialog-close" type="button" aria-label="Close document form">×</button></div><div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file">Document file</label><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance">The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option><option value="address-proof">Address proof</option><option value="other">Other</option></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p><button class="primary-button family-save-button" type="submit">Encrypt and save document</button></form></dialog>
-    <dialog id="document-rename-dialog" class="family-dialog document-rename-dialog" aria-labelledby="document-rename-title"><form id="document-rename-form" class="family-form" novalidate><div class="app-manager-heading family-form-heading"><div><p class="eyebrow">Encrypted metadata</p><h2 id="document-rename-title">Rename document</h2></div><button class="dialog-close" type="button" aria-label="Close rename form">×</button></div><input name="documentId" type="hidden" /><div class="family-field"><label for="document-new-name">Document name</label><input id="document-new-name" name="displayName" maxlength="100" required /></div><p id="document-rename-error" class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Save document name</button></form></dialog>`,
+    ${renderLiquidGlassDialog({
+      id: "document-dialog",
+      labelledBy: "document-form-title",
+      formId: "document-form",
+      eyebrow: "Encrypted local upload",
+      title: "Add document",
+      subtitle: "PDF, JPG, or PNG · Maximum 5 MB",
+      iconSvg:
+        '<svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg>',
+      body: `<div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file">Document file</label><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance">The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option><option value="address-proof">Address proof</option><option value="other">Other</option></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
+      actions:
+        '<button class="primary-button family-save-button liquid-dialog-save" type="submit">Encrypt and save document</button>',
+      dialogClass: "document-dialog",
+      closeLabel: "Close document form",
+    })}
+    ${renderLiquidGlassDialog({
+      id: "document-rename-dialog",
+      labelledBy: "document-rename-title",
+      formId: "document-rename-form",
+      eyebrow: "Encrypted metadata",
+      title: "Rename document",
+      iconSvg:
+        '<svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="m10 16 6-6 2 2-6 6-3 1Z"/></svg>',
+      body: `<input name="documentId" type="hidden" /><div class="family-field"><label for="document-new-name">Document name</label><input id="document-new-name" name="displayName" maxlength="100" required /></div><p id="document-rename-error" class="form-error" role="alert" hidden></p>`,
+      actions:
+        '<button class="primary-button liquid-dialog-save" type="submit">Save document name</button>',
+      dialogClass: "document-rename-dialog",
+      closeLabel: "Close rename form",
+    })}`,
   );
   populatePersonSwitcher(root, members, selectedProfileId);
   const list = root.querySelector<HTMLElement>("#document-list");
