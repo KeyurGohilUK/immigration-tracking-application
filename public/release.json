@@ -1,6 +1,6 @@
 {
-  "version": "2.5.1",
+  "version": "2.6.0",
   "notes": [
-    "Fixed dropdown rendering across the app by removing the tiled custom arrow background and using the browser’s native select indicator, including iPhone/iPad Safari."
+    "Redesigned Travel Timeline with Ibiza Sunset bento cards, rolling 180-day absence status, ILR estimate, and richer recent-trip cards."
   ]
 }
