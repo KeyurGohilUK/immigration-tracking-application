@@ -619,7 +619,7 @@ test("guides Address History from the current address backwards", async ({
     page.getByText("Needs attention · no address linked", { exact: true }),
   ).toBeVisible();
   await expect(
-    addressSection.getByText("Needs attention", { exact: true }),
+    addressSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
 
   if (
@@ -840,7 +840,7 @@ test("stores and manages encrypted documents for a profile", async ({
   const addressRow = page
     .locator(".vault-category-row")
     .filter({ hasText: "Address History" });
-  await expect(addressRow.getByText("Needs attention")).toBeVisible();
+  await expect(addressRow.getByText("To do")).toBeVisible();
   await expect(
     page.locator(".document-review-badge:visible", {
       hasText: "Needs attention · no address linked",
