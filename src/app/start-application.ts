@@ -111,7 +111,9 @@ import {
   readAddressHistoryForm,
   resetAddressHistoryForm,
   restoreAddressHistoryOverview,
+  applyExtractedAddressSuggestion,
   showAddressHistoryForm,
+  showExtractedAddressSuggestion,
   showNewCurrentAddressForm,
   syncAddressEndState,
   syncAddressEvidenceName,
@@ -143,6 +145,7 @@ import {
   createDocumentPack,
   downloadDocumentPack,
 } from "../features/documents/services/document-pack-service";
+import { extractLikelyUkAddressFromPdf } from "../features/documents/services/address-document-extraction";
 import {
   getAddressHistory,
   saveAddressHistory,
@@ -995,8 +998,56 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ?.addEventListener("change", () => syncAddressEndState(addressForm));
       addressForm
         ?.querySelector<HTMLInputElement>("#address-evidence-file")
-        ?.addEventListener("change", () =>
-          syncAddressEvidenceName(addressForm),
+        ?.addEventListener("change", async () => {
+          syncAddressEvidenceName(addressForm);
+          showExtractedAddressSuggestion(addressForm, null, "");
+          const file = readAddressEvidenceFile(addressForm);
+          if (!file) return;
+
+          const isPdf =
+            file.type === "application/pdf" ||
+            file.name.toLowerCase().endsWith(".pdf");
+          if (!isPdf) {
+            showExtractedAddressSuggestion(
+              addressForm,
+              null,
+              "Automatic address reading currently supports text-based PDFs. Enter the address manually for image or scanned evidence.",
+            );
+            return;
+          }
+
+          showExtractedAddressSuggestion(
+            addressForm,
+            null,
+            "Checking the PDF locally for an address…",
+          );
+          try {
+            const extracted = await extractLikelyUkAddressFromPdf(file);
+            if (!extracted) {
+              showExtractedAddressSuggestion(
+                addressForm,
+                null,
+                "No reliable address was found. Enter it manually; the evidence can still be saved.",
+              );
+              return;
+            }
+            showExtractedAddressSuggestion(
+              addressForm,
+              extracted.fullAddress,
+              "Possible address found in this PDF.",
+            );
+          } catch {
+            showExtractedAddressSuggestion(
+              addressForm,
+              null,
+              "This PDF could not be read automatically. Enter the address manually; the evidence can still be saved.",
+            );
+          }
+        });
+      addressForm
+        ?.querySelector<HTMLButtonElement>("[data-use-extracted-address]")
+        ?.addEventListener("click", () =>
+          applyExtractedAddressSuggestion(addressForm),
         );
       root
         .querySelector<HTMLButtonElement>("#address-add-new-current")

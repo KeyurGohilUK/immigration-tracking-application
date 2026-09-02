@@ -66,6 +66,11 @@ export function renderAddressHistoryDialog(
         <div class="inline-evidence-copy"><strong>Address evidence</strong><span>Optional · council tax, tenancy, bank, utility or other proof · PDF, JPG or PNG · up to 5 MB</span><small data-address-existing-evidence>No evidence attached yet</small></div>
         <label class="inline-evidence-picker" for="address-evidence-file"><span>Choose file</span><input id="address-evidence-file" name="addressEvidenceFile" type="file" aria-label="Address evidence" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label>
         <span class="inline-evidence-file-name" data-address-evidence-name>No new file selected</span>
+        <p class="field-guidance address-extraction-status" data-address-extraction-status aria-live="polite"></p>
+        <div class="address-extraction-suggestion" data-address-extraction-suggestion hidden>
+          <div><strong>Possible address found</strong><span data-address-extracted-value></span><small>Check this carefully before using it.</small></div>
+          <button class="secondary-button" data-use-extracted-address type="button">Use this address</button>
+        </div>
       </div>
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
       <div class="address-context-actions">
@@ -242,6 +247,7 @@ export function resetAddressHistoryForm(
   syncAddressGuidedFields(form, firstAddress, false);
   syncAddressEndState(form);
   syncAddressEvidenceState(form, undefined, []);
+  showExtractedAddressSuggestion(form, null, "");
 }
 
 function placeAddressEntryForm(
@@ -388,6 +394,38 @@ export function syncAddressEvidenceName(form: HTMLFormElement): void {
   const label = form.querySelector<HTMLElement>("[data-address-evidence-name]");
   if (!input || !label) return;
   label.textContent = input.files?.[0]?.name ?? "No new file selected";
+}
+
+export function showExtractedAddressSuggestion(
+  form: HTMLFormElement,
+  fullAddress: string | null,
+  statusMessage: string,
+): void {
+  const status = form.querySelector<HTMLElement>(
+    "[data-address-extraction-status]",
+  );
+  const suggestion = form.querySelector<HTMLElement>(
+    "[data-address-extraction-suggestion]",
+  );
+  const value = form.querySelector<HTMLElement>(
+    "[data-address-extracted-value]",
+  );
+  if (status) status.textContent = statusMessage;
+  if (!suggestion || !value) return;
+  suggestion.hidden = !fullAddress;
+  value.textContent = fullAddress ?? "";
+}
+
+export function applyExtractedAddressSuggestion(form: HTMLFormElement): void {
+  const value = form.querySelector<HTMLElement>(
+    "[data-address-extracted-value]",
+  );
+  const address = form.elements.namedItem(
+    "fullAddress",
+  ) as HTMLTextAreaElement | null;
+  if (!value?.textContent || !address) return;
+  address.value = value.textContent;
+  address.focus();
 }
 
 function syncAddressEvidenceState(

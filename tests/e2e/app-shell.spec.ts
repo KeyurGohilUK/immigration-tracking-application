@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Install and updates now checks proactively, offers Check for updates when current, and adds a gold glow when a newer release is available.",
+      "Address History can now suggest a UK address from uploaded text-based PDF evidence, with confirmation before it is used.",
     ),
   ).toBeVisible();
   await expect(
