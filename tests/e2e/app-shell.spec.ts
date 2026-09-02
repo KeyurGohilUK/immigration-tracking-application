@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Completed Address History now stays Complete in the Document Vault even when an address-proof file still needs linking.",
+      "Address History now shows Partial while supporting evidence is still outstanding and reserves Needs attention for timeline issues.",
     ),
   ).toBeVisible();
   await expect(
