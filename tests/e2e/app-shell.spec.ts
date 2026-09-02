@@ -344,13 +344,11 @@ test("stores and manages encrypted documents for a profile", async ({
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64",
   );
-  await lifeEnglishDialog
-    .getByLabel("Life in the UK evidence")
-    .setInputFiles({
-      name: "life-test-evidence.png",
-      mimeType: "image/png",
-      buffer: tinyPng,
-    });
+  await lifeEnglishDialog.getByLabel("Life in the UK evidence").setInputFiles({
+    name: "life-test-evidence.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
   await lifeEnglishDialog.getByLabel("English evidence").setInputFiles({
     name: "english-test-evidence.png",
     mimeType: "image/png",
