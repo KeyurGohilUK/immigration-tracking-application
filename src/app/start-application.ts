@@ -934,7 +934,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#address-history-reset")
         ?.addEventListener("click", () => {
-          if (addressForm) resetAddressHistoryForm(addressForm);
+          if (!addressForm) return;
+          const nextStart = getNextUncoveredAddressMonth(
+            addressHistory,
+            requiredAddressStartMonth,
+            getUkCalendarDate().slice(0, 7),
+          );
+          resetAddressHistoryForm(addressForm, nextStart);
         });
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-edit-address]",
