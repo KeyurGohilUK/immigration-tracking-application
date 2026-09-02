@@ -971,6 +971,77 @@ html[data-theme="dark"] .vault-readiness-card {
   align-items: start;
 }
 
+.address-postcode-card {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.8rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  background: color-mix(
+    in srgb,
+    var(--ibiza-surface-container) 48%,
+    transparent
+  );
+}
+
+.address-postcode-copy {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.address-postcode-copy strong {
+  color: var(--colour-text);
+  font-size: 0.86rem;
+}
+
+.address-postcode-copy span,
+.address-postcode-copy small,
+.address-lookup-status {
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.address-postcode-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  align-items: end;
+}
+
+.address-postcode-row .family-field {
+  min-width: 0;
+}
+
+.address-postcode-row .secondary-button {
+  min-height: 3rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.address-lookup-status {
+  margin: 0;
+}
+
+.address-manual-toggle {
+  width: fit-content;
+}
+
+.address-history-modal [data-address-manual-fields][hidden],
+.address-history-modal [data-address-lookup-results][hidden] {
+  display: none;
+}
+
+@media (max-width: 35.99rem) {
+  .address-postcode-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .address-postcode-row .secondary-button {
+    width: 100%;
+  }
+}
+
 .address-current-toggle {
   display: flex;
   min-height: 2.9rem;
