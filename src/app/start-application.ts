@@ -115,6 +115,7 @@ import {
   showNewCurrentAddressForm,
   syncAddressEndState,
   syncAddressEvidenceName,
+  wireAddressPostcodeLookup,
 } from "../features/documents/components/address-history-dialog";
 import {
   readLifeEnglishEvidenceFiles,
@@ -990,6 +991,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       addressDialog?.addEventListener("click", (event) => {
         if (event.target === addressDialog) addressDialog.close();
       });
+      if (addressForm) wireAddressPostcodeLookup(addressForm);
       addressForm
         ?.querySelector<HTMLInputElement>("#address-current")
         ?.addEventListener("change", () => syncAddressEndState(addressForm));
