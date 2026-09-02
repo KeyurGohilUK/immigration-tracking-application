@@ -21,6 +21,10 @@ product roadmap.
       link proof uploads to a specific address.
 - [x] Address History readiness depends on complete route-required timeline
       coverage plus supporting address proof.
+- [x] Guide Address History from qualifying permission start month and
+      automatically continue from each next uncovered month until Present.
+- [ ] Add UK postcode lookup with provider-backed address selection and manual
+      entry fallback.
 - [ ] Add dedicated requirement-specific Liquid Glass modals for all vault
       sections.
 - [x] Capture Life in the UK status, pass date, UAN/reference number, and
@@ -52,6 +56,9 @@ product roadmap.
 - Required later and Not applicable items must not unfairly reduce current
   readiness.
 - Address-history duration is route-driven; never hard-code five years globally.
+- Guided Address History starts from qualifying permission history, locks the
+  next uncovered month for new sequential entries, and allows manual correction
+  through Edit.
 - Additional Documents do not affect readiness unless explicitly linked to a
   requirement.
 - Keep all document and structured evidence data encrypted and local to the

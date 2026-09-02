@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateAddressHistoryCoverage,
+  getAddressHistoryRequirement,
+  getNextUncoveredAddressMonth,
   getRequiredAddressHistoryMonths,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
@@ -29,7 +31,10 @@ function entry(
   };
 }
 
-function permission(route: "skilled-worker" | "global-talent") {
+function permission(
+  route: "skilled-worker" | "global-talent",
+  permissionStartDate = "2024-01-01",
+) {
   return {
     version: 2 as const,
     id: `permission-${route}`,
@@ -37,8 +42,8 @@ function permission(route: "skilled-worker" | "global-talent") {
     route,
     otherRouteName: "",
     role: "main-applicant" as const,
-    grantDate: "2024-01-01",
-    permissionStartDate: "2024-01-01",
+    grantDate: permissionStartDate,
+    permissionStartDate,
     permissionExpiryDate: "2029-01-01",
     actualUkArrivalDate: "2024-01-01",
     createdAt: timestamp,
@@ -93,5 +98,36 @@ describe("address history", () => {
     const unsupported = permission("global-talent");
     expect(getRequiredAddressHistoryMonths([skilledWorker])).toBe(60);
     expect(getRequiredAddressHistoryMonths([unsupported])).toBeNull();
+  });
+
+  it("starts the guided timeline from the earliest qualifying permission", () => {
+    const requirement = getAddressHistoryRequirement([
+      permission("skilled-worker", "2023-07-15"),
+      permission("skilled-worker", "2021-09-01"),
+    ]);
+    expect(requirement).toEqual({
+      requiredMonths: 60,
+      startMonth: "2021-09",
+    });
+  });
+
+  it("prefills the first uncovered month after a saved address", () => {
+    expect(
+      getNextUncoveredAddressMonth(
+        [entry("one", "2021-09", "2023-06")],
+        "2021-09",
+        "2026-09",
+      ),
+    ).toBe("2023-07");
+  });
+
+  it("returns no next month once the recorded timeline reaches present", () => {
+    expect(
+      getNextUncoveredAddressMonth(
+        [entry("one", "2021-09", "2023-06"), entry("two", "2023-07", "", true)],
+        "2021-09",
+        "2026-09",
+      ),
+    ).toBeNull();
   });
 });

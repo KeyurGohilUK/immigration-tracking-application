@@ -149,7 +149,8 @@ import {
 } from "../features/documents/data/life-english-repository";
 import {
   calculateAddressHistoryCoverage,
-  getRequiredAddressHistoryMonths,
+  getAddressHistoryRequirement,
+  getNextUncoveredAddressMonth,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
   type AddressHistoryEntry,
@@ -642,6 +643,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       documents: DocumentMetadata[],
       addressHistory: AddressHistoryEntry[],
       requiredAddressMonths: number | null,
+      requiredAddressStartMonth: string | null,
       lifeEnglish: LifeEnglishRecord | null,
     ): void => {
       const addressCoverage = calculateAddressHistoryCoverage(
@@ -656,6 +658,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         documents,
         addressHistory,
         addressCoverage,
+        requiredAddressStartMonth,
         lifeEnglish,
       );
       wireAuthenticatedShell(profile, "Documents");
@@ -716,7 +719,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         button.addEventListener("click", () => {
           const sectionId = button.dataset.addVaultSection;
           if (sectionId === "address-history") {
-            showAddressHistoryForm(root);
+            const nextStart = getNextUncoveredAddressMonth(
+              addressHistory,
+              requiredAddressStartMonth,
+              getUkCalendarDate().slice(0, 7),
+            );
+            showAddressHistoryForm(root, undefined, nextStart);
             return;
           }
           if (sectionId === "life-english") {
@@ -926,7 +934,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#address-history-reset")
         ?.addEventListener("click", () => {
-          if (addressForm) resetAddressHistoryForm(addressForm);
+          if (!addressForm) return;
+          const nextStart = getNextUncoveredAddressMonth(
+            addressHistory,
+            requiredAddressStartMonth,
+            getUkCalendarDate().slice(0, 7),
+          );
+          resetAddressHistoryForm(addressForm, nextStart);
         });
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-edit-address]",
@@ -1024,8 +1038,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         try {
           await saveAddressHistory(selectedProfileId, nextEntries, key);
           addressHistoryCache.set(selectedProfileId, nextEntries);
+          const nextStart = getNextUncoveredAddressMonth(
+            nextEntries,
+            requiredAddressStartMonth,
+            getUkCalendarDate().slice(0, 7),
+          );
           addressDialog?.close();
           await showDocuments(profile);
+          if (!existing && nextStart)
+            showAddressHistoryForm(root, undefined, nextStart);
         } catch {
           if (error) {
             error.textContent =
@@ -1297,15 +1318,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         permissionCache.set(selectedProfileId, permissions);
         addressHistoryCache.set(selectedProfileId, addressHistory);
         lifeEnglishCache.set(selectedProfileId, lifeEnglish);
+        const addressRequirement = getAddressHistoryRequirement(permissions);
         renderDocuments(
           profile,
           documents,
           addressHistory,
-          getRequiredAddressHistoryMonths(permissions),
+          addressRequirement.requiredMonths,
+          addressRequirement.startMonth,
           lifeEnglish,
         );
       } catch {
-        renderDocuments(profile, [], [], null, null);
+        renderDocuments(profile, [], [], null, null, null);
         const add = root.querySelector<HTMLButtonElement>("#add-document");
         if (add) add.disabled = true;
         showDocumentPageError(

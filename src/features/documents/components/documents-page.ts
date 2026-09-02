@@ -37,6 +37,7 @@ export function renderDocumentsPage(
   allDocuments: DocumentMetadata[],
   addressHistory: readonly AddressHistoryEntry[],
   addressCoverage: AddressHistoryCoverage,
+  requiredAddressStartMonth: string | null,
   lifeEnglish: LifeEnglishRecord | null,
 ): void {
   const documents = allDocuments
@@ -87,7 +88,11 @@ export function renderDocumentsPage(
       dialogClass: "document-dialog",
       closeLabel: "Close document form",
     })}
-    ${renderAddressHistoryDialog(addressHistory, addressCoverage)}
+    ${renderAddressHistoryDialog(
+      addressHistory,
+      addressCoverage,
+      requiredAddressStartMonth,
+    )}
     ${renderLifeEnglishDialog(documents)}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",

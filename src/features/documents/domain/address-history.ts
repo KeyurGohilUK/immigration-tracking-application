@@ -23,6 +23,11 @@ export interface AddressHistoryCoverage {
   gaps: string[];
 }
 
+export interface AddressHistoryRequirement {
+  requiredMonths: number | null;
+  startMonth: string | null;
+}
+
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
 const FIVE_YEAR_ROUTES = new Set([
   "skilled-worker",
@@ -106,14 +111,56 @@ export function validateAddressHistoryCollection(
   return null;
 }
 
+export function getAddressHistoryRequirement(
+  permissions: readonly ImmigrationPermission[],
+): AddressHistoryRequirement {
+  const qualifying = permissions
+    .filter(({ route }) => FIVE_YEAR_ROUTES.has(route))
+    .sort((a, b) => a.permissionStartDate.localeCompare(b.permissionStartDate));
+  if (qualifying.length === 0)
+    return { requiredMonths: null, startMonth: null };
+
+  const first = qualifying[0];
+  return {
+    requiredMonths: 60,
+    startMonth: first ? first.permissionStartDate.slice(0, 7) : null,
+  };
+}
+
 export function getRequiredAddressHistoryMonths(
   permissions: readonly ImmigrationPermission[],
 ): number | null {
-  const latest = [...permissions].sort((a, b) =>
-    b.permissionStartDate.localeCompare(a.permissionStartDate),
-  )[0];
-  if (!latest || !FIVE_YEAR_ROUTES.has(latest.route)) return null;
-  return 60;
+  return getAddressHistoryRequirement(permissions).requiredMonths;
+}
+
+export function getNextUncoveredAddressMonth(
+  entries: readonly AddressHistoryEntry[],
+  requiredStartMonth: string | null,
+  asOfMonth: string,
+): string | null {
+  if (!requiredStartMonth) return null;
+  if (!MONTH_PATTERN.test(requiredStartMonth) || !MONTH_PATTERN.test(asOfMonth))
+    throw new Error("Address-history month is invalid.");
+
+  const start = monthToIndex(requiredStartMonth);
+  const end = monthToIndex(asOfMonth);
+  if (start > end) return null;
+
+  const covered = new Set<number>();
+  for (const entry of entries) {
+    const entryStart = Math.max(start, monthToIndex(entry.startMonth));
+    const entryEnd = Math.min(
+      end,
+      entry.isCurrent ? end : monthToIndex(entry.endMonth),
+    );
+    for (let month = entryStart; month <= entryEnd; month += 1)
+      covered.add(month);
+  }
+
+  for (let month = start; month <= end; month += 1) {
+    if (!covered.has(month)) return indexToMonth(month);
+  }
+  return null;
 }
 
 export function calculateAddressHistoryCoverage(

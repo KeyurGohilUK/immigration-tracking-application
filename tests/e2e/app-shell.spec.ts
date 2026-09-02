@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Disabled empty Life in the UK and English saves until at least one meaningful status is selected.",
+      "Guided Address History now starts from qualifying permission history and automatically continues from each next uncovered month.",
     ),
   ).toBeVisible();
   await expect(
@@ -232,6 +232,67 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator(".pin-digit")).toHaveCount(4);
   await expect(page.locator(".security-keypad-key")).toHaveCount(10);
   await expect(page.locator("[data-pin-indicator]")).toHaveCount(4);
+});
+
+test("guides Address History from permission start to the next uncovered month", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await page
+    .getByRole("button", { name: "Manage immigration history" })
+    .click();
+  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByLabel("Immigration route").selectOption("skilled-worker");
+  await page.getByLabel("Permission held as").selectOption("main-applicant");
+  await page.getByLabel(/Visa grant date/).fill("2021-09-01");
+  await page.getByLabel("Permission start date").fill("2021-09-01");
+  await page.getByLabel("Permission expiry date").fill("2027-09-01");
+  await page.getByLabel("Actual UK arrival date").fill("2021-09-01");
+  await page.getByRole("button", { name: "Save permission" }).click();
+
+  await page.getByRole("link", { name: "Vault" }).first().click();
+  const addressSection = page.locator('[data-vault-section="address-history"]');
+  await addressSection.locator("summary").click();
+  await addressSection.getByRole("button", { name: "Add document" }).click();
+
+  let dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText(/Start from Sept 2021/)).toBeVisible();
+  await expect(dialog.getByLabel("Start month")).toHaveValue("2021-09");
+  await expect(dialog.getByLabel("Start month")).toHaveAttribute(
+    "aria-readonly",
+    "true",
+  );
+
+  await dialog
+    .getByLabel("Full address")
+    .fill("1 First Street, Bristol, BS1 1AA");
+  await dialog.getByLabel("End month").fill("2023-06");
+  await dialog.getByRole("button", { name: "Save & continue" }).click();
+
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel("Start month")).toHaveValue("2023-07");
+  await expect(dialog.getByLabel("Full address")).toHaveValue("");
+
+  await dialog
+    .getByLabel("Full address")
+    .fill("2 Current Road, Bristol, BS2 2BB");
+  await dialog.getByLabel("Current address").check();
+  await dialog.getByRole("button", { name: "Save & continue" }).click();
+  await expect(dialog).toHaveCount(0);
+
+  await addressSection.locator("summary").click();
+  await addressSection.getByRole("button", { name: "Add document" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(
+    dialog.getByText("1 First Street, Bristol, BS1 1AA"),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText("2 Current Road, Bristol, BS2 2BB"),
+  ).toBeVisible();
 });
 
 test("stores and manages encrypted documents for a profile", async ({
