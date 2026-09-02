@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now keeps the previous-address form focused on a single Save & continue action without a redundant secondary button.",
+      "Address History now opens directly into the address-entry flow without an empty-state message.",
     ),
   ).toBeVisible();
   await expect(
@@ -259,6 +259,7 @@ test("guides Address History from the current address backwards", async ({
 
   let dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByText("No addresses recorded yet")).toHaveCount(0);
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
   await expect(
