@@ -204,7 +204,7 @@ function renderEvidenceAttachment(
         : `${existing.length} evidence files already attached`;
   return `<div class="inline-evidence-attachment" data-${type}-evidence>
     <div class="inline-evidence-copy"><strong>${label}</strong><span>Optional · PDF, JPG or PNG · up to 5 MB</span><small>${existingLabel}</small></div>
-    <label class="inline-evidence-picker" for="${id}"><span>Choose file</span><input id="${id}" name="${name}" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label>
+    <label class="inline-evidence-picker" for="${id}"><span>Choose file</span><input id="${id}" name="${name}" type="file" aria-label="${label}" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label>
     <span class="inline-evidence-file-name" data-${type}-evidence-name>No new file selected</span>
   </div>`;
 }
