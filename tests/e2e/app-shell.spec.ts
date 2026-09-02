@@ -266,10 +266,7 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
   await expect(
-    reopenedNewCurrentHost.getByRole("textbox", {
-      name: "Current address",
-      exact: true,
-    }),
+    dialog.getByRole("textbox", { name: "Current address", exact: true }),
   ).toBeVisible();
   await expect(dialog.getByLabel("This is my current address")).toBeChecked();
   await expect(dialog.getByLabel("This is my current address")).toBeDisabled();
@@ -424,13 +421,18 @@ test("guides Address History from the current address backwards", async ({
   if (newCurrentFormBox && currentCardBox)
     expect(newCurrentFormBox.y).toBeLessThan(currentCardBox.y);
   await expect(
-    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+    reopenedNewCurrentHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Save new current address" }),
+    reopenedNewCurrentHost.getByRole("button", {
+      name: "Save new current address",
+    }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
-  await dialog
+  await reopenedNewCurrentHost
     .getByRole("textbox", { name: "Current address", exact: true })
     .fill("4 New Home Close, Bristol, BS4 4DD");
   await dialog.getByLabel("Start month").fill("2026-09");
