@@ -415,8 +415,12 @@ export function showExtractedAddressSuggestion(
 }
 
 export function applyExtractedAddressSuggestion(form: HTMLFormElement): void {
-  const value = form.querySelector<HTMLElement>("[data-address-extracted-value]");
-  const address = form.elements.namedItem("fullAddress") as HTMLTextAreaElement | null;
+  const value = form.querySelector<HTMLElement>(
+    "[data-address-extracted-value]",
+  );
+  const address = form.elements.namedItem(
+    "fullAddress",
+  ) as HTMLTextAreaElement | null;
   if (!value?.textContent || !address) return;
   address.value = value.textContent;
   address.focus();
