@@ -261,7 +261,9 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog).toBeVisible();
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
-  await expect(dialog.getByLabel("Current address")).toBeVisible();
+  await expect(
+    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeVisible();
   await expect(dialog.getByLabel("This is my current address")).toBeChecked();
   await expect(dialog.getByLabel("This is my current address")).toBeDisabled();
   await expect(dialog.getByLabel("This is my current address")).toBeVisible();
@@ -273,7 +275,7 @@ test("guides Address History from the current address backwards", async ({
     "base64",
   );
   await dialog
-    .getByLabel("Current address")
+    .getByRole("textbox", { name: "Current address", exact: true })
     .fill("3 Current Avenue, Bristol, BS3 3CC");
   await dialog.getByLabel("Start month").fill("2025-01");
   await dialog.getByLabel("Address evidence").setInputFiles({
