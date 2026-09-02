@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now opens directly into the address-entry flow without an empty-state message.",
+      "Address History now hides the previous-address entry form once the required timeline is fully covered.",
     ),
   ).toBeVisible();
   await expect(
@@ -343,8 +343,11 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Previous address", exact: true }),
-  ).toHaveCount(0);
+    dialog.getByRole("textbox", { name: "Previous address", exact: true }),
+  ).toBeHidden();
+  await expect(
+    dialog.getByRole("button", { name: "Save & continue" }),
+  ).toBeHidden();
 
   const moveButtonBox = await dialog
     .getByRole("button", { name: "Add new current address" })
@@ -353,20 +356,17 @@ test("guides Address History from the current address backwards", async ({
     .locator(".address-history-item")
     .filter({ hasText: "Current address" })
     .boundingBox();
-  const previousFormBox = await dialog
-    .getByRole("textbox", { name: "Previous address", exact: true })
-    .boundingBox();
   expect(moveButtonBox).not.toBeNull();
   expect(currentCardBox).not.toBeNull();
-  expect(previousFormBox).not.toBeNull();
-  if (moveButtonBox && currentCardBox && previousFormBox) {
+  if (moveButtonBox && currentCardBox)
     expect(moveButtonBox.y).toBeLessThan(currentCardBox.y);
-    expect(currentCardBox.y).toBeLessThan(previousFormBox.y);
-  }
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
   await expect(
     dialog.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Save new current address" }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
   await dialog
