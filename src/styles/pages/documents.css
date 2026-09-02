@@ -966,3 +966,67 @@ html[data-theme="dark"] .vault-readiness-card {
     min-height: 3rem;
   }
 }
+
+.inline-evidence-attachment {
+  display: grid;
+  min-width: 0;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  background: color-mix(
+    in srgb,
+    var(--ibiza-surface-container) 44%,
+    transparent
+  );
+}
+
+.inline-evidence-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.inline-evidence-copy strong {
+  color: var(--colour-text);
+  font-size: 0.82rem;
+}
+
+.inline-evidence-copy span,
+.inline-evidence-copy small,
+.inline-evidence-file-name {
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.inline-evidence-picker {
+  position: relative;
+  display: inline-flex;
+  width: fit-content;
+  min-height: 2.55rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.9rem;
+  overflow: hidden;
+  border: 1px solid var(--ibiza-border-soft);
+  border-radius: 0.85rem;
+  color: var(--ibiza-primary);
+  background: var(--ibiza-glass-soft);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.inline-evidence-picker input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.inline-evidence-file-name {
+  overflow-wrap: anywhere;
+}
