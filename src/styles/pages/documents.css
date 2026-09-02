@@ -875,7 +875,9 @@ html[data-theme="dark"] .vault-readiness-card {
 .address-context-actions .secondary-button,
 .address-context-actions .family-save-button {
   width: 100%;
-  min-height: 3.2rem;
+  height: 3.2rem;
+  min-height: 0;
+  margin: 0;
 }
 
 .address-context-actions .secondary-button[hidden] {
