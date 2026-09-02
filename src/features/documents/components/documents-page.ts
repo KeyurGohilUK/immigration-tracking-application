@@ -27,6 +27,7 @@ import {
   renderReadOnlyAddressList,
 } from "./address-history-dialog";
 import { renderLifeEnglishDialog } from "./life-english-dialog";
+import { renderEmploymentDialog } from "./employment-dialog";
 import {
   isEnglishRequirementComplete,
   isLifeInUkComplete,
@@ -104,6 +105,7 @@ export function renderDocumentsPage(
       documents,
     )}
     ${renderLifeEnglishDialog(documents)}
+    ${renderEmploymentDialog(documents)}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
