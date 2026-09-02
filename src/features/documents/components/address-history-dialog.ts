@@ -66,7 +66,7 @@ export function renderAddressHistoryDialog(
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
     </div>`,
     actions:
-      '<button id="address-history-reset" class="secondary-button" type="button">Previous address</button><button class="primary-button family-save-button liquid-dialog-save" type="submit">Save & continue</button>',
+      '<button class="primary-button family-save-button liquid-dialog-save" type="submit">Save & continue</button>',
     dialogClass: "address-history-dialog",
     closeLabel: "Close address history",
   });
