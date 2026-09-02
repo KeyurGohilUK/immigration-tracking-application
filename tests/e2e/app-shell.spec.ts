@@ -512,12 +512,16 @@ test("guides Address History from the current address backwards", async ({
     name: "Add new current address",
   });
   await expect(addCurrentButton).toBeVisible();
-  const coverageBox = await dialog.locator(".address-coverage-card").boundingBox();
+  const coverageBox = await dialog
+    .locator(".address-coverage-card")
+    .boundingBox();
   const addCurrentBox = await addCurrentButton.boundingBox();
   expect(coverageBox).not.toBeNull();
   expect(addCurrentBox).not.toBeNull();
   if (coverageBox && addCurrentBox)
-    expect(addCurrentBox.y - (coverageBox.y + coverageBox.height)).toBeLessThanOrEqual(24);
+    expect(
+      addCurrentBox.y - (coverageBox.y + coverageBox.height),
+    ).toBeLessThanOrEqual(24);
 
   await addCurrentButton.click();
   const newCurrentHost = dialog.locator("[data-address-new-current-host]");
