@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.19.3";
+export const APP_VERSION = "3.19.4";
 
 export const RELEASE_NOTES = [
-  "Mobile zoom is now locked to keep the app viewport stable during use.",
+  "Dark lock-screen PIN indicators now show the Ibiza accent colour as each digit is entered.",
 ] as const;

@@ -1,6 +1,6 @@
 {
-  "version": "3.19.3",
+  "version": "3.19.4",
   "notes": [
-    "Mobile zoom is now locked to keep the app viewport stable during use."
+    "Dark lock-screen PIN indicators now show the Ibiza accent colour as each digit is entered."
   ]
 }

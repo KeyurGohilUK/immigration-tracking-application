@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "urbanfox-shell";
-const CACHE_VERSION = "3.19.3";
+const CACHE_VERSION = "3.19.4";
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const APP_SHELL = [
   "./",
