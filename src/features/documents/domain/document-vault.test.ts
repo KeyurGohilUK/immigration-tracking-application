@@ -31,7 +31,7 @@ describe("Document Vault readiness", () => {
     const progress = calculateDocumentVaultProgress([]);
 
     expect(progress.readinessPercent).toBe(0);
-    expect(progress.totalRequired).toBe(4);
+    expect(progress.totalRequired).toBe(5);
     expect(
       progress.sections.some(({ id }) => id === "identity-immigration"),
     ).toBe(false);
@@ -49,7 +49,7 @@ describe("Document Vault readiness", () => {
       documentFor("immigration-evidence", 1),
     ]);
 
-    expect(progress.totalRequired).toBe(4);
+    expect(progress.totalRequired).toBe(5);
     expect(progress.completedRequired).toBe(0);
     expect(progress.readinessPercent).toBe(0);
     expect(
@@ -83,7 +83,7 @@ describe("Document Vault readiness", () => {
     );
     expect(completeAddress?.status).toBe("complete");
     expect(completeAddress?.completedRequired).toBe(1);
-    expect(complete.readinessPercent).toBe(25);
+    expect(complete.readinessPercent).toBe(20);
   });
 
   it("keeps a fully covered timeline Partial while address evidence is still outstanding", () => {
@@ -130,6 +130,35 @@ describe("Document Vault readiness", () => {
     expect(addressSection?.completedRequired).toBe(1);
   });
 
+  it("moves Employment from To do to Partial to Complete as its two documents are added", () => {
+    const empty = calculateDocumentVaultProgress([]);
+    const emptyEmployment = empty.sections.find(
+      ({ id }) => id === "employment",
+    );
+    expect(emptyEmployment?.status).toBe("to-do");
+
+    const employerOnly = calculateDocumentVaultProgress([
+      documentFor("employer-letter", 0),
+    ]);
+    const partialEmployment = employerOnly.sections.find(
+      ({ id }) => id === "employment",
+    );
+    expect(partialEmployment?.status).toBe("partial");
+    expect(partialEmployment?.completedRequired).toBe(1);
+    expect(partialEmployment?.totalRequired).toBe(2);
+
+    const complete = calculateDocumentVaultProgress([
+      documentFor("employer-letter", 0),
+      documentFor("employment-contract", 1),
+    ]);
+    const completeEmployment = complete.sections.find(
+      ({ id }) => id === "employment",
+    );
+    expect(completeEmployment?.status).toBe("complete");
+    expect(completeEmployment?.completedRequired).toBe(2);
+    expect(completeEmployment?.totalRequired).toBe(2);
+  });
+
   it("does not make conditional or later evidence reduce readiness", () => {
     const progress = calculateDocumentVaultProgress([
       documentFor("life-in-uk", 0),
@@ -137,7 +166,7 @@ describe("Document Vault readiness", () => {
     ]);
 
     expect(progress.completedRequired).toBe(0);
-    expect(progress.totalRequired).toBe(4);
+    expect(progress.totalRequired).toBe(5);
     expect(progress.readinessPercent).toBe(0);
   });
 
