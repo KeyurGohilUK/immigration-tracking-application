@@ -137,7 +137,7 @@ export const DOCUMENT_VAULT_SECTIONS: readonly DocumentVaultSectionDefinition[] 
           label: "Employment contract",
           guidance: "Add the relevant contract if it supports your evidence.",
           categories: ["employment-contract"],
-          priority: "recommended",
+          priority: "required",
         },
       ],
     },
@@ -359,6 +359,10 @@ function calculateSectionProgress(
       statusMessage =
         "Add the applicant’s address history and supporting evidence.";
     }
+  } else if (section.id === "employment") {
+    if (completedItems === 0) status = "to-do";
+    else if (completedItems < requirements.length) status = "partial";
+    else status = "complete";
   } else if (allLater) status = "required-later";
   else if (
     (required.length > 0 && completedRequired === required.length) ||
