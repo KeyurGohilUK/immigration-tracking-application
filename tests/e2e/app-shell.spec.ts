@@ -149,6 +149,11 @@ test("shows install and update controls in every device header", async ({
     ),
   ).toBeVisible();
   await expect(
+    page.getByText(
+      "Address History dialogs no longer preselect Close and use tighter spacing around the current-address action.",
+    ),
+  ).toBeVisible();
+  await expect(
     page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
   ).toHaveCount(0);
 });
@@ -335,6 +340,11 @@ test("guides Address History from the current address backwards", async ({
   let dialog = page.getByRole("dialog", { name: "Address History" });
   const currentAddressHost = dialog.locator("[data-address-new-current-host]");
   await expect(dialog).toBeVisible();
+  await expect
+    .poll(() =>
+      dialog.evaluate((element) => document.activeElement === element),
+    )
+    .toBe(true);
   await expect(dialog.getByText("No addresses recorded yet")).toHaveCount(0);
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
@@ -498,11 +508,18 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     currentAddressHost.getByLabel("House number / name"),
   ).toBeHidden();
-  await expect(
-    dialog.getByRole("button", { name: "Add new current address" }),
-  ).toBeVisible();
+  const addCurrentButton = dialog.getByRole("button", {
+    name: "Add new current address",
+  });
+  await expect(addCurrentButton).toBeVisible();
+  const coverageBox = await dialog.locator(".address-coverage-card").boundingBox();
+  const addCurrentBox = await addCurrentButton.boundingBox();
+  expect(coverageBox).not.toBeNull();
+  expect(addCurrentBox).not.toBeNull();
+  if (coverageBox && addCurrentBox)
+    expect(addCurrentBox.y - (coverageBox.y + coverageBox.height)).toBeLessThanOrEqual(24);
 
-  await dialog.getByRole("button", { name: "Add new current address" }).click();
+  await addCurrentButton.click();
   const newCurrentHost = dialog.locator("[data-address-new-current-host]");
   await expect(newCurrentHost.getByLabel("House number / name")).toBeVisible();
   await expect(
