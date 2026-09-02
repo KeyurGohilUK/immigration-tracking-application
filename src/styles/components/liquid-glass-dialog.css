@@ -19,8 +19,12 @@
     inset 0 1px rgb(255 255 255 / 82%);
 }
 
-.liquid-dialog:focus {
-  outline: none;
+.liquid-dialog-initial-focus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 
 .liquid-dialog::before {
