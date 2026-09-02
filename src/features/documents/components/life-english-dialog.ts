@@ -131,6 +131,22 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
   );
   if (englishEvidence)
     englishEvidence.hidden = englishStatus === "not-recorded";
+
+  const saveButton = form.querySelector<HTMLButtonElement>(
+    'button[type="submit"]',
+  );
+  if (saveButton) {
+    const hasMeaningfulStatus =
+      lifeStatus !== "not-recorded" || englishStatus !== "not-recorded";
+    saveButton.disabled = !hasMeaningfulStatus;
+    saveButton.setAttribute(
+      "aria-disabled",
+      hasMeaningfulStatus ? "false" : "true",
+    );
+    saveButton.title = hasMeaningfulStatus
+      ? ""
+      : "Choose at least one status before saving.";
+  }
 }
 
 export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {
