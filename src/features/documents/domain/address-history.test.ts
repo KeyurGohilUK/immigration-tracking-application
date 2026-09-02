@@ -192,7 +192,7 @@ describe("address history", () => {
   it("caps guided coverage to a three-year route window", () => {
     expect(
       getAddressHistoryMonthsRemaining(
-        [entry("current", "2024-01", "", true)],
+        [entry("current", "2023-10", "", true)],
         "2021-01",
         36,
         "2026-09",
@@ -263,6 +263,6 @@ describe("address history", () => {
         60,
         "2026-09",
       ),
-    ).toBe(40);
+    ).toBe(39);
   });
 });
