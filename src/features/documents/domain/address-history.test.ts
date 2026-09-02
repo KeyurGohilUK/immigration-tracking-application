@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { ImmigrationRoute } from "../../immigration/domain/immigration-permission";
+import {
+  IMMIGRATION_ROUTES,
+  type ImmigrationRoute,
+} from "../../immigration/domain/immigration-permission";
 import {
   calculateAddressHistoryCoverage,
   getAddressHistoryMonthsRemaining,
@@ -169,13 +172,51 @@ describe("address history", () => {
     });
   });
 
-  it("uses a route rule instead of a global five-year constant", () => {
-    const skilledWorker = permission("skilled-worker");
-    const innovatorFounder = permission("innovator-founder");
-    const variableGlobalTalent = permission("global-talent");
-    expect(getRequiredAddressHistoryMonths([skilledWorker])).toBe(60);
-    expect(getRequiredAddressHistoryMonths([innovatorFounder])).toBe(36);
-    expect(getRequiredAddressHistoryMonths([variableGlobalTalent])).toBeNull();
+  it("defines the expected address-history requirement for every immigration route", () => {
+    const expectedMonths: Record<ImmigrationRoute, number | null> = {
+      "skilled-worker": 60,
+      "health-and-care-worker": 60,
+      "tier-2-general": 60,
+      "global-talent": null,
+      "innovator-founder": 36,
+      "t2-minister-of-religion": 60,
+      "international-sportsperson": 60,
+      "representative-overseas-business": 60,
+      "tier-1": null,
+      "scale-up": 60,
+      other: null,
+    };
+
+    expect(Object.keys(expectedMonths).sort()).toEqual(
+      [...IMMIGRATION_ROUTES].sort(),
+    );
+
+    for (const route of IMMIGRATION_ROUTES)
+      expect(getRequiredAddressHistoryMonths([permission(route)])).toBe(
+        expectedMonths[route],
+      );
+  });
+
+  it("never creates address-history gaps before the qualifying start for any route", () => {
+    const entries = [
+      entry("previous", "2023-06", "2024-10"),
+      entry("current", "2024-11", "", true),
+    ];
+
+    for (const route of IMMIGRATION_ROUTES) {
+      const requirement = getAddressHistoryRequirement([
+        permission(route, "2023-06-15"),
+      ]);
+      const result = calculateAddressHistoryCoverage(
+        entries,
+        requirement.requiredMonths,
+        requirement.startMonth,
+        "2026-09",
+      );
+
+      expect(result.gaps, route).toEqual([]);
+      expect(result.complete, route).toBe(true);
+    }
   });
 
   it("starts the guided timeline from the earliest qualifying permission", () => {
