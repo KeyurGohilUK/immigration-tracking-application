@@ -1,6 +1,7 @@
 {
   "version": "3.18.1",
   "notes": [
-    "Address History now uses Save consistently when adding a new current address."
+    "Address History now uses Save consistently when adding a new current address.",
+    "Security PIN now follows the app theme with a light Liquid Glass appearance in light mode."
   ]
 }
