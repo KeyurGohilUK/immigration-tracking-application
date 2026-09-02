@@ -751,9 +751,9 @@ test("stores and manages encrypted documents for a profile", async ({
     .filter({ hasText: "Address History" });
   await expect(addressRow.getByText("Needs attention")).toBeVisible();
   await expect(
-    page
-      .locator(".document-card:visible")
-      .getByText("Needs attention · no address linked", { exact: true }),
+    page.locator(".document-review-badge:visible", {
+      hasText: "Needs attention · no address linked",
+    }),
   ).toBeVisible();
   await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
 
