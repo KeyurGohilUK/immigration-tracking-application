@@ -58,6 +58,7 @@ export function renderDocumentsPage(
   );
   const vaultProgress = calculateDocumentVaultProgress(documents, {
     addressHistoryComplete: addressCoverage.complete,
+    addressHistoryEntryCount: addressHistory.length,
     lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
     englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
   });
@@ -153,7 +154,11 @@ function renderVaultRequirement(
         : requirement.priority === "conditional"
           ? "If applicable"
           : "Recommended";
-  return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}"><span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? `${requirement.documentCount} added` : priority}</small></li>`;
+  const completionLabel =
+    requirement.id === "address-proof"
+      ? "Timeline complete"
+      : `${requirement.documentCount} added`;
+  return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}"><span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : priority}</small></li>`;
 }
 
 function renderVaultStatusIcon(

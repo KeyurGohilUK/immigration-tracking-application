@@ -76,19 +76,22 @@ function renderAddressList(
 ): string {
   if (entries.length === 0)
     return '<div class="address-empty-state"><strong>No addresses recorded yet</strong><span>Add the applicant’s address timeline below.</span></div>';
+  let previousAddressNumber = 0;
   return [...entries]
     .sort((left, right) => right.startMonth.localeCompare(left.startMonth))
-    .map(
-      (entry, index) =>
-        `<article class="address-history-item">
-          <div class="address-history-copy"><span class="address-number">Address ${index + 1}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
+    .map((entry) => {
+      const addressLabel = entry.isCurrent
+        ? "Current address"
+        : `Previous address ${(previousAddressNumber += 1)}`;
+      return `<article class="address-history-item">
+          <div class="address-history-copy"><span class="address-number">${addressLabel}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
           <div class="address-history-actions">
             <button type="button" class="member-action" data-edit-address="${entry.id}">Edit</button>
             <span class="address-proof-count">${renderEvidenceCount(documents, entry.id)}</span>
             <button type="button" class="member-action destructive-action" data-delete-address="${entry.id}">Delete</button>
           </div>
-        </article>`,
-    )
+        </article>`;
+    })
     .join("");
 }
 

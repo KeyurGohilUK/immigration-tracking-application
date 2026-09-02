@@ -264,6 +264,7 @@ export const DOCUMENT_VAULT_STATUS_LABELS: Record<DocumentVaultStatus, string> =
 
 export interface DocumentVaultProgressOptions {
   addressHistoryComplete?: boolean;
+  addressHistoryEntryCount?: number;
   lifeInUkComplete?: boolean;
   englishRequirementComplete?: boolean;
 }
@@ -309,7 +310,7 @@ function calculateSectionProgress(
     ).length;
     let complete = documentCount > 0;
     if (section.id === "address-history" && requirement.id === "address-proof")
-      complete = options.addressHistoryComplete === true && documentCount > 0;
+      complete = options.addressHistoryComplete === true;
     if (section.id === "life-english" && requirement.id === "life-in-uk")
       complete = options.lifeInUkComplete === true;
     if (section.id === "life-english" && requirement.id === "english-language")
@@ -331,7 +332,11 @@ function calculateSectionProgress(
     requirements.every(({ priority }) => priority === "later");
 
   let status: DocumentVaultStatus;
-  if (allLater) status = "required-later";
+  if (section.id === "address-history") {
+    if (options.addressHistoryComplete === true) status = "complete";
+    else if ((options.addressHistoryEntryCount ?? 0) > 0) status = "partial";
+    else status = "to-do";
+  } else if (allLater) status = "required-later";
   else if (
     (required.length > 0 && completedRequired === required.length) ||
     (required.length === 0 &&
