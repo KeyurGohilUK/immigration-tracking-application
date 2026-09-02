@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ImmigrationRoute } from "../../immigration/domain/immigration-permission";
 import {
   calculateAddressHistoryCoverage,
   getAddressHistoryMonthsRemaining,
@@ -43,11 +44,7 @@ function entry(
 }
 
 function permission(
-  route:
-    | "skilled-worker"
-    | "global-talent"
-    | "innovator-founder"
-    | "scale-up",
+  route: ImmigrationRoute,
   permissionStartDate = "2024-01-01",
 ) {
   return {
