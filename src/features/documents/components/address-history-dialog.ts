@@ -68,7 +68,7 @@ export function renderAddressHistoryDialog(
         <span class="inline-evidence-file-name" data-address-evidence-name>No new file selected</span>
       </div>
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
-      <button class="primary-button family-save-button" data-address-submit type="submit">Save & continue</button>
+      <button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit">Save & continue</button>
       </div>
       </div>
     </div>`,
