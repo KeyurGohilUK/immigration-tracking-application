@@ -385,6 +385,7 @@ test("guides Address History from the current address backwards", async ({
   expect(saveAddressBox).not.toBeNull();
   expect(cancelAddressBox).not.toBeNull();
   expect(saveAddressBox?.width).toBeCloseTo(cancelAddressBox?.width ?? 0, 0);
+  expect(saveAddressBox?.height).toBeCloseTo(cancelAddressBox?.height ?? 0, 0);
   await cancelAddressButton.click();
   await expect(
     currentCard.getByRole("textbox", { name: "Current address", exact: true }),
