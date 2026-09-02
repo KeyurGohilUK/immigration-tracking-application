@@ -285,11 +285,13 @@ test("guides Address History from permission start to the next uncovered month",
   await expect(dialog).toHaveCount(0);
 
   await addressSection.locator("summary").click();
+  await addressSection.getByRole("button", { name: "Add document" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
-    page.getByText("1 First Street, Bristol, BS1 1AA"),
+    dialog.getByText("1 First Street, Bristol, BS1 1AA"),
   ).toBeVisible();
   await expect(
-    page.getByText("2 Current Road, Bristol, BS2 2BB"),
+    dialog.getByText("2 Current Road, Bristol, BS2 2BB"),
   ).toBeVisible();
 });
 
