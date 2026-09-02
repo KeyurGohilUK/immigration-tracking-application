@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now shows Current address only for the first entry and hides End month while that address is current.",
+      "Address History now labels the first address as Current address and subsequent entries as Previous address.",
     ),
   ).toBeVisible();
   await expect(
@@ -261,9 +261,10 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog).toBeVisible();
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
-  await expect(dialog.getByLabel("Current address")).toBeChecked();
-  await expect(dialog.getByLabel("Current address")).toBeDisabled();
   await expect(dialog.getByLabel("Current address")).toBeVisible();
+  await expect(dialog.getByLabel("This is my current address")).toBeChecked();
+  await expect(dialog.getByLabel("This is my current address")).toBeDisabled();
+  await expect(dialog.getByLabel("This is my current address")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
   await expect(dialog.getByLabel("Notes")).toHaveCount(0);
 
@@ -272,7 +273,7 @@ test("guides Address History from the current address backwards", async ({
     "base64",
   );
   await dialog
-    .getByLabel("Full address")
+    .getByLabel("Current address")
     .fill("3 Current Avenue, Bristol, BS3 3CC");
   await dialog.getByLabel("Start month").fill("2025-01");
   await dialog.getByLabel("Address evidence").setInputFiles({
@@ -284,7 +285,8 @@ test("guides Address History from the current address backwards", async ({
 
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("Current address")).toBeHidden();
+  await expect(dialog.getByLabel("This is my current address")).toBeHidden();
+  await expect(dialog.getByLabel("Previous address")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toHaveValue("2024-12");
   await expect(dialog.getByLabel("End month")).toHaveAttribute(
@@ -294,7 +296,7 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
 
   await dialog
-    .getByLabel("Full address")
+    .getByLabel("Previous address")
     .fill("2 Previous Road, Bristol, BS2 2BB");
   await dialog.getByLabel("Start month").fill("2023-07");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
@@ -303,7 +305,7 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog).toBeVisible();
   await expect(dialog.getByLabel("End month")).toHaveValue("2023-06");
   await dialog
-    .getByLabel("Full address")
+    .getByLabel("Previous address")
     .fill("1 First Street, Bristol, BS1 1AA");
   await dialog.getByLabel("Start month").fill("2021-09");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
