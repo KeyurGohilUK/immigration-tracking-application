@@ -65,10 +65,6 @@ export function renderDocumentsPage(
     addressHistoryHasCurrentAddress:
       addressHistory.length === 0 ||
       addressHistory.some(({ isCurrent }) => isCurrent),
-    addressHistoryHasUnlinkedEvidence: documents.some(
-      ({ category, addressHistoryId }) =>
-        category === "address-proof" && !addressHistoryId,
-    ),
     lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
     englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
   });
