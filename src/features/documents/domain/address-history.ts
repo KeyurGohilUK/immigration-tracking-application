@@ -270,18 +270,36 @@ export function getRequiredAddressHistoryMonths(
   return getAddressHistoryRequirement(permissions).requiredMonths;
 }
 
-export function getLatestUncoveredAddressMonth(
-  entries: readonly AddressHistoryEntry[],
+function getAddressHistoryWindowStart(
   requiredStartMonth: string | null,
+  requiredMonths: number | null,
   asOfMonth: string,
-): string | null {
+): number | null {
   if (!requiredStartMonth) return null;
   if (!MONTH_PATTERN.test(requiredStartMonth) || !MONTH_PATTERN.test(asOfMonth))
     throw new Error("Address-history month is invalid.");
 
-  const start = monthToIndex(requiredStartMonth);
+  const qualifyingStart = monthToIndex(requiredStartMonth);
   const end = monthToIndex(asOfMonth);
-  if (start > end) return null;
+  if (qualifyingStart > end) return null;
+  return requiredMonths === null
+    ? qualifyingStart
+    : Math.max(qualifyingStart, end - requiredMonths + 1);
+}
+
+export function getLatestUncoveredAddressMonth(
+  entries: readonly AddressHistoryEntry[],
+  requiredStartMonth: string | null,
+  requiredMonths: number | null,
+  asOfMonth: string,
+): string | null {
+  const start = getAddressHistoryWindowStart(
+    requiredStartMonth,
+    requiredMonths,
+    asOfMonth,
+  );
+  if (start === null) return null;
+  const end = monthToIndex(asOfMonth);
 
   const covered = new Set<number>();
   for (const entry of entries) {
@@ -303,15 +321,16 @@ export function getLatestUncoveredAddressMonth(
 export function getAddressHistoryMonthsRemaining(
   entries: readonly AddressHistoryEntry[],
   requiredStartMonth: string | null,
+  requiredMonths: number | null,
   asOfMonth: string,
 ): number | null {
-  if (!requiredStartMonth) return null;
-  if (!MONTH_PATTERN.test(requiredStartMonth) || !MONTH_PATTERN.test(asOfMonth))
-    throw new Error("Address-history month is invalid.");
-
-  const start = monthToIndex(requiredStartMonth);
+  const start = getAddressHistoryWindowStart(
+    requiredStartMonth,
+    requiredMonths,
+    asOfMonth,
+  );
+  if (start === null) return requiredStartMonth ? 0 : null;
   const end = monthToIndex(asOfMonth);
-  if (start > end) return 0;
 
   const covered = new Set<number>();
   for (const entry of entries) {
@@ -343,12 +362,12 @@ export function calculateAddressHistoryCoverage(
     throw new Error("Address-history month is invalid.");
 
   const end = monthToIndex(asOfMonth);
-  const qualifyingStart =
-    requiredStartMonth === null ? end : monthToIndex(requiredStartMonth);
   const start =
-    requiredMonths === null
-      ? qualifyingStart
-      : Math.max(end - requiredMonths + 1, qualifyingStart);
+    getAddressHistoryWindowStart(
+      requiredStartMonth ?? asOfMonth,
+      requiredMonths,
+      asOfMonth,
+    ) ?? end;
   if (start > end)
     return {
       requiredMonths,
