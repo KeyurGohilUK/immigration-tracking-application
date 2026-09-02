@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.12.5";
+export const APP_VERSION = "3.12.6";
 
 export const RELEASE_NOTES = [
-  "The Document Vault now shows Add address before Address History starts and Edit address once at least one address is saved.",
+  "Address History now hides the previous-address form as soon as the route-required start month is fully covered.",
 ] as const;
