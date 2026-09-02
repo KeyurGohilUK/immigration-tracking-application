@@ -374,7 +374,7 @@ test("guides Address History from the current address backwards", async ({
     "Previous address 12 Previous Road, Bristol, BS2 2BBJul 2023 – Dec 2024",
   );
   await expect(savedAddresses.getByRole("listitem").nth(2)).toContainText(
-    "Previous address 21 First Street, Bristol, BS1 1AASep 2021 – Jun 2023",
+    "Previous address 21 First Street, Bristol, BS1 1AASept 2021 – Jun 2023",
   );
   await addressSection.getByRole("button", { name: "Edit address" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
