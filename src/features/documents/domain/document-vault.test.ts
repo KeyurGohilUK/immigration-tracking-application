@@ -31,10 +31,10 @@ describe("Document Vault readiness", () => {
     const progress = calculateDocumentVaultProgress([]);
 
     expect(progress.readinessPercent).toBe(0);
-    expect(progress.totalRequired).toBe(6);
+    expect(progress.totalRequired).toBe(4);
     expect(
-      progress.sections.find(({ id }) => id === "identity-immigration")?.status,
-    ).toBe("to-do");
+      progress.sections.some(({ id }) => id === "identity-immigration"),
+    ).toBe(false);
     expect(
       progress.sections.find(({ id }) => id === "salary-tax")?.status,
     ).toBe("needs-attention");
@@ -43,22 +43,18 @@ describe("Document Vault readiness", () => {
     ).toBe("required-later");
   });
 
-  it("marks Identity as partial until both core evidence items are present", () => {
-    const passportOnly = calculateDocumentVaultProgress([
-      documentFor("passport", 0),
-    ]);
-    expect(
-      passportOnly.sections.find(({ id }) => id === "identity-immigration")
-        ?.status,
-    ).toBe("partial");
-
-    const complete = calculateDocumentVaultProgress([
+  it("excludes Identity and Immigration documents from vault readiness", () => {
+    const progress = calculateDocumentVaultProgress([
       documentFor("passport", 0),
       documentFor("immigration-evidence", 1),
     ]);
+
+    expect(progress.totalRequired).toBe(4);
+    expect(progress.completedRequired).toBe(0);
+    expect(progress.readinessPercent).toBe(0);
     expect(
-      complete.sections.find(({ id }) => id === "identity-immigration")?.status,
-    ).toBe("complete");
+      progress.sections.some(({ id }) => id === "identity-immigration"),
+    ).toBe(false);
   });
 
   it("moves Address History from to-do to partial to complete from structured coverage", () => {
@@ -87,7 +83,7 @@ describe("Document Vault readiness", () => {
     );
     expect(completeAddress?.status).toBe("complete");
     expect(completeAddress?.completedRequired).toBe(1);
-    expect(complete.readinessPercent).toBe(17);
+    expect(complete.readinessPercent).toBe(25);
   });
 
   it("keeps a fully covered timeline Partial while address evidence is still outstanding", () => {
@@ -141,7 +137,7 @@ describe("Document Vault readiness", () => {
     ]);
 
     expect(progress.completedRequired).toBe(0);
-    expect(progress.totalRequired).toBe(6);
+    expect(progress.totalRequired).toBe(4);
     expect(progress.readinessPercent).toBe(0);
   });
 
