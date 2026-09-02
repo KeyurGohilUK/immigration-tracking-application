@@ -86,15 +86,10 @@ function renderAddressList(
   documents: readonly DocumentMetadata[],
 ): string {
   if (entries.length === 0) return "";
-  let previousAddressNumber = 0;
-  return [...entries]
-    .sort((left, right) => right.startMonth.localeCompare(left.startMonth))
-    .map((entry) => {
-      const addressLabel = entry.isCurrent
-        ? "Current address"
-        : `Previous address ${(previousAddressNumber += 1)}`;
+  return getDisplayAddresses(entries)
+    .map(({ entry, label }) => {
       return `<article class="address-history-item" data-address-item="${entry.id}">
-          <div class="address-history-copy"><span class="address-number">${addressLabel}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
+          <div class="address-history-copy"><span class="address-number">${label}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
           <div class="address-history-actions">
             <button type="button" class="member-action" data-edit-address="${entry.id}">Edit</button>
             <span class="address-proof-count">${renderEvidenceCount(documents, entry.id)}</span>
@@ -104,6 +99,34 @@ function renderAddressList(
         </article>`;
     })
     .join("");
+}
+
+export function renderReadOnlyAddressList(
+  entries: readonly AddressHistoryEntry[],
+): string {
+  if (entries.length === 0) return "";
+  return `<section class="vault-address-summary" aria-labelledby="vault-address-summary-title"><strong id="vault-address-summary-title">Saved addresses</strong><ol aria-label="Saved addresses">${getDisplayAddresses(
+    entries,
+  )
+    .map(
+      ({ entry, label }) =>
+        `<li><span class="address-number">${label}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></li>`,
+    )
+    .join("")}</ol></section>`;
+}
+
+function getDisplayAddresses(
+  entries: readonly AddressHistoryEntry[],
+): { entry: AddressHistoryEntry; label: string }[] {
+  let previousAddressNumber = 0;
+  return [...entries]
+    .sort((left, right) => right.startMonth.localeCompare(left.startMonth))
+    .map((entry) => ({
+      entry,
+      label: entry.isCurrent
+        ? "Current address"
+        : `Previous address ${(previousAddressNumber += 1)}`,
+    }));
 }
 
 export function showAddressHistoryForm(
