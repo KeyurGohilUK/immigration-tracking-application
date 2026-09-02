@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now puts Add new current address above the saved current address and keeps the previous-address form as the main backward-entry flow.",
+      "Address History now keeps the previous-address form focused on a single Save & continue action without a redundant secondary button.",
     ),
   ).toBeVisible();
   await expect(
@@ -343,7 +343,7 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
   await expect(
     dialog.getByRole("button", { name: "Previous address", exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
 
   const moveButtonBox = await dialog
     .getByRole("button", { name: "Add new current address" })
