@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now supports moving home by adding a new current address and automatically closing the previous current address.",
+      "Address History now keeps the previous-address form focused on a single Save & continue action without a redundant secondary button.",
     ),
   ).toBeVisible();
   await expect(
@@ -341,6 +341,27 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByText("1 First Street, Bristol, BS1 1AA"),
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Previous address", exact: true }),
+  ).toHaveCount(0);
+
+  const moveButtonBox = await dialog
+    .getByRole("button", { name: "Add new current address" })
+    .boundingBox();
+  const currentCardBox = await dialog
+    .locator(".address-history-item")
+    .filter({ hasText: "Current address" })
+    .boundingBox();
+  const previousFormBox = await dialog
+    .getByRole("textbox", { name: "Previous address", exact: true })
+    .boundingBox();
+  expect(moveButtonBox).not.toBeNull();
+  expect(currentCardBox).not.toBeNull();
+  expect(previousFormBox).not.toBeNull();
+  if (moveButtonBox && currentCardBox && previousFormBox) {
+    expect(moveButtonBox.y).toBeLessThan(currentCardBox.y);
+    expect(currentCardBox.y).toBeLessThan(previousFormBox.y);
+  }
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
   await expect(
