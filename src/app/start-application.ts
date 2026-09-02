@@ -151,6 +151,7 @@ import {
 } from "../features/documents/data/life-english-repository";
 import {
   calculateAddressHistoryCoverage,
+  getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
   getLatestUncoveredAddressMonth,
   validateAddressHistoryCollection,
@@ -648,10 +649,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       requiredAddressStartMonth: string | null,
       lifeEnglish: LifeEnglishRecord | null,
     ): void => {
+      const asOfMonth = getUkCalendarDate().slice(0, 7);
       const addressCoverage = calculateAddressHistoryCoverage(
         addressHistory,
         requiredAddressMonths,
-        getUkCalendarDate().slice(0, 7),
+        asOfMonth,
+      );
+      const addressMonthsRemaining = getAddressHistoryMonthsRemaining(
+        addressHistory,
+        requiredAddressStartMonth,
+        asOfMonth,
       );
       renderDocumentsPage(
         root,
@@ -661,6 +668,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         addressHistory,
         addressCoverage,
         requiredAddressStartMonth,
+        addressMonthsRemaining,
         lifeEnglish,
       );
       wireAuthenticatedShell(profile, "Documents");
