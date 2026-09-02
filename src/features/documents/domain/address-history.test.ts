@@ -124,10 +124,7 @@ describe("address history", () => {
   it("returns no next month once the recorded timeline reaches present", () => {
     expect(
       getNextUncoveredAddressMonth(
-        [
-          entry("one", "2021-09", "2023-06"),
-          entry("two", "2023-07", "", true),
-        ],
+        [entry("one", "2021-09", "2023-06"), entry("two", "2023-07", "", true)],
         "2021-09",
         "2026-09",
       ),
