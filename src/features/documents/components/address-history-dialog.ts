@@ -407,7 +407,9 @@ export function showExtractedAddressSuggestion(
   const suggestion = form.querySelector<HTMLElement>(
     "[data-address-extraction-suggestion]",
   );
-  const value = form.querySelector<HTMLElement>(\n    "[data-address-extracted-value]",\n  );
+  const value = form.querySelector<HTMLElement>(
+    "[data-address-extracted-value]",
+  );
   if (status) status.textContent = statusMessage;
   if (!suggestion || !value) return;
   suggestion.hidden = !fullAddress;
