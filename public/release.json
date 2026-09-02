@@ -1,6 +1,6 @@
 {
-  "version": "3.12.7",
+  "version": "3.13.0",
   "notes": [
-    "Address History now keeps consistent spacing between the end-month field and optional evidence."
+    "Address History now edits each saved address in place and shows a new-current-address form above the existing current address."
   ]
 }
