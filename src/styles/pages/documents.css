@@ -872,6 +872,8 @@ html[data-theme="dark"] .vault-readiness-card {
 .life-english-panel {
   display: grid;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   gap: 0.75rem;
   padding: 0.85rem;
   border: 1px solid var(--glass-border);
@@ -894,7 +896,10 @@ html[data-theme="dark"] .vault-readiness-card {
 }
 
 .life-english-panel .family-field {
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .life-english-panel input[type="date"] {
