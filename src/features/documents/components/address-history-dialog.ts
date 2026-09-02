@@ -4,11 +4,13 @@ import {
   type AddressHistoryEntry,
   type AddressHistoryInput,
 } from "../domain/address-history";
+import type { DocumentMetadata } from "../domain/document";
 
 export function renderAddressHistoryDialog(
   entries: readonly AddressHistoryEntry[],
   coverage: AddressHistoryCoverage,
   requiredStartMonth: string | null,
+  documents: readonly DocumentMetadata[],
 ): string {
   const requiredLabel =
     coverage.requiredMonths === null
@@ -42,7 +44,7 @@ export function renderAddressHistoryDialog(
         ${gaps}
       </section>
       <section class="address-history-list" aria-label="Recorded addresses">
-        ${renderAddressList(entries)}
+        ${renderAddressList(entries, documents)}
       </section>
       <input name="addressId" type="hidden" />
       <div class="family-form-fields address-history-fields">
@@ -50,9 +52,12 @@ export function renderAddressHistoryDialog(
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
         <div class="family-field"><label for="address-end">End month</label><input id="address-end" name="endMonth" type="month" /></div>
         <label class="address-current-toggle family-field-wide"><input id="address-current" name="isCurrent" type="checkbox" /><span>Current address</span></label>
-        <div class="family-field family-field-wide"><label for="address-notes">Notes <span class="optional-label">Optional</span></label><textarea id="address-notes" name="notes" maxlength="500" rows="2"></textarea></div>
       </div>
-      <p class="field-guidance">Save the address first, then use “Add proof” beside it to attach council tax, tenancy, bank, utility, HMRC or other supporting evidence.</p>
+      <div class="inline-evidence-attachment" data-address-evidence>
+        <div class="inline-evidence-copy"><strong>Address evidence</strong><span>Optional · council tax, tenancy, bank, utility or other proof · PDF, JPG or PNG · up to 5 MB</span><small data-address-existing-evidence>No evidence attached yet</small></div>
+        <label class="inline-evidence-picker" for="address-evidence-file"><span>Choose file</span><input id="address-evidence-file" name="addressEvidenceFile" type="file" aria-label="Address evidence" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label>
+        <span class="inline-evidence-file-name" data-address-evidence-name>No new file selected</span>
+      </div>
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
     </div>`,
     actions:
@@ -62,7 +67,10 @@ export function renderAddressHistoryDialog(
   });
 }
 
-function renderAddressList(entries: readonly AddressHistoryEntry[]): string {
+function renderAddressList(
+  entries: readonly AddressHistoryEntry[],
+  documents: readonly DocumentMetadata[],
+): string {
   if (entries.length === 0)
     return '<div class="address-empty-state"><strong>No addresses recorded yet</strong><span>Add the applicant’s address timeline below.</span></div>';
   return [...entries]
@@ -73,7 +81,7 @@ function renderAddressList(entries: readonly AddressHistoryEntry[]): string {
           <div class="address-history-copy"><span class="address-number">Address ${index + 1}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
           <div class="address-history-actions">
             <button type="button" class="member-action" data-edit-address="${entry.id}">Edit</button>
-            <button type="button" class="member-action" data-add-address-proof="${entry.id}">Add proof</button>
+            <span class="address-proof-count">${renderEvidenceCount(documents, entry.id)}</span>
             <button type="button" class="member-action destructive-action" data-delete-address="${entry.id}">Delete</button>
           </div>
         </article>`,
@@ -85,6 +93,7 @@ export function showAddressHistoryForm(
   root: HTMLElement,
   entry?: AddressHistoryEntry,
   suggestedStartMonth?: string | null,
+  documents: readonly DocumentMetadata[] = [],
 ): void {
   const dialog = root.querySelector<HTMLDialogElement>(
     "#address-history-dialog",
@@ -111,10 +120,9 @@ export function showAddressHistoryForm(
       entry.endMonth;
     (form.elements.namedItem("isCurrent") as HTMLInputElement).checked =
       entry.isCurrent;
-    (form.elements.namedItem("notes") as HTMLTextAreaElement).value =
-      entry.notes;
     syncAddressEndState(form);
   }
+  syncAddressEvidenceState(form, entry?.id, documents);
   if (!dialog.open) dialog.showModal();
 }
 
@@ -137,6 +145,7 @@ export function resetAddressHistoryForm(
     error.hidden = true;
   }
   syncAddressEndState(form);
+  syncAddressEvidenceState(form, undefined, []);
 }
 
 export function syncAddressEndState(form: HTMLFormElement): void {
@@ -160,7 +169,7 @@ export function readAddressHistoryForm(form: HTMLFormElement): {
       startMonth: String(data.get("startMonth") ?? ""),
       endMonth: current.checked ? "" : String(data.get("endMonth") ?? ""),
       isCurrent: current.checked,
-      notes: String(data.get("notes") ?? "").trim(),
+      notes: "",
     },
   };
 }
@@ -182,4 +191,58 @@ function escapeHtml(value: string): string {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+
+export function readAddressEvidenceFile(form: HTMLFormElement): File | null {
+  const input = form.elements.namedItem(
+    "addressEvidenceFile",
+  ) as HTMLInputElement | null;
+  return input?.files?.[0] ?? null;
+}
+
+export function syncAddressEvidenceName(form: HTMLFormElement): void {
+  const input = form.elements.namedItem(
+    "addressEvidenceFile",
+  ) as HTMLInputElement | null;
+  const label = form.querySelector<HTMLElement>("[data-address-evidence-name]");
+  if (!input || !label) return;
+  label.textContent = input.files?.[0]?.name ?? "No new file selected";
+}
+
+function syncAddressEvidenceState(
+  form: HTMLFormElement,
+  addressId: string | undefined,
+  documents: readonly DocumentMetadata[],
+): void {
+  const label = form.querySelector<HTMLElement>(
+    "[data-address-existing-evidence]",
+  );
+  if (!label) return;
+  const evidence = addressId
+    ? documents.filter(
+        ({ category, addressHistoryId }) =>
+          category === "address-proof" && addressHistoryId === addressId,
+      )
+    : [];
+  if (evidence.length === 0) {
+    label.textContent = "No evidence attached yet";
+    return;
+  }
+  label.textContent =
+    evidence.length === 1
+      ? `Attached: ${evidence[0]?.displayName ?? ""}`
+      : `${evidence.length} evidence files already attached`;
+}
+
+function renderEvidenceCount(
+  documents: readonly DocumentMetadata[],
+  addressId: string,
+): string {
+  const count = documents.filter(
+    ({ category, addressHistoryId }) =>
+      category === "address-proof" && addressHistoryId === addressId,
+  ).length;
+  if (count === 0) return "No evidence";
+  return count === 1 ? "1 evidence file" : `${count} evidence files`;
 }
