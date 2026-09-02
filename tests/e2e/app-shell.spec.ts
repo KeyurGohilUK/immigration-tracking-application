@@ -285,8 +285,12 @@ test("guides Address History from permission start to the next uncovered month",
   await expect(dialog).toHaveCount(0);
 
   await addressSection.locator("summary").click();
-  await expect(page.getByText("1 First Street, Bristol, BS1 1AA")).toBeVisible();
-  await expect(page.getByText("2 Current Road, Bristol, BS2 2BB")).toBeVisible();
+  await expect(
+    page.getByText("1 First Street, Bristol, BS1 1AA"),
+  ).toBeVisible();
+  await expect(
+    page.getByText("2 Current Road, Bristol, BS2 2BB"),
+  ).toBeVisible();
 });
 
 test("stores and manages encrypted documents for a profile", async ({
