@@ -1,6 +1,6 @@
 {
-  "version": "3.7.1",
+  "version": "3.8.0",
   "notes": [
-    "Disabled empty Life in the UK and English saves until at least one meaningful status is selected."
+    "Guided Address History now starts from qualifying permission history and automatically continues from each next uncovered month."
   ]
 }
