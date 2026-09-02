@@ -68,8 +68,7 @@ async function fillStructuredAddress(
   if (address.locality)
     await scope.getByLabel(/^Locality/).fill(address.locality);
   await scope.getByLabel("Town / city").fill(address.townCity);
-  if (address.county)
-    await scope.getByLabel(/^County/).fill(address.county);
+  if (address.county) await scope.getByLabel(/^County/).fill(address.county);
   await scope.getByLabel("Postcode").fill(address.postcode);
 }
 
@@ -376,30 +375,24 @@ test("guides Address History from the current address backwards", async ({
       evidenceBox.y - (endMonthBox.y + endMonthBox.height),
     ).toBeGreaterThan(8);
 
-  await fillStructuredAddress(
-    dialog.locator("[data-address-previous-host]"),
-    {
-      houseNumberName: "2",
-      street: "Previous Road",
-      townCity: "Bristol",
-      postcode: "BS2 2BB",
-    },
-  );
+  await fillStructuredAddress(dialog.locator("[data-address-previous-host]"), {
+    houseNumberName: "2",
+    street: "Previous Road",
+    townCity: "Bristol",
+    postcode: "BS2 2BB",
+  });
   await dialog.getByLabel("Start month").fill("2023-07");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
 
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByLabel("End month")).toHaveValue("2023-06");
-  await fillStructuredAddress(
-    dialog.locator("[data-address-previous-host]"),
-    {
-      houseNumberName: "1",
-      street: "First Street",
-      townCity: "Bristol",
-      postcode: "BS1 1AA",
-    },
-  );
+  await fillStructuredAddress(dialog.locator("[data-address-previous-host]"), {
+    houseNumberName: "1",
+    street: "First Street",
+    townCity: "Bristol",
+    postcode: "BS1 1AA",
+  });
   await dialog.getByLabel("Start month").fill("2021-09");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
@@ -488,18 +481,14 @@ test("guides Address History from the current address backwards", async ({
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
   const newCurrentHost = dialog.locator("[data-address-new-current-host]");
-  await expect(
-    newCurrentHost.getByLabel("House number / name"),
-  ).toBeVisible();
+  await expect(newCurrentHost.getByLabel("House number / name")).toBeVisible();
   await expect(
     dialog.getByRole("button", { name: "Add new current address" }),
   ).toBeHidden();
   await expect(
     newCurrentHost.getByRole("button", { name: "Cancel" }),
   ).toBeVisible();
-  await newCurrentHost
-    .getByLabel("House number / name")
-    .fill("Temporary");
+  await newCurrentHost.getByLabel("House number / name").fill("Temporary");
   await newCurrentHost.getByRole("button", { name: "Cancel" }).click();
   await expect(newCurrentHost.getByRole("textbox")).toHaveCount(0);
   await expect(
