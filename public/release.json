@@ -1,6 +1,6 @@
 {
-  "version": "3.18.0",
+  "version": "3.18.1",
   "notes": [
-    "Address History now uses structured UK address fields for house/building, street, locality, town/city, county, and postcode."
+    "Address History now uses Save consistently when adding a new current address."
   ]
 }
