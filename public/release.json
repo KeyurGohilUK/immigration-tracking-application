@@ -1,6 +1,6 @@
 {
-  "version": "3.6.0",
+  "version": "3.6.1",
   "notes": [
-    "Added structured Life in the UK and English evidence details, including pass date, UAN/reference capture, evidence type, and optional supporting uploads."
+    "Refined the Life in the UK and English modal for iPhone with contained date fields, compact spacing, and conditional evidence controls."
   ]
 }

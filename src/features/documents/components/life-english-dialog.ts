@@ -22,8 +22,8 @@ export function renderLifeEnglishDialog(): string {
         <div class="section-heading"><div><p class="eyebrow">Life in the UK</p><h3>Test details</h3></div></div>
         <div class="family-form-fields">
           <div class="family-field family-field-wide"><label for="life-status">Status</label><select id="life-status" name="lifeInUkStatus"><option value="not-recorded">Not recorded</option><option value="passed">Passed</option><option value="exempt">Exempt / not required</option></select></div>
-          <div class="family-field"><label for="life-pass-date">Passed date</label><input id="life-pass-date" name="lifeInUkPassedDate" type="date" /></div>
-          <div class="family-field"><label for="life-reference">UAN / reference number <span class="optional-label">Optional</span></label><input id="life-reference" name="lifeInUkReference" maxlength="120" autocomplete="off" /></div>
+          <div class="family-field family-field-wide" data-life-passed-details><label for="life-pass-date">Passed date</label><input id="life-pass-date" name="lifeInUkPassedDate" type="date" /></div>
+          <div class="family-field family-field-wide" data-life-passed-details><label for="life-reference">UAN / reference number <span class="optional-label">Optional</span></label><input id="life-reference" name="lifeInUkReference" maxlength="120" autocomplete="off" /></div>
         </div>
         <button type="button" class="secondary-button" data-add-life-evidence>Add Life in the UK evidence</button>
       </section>
@@ -31,8 +31,8 @@ export function renderLifeEnglishDialog(): string {
         <div class="section-heading"><div><p class="eyebrow">English requirement</p><h3>Evidence details</h3></div></div>
         <div class="family-form-fields">
           <div class="family-field family-field-wide"><label for="english-status">Status</label><select id="english-status" name="englishStatus"><option value="not-recorded">Not recorded</option><option value="met">Requirement met</option><option value="exempt">Exempt / not required</option></select></div>
-          <div class="family-field family-field-wide"><label for="english-evidence-type">Evidence type</label><input id="english-evidence-type" name="englishEvidenceType" maxlength="120" placeholder="e.g. approved qualification" /></div>
-          <div class="family-field family-field-wide"><label for="english-reference">Certificate / reference number <span class="optional-label">Optional</span></label><input id="english-reference" name="englishReference" maxlength="120" autocomplete="off" /></div>
+          <div class="family-field family-field-wide" data-english-met-details><label for="english-evidence-type">Evidence type</label><input id="english-evidence-type" name="englishEvidenceType" maxlength="120" placeholder="e.g. approved qualification" /></div>
+          <div class="family-field family-field-wide" data-english-met-details><label for="english-reference">Certificate / reference number <span class="optional-label">Optional</span></label><input id="english-reference" name="englishReference" maxlength="120" autocomplete="off" /></div>
         </div>
         <button type="button" class="secondary-button" data-add-english-evidence>Add English evidence</button>
       </section>
@@ -85,6 +85,14 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
   passDate.disabled = lifeStatus !== "passed";
   passDate.required = lifeStatus === "passed";
   if (lifeStatus !== "passed") passDate.value = "";
+  for (const field of form.querySelectorAll<HTMLElement>(
+    "[data-life-passed-details]",
+  ))
+    field.hidden = lifeStatus !== "passed";
+  const lifeEvidence = form.querySelector<HTMLButtonElement>(
+    "[data-add-life-evidence]",
+  );
+  if (lifeEvidence) lifeEvidence.hidden = lifeStatus === "not-recorded";
 
   const englishStatus = (
     form.elements.namedItem("englishStatus") as HTMLSelectElement
@@ -95,6 +103,15 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
   evidenceType.disabled = englishStatus !== "met";
   evidenceType.required = englishStatus === "met";
   if (englishStatus !== "met") evidenceType.value = "";
+  for (const field of form.querySelectorAll<HTMLElement>(
+    "[data-english-met-details]",
+  ))
+    field.hidden = englishStatus !== "met";
+  const englishEvidence = form.querySelector<HTMLButtonElement>(
+    "[data-add-english-evidence]",
+  );
+  if (englishEvidence)
+    englishEvidence.hidden = englishStatus === "not-recorded";
 }
 
 export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {

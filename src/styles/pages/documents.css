@@ -871,8 +871,9 @@ html[data-theme="dark"] .vault-readiness-card {
 
 .life-english-panel {
   display: grid;
-  gap: 0.85rem;
-  padding: 0.9rem;
+  min-width: 0;
+  gap: 0.75rem;
+  padding: 0.85rem;
   border: 1px solid var(--glass-border);
   border-radius: 1.15rem;
   background: color-mix(
@@ -886,17 +887,77 @@ html[data-theme="dark"] .vault-readiness-card {
   margin: 0;
 }
 
+.life-english-panel .family-form-fields {
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 0.7rem;
+}
+
+.life-english-panel .family-field {
+  min-width: 0;
+}
+
+.life-english-panel input[type="date"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .life-english-panel h3 {
   margin: 0.15rem 0 0;
   font-size: 1rem;
 }
 
 .life-english-panel .secondary-button {
-  min-height: 2.75rem;
+  min-height: 2.65rem;
   margin: 0;
   border-radius: 0.9rem;
 }
 
 .life-english-dialog textarea {
   resize: vertical;
+}
+
+@media (max-width: 35.99rem) {
+  .life-english-dialog .liquid-dialog-form {
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .life-english-dialog .liquid-dialog-header {
+    gap: 0.25rem;
+    padding: 0.15rem 2.2rem 0.25rem;
+  }
+
+  .life-english-dialog .liquid-dialog-header h2 {
+    font-size: clamp(1.45rem, 6vw, 1.8rem);
+  }
+
+  .life-english-dialog .liquid-dialog-subtitle {
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
+  .life-english-modal {
+    gap: 0.75rem;
+  }
+
+  .life-english-panel {
+    gap: 0.7rem;
+    padding: 0.8rem;
+  }
+
+  .life-english-panel h3 {
+    font-size: 0.95rem;
+  }
+
+  .life-english-panel .family-form-fields {
+    gap: 0.6rem;
+  }
+
+  .life-english-dialog .liquid-dialog-form input:not([type="checkbox"]),
+  .life-english-dialog .liquid-dialog-form select {
+    min-height: 3rem;
+  }
 }

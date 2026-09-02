@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added structured Life in the UK and English evidence details, including pass date, UAN/reference capture, evidence type, and optional supporting uploads.",
+      "Refined the Life in the UK and English modal for iPhone with contained date fields, compact spacing, and conditional evidence controls.",
     ),
   ).toBeVisible();
   await expect(
@@ -299,12 +299,31 @@ test("stores and manages encrypted documents for a profile", async ({
     name: "Life in the UK & English",
   });
   await expect(lifeEnglishDialog).toBeVisible();
+  await expect(lifeEnglishDialog.getByLabel("Passed date")).toBeHidden();
+  await expect(lifeEnglishDialog.getByLabel("Evidence type")).toBeHidden();
   await lifeEnglishDialog.getByLabel("Status").first().selectOption("passed");
+  await expect(lifeEnglishDialog.getByLabel("Passed date")).toBeVisible();
+  const lifePanelBox = await lifeEnglishDialog
+    .locator(".life-english-panel")
+    .first()
+    .boundingBox();
+  const passedDateBox = await lifeEnglishDialog
+    .getByLabel("Passed date")
+    .boundingBox();
+  expect(lifePanelBox).not.toBeNull();
+  expect(passedDateBox).not.toBeNull();
+  if (lifePanelBox && passedDateBox) {
+    expect(passedDateBox.x).toBeGreaterThanOrEqual(lifePanelBox.x);
+    expect(passedDateBox.x + passedDateBox.width).toBeLessThanOrEqual(
+      lifePanelBox.x + lifePanelBox.width + 1,
+    );
+  }
   await lifeEnglishDialog.getByLabel("Passed date").fill("2026-08-20");
   await lifeEnglishDialog
     .getByLabel("UAN / reference number")
     .fill("UAN-TEST-123");
   await lifeEnglishDialog.getByLabel("Status").nth(1).selectOption("met");
+  await expect(lifeEnglishDialog.getByLabel("Evidence type")).toBeVisible();
   await lifeEnglishDialog
     .getByLabel("Evidence type")
     .fill("Approved qualification");
