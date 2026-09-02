@@ -47,12 +47,14 @@ export function renderAddressHistoryDialog(
         <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
         ${gaps}
       </section>
+      <div data-address-new-current-host></div>
       ${entries.some(({ isCurrent }) => isCurrent) ? '<button id="address-add-new-current" class="secondary-button" type="button">Add new current address</button>' : ""}
       <section class="address-history-list" aria-label="Recorded addresses">
         ${renderAddressList(entries, documents)}
       </section>
       <input name="addressId" type="hidden" />
       <input name="addressMoveMode" type="hidden" value="false" />
+      <div data-address-previous-host>
       <div data-address-entry-fields${requiredTimelineReached ? " hidden" : ""}>
       <div class="family-form-fields address-history-fields">
         <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
@@ -66,9 +68,11 @@ export function renderAddressHistoryDialog(
         <span class="inline-evidence-file-name" data-address-evidence-name>No new file selected</span>
       </div>
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
+      <button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit">Save & continue</button>
+      </div>
       </div>
     </div>`,
-    actions: `<button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit"${requiredTimelineReached ? " hidden" : ""}>Save & continue</button>`,
+    actions: "",
     dialogClass: "address-history-dialog",
     closeLabel: "Close address history",
   });
@@ -86,13 +90,14 @@ function renderAddressList(
       const addressLabel = entry.isCurrent
         ? "Current address"
         : `Previous address ${(previousAddressNumber += 1)}`;
-      return `<article class="address-history-item">
+      return `<article class="address-history-item" data-address-item="${entry.id}">
           <div class="address-history-copy"><span class="address-number">${addressLabel}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
           <div class="address-history-actions">
             <button type="button" class="member-action" data-edit-address="${entry.id}">Edit</button>
             <span class="address-proof-count">${renderEvidenceCount(documents, entry.id)}</span>
             <button type="button" class="member-action destructive-action" data-delete-address="${entry.id}">Delete</button>
           </div>
+          <div data-address-edit-host="${entry.id}"></div>
         </article>`;
     })
     .join("");
@@ -111,6 +116,7 @@ export function showAddressHistoryForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, guidedEndMonth, firstAddress);
+  placeAddressEntryForm(form, entry?.id ? "edit" : "previous", entry?.id);
   setAddressEntryVisibility(form, true);
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit)
@@ -151,6 +157,7 @@ export function showNewCurrentAddressForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, null, true);
+  placeAddressEntryForm(form, "new-current");
   setAddressEntryVisibility(form, true);
   const moveMode = form.elements.namedItem(
     "addressMoveMode",
@@ -196,6 +203,30 @@ export function resetAddressHistoryForm(
   syncAddressGuidedFields(form, firstAddress, false);
   syncAddressEndState(form);
   syncAddressEvidenceState(form, undefined, []);
+}
+
+function placeAddressEntryForm(
+  form: HTMLFormElement,
+  mode: "previous" | "new-current" | "edit",
+  addressId?: string,
+): void {
+  const fields = form.querySelector<HTMLElement>("[data-address-entry-fields]");
+  if (!fields) return;
+
+  const host =
+    mode === "new-current"
+      ? form.querySelector<HTMLElement>("[data-address-new-current-host]")
+      : mode === "edit" && addressId
+        ? form.querySelector<HTMLElement>(
+            `[data-address-edit-host="${CSS.escape(addressId)}"]`,
+          )
+        : form.querySelector<HTMLElement>("[data-address-previous-host]");
+
+  host?.append(fields);
+  const addCurrent = form.querySelector<HTMLButtonElement>(
+    "#address-add-new-current",
+  );
+  if (addCurrent) addCurrent.hidden = mode === "new-current";
 }
 
 function setAddressEntryVisibility(

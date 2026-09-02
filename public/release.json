@@ -1,6 +1,6 @@
 {
-  "version": "3.12.6",
+  "version": "3.13.0",
   "notes": [
-    "Address History now hides the previous-address form as soon as the route-required start month is fully covered."
+    "Address History now edits each saved address in place and shows a new-current-address form above the existing current address."
   ]
 }

@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now hides the previous-address form as soon as the route-required start month is fully covered.",
+      "Address History now edits each saved address in place and shows a new-current-address form above the existing current address.",
     ),
   ).toBeVisible();
   await expect(
@@ -307,6 +307,17 @@ test("guides Address History from the current address backwards", async ({
   );
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
 
+  const endMonthBox = await dialog.getByLabel("End month").boundingBox();
+  const evidenceBox = await dialog
+    .locator("[data-address-evidence]")
+    .boundingBox();
+  expect(endMonthBox).not.toBeNull();
+  expect(evidenceBox).not.toBeNull();
+  if (endMonthBox && evidenceBox)
+    expect(
+      evidenceBox.y - (endMonthBox.y + endMonthBox.height),
+    ).toBeGreaterThan(8);
+
   await dialog
     .getByLabel("Previous address")
     .fill("2 Previous Road, Bristol, BS2 2BB");
@@ -357,19 +368,34 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByRole("button", { name: "Save & continue" }),
   ).toBeHidden();
 
-  const moveButtonBox = await dialog
-    .getByRole("button", { name: "Add new current address" })
-    .boundingBox();
-  const currentCardBox = await dialog
+  const currentCard = dialog
     .locator(".address-history-item")
-    .filter({ hasText: "Current address" })
-    .boundingBox();
-  expect(moveButtonBox).not.toBeNull();
-  expect(currentCardBox).not.toBeNull();
-  if (moveButtonBox && currentCardBox)
-    expect(moveButtonBox.y).toBeLessThan(currentCardBox.y);
+    .filter({ hasText: "Current address" });
+  await currentCard.getByRole("button", { name: "Edit" }).click();
+  await expect(
+    currentCard.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeVisible();
+  await expect(
+    currentCard.getByRole("button", { name: "Save changes" }),
+  ).toBeVisible();
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
+  const newCurrentHost = dialog.locator("[data-address-new-current-host]");
+  await expect(
+    newCurrentHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Add new current address" }),
+  ).toBeHidden();
+  const newCurrentFormBox = await newCurrentHost.boundingBox();
+  const currentCardBox = await currentCard.boundingBox();
+  expect(newCurrentFormBox).not.toBeNull();
+  expect(currentCardBox).not.toBeNull();
+  if (newCurrentFormBox && currentCardBox)
+    expect(newCurrentFormBox.y).toBeLessThan(currentCardBox.y);
   await expect(
     dialog.getByRole("textbox", { name: "Current address", exact: true }),
   ).toBeVisible();
