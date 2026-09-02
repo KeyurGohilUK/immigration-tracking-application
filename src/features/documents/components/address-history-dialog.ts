@@ -92,6 +92,13 @@ export function showAddressHistoryForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, suggestedStartMonth);
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submit)
+    submit.textContent = entry
+      ? "Save changes"
+      : suggestedStartMonth
+        ? "Save & continue"
+        : "Save address";
   if (entry) {
     (form.elements.namedItem("addressId") as HTMLInputElement).value = entry.id;
     (form.elements.namedItem("fullAddress") as HTMLTextAreaElement).value =
@@ -124,6 +131,9 @@ export function resetAddressHistoryForm(
     "aria-readonly",
     suggestedStartMonth ? "true" : "false",
   );
+  start.title = suggestedStartMonth
+    ? "Start month is set automatically from the first uncovered month."
+    : "";
   const error = form.querySelector<HTMLElement>("#address-history-error");
   if (error) {
     error.textContent = "";
