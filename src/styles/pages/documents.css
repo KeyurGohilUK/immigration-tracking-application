@@ -839,6 +839,38 @@ html[data-theme="dark"] .vault-readiness-card {
   gap: 1rem;
 }
 
+.address-history-modal [data-address-entry-fields][hidden] {
+  display: none;
+}
+
+[data-address-new-current-host],
+[data-address-previous-host],
+[data-address-edit-host] {
+  display: grid;
+  gap: 0.8rem;
+}
+
+[data-address-new-current-host] > [data-address-entry-fields] {
+  padding: 0.85rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1.1rem;
+  background: color-mix(
+    in srgb,
+    var(--ibiza-surface-container) 54%,
+    transparent
+  );
+}
+
+[data-address-edit-host] > [data-address-entry-fields] {
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+[data-address-entry-fields] > .family-save-button {
+  width: 100%;
+  min-height: 3.2rem;
+}
+
 .address-history-fields {
   align-items: start;
 }
