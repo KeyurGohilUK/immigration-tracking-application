@@ -1,6 +1,6 @@
 {
-  "version": "3.7.0",
+  "version": "3.7.1",
   "notes": [
-    "Added inline encrypted evidence attachments to the Life in the UK and English modal so users can save details and files in one flow."
+    "Disabled empty Life in the UK and English saves until at least one meaningful status is selected."
   ]
 }
