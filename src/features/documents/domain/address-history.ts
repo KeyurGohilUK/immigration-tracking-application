@@ -39,8 +39,7 @@ export interface AddressHistoryRequirement {
 }
 
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
-const UK_POSTCODE_PATTERN =
-  /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
+const UK_POSTCODE_PATTERN = /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
 const FIVE_YEAR_ROUTES = new Set([
   "skilled-worker",
   "health-and-care-worker",
