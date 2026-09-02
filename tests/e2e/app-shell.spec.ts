@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History edit actions now use equal-width Cancel and Save buttons.",
+      "Address History now shows saved addresses in order on the Document Vault page and uses matching Cancel and Save buttons.",
     ),
   ).toBeVisible();
   await expect(
@@ -358,6 +358,26 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByText("1 First Street, Bristol, BS1 1AA"),
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
+  await dialog.getByRole("button", { name: "Close address history" }).click();
+  if (
+    !(await addressSection.evaluate((section) => section.hasAttribute("open")))
+  )
+    await addressSection.locator("summary").click();
+  const savedAddresses = addressSection.getByRole("list", {
+    name: "Saved addresses",
+  });
+  await expect(savedAddresses.getByRole("listitem")).toHaveCount(3);
+  await expect(savedAddresses.getByRole("listitem").nth(0)).toContainText(
+    "Current address3 Current Avenue, Bristol, BS3 3CCJan 2025 – Present",
+  );
+  await expect(savedAddresses.getByRole("listitem").nth(1)).toContainText(
+    "Previous address 12 Previous Road, Bristol, BS2 2BBJul 2023 – Dec 2024",
+  );
+  await expect(savedAddresses.getByRole("listitem").nth(2)).toContainText(
+    "Previous address 21 First Street, Bristol, BS1 1AASept 2021 – Jun 2023",
+  );
+  await addressSection.getByRole("button", { name: "Edit address" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog.getByRole("textbox", { name: "Previous address", exact: true }),
   ).toBeHidden();
@@ -385,6 +405,7 @@ test("guides Address History from the current address backwards", async ({
   expect(saveAddressBox).not.toBeNull();
   expect(cancelAddressBox).not.toBeNull();
   expect(saveAddressBox?.width).toBeCloseTo(cancelAddressBox?.width ?? 0, 0);
+  expect(saveAddressBox?.height).toBeCloseTo(cancelAddressBox?.height ?? 0, 0);
   await cancelAddressButton.click();
   await expect(
     currentCard.getByRole("textbox", { name: "Current address", exact: true }),

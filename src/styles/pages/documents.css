@@ -799,6 +799,49 @@ html[data-theme="dark"] .vault-readiness-card {
   gap: 0.6rem;
 }
 
+.vault-address-summary {
+  display: grid;
+  gap: 0.6rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.vault-address-summary > strong {
+  color: var(--colour-text);
+  font-size: 0.82rem;
+}
+
+.vault-address-summary ol {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vault-address-summary li {
+  display: grid;
+  gap: 0.16rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.9rem;
+  background: color-mix(
+    in srgb,
+    var(--ibiza-surface-container) 45%,
+    transparent
+  );
+}
+
+.vault-address-summary li > strong {
+  color: var(--colour-text);
+  font-size: 0.86rem;
+}
+
+.vault-address-summary li > small {
+  color: var(--colour-text-muted);
+  font-size: 0.74rem;
+}
+
 .address-history-item {
   display: grid;
   gap: 0.7rem;
@@ -875,7 +918,9 @@ html[data-theme="dark"] .vault-readiness-card {
 .address-context-actions .secondary-button,
 .address-context-actions .family-save-button {
   width: 100%;
-  min-height: 3.2rem;
+  height: 3.2rem;
+  min-height: 0;
+  margin: 0;
 }
 
 .address-context-actions .secondary-button[hidden] {

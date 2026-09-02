@@ -22,7 +22,10 @@ import type {
   AddressHistoryCoverage,
   AddressHistoryEntry,
 } from "../domain/address-history";
-import { renderAddressHistoryDialog } from "./address-history-dialog";
+import {
+  renderAddressHistoryDialog,
+  renderReadOnlyAddressList,
+} from "./address-history-dialog";
 import { renderLifeEnglishDialog } from "./life-english-dialog";
 import {
   isEnglishRequirementComplete,
@@ -69,7 +72,7 @@ export function renderDocumentsPage(
       <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true">▣</span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div><div class="record-heading-actions document-heading-actions"><button id="add-document" class="vault-add-button" type="button"><span aria-hidden="true">＋</span> Add document</button></div></section>
       <section class="documents-profile-picker vault-profile-picker" aria-label="Choose a profile for documents">${renderVaultMemberStrip(members, selectedProfileId)}<div class="documents-profile-select">${renderPersonSwitcherMarkup()}</div></section>
       <section class="document-summary-grid vault-summary-grid" aria-label="Local document summary"><article class="document-summary-card vault-readiness-card"><p class="eyebrow">Selected profile</p><div class="vault-readiness-line"><p class="document-summary-value"><span id="vault-readiness-percent">${vaultProgress.readinessPercent}%</span><small>ready</small></p><span class="vault-ready-label">${vaultProgress.completedRequired} of ${vaultProgress.totalRequired} core items</span></div><div class="vault-readiness-track" role="progressbar" aria-label="Document Vault readiness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${vaultProgress.readinessPercent}"><span style="--vault-readiness-progress: ${vaultProgress.readinessPercent}%"></span></div><p>${vaultProgress.completedSections} of ${vaultProgress.sections.length} sections complete. Conditional and later items do not reduce readiness.</p></article><article class="document-summary-card vault-storage-card"><p class="eyebrow">Encrypted storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
-      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory.length)}</section>
+      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory)}</section>
 <section class="vault-download-panel"><button id="download-document-pack" class="vault-download-button" type="button" ${documents.length === 0 ? "disabled" : ""}><span aria-hidden="true">⇩</span> Download PDF pack</button></section>
 <aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups include documents</h2><p>Encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
       <section class="documents-panel" aria-labelledby="document-list-title"><div class="section-heading"><div><p class="eyebrow">Selected profile</p><h2 id="document-list-title">Document collection</h2></div></div><div id="document-list" class="document-list"></div></section>
@@ -134,18 +137,22 @@ export function renderDocumentsPage(
 
 function renderVaultCategoryRows(
   sections: readonly DocumentVaultSectionProgress[],
-  addressHistoryCount: number,
+  addressHistory: readonly AddressHistoryEntry[],
 ): string {
   return sections
     .map((section) => {
       const statusLabel = DOCUMENT_VAULT_STATUS_LABELS[section.status];
       const actionLabel =
         section.id === "address-history"
-          ? addressHistoryCount > 0
+          ? addressHistory.length > 0
             ? "Edit address"
             : "Add address"
           : "Add document";
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p>${section.description}</p></div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div><button class="vault-section-add" type="button" data-add-vault-section="${section.id}">${actionLabel}</button></div><ul class="vault-requirement-list">${section.requirements.map(renderVaultRequirement).join("")}</ul></div></details>`;
+      const addressList =
+        section.id === "address-history"
+          ? renderReadOnlyAddressList(addressHistory)
+          : "";
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p>${section.description}</p></div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div><button class="vault-section-add" type="button" data-add-vault-section="${section.id}">${actionLabel}</button></div><ul class="vault-requirement-list">${section.requirements.map(renderVaultRequirement).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
