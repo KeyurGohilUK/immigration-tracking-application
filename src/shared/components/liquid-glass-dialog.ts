@@ -41,13 +41,13 @@ export function renderLiquidGlassDialog({
     .filter(Boolean)
     .join(" ");
 
-  return `<dialog id="${id}" class="${dialogClasses}" aria-labelledby="${labelledBy}">
+  return `<dialog id="${id}" class="${dialogClasses}" aria-labelledby="${labelledBy}" tabindex="-1" autofocus>
     <form id="${formId}" class="${formClasses}" novalidate>
       <button class="dialog-close liquid-dialog-close" type="button" aria-label="${closeLabel}">×</button>
       <div class="${headerClasses}">
         ${iconSvg ? `<div class="liquid-dialog-icon" aria-hidden="true">${iconSvg}</div>` : ""}
         <p class="eyebrow">${eyebrow}</p>
-        <h2 id="${labelledBy}" tabindex="-1" autofocus>${title}</h2>
+        <h2 id="${labelledBy}">${title}</h2>
         ${subtitle ? `<p${subtitleId ? ` id="${subtitleId}"` : ""} class="liquid-dialog-subtitle">${subtitle}</p>` : ""}
       </div>
       <div class="liquid-dialog-body">
