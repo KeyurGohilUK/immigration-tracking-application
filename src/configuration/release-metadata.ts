@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.15.0";
+export const APP_VERSION = "3.16.0";
 
 export const RELEASE_NOTES = [
-  "Install and updates now checks proactively, offers Check for updates when current, and adds a gold glow when a newer release is available.",
+  "Address History now supports postcode-first UK address lookup with selectable results and a manual fallback.",
 ] as const;
