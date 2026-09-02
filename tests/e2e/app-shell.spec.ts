@@ -368,7 +368,7 @@ test("stores and manages encrypted documents for a profile", async ({
   const dialogBox = await addressDialog.boundingBox();
   expect(inputBox).not.toBeNull();
   expect(dialogBox).not.toBeNull();
-    if (!inputBox || !dialogBox) continue;
+  if (inputBox && dialogBox) {
     expect(inputBox.x).toBeGreaterThanOrEqual(dialogBox.x);
     expect(inputBox.x + inputBox.width).toBeLessThanOrEqual(
       dialogBox.x + dialogBox.width + 1,
