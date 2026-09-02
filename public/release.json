@@ -1,6 +1,6 @@
 {
-  "version": "3.13.1",
+  "version": "3.13.2",
   "notes": [
-    "Address History edit and new-current forms now include Cancel so users can return to the saved timeline without making changes."
+    "Address History now keeps the dialog open after Save, Cancel, and Delete while updating the timeline in place."
   ]
 }
