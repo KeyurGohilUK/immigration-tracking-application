@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now hides the previous-address entry form once the required timeline is fully covered.",
+      "The Document Vault now shows Add address before Address History starts and Edit address once at least one address is saved.",
     ),
   ).toBeVisible();
   await expect(
@@ -255,7 +255,10 @@ test("guides Address History from the current address backwards", async ({
   await page.getByRole("link", { name: "Vault" }).first().click();
   const addressSection = page.locator('[data-vault-section="address-history"]');
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await expect(
+    addressSection.getByRole("button", { name: "Add address" }),
+  ).toBeVisible();
+  await addressSection.getByRole("button", { name: "Add address" }).click();
 
   let dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
@@ -290,6 +293,9 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog).toBeVisible();
   await expect(
     addressSection.getByText("Partial", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    addressSection.getByRole("button", { name: "Edit address" }),
   ).toBeVisible();
   await expect(dialog.getByLabel("This is my current address")).toBeHidden();
   await expect(dialog.getByLabel("Previous address")).toBeVisible();
