@@ -1,7 +1,19 @@
 import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
 
+export interface StructuredAddress {
+  flatBuilding: string;
+  houseNumberName: string;
+  street: string;
+  locality: string;
+  townCity: string;
+  county: string;
+  postcode: string;
+  country: string;
+}
+
 export interface AddressHistoryInput {
   fullAddress: string;
+  address?: StructuredAddress;
   startMonth: string;
   endMonth: string;
   isCurrent: boolean;
@@ -29,6 +41,8 @@ export interface AddressHistoryRequirement {
 }
 
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+const UK_POSTCODE_PATTERN =
+  /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
 const FIVE_YEAR_ROUTES = new Set([
   "skilled-worker",
   "health-and-care-worker",
@@ -40,7 +54,11 @@ export function validateAddressHistoryInput(
 ): string | null {
   const address = input.fullAddress.trim();
   if (address.length < 5 || address.length > 300)
-    return "Enter the full address between 5 and 300 characters.";
+    return "Enter a complete address between 5 and 300 characters.";
+  if (input.address) {
+    const structuredError = validateStructuredAddress(input.address);
+    if (structuredError) return structuredError;
+  }
   if (!MONTH_PATTERN.test(input.startMonth))
     return "Enter a valid address start month.";
   if (input.isCurrent) {
@@ -53,6 +71,58 @@ export function validateAddressHistoryInput(
   }
   if (input.notes.trim().length > 500)
     return "Address notes must be 500 characters or fewer.";
+  return null;
+}
+
+export function formatStructuredAddress(address: StructuredAddress): string {
+  return [
+    address.flatBuilding,
+    address.houseNumberName,
+    address.street,
+    address.locality,
+    address.townCity,
+    address.county,
+    address.postcode.toUpperCase(),
+    address.country,
+  ]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
+export function validateStructuredAddress(
+  address: StructuredAddress,
+): string | null {
+  if (!address.houseNumberName.trim())
+    return "Enter the house number or house name.";
+  if (!address.street.trim()) return "Enter the street.";
+  if (!address.townCity.trim()) return "Enter the town or city.";
+  if (!address.country.trim()) return "Enter the country.";
+
+  const country = address.country.trim().toLowerCase();
+  const isUnitedKingdom =
+    country === "united kingdom" || country === "uk" || country === "great britain";
+  if (isUnitedKingdom) {
+    const postcode = address.postcode.trim();
+    if (!postcode) return "Enter the postcode.";
+    if (!UK_POSTCODE_PATTERN.test(postcode))
+      return "Enter a valid UK postcode, for example BS1 5AH.";
+  }
+
+  const limits: Array<[string, string, number]> = [
+    ["Flat / building", address.flatBuilding, 100],
+    ["House number / name", address.houseNumberName, 100],
+    ["Street", address.street, 120],
+    ["Locality", address.locality, 100],
+    ["Town / city", address.townCity, 100],
+    ["County", address.county, 100],
+    ["Postcode", address.postcode, 20],
+    ["Country", address.country, 100],
+  ];
+  for (const [label, value, maximum] of limits)
+    if (value.trim().length > maximum)
+      return `${label} must be ${maximum} characters or fewer.`;
+
   return null;
 }
 
