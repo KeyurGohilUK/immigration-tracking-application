@@ -656,6 +656,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const addressCoverage = calculateAddressHistoryCoverage(
         addressHistory,
         requiredAddressMonths,
+        requiredAddressStartMonth,
         asOfMonth,
       );
       const addressMonthsRemaining = getAddressHistoryMonthsRemaining(
