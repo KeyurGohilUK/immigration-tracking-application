@@ -662,6 +662,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const addressMonthsRemaining = getAddressHistoryMonthsRemaining(
         addressHistory,
         requiredAddressStartMonth,
+        requiredAddressMonths,
         asOfMonth,
       );
       renderDocumentsPage(
@@ -699,6 +700,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const nextRemaining = getAddressHistoryMonthsRemaining(
           nextEntries,
           requiredAddressStartMonth,
+          requiredAddressMonths,
           getUkCalendarDate().slice(0, 7),
         );
         if (nextRemaining !== 0) {
@@ -709,6 +711,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             ? getLatestUncoveredAddressMonth(
                 nextEntries,
                 requiredAddressStartMonth,
+                requiredAddressMonths,
                 getUkCalendarDate().slice(0, 7),
               )
             : null;
@@ -778,6 +781,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               ? getLatestUncoveredAddressMonth(
                   addressHistory,
                   requiredAddressStartMonth,
+                  requiredAddressMonths,
                   getUkCalendarDate().slice(0, 7),
                 )
               : null;
@@ -1014,6 +1018,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             ? getLatestUncoveredAddressMonth(
                 addressHistory,
                 requiredAddressStartMonth,
+                requiredAddressMonths,
                 getUkCalendarDate().slice(0, 7),
               )
             : null;
@@ -1035,6 +1040,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             ? getLatestUncoveredAddressMonth(
                 addressHistory,
                 requiredAddressStartMonth,
+                requiredAddressMonths,
                 getUkCalendarDate().slice(0, 7),
               )
             : null;
