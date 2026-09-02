@@ -140,7 +140,12 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now uses structured UK address fields for house/building, street, locality, town/city, county, and postcode.",
+      "Address History now uses Save consistently when adding a new current address.",
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Security PIN now follows the app theme with a light Liquid Glass appearance in light mode.",
     ),
   ).toBeVisible();
   await expect(
@@ -261,6 +266,24 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
     "24px",
   );
   await expect(page.locator(".security-logo-orb")).toHaveCount(0);
+  await expect(page.locator(".security-keypad-copy h1")).toHaveCSS(
+    "color",
+    "rgb(35, 20, 55)",
+  );
+  await expect(page.locator(".security-keypad-key").first()).toHaveCSS(
+    "color",
+    "rgb(35, 20, 55)",
+  );
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "dark"),
+  );
+  await expect(page.locator(".security-keypad-copy h1")).toHaveCSS(
+    "color",
+    "rgb(255, 255, 255)",
+  );
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "light"),
+  );
   await page.getByRole("button", { name: "Enter 1" }).click();
   await expect(page.locator("[data-pin-indicator].is-filled")).toHaveCount(1);
   await enterPin(page, "Four-digit PIN", "111");
@@ -512,9 +535,7 @@ test("guides Address History from the current address backwards", async ({
     reopenedNewCurrentHost.getByLabel("House number / name"),
   ).toBeVisible();
   await expect(
-    reopenedNewCurrentHost.getByRole("button", {
-      name: "Save new current address",
-    }),
+    reopenedNewCurrentHost.getByRole("button", { name: "Save" }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
   await fillStructuredAddress(reopenedNewCurrentHost, {
@@ -524,9 +545,7 @@ test("guides Address History from the current address backwards", async ({
     postcode: "BS4 4DD",
   });
   await dialog.getByLabel("Start month").fill("2026-09");
-  await dialog
-    .getByRole("button", { name: "Save new current address" })
-    .click();
+  await dialog.getByRole("button", { name: "Save" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
   await expect(

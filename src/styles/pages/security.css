@@ -130,8 +130,19 @@
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  color: #e2e1eb;
-  background: #12131a;
+  color: var(--colour-text);
+  background:
+    radial-gradient(
+      circle at 10% 8%,
+      var(--ibiza-glow-pink-soft),
+      transparent 25rem
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      var(--ibiza-glow-orange-soft),
+      transparent 28rem
+    ),
+    var(--colour-canvas);
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
@@ -141,7 +152,7 @@
   border-radius: 999px;
   pointer-events: none;
   filter: blur(6rem);
-  opacity: 0.24;
+  opacity: 0.18;
 }
 
 .security-ambient-glow-primary {
@@ -149,7 +160,7 @@
   left: -16vw;
   width: 58vw;
   height: 58vw;
-  background: rgb(255 74 143 / 30%);
+  background: rgb(238 9 121 / 18%);
 }
 
 .security-ambient-glow-secondary {
@@ -157,7 +168,7 @@
   bottom: -20vw;
   width: 68vw;
   height: 68vw;
-  background: rgb(255 106 0 / 24%);
+  background: rgb(255 106 0 / 14%);
 }
 
 .security-keypad-main {
@@ -191,7 +202,7 @@
   height: 7rem;
   border-radius: 1.5rem;
   object-fit: contain;
-  filter: drop-shadow(0 0.8rem 1.5rem rgb(0 0 0 / 34%));
+  filter: drop-shadow(0 0.8rem 1.5rem rgb(182 0 90 / 14%));
 }
 
 .security-keypad-copy {
@@ -203,7 +214,7 @@
 .security-keypad-copy h1 {
   max-width: none;
   margin: 0;
-  color: #ffffff;
+  color: var(--colour-text);
   font-family: "Plus Jakarta Sans", sans-serif;
   font-size: clamp(1.75rem, 7vw, 2rem);
   font-weight: 700;
@@ -213,7 +224,7 @@
 .security-keypad-copy p {
   max-width: 18rem;
   margin: 0;
-  color: #e3bdc5;
+  color: var(--colour-text-muted);
   font-size: 0.92rem;
   line-height: 1.55;
 }
@@ -243,10 +254,10 @@
 .security-pin-indicators span {
   width: 1rem;
   height: 1rem;
-  border: 1px solid rgb(255 255 255 / 20%);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
-  background: #282a31;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+  background: var(--glass-surface-strong);
+  box-shadow: inset 0 1px 0 var(--ibiza-glass-highlight);
   transition:
     transform 180ms ease,
     background 180ms ease,
@@ -287,14 +298,14 @@
 }
 
 .security-keypad-key {
-  border: 1px solid rgb(255 255 255 / 15%);
-  color: #ffffff;
+  border: 1px solid var(--glass-border);
+  color: var(--colour-text);
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 7%), rgb(255 255 255 / 3%)),
-    rgb(255 255 255 / 4%);
+    linear-gradient(180deg, rgb(255 255 255 / 56%), rgb(255 255 255 / 22%)),
+    var(--glass-surface);
   box-shadow:
-    0 0.5rem 1rem rgb(0 0 0 / 22%),
-    inset 0 1px 0 rgb(255 255 255 / 10%);
+    0 0.5rem 1.1rem rgb(182 0 90 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 72%);
   font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 1.75rem;
   font-weight: 600;
@@ -307,18 +318,18 @@
 }
 
 .security-keypad-key:hover {
-  border-color: rgb(255 255 255 / 28%);
-  background-color: rgb(255 255 255 / 8%);
+  border-color: rgb(182 0 90 / 24%);
+  background-color: rgb(255 247 255 / 82%);
 }
 
 .security-keypad-key:active {
-  background-color: rgb(255 255 255 / 16%);
+  background-color: rgb(238 9 121 / 10%);
   transform: scale(0.9);
 }
 
 .security-keypad-backspace {
   border: 0;
-  color: #e3bdc5;
+  color: var(--colour-text-muted);
   background: transparent;
   transition:
     color 160ms ease,
@@ -326,7 +337,7 @@
 }
 
 .security-keypad-backspace:hover {
-  color: #ffffff;
+  color: var(--colour-text);
 }
 
 .security-keypad-backspace:active {
@@ -346,7 +357,7 @@
 .security-keypad-error {
   max-width: 18rem;
   margin: -0.35rem 0 0;
-  color: #ffb4ab;
+  color: var(--colour-danger);
   text-align: center;
 }
 
@@ -354,7 +365,7 @@
   margin: -0.25rem 0 0;
   padding: 0.7rem 1rem;
   border: 0;
-  color: #ffb1c5;
+  color: var(--ibiza-primary);
   background: transparent;
   font-size: 0.75rem;
   font-weight: 700;
@@ -363,14 +374,86 @@
 }
 
 .security-forgot-pin:hover {
-  color: #ffd9e1;
+  color: var(--ibiza-pink);
 }
 
 .security-keypad-key:focus-visible,
 .security-keypad-backspace:focus-visible,
 .security-forgot-pin:focus-visible {
-  outline: 2px solid #ffb1c5;
+  outline: 2px solid var(--ibiza-primary);
   outline-offset: 3px;
+}
+
+html[data-theme="dark"] .security-keypad-shell {
+  color: #e2e1eb;
+  background: #12131a;
+}
+
+html[data-theme="dark"] .security-ambient-glow {
+  opacity: 0.24;
+}
+
+html[data-theme="dark"] .security-ambient-glow-primary {
+  background: rgb(255 74 143 / 30%);
+}
+
+html[data-theme="dark"] .security-ambient-glow-secondary {
+  background: rgb(255 106 0 / 24%);
+}
+
+html[data-theme="dark"] .security-logo-mark img {
+  filter: drop-shadow(0 0.8rem 1.5rem rgb(0 0 0 / 34%));
+}
+
+html[data-theme="dark"] .security-keypad-copy h1,
+html[data-theme="dark"] .security-keypad-key {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .security-keypad-copy p,
+html[data-theme="dark"] .security-keypad-backspace {
+  color: #e3bdc5;
+}
+
+html[data-theme="dark"] .security-pin-indicators span {
+  border-color: rgb(255 255 255 / 20%);
+  background: #282a31;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+html[data-theme="dark"] .security-keypad-key {
+  border-color: rgb(255 255 255 / 15%);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 7%), rgb(255 255 255 / 3%)),
+    rgb(255 255 255 / 4%);
+  box-shadow:
+    0 0.5rem 1rem rgb(0 0 0 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+html[data-theme="dark"] .security-keypad-key:hover {
+  border-color: rgb(255 255 255 / 28%);
+  background-color: rgb(255 255 255 / 8%);
+}
+
+html[data-theme="dark"] .security-keypad-key:active {
+  background-color: rgb(255 255 255 / 16%);
+}
+
+html[data-theme="dark"] .security-keypad-backspace:hover {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .security-keypad-error {
+  color: #ffb4ab;
+}
+
+html[data-theme="dark"] .security-forgot-pin {
+  color: #ffb1c5;
+}
+
+html[data-theme="dark"] .security-forgot-pin:hover {
+  color: #ffd9e1;
 }
 
 @media (max-height: 46rem) {

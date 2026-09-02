@@ -211,7 +211,7 @@ export function showNewCurrentAddressForm(
   ) as HTMLInputElement;
   moveMode.value = "true";
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-  if (submit) submit.textContent = "Save new current address";
+  if (submit) submit.textContent = "Save";
   syncAddressEvidenceState(form, undefined, documents);
   if (!dialog.open) dialog.showModal();
 }
