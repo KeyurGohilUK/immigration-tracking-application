@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.12.2";
+export const APP_VERSION = "3.12.3";
 
 export const RELEASE_NOTES = [
-  "Address History now keeps the previous-address form focused on a single Save & continue action without a redundant secondary button.",
+  "Address History now opens directly into the address-entry flow without an empty-state message.",
 ] as const;
