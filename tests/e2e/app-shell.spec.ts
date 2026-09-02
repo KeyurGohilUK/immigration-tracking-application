@@ -749,7 +749,10 @@ test("stores and manages encrypted documents for a profile", async ({
   const addressRow = page
     .locator(".vault-category-row")
     .filter({ hasText: "Address History" });
-  await expect(addressRow.getByText("To do")).toBeVisible();
+  await expect(addressRow.getByText("Needs attention")).toBeVisible();
+  await expect(
+    page.getByText("Needs attention · no address linked", { exact: true }),
+  ).toBeVisible();
   await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
 
   const storedDocument = await page.evaluate(async () => {
