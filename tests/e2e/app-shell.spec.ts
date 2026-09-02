@@ -72,6 +72,21 @@ async function fillStructuredAddress(
   await scope.getByLabel("Postcode").fill(address.postcode);
 }
 
+test("locks zoom in the mobile viewport metadata", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  await page.goto("/");
+
+  const viewportContent = await page
+    .locator('meta[name="viewport"]')
+    .getAttribute("content");
+
+  expect(viewportContent).toContain("width=device-width");
+  expect(viewportContent).toContain("initial-scale=1.0");
+  expect(viewportContent).toContain("maximum-scale=1.0");
+  expect(viewportContent).toContain("user-scalable=no");
+  expect(viewportContent).toContain("viewport-fit=cover");
+});
+
 test("shows the anonymous landing page without tracker controls", async ({
   page,
 }) => {
@@ -140,7 +155,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now explains why a section is Partial when the timeline is complete but supporting evidence is still missing.",
+      "Mobile zoom is now locked to keep the app viewport stable during use.",
     ),
   ).toBeVisible();
   await expect(
