@@ -359,9 +359,7 @@ export function wireAddressPostcodeLookup(form: HTMLFormElement): void {
   const resultSelect = form.querySelector<HTMLSelectElement>(
     "[data-address-result]",
   );
-  const status = form.querySelector<HTMLElement>(
-    "[data-address-lookup-status]",
-  );
+  const status = form.querySelector<HTMLElement>("[data-address-lookup-status]");
   const manualToggle = form.querySelector<HTMLButtonElement>(
     "[data-address-manual-toggle]",
   );
@@ -492,10 +490,7 @@ function resetAddressLookupUi(
         : "Enter your postcode to find the address.";
 }
 
-function setAddressManualEntry(
-  form: HTMLFormElement,
-  visible: boolean,
-): void {
+function setAddressManualEntry(form: HTMLFormElement, visible: boolean): void {
   const fields = form.querySelector<HTMLElement>(
     "[data-address-manual-fields]",
   );
