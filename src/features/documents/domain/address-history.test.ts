@@ -43,7 +43,11 @@ function entry(
 }
 
 function permission(
-  route: "skilled-worker" | "global-talent",
+  route:
+    | "skilled-worker"
+    | "global-talent"
+    | "innovator-founder"
+    | "scale-up",
   permissionStartDate = "2024-01-01",
 ) {
   return {
@@ -161,6 +165,7 @@ describe("address history", () => {
 
     expect(result).toEqual({
       requiredMonths: 60,
+      applicableMonths: 40,
       coveredMonths: 40,
       complete: true,
       gaps: [],
@@ -169,9 +174,11 @@ describe("address history", () => {
 
   it("uses a route rule instead of a global five-year constant", () => {
     const skilledWorker = permission("skilled-worker");
-    const unsupported = permission("global-talent");
+    const innovatorFounder = permission("innovator-founder");
+    const variableGlobalTalent = permission("global-talent");
     expect(getRequiredAddressHistoryMonths([skilledWorker])).toBe(60);
-    expect(getRequiredAddressHistoryMonths([unsupported])).toBeNull();
+    expect(getRequiredAddressHistoryMonths([innovatorFounder])).toBe(36);
+    expect(getRequiredAddressHistoryMonths([variableGlobalTalent])).toBeNull();
   });
 
   it("starts the guided timeline from the earliest qualifying permission", () => {
@@ -185,11 +192,33 @@ describe("address history", () => {
     });
   });
 
+  it("caps guided coverage to a three-year route window", () => {
+    expect(
+      getAddressHistoryMonthsRemaining(
+        [entry("current", "2024-01", "", true)],
+        "2021-01",
+        36,
+        "2026-09",
+      ),
+    ).toBe(0);
+  });
+
+  it("tracks variable-period routes from their qualifying start without inventing a fixed duration", () => {
+    const requirement = getAddressHistoryRequirement([
+      permission("global-talent", "2024-04-12"),
+    ]);
+    expect(requirement).toEqual({
+      requiredMonths: null,
+      startMonth: "2024-04",
+    });
+  });
+
   it("finds the latest uncovered month when working backwards", () => {
     expect(
       getLatestUncoveredAddressMonth(
         [entry("current", "2025-01", "", true)],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBe("2024-12");
@@ -203,6 +232,7 @@ describe("address history", () => {
           entry("current", "2025-01", "", true),
         ],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBe("2023-06");
@@ -217,6 +247,7 @@ describe("address history", () => {
           entry("current", "2025-01", "", true),
         ],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBeNull();
@@ -232,6 +263,7 @@ describe("address history", () => {
       getAddressHistoryMonthsRemaining(
         [entry("current", "2025-01", "", true)],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBe(40);
