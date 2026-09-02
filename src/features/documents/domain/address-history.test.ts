@@ -4,6 +4,7 @@ import {
   getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
   getLatestUncoveredAddressMonth,
+  getPreviousCalendarMonth,
   getRequiredAddressHistoryMonths,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
@@ -147,6 +148,11 @@ describe("address history", () => {
         "2026-09",
       ),
     ).toBeNull();
+  });
+
+  it("calculates the previous calendar month for a move-home transition", () => {
+    expect(getPreviousCalendarMonth("2026-09")).toBe("2026-08");
+    expect(getPreviousCalendarMonth("2026-01")).toBe("2025-12");
   });
 
   it("reports how many required months remain uncovered", () => {

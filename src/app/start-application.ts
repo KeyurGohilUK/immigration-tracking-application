@@ -111,6 +111,7 @@ import {
   readAddressHistoryForm,
   resetAddressHistoryForm,
   showAddressHistoryForm,
+  showNewCurrentAddressForm,
   syncAddressEndState,
   syncAddressEvidenceName,
 } from "../features/documents/components/address-history-dialog";
@@ -154,6 +155,7 @@ import {
   getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
   getLatestUncoveredAddressMonth,
+  getPreviousCalendarMonth,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
   type AddressHistoryEntry,
@@ -958,6 +960,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           syncAddressEvidenceName(addressForm),
         );
       root
+        .querySelector<HTMLButtonElement>("#address-add-new-current")
+        ?.addEventListener("click", () =>
+          showNewCurrentAddressForm(root, documents),
+        );
+      root
         .querySelector<HTMLButtonElement>("#address-history-reset")
         ?.addEventListener("click", () => {
           if (!addressForm) return;
@@ -1021,7 +1028,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       }
       addressForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const { addressId, input } = readAddressHistoryForm(addressForm);
+        const { addressId, movingHome, input } =
+          readAddressHistoryForm(addressForm);
         const evidenceFile = readAddressEvidenceFile(addressForm);
         const error = addressForm.querySelector<HTMLElement>(
           "#address-history-error",
@@ -1036,6 +1044,20 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         }
 
         const existing = addressHistory.find(({ id }) => id === addressId);
+        const currentAddress = addressHistory.find(
+          ({ isCurrent }) => isCurrent,
+        );
+        if (
+          movingHome &&
+          (!currentAddress || input.startMonth <= currentAddress.startMonth)
+        ) {
+          if (error) {
+            error.textContent =
+              "The new current address must start after the existing current address.";
+            error.hidden = false;
+          }
+          return;
+        }
         const profileDocuments = documents.filter(
           ({ profileId }) => profileId === selectedProfileId,
         );
@@ -1127,11 +1149,29 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           };
         }
 
+        const movedCurrentAddress =
+          movingHome && currentAddress
+            ? {
+                ...currentAddress,
+                isCurrent: false,
+                endMonth: getPreviousCalendarMonth(input.startMonth),
+                updatedAt: timestamp,
+              }
+            : null;
         const nextEntries = existing
           ? addressHistory.map((current) =>
               current.id === existing.id ? entry : current,
             )
-          : [...addressHistory, entry];
+          : movingHome && movedCurrentAddress
+            ? [
+                ...addressHistory.map((current) =>
+                  current.id === movedCurrentAddress.id
+                    ? movedCurrentAddress
+                    : current,
+                ),
+                entry,
+              ]
+            : [...addressHistory, entry];
         const collectionError = validateAddressHistoryCollection(nextEntries);
         if (collectionError) {
           if (error) {
@@ -1160,7 +1200,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           );
           addressDialog?.close();
           await showDocuments(profile);
-          if (!existing && previousEndMonth)
+          if (!existing && !movingHome && previousEndMonth)
             showAddressHistoryForm(
               root,
               undefined,

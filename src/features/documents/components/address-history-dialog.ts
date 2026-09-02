@@ -49,7 +49,9 @@ export function renderAddressHistoryDialog(
       <section class="address-history-list" aria-label="Recorded addresses">
         ${renderAddressList(entries, documents)}
       </section>
+      ${entries.some(({ isCurrent }) => isCurrent) ? '<button id="address-add-new-current" class="secondary-button" type="button">Add new current address</button>' : ""}
       <input name="addressId" type="hidden" />
+      <input name="addressMoveMode" type="hidden" value="false" />
       <div class="family-form-fields address-history-fields">
         <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
@@ -137,6 +139,26 @@ export function showAddressHistoryForm(
   if (!dialog.open) dialog.showModal();
 }
 
+export function showNewCurrentAddressForm(
+  root: HTMLElement,
+  documents: readonly DocumentMetadata[] = [],
+): void {
+  const dialog = root.querySelector<HTMLDialogElement>(
+    "#address-history-dialog",
+  );
+  const form = root.querySelector<HTMLFormElement>("#address-history-form");
+  if (!dialog || !form) throw new Error("Address History form is unavailable.");
+  resetAddressHistoryForm(form, null, true);
+  const moveMode = form.elements.namedItem(
+    "addressMoveMode",
+  ) as HTMLInputElement;
+  moveMode.value = "true";
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submit) submit.textContent = "Save new current address";
+  syncAddressEvidenceState(form, undefined, documents);
+  if (!dialog.open) dialog.showModal();
+}
+
 export function resetAddressHistoryForm(
   form: HTMLFormElement,
   guidedEndMonth?: string | null,
@@ -144,6 +166,10 @@ export function resetAddressHistoryForm(
 ): void {
   form.reset();
   (form.elements.namedItem("addressId") as HTMLInputElement).value = "";
+  const moveMode = form.elements.namedItem(
+    "addressMoveMode",
+  ) as HTMLInputElement | null;
+  if (moveMode) moveMode.value = "false";
   const start = form.elements.namedItem("startMonth") as HTMLInputElement;
   start.value = "";
   start.readOnly = false;
@@ -202,12 +228,14 @@ export function syncAddressEndState(form: HTMLFormElement): void {
 
 export function readAddressHistoryForm(form: HTMLFormElement): {
   addressId: string;
+  movingHome: boolean;
   input: AddressHistoryInput;
 } {
   const data = new FormData(form);
   const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
   return {
     addressId: String(data.get("addressId") ?? ""),
+    movingHome: String(data.get("addressMoveMode") ?? "false") === "true",
     input: {
       fullAddress: String(data.get("fullAddress") ?? "").trim(),
       startMonth: String(data.get("startMonth") ?? ""),

@@ -259,3 +259,9 @@ function formatMonthRange(start: number, end: number): string {
   const to = indexToMonth(end);
   return from === to ? from : `${from} to ${to}`;
 }
+
+export function getPreviousCalendarMonth(month: string): string {
+  if (!MONTH_PATTERN.test(month))
+    throw new Error("Address-history month is invalid.");
+  return indexToMonth(monthToIndex(month) - 1);
+}
