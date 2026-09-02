@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Identity & Immigration is hidden from the Document Vault checklist and no longer affects readiness progress; those document types remain available through Add document.",
+      "Profile & Settings is organised into collapsed-by-default sections so controls only appear when needed.",
     ),
   ).toBeVisible();
   await expect(
@@ -977,12 +977,17 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await expect(
     page.getByText("Encrypted locally", { exact: true }),
   ).toBeVisible();
+
+  await page.getByText("Protect this device", { exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Stored only on this device" }),
   ).toBeVisible();
+
+  await page.getByText("UrbanFox settings", { exact: true }).click();
   await page.getByRole("button", { name: "Open", exact: true }).click();
   await expect(page.locator("#app-manager-title")).toBeVisible();
   await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByText("Backup and restore", { exact: true }).click();
   await page.getByRole("button", { name: "Create encrypted backup" }).click();
   await expect(
     page.getByRole("dialog", { name: "Create a backup" }),
@@ -1027,6 +1032,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Backup and restore", { exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
   await expect(
     page.getByRole("dialog", { name: "Restore a backup" }),
@@ -1133,7 +1139,7 @@ test("persists dark, system, and light segmented theme preferences", async ({
   const system = page.getByRole("radio", { name: "System" });
   await expect(light).toBeChecked();
 
-  await dark.check();
+  await page.getByText("Dark", { exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
@@ -1194,12 +1200,12 @@ test("persists dark, system, and light segmented theme preferences", async ({
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByText("UrbanFox settings", { exact: true }).click();
 
-  await system.check();
+  await page.getByText("System", { exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("system");
 
-  await light.check();
+  await page.getByText("Light", { exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 
   await page.reload();
@@ -1216,6 +1222,7 @@ test("permanently deletes all local application data", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Delete all local data" }),
   ).toBeVisible();
+  await page.getByText("Delete all local data", { exact: true }).first().click();
   const openDeleteButton = page.getByRole("button", {
     name: "Delete all local data",
   });
