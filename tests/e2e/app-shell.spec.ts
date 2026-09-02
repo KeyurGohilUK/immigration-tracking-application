@@ -1076,6 +1076,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toHaveCount(0);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
+  await page.getByText("UrbanFox settings", { exact: true }).click();
   await page.getByRole("button", { name: "View legal information" }).click();
   await expect(
     page.getByRole("heading", { name: "Terms and privacy" }),
@@ -1085,22 +1086,54 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByRole("heading", { name: "Profile & settings" }),
   ).toBeVisible();
 
+  await page.getByText("Protect this device", { exact: true }).click();
   await page.getByRole("button", { name: "Lock now" }).click();
   await expect(
     page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
 });
 
-test("persists light, dark, and system theme preferences", async ({ page }) => {
+test("keeps profile settings sections collapsed until requested", async ({
+  page,
+}) => {
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
-  const theme = page.getByLabel("Theme preference");
-  await expect(theme).toHaveValue("light");
-  await expect(theme).toHaveCSS("background-image", "none");
+  const sections = [
+    "Protect this device",
+    "Backup and restore",
+    "UrbanFox settings",
+    "Delete all local data",
+  ];
 
-  await theme.selectOption("dark");
+  for (const heading of sections) {
+    const details = page.locator("details").filter({ hasText: heading });
+    await expect(details).not.toHaveAttribute("open", "");
+  }
+
+  const appSettings = page
+    .locator("details")
+    .filter({ hasText: "UrbanFox settings" });
+  await page.getByText("UrbanFox settings", { exact: true }).click();
+  await expect(appSettings).toHaveAttribute("open", "");
+  await expect(page.getByRole("radio", { name: "System" })).toBeVisible();
+});
+
+test("persists dark, system, and light segmented theme preferences", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("UrbanFox settings", { exact: true }).click();
+
+  const light = page.getByRole("radio", { name: "Light" });
+  const dark = page.getByRole("radio", { name: "Dark" });
+  const system = page.getByRole("radio", { name: "System" });
+  await expect(light).toBeChecked();
+
+  await dark.check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
@@ -1159,19 +1192,21 @@ test("persists light, dark, and system theme preferences", async ({ page }) => {
   ).toBeLessThanOrEqual(1);
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("UrbanFox settings", { exact: true }).click();
 
-  await theme.selectOption("system");
+  await system.check();
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("system");
 
-  await theme.selectOption("light");
+  await light.check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 
   await page.reload();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
-  await expect(page.getByLabel("Theme preference")).toHaveValue("light");
+  await page.getByText("UrbanFox settings", { exact: true }).click();
+  await expect(page.getByRole("radio", { name: "Light" })).toBeChecked();
 });
 
 test("permanently deletes all local application data", async ({ page }) => {
