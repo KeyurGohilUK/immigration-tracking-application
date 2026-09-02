@@ -132,8 +132,16 @@
   overflow: hidden;
   color: var(--colour-text);
   background:
-    radial-gradient(circle at 10% 8%, var(--ibiza-glow-pink-soft), transparent 25rem),
-    radial-gradient(circle at 90% 90%, var(--ibiza-glow-orange-soft), transparent 28rem),
+    radial-gradient(
+      circle at 10% 8%,
+      var(--ibiza-glow-pink-soft),
+      transparent 25rem
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      var(--ibiza-glow-orange-soft),
+      transparent 28rem
+    ),
     var(--colour-canvas);
   font-family: "Plus Jakarta Sans", sans-serif;
 }
