@@ -345,8 +345,7 @@ function calculateSectionProgress(
       requirements.every(({ complete }) => complete)
     ) {
       status = "complete";
-      statusMessage =
-        "Address timeline and supporting evidence are complete.";
+      statusMessage = "Address timeline and supporting evidence are complete.";
     } else if ((options.addressHistoryEntryCount ?? 0) > 0) {
       status = "partial";
       statusMessage =
