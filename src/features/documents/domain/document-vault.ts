@@ -311,7 +311,8 @@ function calculateSectionProgress(
     ).length;
     let complete = documentCount > 0;
     if (section.id === "address-history" && requirement.id === "address-proof")
-      complete = options.addressHistoryComplete === true;
+      complete =
+        options.addressHistoryComplete === true && documentCount > 0;
     if (section.id === "life-english" && requirement.id === "life-in-uk")
       complete = options.lifeInUkComplete === true;
     if (section.id === "life-english" && requirement.id === "english-language")
@@ -336,7 +337,11 @@ function calculateSectionProgress(
   if (section.id === "address-history") {
     if (options.addressHistoryHasCurrentAddress === false)
       status = "needs-attention";
-    else if (options.addressHistoryComplete === true) status = "complete";
+    else if (
+      options.addressHistoryComplete === true &&
+      requirements.every(({ complete }) => complete)
+    )
+      status = "complete";
     else if ((options.addressHistoryEntryCount ?? 0) > 0) status = "partial";
     else status = "to-do";
   } else if (allLater) status = "required-later";
