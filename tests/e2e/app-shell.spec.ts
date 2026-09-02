@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Refined the Life in the UK and English modal for iPhone with contained date fields, compact spacing, and conditional evidence controls.",
+      "Fixed native iPhone date controls so they stay visually contained inside Liquid Glass form cards.",
     ),
   ).toBeVisible();
   await expect(
@@ -318,6 +318,9 @@ test("stores and manages encrypted documents for a profile", async ({
       lifePanelBox.x + lifePanelBox.width + 1,
     );
   }
+  await expect(
+    lifeEnglishDialog.locator(".life-english-panel").first(),
+  ).toHaveCSS("overflow-x", "hidden");
   await lifeEnglishDialog.getByLabel("Passed date").fill("2026-08-20");
   await lifeEnglishDialog
     .getByLabel("UAN / reference number")
