@@ -6,8 +6,11 @@
 > independently deploy its source code. GitHub forks and clones are unsupported.
 > See [LICENSE](LICENSE).
 
-UrbanFox ILR is a mobile-first, local-only web application for tracking
-information relevant to UK indefinite leave to remain eligibility.
+UrbanFox ILR is a mobile-first, local-first web application for tracking
+information relevant to UK indefinite leave to remain eligibility. Core profile,
+immigration, travel, document, and address-history records are encrypted and
+stored in the browser. The optional postcode finder sends only the postcode
+entered by the user to Ideal Postcodes to return selectable UK addresses.
 
 The interface adapts to its device: signed-in pages scroll beneath a translucent
 sticky header, and mobile screens use a floating icon dock that becomes smaller
@@ -99,3 +102,9 @@ to **GitHub Actions**.
 Every push to `main` builds and deploys the current production app. A deployment
 can also be rerun manually from the **Deploy GitHub Pages** workflow. Generated
 `dist` files are uploaded as a deployment artifact and are not committed.
+
+For postcode lookup, configure the repository Actions secret
+`IDEAL_POSTCODES_API_KEY` and restrict that browser key to the production
+GitHub Pages origin in the Ideal Postcodes dashboard. Without the secret, the
+app keeps manual address entry available. See
+[UK postcode address lookup](docs/uk-postcode-address-lookup.md).
