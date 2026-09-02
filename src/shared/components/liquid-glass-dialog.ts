@@ -41,7 +41,8 @@ export function renderLiquidGlassDialog({
     .filter(Boolean)
     .join(" ");
 
-  return `<dialog id="${id}" class="${dialogClasses}" aria-labelledby="${labelledBy}" tabindex="-1" autofocus>
+  return `<dialog id="${id}" class="${dialogClasses}" aria-labelledby="${labelledBy}">
+    <span class="liquid-dialog-initial-focus" tabindex="-1" autofocus aria-hidden="true"></span>
     <form id="${formId}" class="${formClasses}" novalidate>
       <button class="dialog-close liquid-dialog-close" type="button" aria-label="${closeLabel}">×</button>
       <div class="${headerClasses}">
