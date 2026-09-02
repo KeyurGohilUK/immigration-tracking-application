@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now uses route-aware qualifying windows and no longer reports gaps before the applicable settlement period.",
+      "Completed Address History now stays Complete in the Document Vault even when an address-proof file still needs linking.",
     ),
   ).toBeVisible();
   await expect(
