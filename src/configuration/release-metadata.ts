@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.10.2";
+export const APP_VERSION = "3.10.3";
 
 export const RELEASE_NOTES = [
-  "Address History now labels the first address as Current address and subsequent entries as Previous address.",
+  "Saved Address History now labels entries as Current address, Previous address 1, Previous address 2, and so on.",
 ] as const;
