@@ -101,6 +101,9 @@ describe("Document Vault readiness", () => {
       ({ id }) => id === "address-history",
     );
     expect(addressSection?.status).toBe("partial");
+    expect(addressSection?.statusMessage).toBe(
+      "Address timeline is complete. Upload supporting address evidence to complete this section.",
+    );
     expect(addressSection?.requirements[0]?.complete).toBe(false);
   });
 

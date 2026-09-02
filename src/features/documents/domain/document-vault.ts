@@ -64,6 +64,7 @@ export interface DocumentVaultSectionProgress extends Omit<
   totalRequired: number;
   completedItems: number;
   totalItems: number;
+  statusMessage?: string;
   requirements: DocumentRequirementProgress[];
 }
 
@@ -333,16 +334,29 @@ function calculateSectionProgress(
     requirements.every(({ priority }) => priority === "later");
 
   let status: DocumentVaultStatus;
+  let statusMessage: string | undefined;
   if (section.id === "address-history") {
-    if (options.addressHistoryHasCurrentAddress === false)
+    if (options.addressHistoryHasCurrentAddress === false) {
       status = "needs-attention";
-    else if (
+      statusMessage =
+        "Add a current address to fix the Address History timeline.";
+    } else if (
       options.addressHistoryComplete === true &&
       requirements.every(({ complete }) => complete)
-    )
+    ) {
       status = "complete";
-    else if ((options.addressHistoryEntryCount ?? 0) > 0) status = "partial";
-    else status = "to-do";
+      statusMessage = "Address timeline and supporting evidence are complete.";
+    } else if ((options.addressHistoryEntryCount ?? 0) > 0) {
+      status = "partial";
+      statusMessage =
+        options.addressHistoryComplete === true
+          ? "Address timeline is complete. Upload supporting address evidence to complete this section."
+          : "Address History is partly recorded. Continue the timeline and add supporting evidence.";
+    } else {
+      status = "to-do";
+      statusMessage =
+        "Add the applicant’s address history and supporting evidence.";
+    }
   } else if (allLater) status = "required-later";
   else if (
     (required.length > 0 && completedRequired === required.length) ||
@@ -364,6 +378,7 @@ function calculateSectionProgress(
     totalRequired: required.length,
     completedItems,
     totalItems: requirements.length,
+    statusMessage,
   };
 }
 

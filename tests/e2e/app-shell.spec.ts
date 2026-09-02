@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now shows Partial while supporting evidence is still outstanding and reserves Needs attention for timeline issues.",
+      "Address History now explains why a section is Partial when the timeline is complete but supporting evidence is still missing.",
     ),
   ).toBeVisible();
   await expect(
@@ -374,6 +374,12 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog).toBeVisible();
   await expect(
     addressSection.getByText("Partial", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    addressSection.getByText(
+      "Address History is partly recorded. Continue the timeline and add supporting evidence.",
+      { exact: true },
+    ),
   ).toBeVisible();
   await expect(
     addressSection.locator('[data-add-vault-section="address-history"]'),
