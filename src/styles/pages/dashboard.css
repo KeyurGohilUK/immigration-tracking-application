@@ -306,6 +306,112 @@
   padding: 0.15rem;
 }
 
+.collapsible-settings-section {
+  padding: 0;
+}
+
+.collapsible-settings-section > summary {
+  position: relative;
+  margin: 0;
+  padding: 0.9rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.collapsible-settings-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-settings-section > summary::after {
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-left: auto;
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  content: "";
+  transform: rotate(45deg);
+  transition: transform 180ms ease;
+}
+
+.collapsible-settings-section[open] > summary::after {
+  transform: rotate(225deg);
+}
+
+.collapsible-settings-section[open] > summary {
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.settings-section-content {
+  padding: 0.85rem;
+}
+
+.settings-section-content > :first-child {
+  margin-top: 0;
+}
+
+.theme-segmented-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 13.5rem;
+  margin: 0;
+  padding: 0.2rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass-surface-strong);
+}
+
+.theme-segmented-control label {
+  position: relative;
+  cursor: pointer;
+}
+
+.theme-segmented-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-segmented-control span {
+  display: grid;
+  min-height: 2rem;
+  place-items: center;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.theme-segmented-control input:checked + span {
+  color: var(--colour-on-strong);
+  background: var(--colour-strong);
+  box-shadow: 0 0.2rem 0.7rem rgb(0 0 0 / 14%);
+}
+
+.theme-segmented-control input:focus-visible + span {
+  outline: 2px solid var(--colour-strong);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .theme-settings-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .theme-settings-row .theme-segmented-control {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .settings-list {
   overflow: hidden;
   border: 1px solid var(--glass-border);

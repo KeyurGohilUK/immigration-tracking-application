@@ -352,12 +352,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         .querySelector<HTMLButtonElement>("#lock-from-more")
         ?.addEventListener("click", lock);
       root
-        .querySelector<HTMLSelectElement>("#theme-preference")
-        ?.addEventListener("change", (event) => {
-          const preference = (event.currentTarget as HTMLSelectElement)
-            .value as ThemePreference;
-          setThemePreference(preference);
-        });
+        .querySelectorAll<HTMLInputElement>('input[name="theme-preference"]')
+        .forEach((option) =>
+          option.addEventListener("change", (event) => {
+            const input = event.currentTarget as HTMLInputElement;
+            if (!input.checked) return;
+            setThemePreference(input.value as ThemePreference);
+          }),
+        );
       root
         .querySelector<HTMLButtonElement>("#open-install-settings")
         ?.addEventListener("click", () =>
