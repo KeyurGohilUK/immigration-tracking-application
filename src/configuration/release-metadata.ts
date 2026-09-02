@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.15.0";
+export const APP_VERSION = "3.17.0";
 
 export const RELEASE_NOTES = [
-  "Install and updates now checks proactively, offers Check for updates when current, and adds a gold glow when a newer release is available.",
+  "Removed the experimental PDF address-reading feature; Address History continues to use manual address entry and evidence uploads.",
 ] as const;
