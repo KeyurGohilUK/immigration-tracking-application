@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.12.0";
+export const APP_VERSION = "3.12.1";
 
 export const RELEASE_NOTES = [
-  "Address History now supports moving home by adding a new current address and automatically closing the previous current address.",
+  "Address History now puts Add new current address above the saved current address and keeps the previous-address form as the main backward-entry flow.",
 ] as const;
