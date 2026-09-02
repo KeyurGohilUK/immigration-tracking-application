@@ -72,7 +72,9 @@ async function fillStructuredAddress(
   await scope.getByLabel("Postcode").fill(address.postcode);
 }
 
-test("locks zoom in the mobile viewport metadata", async ({ page }, testInfo) => {
+test("locks zoom in the mobile viewport metadata", async ({
+  page,
+}, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
   await page.goto("/");
 
