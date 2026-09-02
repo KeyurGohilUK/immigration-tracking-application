@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Mobile zoom is now locked to keep the app viewport stable during use.",
+      "Dark lock-screen PIN indicators now show the Ibiza accent colour as each digit is entered.",
     ),
   ).toBeVisible();
   await expect(
@@ -293,11 +293,14 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
     "color",
     "rgb(255, 255, 255)",
   );
+  await page.getByRole("button", { name: "Enter 1" }).click();
+  const filledIndicator = page.locator("[data-pin-indicator].is-filled");
+  await expect(filledIndicator).toHaveCount(1);
+  await expect(filledIndicator).toHaveCSS("background-image", /linear-gradient/);
+  await expect(filledIndicator).toHaveCSS("border-color", "rgba(0, 0, 0, 0)");
   await page.evaluate(() =>
     document.documentElement.setAttribute("data-theme", "light"),
   );
-  await page.getByRole("button", { name: "Enter 1" }).click();
-  await expect(page.locator("[data-pin-indicator].is-filled")).toHaveCount(1);
   await enterPin(page, "Four-digit PIN", "111");
   await expect(page.getByRole("alert")).toContainText("could not unlock");
 
