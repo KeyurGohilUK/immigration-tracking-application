@@ -94,7 +94,7 @@ describe("address history", () => {
         county: "",
         postcode: "bs16 3xx",
       }),
-    ).toBe("Flat 4, 27, Blackhorse Lane, Bristol, BS16 3XX");
+    ).toBe("Flat 4, 27 Blackhorse Lane, Bristol, BS16 3XX");
   });
 
   it("rejects an invalid UK postcode", () => {
