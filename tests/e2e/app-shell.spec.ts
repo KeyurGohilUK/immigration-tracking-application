@@ -295,8 +295,8 @@ test("guides Address History from the current address backwards", async ({
     addressSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
   await expect(
-    addressSection.getByRole("button", { name: "Edit address" }),
-  ).toBeVisible();
+    addressSection.locator('[data-add-vault-section="address-history"]'),
+  ).toHaveText("Edit address");
   await expect(dialog.getByLabel("This is my current address")).toBeHidden();
   await expect(dialog.getByLabel("Previous address")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeVisible();
@@ -327,7 +327,7 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
 
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await addressSection.getByRole("button", { name: "Edit address" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog.getByText("Current address", { exact: true }),
@@ -388,7 +388,7 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
 
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await addressSection.getByRole("button", { name: "Edit address" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog.getByText("4 New Home Close, Bristol, BS4 4DD"),
@@ -447,7 +447,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   const addressSection = page.locator('[data-vault-section="address-history"]');
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await addressSection.getByRole("button", { name: "Add address" }).click();
   const addressDialog = page.getByRole("dialog", { name: "Address History" });
   await expect(addressDialog).toBeVisible();
   await expect(addressDialog.getByLabel("End month")).toBeHidden();
