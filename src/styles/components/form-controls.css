@@ -12,10 +12,15 @@ select:not([multiple]) {
 
 input[type="date"],
 input[type="month"] {
+  display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
   box-sizing: border-box;
+  overflow: hidden;
   padding: 0 0.85rem;
   text-align: left;
 }
@@ -69,7 +74,10 @@ html[data-theme="dark"] input[type="month"]::-webkit-calendar-picker-indicator {
 }
 
 @supports (-webkit-touch-callout: none) {
+  input[type="date"],
   input[type="month"] {
+    width: -webkit-fill-available;
+    inline-size: -webkit-fill-available;
     -webkit-appearance: none;
     appearance: none;
   }

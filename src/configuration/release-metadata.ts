@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.6.1";
+export const APP_VERSION = "3.6.2";
 
 export const RELEASE_NOTES = [
-  "Refined the Life in the UK and English modal for iPhone with contained date fields, compact spacing, and conditional evidence controls.",
+  "Fixed native iPhone date controls so they stay visually contained inside Liquid Glass form cards.",
 ] as const;
