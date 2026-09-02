@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.14.0";
+export const APP_VERSION = "3.15.0";
 
 export const RELEASE_NOTES = [
-  "Deleting an address now preserves and unlinks its evidence, while a missing current address is clearly flagged for review.",
+  "Install and updates now checks proactively, offers Check for updates when current, and adds a gold glow when a newer release is available.",
 ] as const;

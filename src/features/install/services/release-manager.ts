@@ -10,6 +10,17 @@ interface ReleaseManifest {
   notes: string[];
 }
 
+function isNewerVersion(candidate: string, installed: string): boolean {
+  const candidateParts = candidate.split(".").map(Number);
+  const installedParts = installed.split(".").map(Number);
+  for (const [index, part] of candidateParts.entries()) {
+    const installedPart = installedParts[index] ?? 0;
+    if (part === installedPart) continue;
+    return part > installedPart;
+  }
+  return false;
+}
+
 function isReleaseManifest(value: unknown): value is ReleaseManifest {
   if (!value || typeof value !== "object") return false;
   const release = value as Partial<ReleaseManifest>;
@@ -102,6 +113,27 @@ export function initialiseReleaseManager(
   const notes = dialog.querySelector<HTMLUListElement>("#release-notes");
   const guidance = dialog.querySelector<HTMLElement>("#install-guidance");
   const message = dialog.querySelector<HTMLElement>("#update-message");
+  let latestRelease: ReleaseManifest | null = null;
+
+  const updateReleaseControls = (release: ReleaseManifest | null): void => {
+    const updateAvailable = release
+      ? isNewerVersion(release.version, APP_VERSION)
+      : false;
+    trigger.classList.toggle("is-update-available", updateAvailable);
+    trigger.setAttribute(
+      "aria-label",
+      updateAvailable
+        ? `Update ${release?.version} available`
+        : "Install and updates",
+    );
+    trigger.title = updateAvailable
+      ? `Update ${release?.version} available`
+      : "Install and updates";
+    if (download)
+      download.textContent = updateAvailable
+        ? "Download update"
+        : "Check for updates";
+  };
 
   const updateInstallState = (): void => {
     if (!install || !guidance) return;
@@ -115,22 +147,24 @@ export function initialiseReleaseManager(
         : "If installation is supported, use Chrome’s Install app option after eligibility is detected.";
   };
 
-  const showRelease = async (): Promise<void> => {
+  const showRelease = async (): Promise<ReleaseManifest | null> => {
     updateInstallState();
     if (notes) notes.replaceChildren();
     try {
       const release = await fetchLatestRelease();
+      latestRelease = release;
+      updateReleaseControls(release);
       if (latestVersion) latestVersion.textContent = release.version;
       if (status)
-        status.textContent =
-          release.version === APP_VERSION
-            ? "All up to date"
-            : `Update ${release.version} available`;
+        status.textContent = isNewerVersion(release.version, APP_VERSION)
+          ? `Update ${release.version} available`
+          : "All up to date";
       for (const note of release.notes) {
         const item = document.createElement("li");
         item.textContent = note;
         notes?.append(item);
       }
+      return release;
     } catch {
       if (latestVersion) latestVersion.textContent = "Unavailable";
       if (status)
@@ -141,6 +175,7 @@ export function initialiseReleaseManager(
         item.textContent = note;
         notes?.append(item);
       }
+      return null;
     }
   };
 
@@ -158,6 +193,22 @@ export function initialiseReleaseManager(
   });
   download?.addEventListener("click", async () => {
     download.disabled = true;
+    const updateAvailable = latestRelease
+      ? isNewerVersion(latestRelease.version, APP_VERSION)
+      : false;
+    if (!updateAvailable) {
+      if (message) message.textContent = "Checking for updates…";
+      const release = await showRelease();
+      download.disabled = false;
+      if (message)
+        message.textContent =
+          release && isNewerVersion(release.version, APP_VERSION)
+            ? `Update ${release.version} is ready to download.`
+            : release
+              ? "You already have the latest version."
+              : "Could not check for updates. Please try again.";
+      return;
+    }
     if (message)
       message.textContent =
         "Downloading the latest app files… Your local records will be preserved.";
@@ -172,4 +223,10 @@ export function initialiseReleaseManager(
     }
   });
   window.addEventListener("urbanfox-install-statechange", updateInstallState);
+  window.addEventListener("online", () => void showRelease());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void showRelease();
+  });
+  updateReleaseControls(null);
+  void showRelease();
 }

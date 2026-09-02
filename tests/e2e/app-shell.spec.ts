@@ -113,16 +113,42 @@ test("shows install and update controls in every device header", async ({
   await expect(page.getByText("Installed", { exact: true })).toBeVisible();
   await expect(page.getByText("Latest", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Download updates" }),
+    page.getByRole("button", { name: "Check for updates" }),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Deleting an address now preserves and unlinks its evidence, while a missing current address is clearly flagged for review.",
+      "Install and updates now checks proactively, offers Check for updates when current, and adds a gold glow when a newer release is available.",
     ),
   ).toBeVisible();
   await expect(
     page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
   ).toHaveCount(0);
+});
+
+test("highlights the header control when an update is available", async ({
+  page,
+}) => {
+  await page.route("**/release.json?check=**", async (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        version: "99.0.0",
+        notes: ["Test update"],
+      }),
+    }),
+  );
+  await page.goto("/");
+
+  const trigger = page.locator(".app-manager-trigger");
+  await expect(trigger).toHaveClass(/is-update-available/);
+  await expect(trigger).toHaveAttribute(
+    "aria-label",
+    "Update 99.0.0 available",
+  );
+  await expect(trigger).toHaveCSS("background-image", /linear-gradient/);
+  await expect(trigger).toHaveCSS("border-color", "rgba(255, 200, 61, 0.88)");
+
+  await expect(page.locator("#download-update")).toHaveText("Download update");
 });
 
 test("opens PIN setup from the public landing page", async ({ page }) => {

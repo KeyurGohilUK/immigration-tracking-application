@@ -1,6 +1,6 @@
 {
-  "version": "3.14.0",
+  "version": "3.15.0",
   "notes": [
-    "Deleting an address now preserves and unlinks its evidence, while a missing current address is clearly flagged for review."
+    "Install and updates now checks proactively, offers Check for updates when current, and adds a gold glow when a newer release is available."
   ]
 }
