@@ -709,7 +709,7 @@ html[data-theme="dark"] .vault-readiness-card {
     display: none;
   }
 
-  .vault-category-row p {
+  .vault-category-description {
     display: none;
   }
 }
