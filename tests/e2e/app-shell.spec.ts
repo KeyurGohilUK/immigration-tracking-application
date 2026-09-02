@@ -332,14 +332,11 @@ test("guides Address History from the current address backwards", async ({
     .fill("1 First Street, Bristol, BS1 1AA");
   await dialog.getByLabel("Start month").fill("2021-09");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
-  await expect(dialog).toHaveCount(0);
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
   await expect(
     addressSection.getByText("Complete", { exact: true }),
   ).toBeVisible();
-
-  await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Edit address" }).click();
-  dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog
       .getByLabel("Recorded addresses")
@@ -413,7 +410,9 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
-  const reopenedNewCurrentHost = dialog.locator("[data-address-new-current-host]");
+  const reopenedNewCurrentHost = dialog.locator(
+    "[data-address-new-current-host]",
+  );
   const newCurrentFormBox = await reopenedNewCurrentHost.boundingBox();
   const currentCardBox = await currentCard.boundingBox();
   expect(newCurrentFormBox).not.toBeNull();
@@ -439,14 +438,11 @@ test("guides Address History from the current address backwards", async ({
   await dialog
     .getByRole("button", { name: "Save new current address" })
     .click();
-  await expect(dialog).toHaveCount(0);
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
   await expect(
     addressSection.getByText("Complete", { exact: true }),
   ).toBeVisible();
-
-  await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Edit address" }).click();
-  dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog.getByText("4 New Home Close, Bristol, BS4 4DD"),
   ).toBeVisible();
@@ -468,6 +464,17 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     dialog.getByText("Previous address 3", { exact: true }),
   ).toBeVisible();
+
+  page.once("dialog", async (confirmation) => confirmation.accept());
+  const oldestCard = dialog
+    .locator(".address-history-item")
+    .filter({ hasText: "Previous address 3" });
+  await oldestCard.getByRole("button", { name: "Delete" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByText("Previous address 3", { exact: true }),
+  ).toHaveCount(0);
 });
 
 test("stores and manages encrypted documents for a profile", async ({
