@@ -1,5 +1,5 @@
 {
-  "version": "3.20.0",
+  "version": "3.20.1",
   "notes": [
     "Profile & Settings is organised into collapsed-by-default sections so controls only appear when needed.",
     "Theme selection now uses a three-position Dark, System, Light segmented control with System in the centre."
