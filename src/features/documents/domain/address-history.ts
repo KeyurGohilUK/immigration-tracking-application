@@ -1,4 +1,8 @@
-import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
+import type {
+  ImmigrationPermission,
+  ImmigrationRoute,
+} from "../../immigration/domain/immigration-permission";
+import { SKILLED_WORKER_QUALIFYING_PERIOD_RULE } from "../../calculation/domain/qualifying-period-rule";
 
 export interface StructuredAddress {
   flatBuilding: string;
@@ -28,6 +32,7 @@ export interface AddressHistoryEntry extends AddressHistoryInput {
 
 export interface AddressHistoryCoverage {
   requiredMonths: number | null;
+  applicableMonths: number;
   coveredMonths: number;
   complete: boolean;
   gaps: string[];
@@ -40,11 +45,60 @@ export interface AddressHistoryRequirement {
 
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
 const UK_POSTCODE_PATTERN = /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
-const FIVE_YEAR_ROUTES = new Set([
-  "skilled-worker",
-  "health-and-care-worker",
-  "tier-2-general",
-]);
+interface AddressHistoryRouteRule {
+  requiredMonths: number | null;
+  qualifyingRoutes: readonly ImmigrationRoute[];
+}
+
+const ADDRESS_HISTORY_ROUTE_RULES: Record<
+  ImmigrationRoute,
+  AddressHistoryRouteRule
+> = {
+  "skilled-worker": {
+    requiredMonths: 60,
+    qualifyingRoutes: SKILLED_WORKER_QUALIFYING_PERIOD_RULE.qualifyingRoutes,
+  },
+  "health-and-care-worker": {
+    requiredMonths: 60,
+    qualifyingRoutes: SKILLED_WORKER_QUALIFYING_PERIOD_RULE.qualifyingRoutes,
+  },
+  "tier-2-general": {
+    requiredMonths: 60,
+    qualifyingRoutes: SKILLED_WORKER_QUALIFYING_PERIOD_RULE.qualifyingRoutes,
+  },
+  "innovator-founder": {
+    requiredMonths: 36,
+    qualifyingRoutes: ["innovator-founder"],
+  },
+  "t2-minister-of-religion": {
+    requiredMonths: 60,
+    qualifyingRoutes: ["t2-minister-of-religion"],
+  },
+  "international-sportsperson": {
+    requiredMonths: 60,
+    qualifyingRoutes: ["international-sportsperson"],
+  },
+  "representative-overseas-business": {
+    requiredMonths: 60,
+    qualifyingRoutes: ["representative-overseas-business"],
+  },
+  "scale-up": {
+    requiredMonths: 60,
+    qualifyingRoutes: ["scale-up"],
+  },
+  "global-talent": {
+    requiredMonths: null,
+    qualifyingRoutes: ["global-talent"],
+  },
+  "tier-1": {
+    requiredMonths: null,
+    qualifyingRoutes: ["tier-1"],
+  },
+  other: {
+    requiredMonths: null,
+    qualifyingRoutes: ["other"],
+  },
+};
 
 export function validateAddressHistoryInput(
   input: AddressHistoryInput,
@@ -191,16 +245,22 @@ export function validateAddressHistoryCollection(
 export function getAddressHistoryRequirement(
   permissions: readonly ImmigrationPermission[],
 ): AddressHistoryRequirement {
-  const qualifying = permissions
-    .filter(({ route }) => FIVE_YEAR_ROUTES.has(route))
-    .sort((a, b) => a.permissionStartDate.localeCompare(b.permissionStartDate));
-  if (qualifying.length === 0)
-    return { requiredMonths: null, startMonth: null };
+  const ordered = [...permissions].sort((a, b) =>
+    a.permissionStartDate.localeCompare(b.permissionStartDate),
+  );
+  const latest = ordered.at(-1);
+  if (!latest) return { requiredMonths: null, startMonth: null };
 
-  const first = qualifying[0];
+  const rule = ADDRESS_HISTORY_ROUTE_RULES[latest.route];
+  const qualifying = ordered.filter(
+    ({ route, role }) =>
+      role === latest.role &&
+      rule.qualifyingRoutes.some((candidate) => candidate === route),
+  );
+  const first = qualifying[0] ?? latest;
   return {
-    requiredMonths: 60,
-    startMonth: first ? first.permissionStartDate.slice(0, 7) : null,
+    requiredMonths: rule.requiredMonths,
+    startMonth: first.permissionStartDate.slice(0, 7),
   };
 }
 
@@ -276,13 +336,6 @@ export function calculateAddressHistoryCoverage(
   requiredStartMonth: string | null,
   asOfMonth: string,
 ): AddressHistoryCoverage {
-  if (requiredMonths === null)
-    return {
-      requiredMonths: null,
-      coveredMonths: 0,
-      complete: false,
-      gaps: [],
-    };
   if (
     !MONTH_PATTERN.test(asOfMonth) ||
     (requiredStartMonth !== null && !MONTH_PATTERN.test(requiredStartMonth))
@@ -290,15 +343,16 @@ export function calculateAddressHistoryCoverage(
     throw new Error("Address-history month is invalid.");
 
   const end = monthToIndex(asOfMonth);
-  const rollingStart = end - requiredMonths + 1;
   const qualifyingStart =
-    requiredStartMonth === null
-      ? rollingStart
-      : monthToIndex(requiredStartMonth);
-  const start = Math.max(rollingStart, qualifyingStart);
+    requiredStartMonth === null ? end : monthToIndex(requiredStartMonth);
+  const start =
+    requiredMonths === null
+      ? qualifyingStart
+      : Math.max(end - requiredMonths + 1, qualifyingStart);
   if (start > end)
     return {
       requiredMonths,
+      applicableMonths: 0,
       coveredMonths: 0,
       complete: true,
       gaps: [],
@@ -330,6 +384,7 @@ export function calculateAddressHistoryCoverage(
   const applicableMonths = end - start + 1;
   return {
     requiredMonths,
+    applicableMonths,
     coveredMonths: covered.size,
     complete: covered.size >= applicableMonths && gaps.length === 0,
     gaps,
