@@ -915,10 +915,6 @@ html[data-theme="dark"] .vault-readiness-card {
   border-radius: 0.9rem;
 }
 
-.life-english-panel [hidden] {
-  display: none !important;
-}
-
 .life-english-dialog textarea {
   resize: vertical;
 }
