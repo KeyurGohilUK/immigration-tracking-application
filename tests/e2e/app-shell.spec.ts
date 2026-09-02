@@ -261,12 +261,16 @@ test("guides Address History from the current address backwards", async ({
   await addressSection.getByRole("button", { name: "Add address" }).click();
 
   let dialog = page.getByRole("dialog", { name: "Address History" });
+  const currentAddressHost = dialog.locator("[data-address-new-current-host]");
   await expect(dialog).toBeVisible();
   await expect(dialog.getByText("No addresses recorded yet")).toHaveCount(0);
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
   await expect(
-    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+    currentAddressHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(dialog.getByLabel("This is my current address")).toBeChecked();
   await expect(dialog.getByLabel("This is my current address")).toBeDisabled();
@@ -390,13 +394,16 @@ test("guides Address History from the current address backwards", async ({
     .filter({ hasText: "Current address" });
   await currentCard.getByRole("button", { name: "Edit" }).click();
   await expect(
-    currentCard.getByRole("textbox", { name: "Current address", exact: true }),
+    currentAddressHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
   ).toBeVisible();
-  const saveAddressButton = currentCard.getByRole("button", {
+  const saveAddressButton = currentAddressHost.getByRole("button", {
     name: "Save",
     exact: true,
   });
-  const cancelAddressButton = currentCard.getByRole("button", {
+  const cancelAddressButton = currentAddressHost.getByRole("button", {
     name: "Cancel",
   });
   await expect(saveAddressButton).toBeVisible();
@@ -408,7 +415,10 @@ test("guides Address History from the current address backwards", async ({
   expect(saveAddressBox?.height).toBeCloseTo(cancelAddressBox?.height ?? 0, 0);
   await cancelAddressButton.click();
   await expect(
-    currentCard.getByRole("textbox", { name: "Current address", exact: true }),
+    currentAddressHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
   ).toBeHidden();
   await expect(
     dialog.getByRole("button", { name: "Add new current address" }),
