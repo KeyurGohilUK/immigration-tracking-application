@@ -1,6 +1,6 @@
 {
-  "version": "3.12.3",
+  "version": "3.12.4",
   "notes": [
-    "Address History now opens directly into the address-entry flow without an empty-state message."
+    "Address History now hides the previous-address entry form once the required timeline is fully covered."
   ]
 }
