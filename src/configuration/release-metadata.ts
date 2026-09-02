@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.19.2";
+export const APP_VERSION = "3.19.3";
 
 export const RELEASE_NOTES = [
-  "Address History now explains why a section is Partial when the timeline is complete but supporting evidence is still missing.",
+  "Mobile zoom is now locked to keep the app viewport stable during use.",
 ] as const;
