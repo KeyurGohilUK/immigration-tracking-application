@@ -1022,12 +1022,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           updatedAt: timestamp,
         };
 
-        let preparedEvidence:
-          | {
-              metadata: DocumentMetadata;
-              bytes: Uint8Array<ArrayBuffer>;
-            }
-          | null = null;
+        let preparedEvidence: {
+          metadata: DocumentMetadata;
+          bytes: Uint8Array<ArrayBuffer>;
+        } | null = null;
         if (evidenceFile) {
           if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
             if (error) {
@@ -1091,8 +1089,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               addressHistoryId: entry.id,
               sortOrder:
                 profileDocuments.reduce(
-                  (maximum, document) =>
-                    Math.max(maximum, document.sortOrder),
+                  (maximum, document) => Math.max(maximum, document.sortOrder),
                   -1,
                 ) + 1,
               createdAt: timestamp,
