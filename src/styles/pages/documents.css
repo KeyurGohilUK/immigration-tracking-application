@@ -901,6 +901,10 @@ html[data-theme="dark"] .vault-readiness-card {
   resize: vertical;
 }
 
+.address-history-dialog .liquid-dialog-actions:empty {
+  display: none;
+}
+
 .life-english-modal {
   display: grid;
   gap: 1rem;
