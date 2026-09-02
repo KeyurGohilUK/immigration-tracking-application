@@ -150,7 +150,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History dialogs no longer preselect Close and use tighter spacing around the current-address action.",
+      "Liquid Glass dialogs now focus their title on open instead of visually preselecting Close; Address History spacing is also tightened.",
     ),
   ).toBeVisible();
   await expect(
