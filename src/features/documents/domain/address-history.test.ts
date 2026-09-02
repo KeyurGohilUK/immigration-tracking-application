@@ -130,6 +130,7 @@ describe("address history", () => {
     const result = calculateAddressHistoryCoverage(
       [entry("one", "2021-09", "2023-12"), entry("two", "2024-02", "", true)],
       60,
+      "2021-10",
       "2026-09",
     );
     expect(result.complete).toBe(false);
@@ -140,10 +141,30 @@ describe("address history", () => {
     const result = calculateAddressHistoryCoverage(
       [entry("one", "2021-09", "", true)],
       60,
+      "2021-10",
       "2026-09",
     );
     expect(result.complete).toBe(true);
     expect(result.coveredMonths).toBe(60);
+  });
+
+  it("does not create gaps before the qualifying permission start", () => {
+    const result = calculateAddressHistoryCoverage(
+      [
+        entry("previous", "2023-06", "2024-10"),
+        entry("current", "2024-11", "", true),
+      ],
+      60,
+      "2023-06",
+      "2026-09",
+    );
+
+    expect(result).toEqual({
+      requiredMonths: 60,
+      coveredMonths: 40,
+      complete: true,
+      gaps: [],
+    });
   });
 
   it("uses a route rule instead of a global five-year constant", () => {
