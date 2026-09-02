@@ -690,6 +690,40 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const addressForm = root.querySelector<HTMLFormElement>(
         "#address-history-form",
       );
+      const refreshAndKeepAddressHistoryOpen = async (
+        nextEntries: AddressHistoryEntry[],
+        nextDocuments: DocumentMetadata[],
+      ): Promise<void> => {
+        await showDocuments(profile);
+        const nextRemaining = getAddressHistoryMonthsRemaining(
+          nextEntries,
+          requiredAddressStartMonth,
+          getUkCalendarDate().slice(0, 7),
+        );
+        if (nextRemaining !== 0) {
+          const hasCurrentAddress = nextEntries.some(
+            ({ isCurrent }) => isCurrent,
+          );
+          const previousEndMonth = hasCurrentAddress
+            ? getLatestUncoveredAddressMonth(
+                nextEntries,
+                requiredAddressStartMonth,
+                getUkCalendarDate().slice(0, 7),
+              )
+            : null;
+          showAddressHistoryForm(
+            root,
+            undefined,
+            previousEndMonth,
+            nextDocuments,
+            !hasCurrentAddress,
+          );
+          return;
+        }
+        root
+          .querySelector<HTMLDialogElement>("#address-history-dialog")
+          ?.showModal();
+      };
       const lifeEnglishDialog = root.querySelector<HTMLDialogElement>(
         "#life-english-dialog",
       );
@@ -1038,7 +1072,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           try {
             await saveAddressHistory(selectedProfileId, nextEntries, key);
             addressHistoryCache.set(selectedProfileId, nextEntries);
-            await showDocuments(profile);
+            await refreshAndKeepAddressHistoryOpen(nextEntries, documents);
           } catch {
             const error = root.querySelector<HTMLElement>(
               "#address-history-error",
@@ -1218,21 +1252,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               key,
             );
           addressHistoryCache.set(selectedProfileId, nextEntries);
-          const previousEndMonth = getLatestUncoveredAddressMonth(
-            nextEntries,
-            requiredAddressStartMonth,
-            getUkCalendarDate().slice(0, 7),
-          );
-          addressDialog?.close();
-          await showDocuments(profile);
-          if (!existing && !movingHome && previousEndMonth)
-            showAddressHistoryForm(
-              root,
-              undefined,
-              previousEndMonth,
-              documents,
-              false,
-            );
+          const nextDocuments = preparedEvidence
+            ? [...documents, preparedEvidence.metadata]
+            : documents;
+          await refreshAndKeepAddressHistoryOpen(nextEntries, nextDocuments);
         } catch {
           if (error) {
             error.textContent =
