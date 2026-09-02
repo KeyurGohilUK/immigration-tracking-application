@@ -816,13 +816,13 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       employmentDialog?.addEventListener("click", (event) => {
         if (event.target === employmentDialog) employmentDialog.close();
       });
-      for (const form of root.querySelectorAll<HTMLFormElement>(
+      for (const panel of root.querySelectorAll<HTMLElement>(
         "[data-employment-upload]",
       )) {
-        const fileInput = form.querySelector<HTMLInputElement>(
+        const fileInput = panel.querySelector<HTMLInputElement>(
           'input[name="documentFile"]',
         );
-        const nameInput = form.querySelector<HTMLInputElement>(
+        const nameInput = panel.querySelector<HTMLInputElement>(
           'input[name="displayName"]',
         );
         fileInput?.addEventListener("change", () => {
@@ -830,15 +830,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (file && nameInput && !nameInput.value.trim())
             nameInput.value = suggestDocumentName(file.name);
         });
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          const category = form.dataset.employmentUpload;
+        panel
+          .querySelector<HTMLButtonElement>("[data-employment-save]")
+          ?.addEventListener("click", async () => {
+          const category = panel.dataset.employmentUpload;
           if (
             category !== "employer-letter" &&
             category !== "employment-contract"
           )
             return;
-          const error = form.querySelector<HTMLElement>(
+          const error = panel.querySelector<HTMLElement>(
             "[data-employment-error]",
           );
           const file = fileInput?.files?.[0];
@@ -916,8 +917,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             createdAt: timestamp,
             updatedAt: timestamp,
           };
-          const submit = form.querySelector<HTMLButtonElement>(
-            'button[type="submit"]',
+          const submit = panel.querySelector<HTMLButtonElement>(
+            "[data-employment-save]",
           );
           if (submit) submit.disabled = true;
           try {
