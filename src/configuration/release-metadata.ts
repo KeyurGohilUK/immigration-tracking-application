@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.6.2";
+export const APP_VERSION = "3.6.3";
 
 export const RELEASE_NOTES = [
-  "Fixed native iPhone date controls so they stay visually contained inside Liquid Glass form cards.",
+  "Aligned iPhone date and select controls to the same Liquid Glass height with vertically centred date text.",
 ] as const;
