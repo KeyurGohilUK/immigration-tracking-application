@@ -105,7 +105,10 @@ export function renderReadOnlyAddressList(
   entries: readonly AddressHistoryEntry[],
 ): string {
   if (entries.length === 0) return "";
-  return `<section class="vault-address-summary" aria-labelledby="vault-address-summary-title"><strong id="vault-address-summary-title">Saved addresses</strong><ol aria-label="Saved addresses">${getDisplayAddresses(
+  const currentAddressWarning = entries.some(({ isCurrent }) => isCurrent)
+    ? ""
+    : '<p class="vault-address-current-warning"><strong>No current address recorded</strong><span>Add the current residence to repair the timeline. Previous addresses have not been changed.</span></p>';
+  return `<section class="vault-address-summary" aria-labelledby="vault-address-summary-title"><strong id="vault-address-summary-title">Saved addresses</strong>${currentAddressWarning}<ol aria-label="Saved addresses">${getDisplayAddresses(
     entries,
   )
     .map(
