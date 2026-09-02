@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "The Document Vault now shows Add address before Address History starts and Edit address once at least one address is saved.",
+      "Address History now hides the previous-address form as soon as the route-required start month is fully covered.",
     ),
   ).toBeVisible();
   await expect(

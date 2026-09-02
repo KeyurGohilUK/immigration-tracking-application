@@ -23,6 +23,7 @@ export function renderAddressHistoryDialog(
     : "Work backwards from your current address until a supported qualifying permission is available.";
   const remainingLabel =
     monthsRemaining === null ? "" : `${monthsRemaining} months remaining`;
+  const requiredTimelineReached = monthsRemaining === 0;
   const gaps =
     coverage.gaps.length === 0
       ? coverage.complete
@@ -52,7 +53,7 @@ export function renderAddressHistoryDialog(
       </section>
       <input name="addressId" type="hidden" />
       <input name="addressMoveMode" type="hidden" value="false" />
-      <div data-address-entry-fields${coverage.complete ? " hidden" : ""}>
+      <div data-address-entry-fields${requiredTimelineReached ? " hidden" : ""}>
       <div class="family-form-fields address-history-fields">
         <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
@@ -67,7 +68,7 @@ export function renderAddressHistoryDialog(
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
       </div>
     </div>`,
-    actions: `<button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit"${coverage.complete ? " hidden" : ""}>Save & continue</button>`,
+    actions: `<button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit"${requiredTimelineReached ? " hidden" : ""}>Save & continue</button>`,
     dialogClass: "address-history-dialog",
     closeLabel: "Close address history",
   });
