@@ -259,7 +259,7 @@ test("guides Address History from permission start to the next uncovered month",
 
   let dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText(/Start from Sep 2021/)).toBeVisible();
+  await expect(dialog.getByText(/Start from Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("2021-09");
   await expect(dialog.getByLabel("Start month")).toHaveAttribute(
     "aria-readonly",
