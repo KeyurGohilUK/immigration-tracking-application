@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.19.0";
+export const APP_VERSION = "3.19.1";
 
 export const RELEASE_NOTES = [
-  "Address History now uses route-aware qualifying windows and no longer reports gaps before the applicable settlement period.",
+  "Address History now shows Partial while supporting evidence is still outstanding and reserves Needs attention for timeline issues.",
 ] as const;

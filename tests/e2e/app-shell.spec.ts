@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now uses route-aware qualifying windows and no longer reports gaps before the applicable settlement period.",
+      "Address History now shows Partial while supporting evidence is still outstanding and reserves Needs attention for timeline issues.",
     ),
   ).toBeVisible();
   await expect(
@@ -619,7 +619,7 @@ test("guides Address History from the current address backwards", async ({
     page.getByText("Needs attention · no address linked", { exact: true }),
   ).toBeVisible();
   await expect(
-    addressSection.getByText("Needs attention", { exact: true }),
+    addressSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
 
   if (
@@ -840,7 +840,7 @@ test("stores and manages encrypted documents for a profile", async ({
   const addressRow = page
     .locator(".vault-category-row")
     .filter({ hasText: "Address History" });
-  await expect(addressRow.getByText("Needs attention")).toBeVisible();
+  await expect(addressRow.getByText("To do")).toBeVisible();
   await expect(
     page.locator(".document-review-badge:visible", {
       hasText: "Needs attention · no address linked",
