@@ -376,6 +376,12 @@ test("guides Address History from the current address backwards", async ({
     addressSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
   await expect(
+    addressSection.getByText(
+      "Address timeline is complete. Upload supporting address evidence to complete this section.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
     addressSection.locator('[data-add-vault-section="address-history"]'),
   ).toHaveText("Edit address");
   await expect(dialog.getByLabel("This is my current address")).toBeHidden();
