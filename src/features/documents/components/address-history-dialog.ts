@@ -68,7 +68,10 @@ export function renderAddressHistoryDialog(
         <span class="inline-evidence-file-name" data-address-evidence-name>No new file selected</span>
       </div>
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
-      <button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit">Save & continue</button>
+      <div class="address-context-actions">
+        <button class="secondary-button" data-address-cancel type="button" hidden>Cancel</button>
+        <button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit">Save & continue</button>
+      </div>
       </div>
       </div>
     </div>`,
@@ -117,6 +120,7 @@ export function showAddressHistoryForm(
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, guidedEndMonth, firstAddress);
   placeAddressEntryForm(form, entry?.id ? "edit" : "previous", entry?.id);
+  setAddressContextMode(form, entry ? "edit" : "previous");
   setAddressEntryVisibility(form, true);
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit)
@@ -158,6 +162,7 @@ export function showNewCurrentAddressForm(
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, null, true);
   placeAddressEntryForm(form, "new-current");
+  setAddressContextMode(form, "new-current");
   setAddressEntryVisibility(form, true);
   const moveMode = form.elements.namedItem(
     "addressMoveMode",
@@ -227,6 +232,32 @@ function placeAddressEntryForm(
     "#address-add-new-current",
   );
   if (addCurrent) addCurrent.hidden = mode === "new-current";
+}
+
+function setAddressContextMode(
+  form: HTMLFormElement,
+  mode: "previous" | "new-current" | "edit",
+): void {
+  const cancel = form.querySelector<HTMLButtonElement>("[data-address-cancel]");
+  if (cancel) cancel.hidden = mode === "previous";
+}
+
+export function restoreAddressHistoryOverview(
+  root: HTMLElement,
+  previousEndMonth: string | null,
+  firstAddress: boolean,
+  showPreviousEntry: boolean,
+): void {
+  const form = root.querySelector<HTMLFormElement>("#address-history-form");
+  if (!form) return;
+  resetAddressHistoryForm(form, previousEndMonth, firstAddress);
+  placeAddressEntryForm(form, "previous");
+  setAddressContextMode(form, "previous");
+  setAddressEntryVisibility(form, showPreviousEntry);
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submit)
+    submit.textContent =
+      firstAddress || previousEndMonth ? "Save & continue" : "Save address";
 }
 
 function setAddressEntryVisibility(

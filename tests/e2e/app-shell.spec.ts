@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now edits each saved address in place and shows a new-current-address form above the existing current address.",
+      "Address History now keeps the dialog open after Save, Cancel, and Delete while updating the timeline in place.",
     ),
   ).toBeVisible();
   await expect(
@@ -332,14 +332,11 @@ test("guides Address History from the current address backwards", async ({
     .fill("1 First Street, Bristol, BS1 1AA");
   await dialog.getByLabel("Start month").fill("2021-09");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
-  await expect(dialog).toHaveCount(0);
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
   await expect(
     addressSection.getByText("Complete", { exact: true }),
   ).toBeVisible();
-
-  await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Edit address" }).click();
-  dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog
       .getByLabel("Recorded addresses")
@@ -378,6 +375,13 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     currentCard.getByRole("button", { name: "Save changes" }),
   ).toBeVisible();
+  await currentCard.getByRole("button", { name: "Cancel" }).click();
+  await expect(
+    currentCard.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeHidden();
+  await expect(
+    dialog.getByRole("button", { name: "Add new current address" }),
+  ).toBeVisible();
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
   const newCurrentHost = dialog.locator("[data-address-new-current-host]");
@@ -390,34 +394,55 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     dialog.getByRole("button", { name: "Add new current address" }),
   ).toBeHidden();
-  const newCurrentFormBox = await newCurrentHost.boundingBox();
+  await expect(
+    newCurrentHost.getByRole("button", { name: "Cancel" }),
+  ).toBeVisible();
+  await newCurrentHost
+    .getByRole("textbox", { name: "Current address", exact: true })
+    .fill("Temporary address");
+  await newCurrentHost.getByRole("button", { name: "Cancel" }).click();
+  await expect(newCurrentHost.getByRole("textbox")).toHaveCount(0);
+  await expect(
+    dialog.getByRole("button", { name: "Add new current address" }),
+  ).toBeVisible();
+  await expect(
+    currentCard.getByText("3 Current Avenue, Bristol, BS3 3CC"),
+  ).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Add new current address" }).click();
+  const reopenedNewCurrentHost = dialog.locator(
+    "[data-address-new-current-host]",
+  );
+  const newCurrentFormBox = await reopenedNewCurrentHost.boundingBox();
   const currentCardBox = await currentCard.boundingBox();
   expect(newCurrentFormBox).not.toBeNull();
   expect(currentCardBox).not.toBeNull();
   if (newCurrentFormBox && currentCardBox)
     expect(newCurrentFormBox.y).toBeLessThan(currentCardBox.y);
   await expect(
-    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+    reopenedNewCurrentHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Save new current address" }),
+    reopenedNewCurrentHost.getByRole("button", {
+      name: "Save new current address",
+    }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
-  await dialog
+  await reopenedNewCurrentHost
     .getByRole("textbox", { name: "Current address", exact: true })
     .fill("4 New Home Close, Bristol, BS4 4DD");
   await dialog.getByLabel("Start month").fill("2026-09");
   await dialog
     .getByRole("button", { name: "Save new current address" })
     .click();
-  await expect(dialog).toHaveCount(0);
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
   await expect(
     addressSection.getByText("Complete", { exact: true }),
   ).toBeVisible();
-
-  await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Edit address" }).click();
-  dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog.getByText("4 New Home Close, Bristol, BS4 4DD"),
   ).toBeVisible();
@@ -439,6 +464,17 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     dialog.getByText("Previous address 3", { exact: true }),
   ).toBeVisible();
+
+  page.once("dialog", async (confirmation) => confirmation.accept());
+  const oldestCard = dialog
+    .locator(".address-history-item")
+    .filter({ hasText: "Previous address 3" });
+  await oldestCard.getByRole("button", { name: "Delete" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByText("Previous address 3", { exact: true }),
+  ).toHaveCount(0);
 });
 
 test("stores and manages encrypted documents for a profile", async ({

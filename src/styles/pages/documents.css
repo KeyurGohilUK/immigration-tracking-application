@@ -866,9 +866,27 @@ html[data-theme="dark"] .vault-readiness-card {
   border-top: 1px solid var(--glass-border);
 }
 
-[data-address-entry-fields] > .family-save-button {
-  width: 100%;
+.address-context-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+.address-context-actions .secondary-button,
+.address-context-actions .family-save-button {
   min-height: 3.2rem;
+}
+
+.address-context-actions .family-save-button {
+  width: 100%;
+}
+
+.address-context-actions .secondary-button[hidden] {
+  display: none;
+}
+
+.address-context-actions:has(.secondary-button[hidden]) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .address-history-fields {
