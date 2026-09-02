@@ -52,6 +52,7 @@ export function renderAddressHistoryDialog(
       </section>
       <input name="addressId" type="hidden" />
       <input name="addressMoveMode" type="hidden" value="false" />
+      <div data-address-entry-fields${coverage.complete ? " hidden" : ""}>
       <div class="family-form-fields address-history-fields">
         <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
@@ -64,9 +65,9 @@ export function renderAddressHistoryDialog(
         <span class="inline-evidence-file-name" data-address-evidence-name>No new file selected</span>
       </div>
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
+      </div>
     </div>`,
-    actions:
-      '<button class="primary-button family-save-button liquid-dialog-save" type="submit">Save & continue</button>',
+    actions: `<button class="primary-button family-save-button liquid-dialog-save" data-address-submit type="submit"${coverage.complete ? " hidden" : ""}>Save & continue</button>`,
     dialogClass: "address-history-dialog",
     closeLabel: "Close address history",
   });
@@ -76,8 +77,7 @@ function renderAddressList(
   entries: readonly AddressHistoryEntry[],
   documents: readonly DocumentMetadata[],
 ): string {
-  if (entries.length === 0)
-    return '<div class="address-empty-state"><strong>No addresses recorded yet</strong><span>Add the applicant’s address timeline below.</span></div>';
+  if (entries.length === 0) return "";
   let previousAddressNumber = 0;
   return [...entries]
     .sort((left, right) => right.startMonth.localeCompare(left.startMonth))
@@ -110,6 +110,7 @@ export function showAddressHistoryForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, guidedEndMonth, firstAddress);
+  setAddressEntryVisibility(form, true);
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit)
     submit.textContent = entry
@@ -149,6 +150,7 @@ export function showNewCurrentAddressForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, null, true);
+  setAddressEntryVisibility(form, true);
   const moveMode = form.elements.namedItem(
     "addressMoveMode",
   ) as HTMLInputElement;
@@ -193,6 +195,16 @@ export function resetAddressHistoryForm(
   syncAddressGuidedFields(form, firstAddress, false);
   syncAddressEndState(form);
   syncAddressEvidenceState(form, undefined, []);
+}
+
+function setAddressEntryVisibility(
+  form: HTMLFormElement,
+  visible: boolean,
+): void {
+  const fields = form.querySelector<HTMLElement>("[data-address-entry-fields]");
+  const submit = form.querySelector<HTMLButtonElement>("[data-address-submit]");
+  if (fields) fields.hidden = !visible;
+  if (submit) submit.hidden = !visible;
 }
 
 export function syncAddressGuidedFields(

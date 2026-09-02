@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now keeps the previous-address form focused on a single Save & continue action without a redundant secondary button.",
+      "The Document Vault now shows Add address before Address History starts and Edit address once at least one address is saved.",
     ),
   ).toBeVisible();
   await expect(
@@ -255,10 +255,14 @@ test("guides Address History from the current address backwards", async ({
   await page.getByRole("link", { name: "Vault" }).first().click();
   const addressSection = page.locator('[data-vault-section="address-history"]');
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await expect(
+    addressSection.getByRole("button", { name: "Add address" }),
+  ).toBeVisible();
+  await addressSection.getByRole("button", { name: "Add address" }).click();
 
   let dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByText("No addresses recorded yet")).toHaveCount(0);
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
   await expect(
@@ -290,6 +294,9 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     addressSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
+  await expect(
+    addressSection.locator('[data-add-vault-section="address-history"]'),
+  ).toHaveText("Edit address");
   await expect(dialog.getByLabel("This is my current address")).toBeHidden();
   await expect(dialog.getByLabel("Previous address")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeVisible();
@@ -320,10 +327,12 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
 
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await addressSection.getByRole("button", { name: "Edit address" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
-    dialog.getByText("Current address", { exact: true }),
+    dialog
+      .getByLabel("Recorded addresses")
+      .getByText("Current address", { exact: true }),
   ).toBeVisible();
   await expect(
     dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
@@ -342,8 +351,11 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Previous address", exact: true }),
-  ).toHaveCount(0);
+    dialog.getByRole("textbox", { name: "Previous address", exact: true }),
+  ).toBeHidden();
+  await expect(
+    dialog.getByRole("button", { name: "Save & continue" }),
+  ).toBeHidden();
 
   const moveButtonBox = await dialog
     .getByRole("button", { name: "Add new current address" })
@@ -352,20 +364,17 @@ test("guides Address History from the current address backwards", async ({
     .locator(".address-history-item")
     .filter({ hasText: "Current address" })
     .boundingBox();
-  const previousFormBox = await dialog
-    .getByRole("textbox", { name: "Previous address", exact: true })
-    .boundingBox();
   expect(moveButtonBox).not.toBeNull();
   expect(currentCardBox).not.toBeNull();
-  expect(previousFormBox).not.toBeNull();
-  if (moveButtonBox && currentCardBox && previousFormBox) {
+  if (moveButtonBox && currentCardBox)
     expect(moveButtonBox.y).toBeLessThan(currentCardBox.y);
-    expect(currentCardBox.y).toBeLessThan(previousFormBox.y);
-  }
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
   await expect(
     dialog.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Save new current address" }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
   await dialog
@@ -381,7 +390,7 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
 
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await addressSection.getByRole("button", { name: "Edit address" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
     dialog.getByText("4 New Home Close, Bristol, BS4 4DD"),
@@ -390,7 +399,9 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
   ).toBeVisible();
   await expect(
-    dialog.getByText("Current address", { exact: true }),
+    dialog
+      .getByLabel("Recorded addresses")
+      .getByText("Current address", { exact: true }),
   ).toBeVisible();
   await expect(
     dialog.getByText("Previous address 1", { exact: true }),
@@ -440,7 +451,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   const addressSection = page.locator('[data-vault-section="address-history"]');
   await addressSection.locator("summary").click();
-  await addressSection.getByRole("button", { name: "Add document" }).click();
+  await addressSection.getByRole("button", { name: "Add address" }).click();
   const addressDialog = page.getByRole("dialog", { name: "Address History" });
   await expect(addressDialog).toBeVisible();
   await expect(addressDialog.getByLabel("End month")).toBeHidden();
