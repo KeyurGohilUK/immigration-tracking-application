@@ -1,8 +1,10 @@
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import {
+  formatStructuredAddress,
   type AddressHistoryCoverage,
   type AddressHistoryEntry,
   type AddressHistoryInput,
+  type StructuredAddress,
 } from "../domain/address-history";
 import type { DocumentMetadata } from "../domain/document";
 
@@ -57,7 +59,14 @@ export function renderAddressHistoryDialog(
       <div data-address-previous-host>
       <div data-address-entry-fields${requiredTimelineReached ? " hidden" : ""}>
       <div class="family-form-fields address-history-fields">
-        <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
+        <div class="family-field family-field-wide"><strong data-address-full-label>Current address</strong><span class="field-guidance">Enter the UK address in separate fields.</span></div>
+        <div class="family-field family-field-wide"><label for="address-flat-building">Flat / building <span class="field-optional">Optional</span></label><input id="address-flat-building" name="flatBuilding" maxlength="100" autocomplete="address-line1" /></div>
+        <div class="family-field"><label for="address-house">House number / name</label><input id="address-house" name="houseNumberName" maxlength="100" required autocomplete="address-line1" /></div>
+        <div class="family-field"><label for="address-street">Street</label><input id="address-street" name="street" maxlength="120" required autocomplete="address-line2" /></div>
+        <div class="family-field"><label for="address-locality">Locality <span class="field-optional">Optional</span></label><input id="address-locality" name="locality" maxlength="100" autocomplete="address-line3" /></div>
+        <div class="family-field"><label for="address-town">Town / city</label><input id="address-town" name="townCity" maxlength="100" required autocomplete="address-level2" /></div>
+        <div class="family-field"><label for="address-county">County <span class="field-optional">Optional</span></label><input id="address-county" name="county" maxlength="100" autocomplete="address-level1" /></div>
+        <div class="family-field"><label for="address-postcode">Postcode</label><input id="address-postcode" name="postcode" maxlength="20" required autocomplete="postal-code" autocapitalize="characters" /></div>
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
         <div class="family-field" data-address-end-field><label for="address-end">End month</label><input id="address-end" name="endMonth" type="month" /></div>
         <label class="address-current-toggle family-field-wide" data-address-current-field><input id="address-current" name="isCurrent" type="checkbox" /><span>This is my current address</span></label>
@@ -165,8 +174,10 @@ export function showAddressHistoryForm(
         : "Save address";
   if (entry) {
     (form.elements.namedItem("addressId") as HTMLInputElement).value = entry.id;
-    (form.elements.namedItem("fullAddress") as HTMLTextAreaElement).value =
-      entry.fullAddress;
+    writeStructuredAddressFields(
+      form,
+      entry.address ?? parseLegacyAddress(entry.fullAddress),
+    );
     const start = form.elements.namedItem("startMonth") as HTMLInputElement;
     start.value = entry.startMonth;
     start.readOnly = false;
@@ -315,7 +326,7 @@ export function syncAddressGuidedFields(
   const endField = form.querySelector<HTMLElement>("[data-address-end-field]");
   if (currentField) currentField.hidden = !isCurrentAddress;
   if (endField) endField.hidden = isCurrentAddress;
-  const addressLabel = form.querySelector<HTMLLabelElement>(
+  const addressLabel = form.querySelector<HTMLElement>(
     "[data-address-full-label]",
   );
   if (addressLabel)
@@ -342,16 +353,79 @@ export function readAddressHistoryForm(form: HTMLFormElement): {
 } {
   const data = new FormData(form);
   const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
+  const address = readStructuredAddressFields(data);
   return {
     addressId: String(data.get("addressId") ?? ""),
     movingHome: String(data.get("addressMoveMode") ?? "false") === "true",
     input: {
-      fullAddress: String(data.get("fullAddress") ?? "").trim(),
+      fullAddress: formatStructuredAddress(address),
+      address,
       startMonth: String(data.get("startMonth") ?? ""),
       endMonth: current.checked ? "" : String(data.get("endMonth") ?? ""),
       isCurrent: current.checked,
       notes: "",
     },
+  };
+}
+
+function readStructuredAddressFields(data: FormData): StructuredAddress {
+  return {
+    flatBuilding: String(data.get("flatBuilding") ?? "").trim(),
+    houseNumberName: String(data.get("houseNumberName") ?? "").trim(),
+    street: String(data.get("street") ?? "").trim(),
+    locality: String(data.get("locality") ?? "").trim(),
+    townCity: String(data.get("townCity") ?? "").trim(),
+    county: String(data.get("county") ?? "").trim(),
+    postcode: String(data.get("postcode") ?? "")
+      .trim()
+      .toUpperCase(),
+  };
+}
+
+function writeStructuredAddressFields(
+  form: HTMLFormElement,
+  address: StructuredAddress,
+): void {
+  const values: Array<[keyof StructuredAddress, string]> = [
+    ["flatBuilding", address.flatBuilding],
+    ["houseNumberName", address.houseNumberName],
+    ["street", address.street],
+    ["locality", address.locality],
+    ["townCity", address.townCity],
+    ["county", address.county],
+    ["postcode", address.postcode],
+  ];
+  for (const [name, value] of values) {
+    const input = form.elements.namedItem(name) as HTMLInputElement | null;
+    if (input) input.value = value;
+  }
+}
+
+function parseLegacyAddress(fullAddress: string): StructuredAddress {
+  const parts = fullAddress
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const postcodeIndex = parts.findIndex((part) =>
+    /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(part),
+  );
+  const postcode = postcodeIndex >= 0 ? (parts[postcodeIndex] ?? "") : "";
+  const beforePostcode =
+    postcodeIndex >= 0 ? parts.slice(0, postcodeIndex) : [...parts];
+  return {
+    flatBuilding: "",
+    houseNumberName: beforePostcode[0] ?? fullAddress.trim(),
+    street: beforePostcode[1] ?? "",
+    locality: beforePostcode.length > 4 ? (beforePostcode[2] ?? "") : "",
+    townCity:
+      beforePostcode.length >= 3
+        ? (beforePostcode[beforePostcode.length - 2] ?? "")
+        : "",
+    county:
+      beforePostcode.length >= 2
+        ? (beforePostcode[beforePostcode.length - 1] ?? "")
+        : "",
+    postcode,
   };
 }
 
