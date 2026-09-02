@@ -10,6 +10,7 @@ export function renderAddressHistoryDialog(
   entries: readonly AddressHistoryEntry[],
   coverage: AddressHistoryCoverage,
   requiredStartMonth: string | null,
+  monthsRemaining: number | null,
   documents: readonly DocumentMetadata[],
 ): string {
   const requiredLabel =
@@ -21,9 +22,7 @@ export function renderAddressHistoryDialog(
     ? `Work backwards from your current address to ${formatMonth(requiredStartMonth)} based on qualifying permission history.`
     : "Work backwards from your current address until a supported qualifying permission is available.";
   const remainingLabel =
-    coverage.requiredMonths === null
-      ? ""
-      : `${Math.max(coverage.requiredMonths - coverage.coveredMonths, 0)} months remaining`;
+    monthsRemaining === null ? "" : `${monthsRemaining} months remaining`;
   const gaps =
     coverage.gaps.length === 0
       ? coverage.complete
