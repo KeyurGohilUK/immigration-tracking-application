@@ -19,6 +19,10 @@
     inset 0 1px rgb(255 255 255 / 82%);
 }
 
+.liquid-dialog:focus {
+  outline: none;
+}
+
 .liquid-dialog::before {
   position: absolute;
   z-index: -1;
