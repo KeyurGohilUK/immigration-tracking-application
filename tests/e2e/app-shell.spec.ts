@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now replaces notes with optional inline encrypted evidence so address details and proof can be saved in one flow.",
+      "Guided Address History now starts with the current address and works backwards month by month to the permission-derived required start.",
     ),
   ).toBeVisible();
   await expect(
@@ -234,7 +234,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await expect(page.locator("[data-pin-indicator]")).toHaveCount(4);
 });
 
-test("guides Address History from permission start to the next uncovered month", async ({
+test("guides Address History from the current address backwards", async ({
   page,
 }) => {
   await page.goto("/");
@@ -259,42 +259,52 @@ test("guides Address History from permission start to the next uncovered month",
 
   let dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText(/Start from Sept 2021/)).toBeVisible();
-  await expect(dialog.getByLabel("Start month")).toHaveValue("2021-09");
-  await expect(dialog.getByLabel("Start month")).toHaveAttribute(
-    "aria-readonly",
-    "true",
-  );
+  await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
+  await expect(dialog.getByLabel("Start month")).toHaveValue("");
+  await expect(dialog.getByLabel("Current address")).toBeChecked();
+  await expect(dialog.getByLabel("Current address")).toBeDisabled();
+  await expect(dialog.getByLabel("End month")).toBeDisabled();
   await expect(dialog.getByLabel("Notes")).toHaveCount(0);
+
   const addressEvidence = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64",
   );
-
   await dialog
     .getByLabel("Full address")
-    .fill("1 First Street, Bristol, BS1 1AA");
-  await dialog.getByLabel("End month").fill("2023-06");
+    .fill("3 Current Avenue, Bristol, BS3 3CC");
+  await dialog.getByLabel("Start month").fill("2025-01");
   await dialog.getByLabel("Address evidence").setInputFiles({
-    name: "council-tax-proof.png",
+    name: "current-address-proof.png",
     mimeType: "image/png",
     buffer: addressEvidence,
   });
-  await expect(dialog.getByText("council-tax-proof.png")).toBeVisible();
-  await expect(page.getByRole("dialog", { name: "Add document" })).toHaveCount(
-    0,
-  );
   await dialog.getByRole("button", { name: "Save & continue" }).click();
 
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("Start month")).toHaveValue("2023-07");
-  await expect(dialog.getByLabel("Full address")).toHaveValue("");
+  await expect(dialog.getByLabel("Current address")).not.toBeChecked();
+  await expect(dialog.getByLabel("Current address")).toBeDisabled();
+  await expect(dialog.getByLabel("End month")).toHaveValue("2024-12");
+  await expect(dialog.getByLabel("End month")).toHaveAttribute(
+    "aria-readonly",
+    "true",
+  );
+  await expect(dialog.getByLabel("Start month")).toHaveValue("");
 
   await dialog
     .getByLabel("Full address")
-    .fill("2 Current Road, Bristol, BS2 2BB");
-  await dialog.getByLabel("Current address").check();
+    .fill("2 Previous Road, Bristol, BS2 2BB");
+  await dialog.getByLabel("Start month").fill("2023-07");
+  await dialog.getByRole("button", { name: "Save & continue" }).click();
+
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel("End month")).toHaveValue("2023-06");
+  await dialog
+    .getByLabel("Full address")
+    .fill("1 First Street, Bristol, BS1 1AA");
+  await dialog.getByLabel("Start month").fill("2021-09");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
   await expect(dialog).toHaveCount(0);
 
@@ -302,15 +312,15 @@ test("guides Address History from permission start to the next uncovered month",
   await addressSection.getByRole("button", { name: "Add document" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
-    dialog.getByText("1 First Street, Bristol, BS1 1AA"),
+    dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
   ).toBeVisible();
   await expect(
-    dialog.getByText("2 Current Road, Bristol, BS2 2BB"),
+    dialog.getByText("2 Previous Road, Bristol, BS2 2BB"),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText("1 First Street, Bristol, BS1 1AA"),
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
-  await expect(dialog.getByRole("button", { name: "Add proof" })).toHaveCount(
-    0,
-  );
 });
 
 test("stores and manages encrypted documents for a profile", async ({
