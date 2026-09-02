@@ -260,7 +260,6 @@ function formatMonthRange(start: number, end: number): string {
   return from === to ? from : `${from} to ${to}`;
 }
 
-
 export function getPreviousCalendarMonth(month: string): string {
   if (!MONTH_PATTERN.test(month))
     throw new Error("Address-history month is invalid.");
