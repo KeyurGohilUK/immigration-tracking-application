@@ -87,6 +87,30 @@ describe("Document Vault readiness", () => {
     expect(complete.readinessPercent).toBe(17);
   });
 
+  it("marks Address History as needing attention without a current address or with unlinked evidence", () => {
+    const noCurrentAddress = calculateDocumentVaultProgress([], {
+      addressHistoryEntryCount: 2,
+      addressHistoryComplete: false,
+      addressHistoryHasCurrentAddress: false,
+    });
+    expect(
+      noCurrentAddress.sections.find(({ id }) => id === "address-history")
+        ?.status,
+    ).toBe("needs-attention");
+
+    const unlinkedProof = documentFor("address-proof", 0);
+    const unlinkedEvidence = calculateDocumentVaultProgress([unlinkedProof], {
+      addressHistoryEntryCount: 3,
+      addressHistoryComplete: true,
+      addressHistoryHasCurrentAddress: true,
+      addressHistoryHasUnlinkedEvidence: true,
+    });
+    expect(
+      unlinkedEvidence.sections.find(({ id }) => id === "address-history")
+        ?.status,
+    ).toBe("needs-attention");
+  });
+
   it("does not make conditional or later evidence reduce readiness", () => {
     const progress = calculateDocumentVaultProgress([
       documentFor("life-in-uk", 0),

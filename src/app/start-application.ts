@@ -1059,27 +1059,46 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         button.addEventListener("click", async () => {
           const addressId = button.dataset.deleteAddress;
           const entry = addressHistory.find(({ id }) => id === addressId);
-          if (
-            !entry ||
-            !window.confirm(
-              `Delete this address from the recorded timeline? Linked proof documents will remain in the vault.`,
-            )
-          )
-            return;
+          const linkedDocuments = entry
+            ? documents.filter(
+                ({ addressHistoryId }) => addressHistoryId === entry.id,
+              )
+            : [];
+          const evidenceMessage =
+            linkedDocuments.length === 0
+              ? ""
+              : ` ${linkedDocuments.length} linked proof ${linkedDocuments.length === 1 ? "document" : "documents"} will be kept, unlinked, and marked as needing attention.`;
+          const confirmationMessage = entry?.isCurrent
+            ? `Delete the current address? Your timeline will have no current residence and will need attention. If you moved home, use Add new current address instead.${evidenceMessage}`
+            : `Delete this address from the recorded timeline?${evidenceMessage}`;
+          if (!entry || !window.confirm(confirmationMessage)) return;
           const nextEntries = addressHistory.filter(
             ({ id }) => id !== entry.id,
           );
+          const timestamp = new Date().toISOString();
+          const unlinkedDocuments = linkedDocuments.map((document) => {
+            const unlinkedDocument = { ...document, updatedAt: timestamp };
+            delete unlinkedDocument.addressHistoryId;
+            return unlinkedDocument;
+          });
+          const nextDocuments = documents.map(
+            (document) =>
+              unlinkedDocuments.find(({ id }) => id === document.id) ??
+              document,
+          );
           try {
+            if (unlinkedDocuments.length > 0)
+              await saveDocumentMetadataBatch(unlinkedDocuments, key);
             await saveAddressHistory(selectedProfileId, nextEntries, key);
             addressHistoryCache.set(selectedProfileId, nextEntries);
-            await refreshAndKeepAddressHistoryOpen(nextEntries, documents);
+            await refreshAndKeepAddressHistoryOpen(nextEntries, nextDocuments);
           } catch {
             const error = root.querySelector<HTMLElement>(
               "#address-history-error",
             );
             if (error) {
               error.textContent =
-                "The address could not be deleted. Your saved timeline is unchanged.";
+                "The address could not be fully deleted. Review the timeline and any linked evidence before trying again.";
               error.hidden = false;
             }
           }

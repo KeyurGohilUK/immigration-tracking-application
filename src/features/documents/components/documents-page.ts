@@ -62,6 +62,13 @@ export function renderDocumentsPage(
   const vaultProgress = calculateDocumentVaultProgress(documents, {
     addressHistoryComplete: addressCoverage.complete,
     addressHistoryEntryCount: addressHistory.length,
+    addressHistoryHasCurrentAddress:
+      addressHistory.length === 0 ||
+      addressHistory.some(({ isCurrent }) => isCurrent),
+    addressHistoryHasUnlinkedEvidence: documents.some(
+      ({ category, addressHistoryId }) =>
+        category === "address-proof" && !addressHistoryId,
+    ),
     lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
     englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
   });
@@ -142,17 +149,23 @@ function renderVaultCategoryRows(
   return sections
     .map((section) => {
       const statusLabel = DOCUMENT_VAULT_STATUS_LABELS[section.status];
+      const missingCurrentAddress =
+        section.id === "address-history" &&
+        addressHistory.length > 0 &&
+        !addressHistory.some(({ isCurrent }) => isCurrent);
       const actionLabel =
         section.id === "address-history"
-          ? addressHistory.length > 0
-            ? "Edit address"
-            : "Add address"
+          ? missingCurrentAddress
+            ? "Add current address"
+            : addressHistory.length > 0
+              ? "Edit address"
+              : "Add address"
           : "Add document";
       const addressList =
         section.id === "address-history"
           ? renderReadOnlyAddressList(addressHistory)
           : "";
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p>${section.description}</p></div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div><button class="vault-section-add" type="button" data-add-vault-section="${section.id}">${actionLabel}</button></div><ul class="vault-requirement-list">${section.requirements.map(renderVaultRequirement).join("")}</ul>${addressList}</div></details>`;
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p>${section.description}</p></div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div><button class="vault-section-add${missingCurrentAddress ? " is-attention-action" : ""}" type="button" data-add-vault-section="${section.id}">${actionLabel}</button></div><ul class="vault-requirement-list">${section.requirements.map(renderVaultRequirement).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
@@ -228,18 +241,23 @@ function createDocumentCard(
   isLast: boolean,
 ): HTMLElement {
   const card = documentNode("article", "document-card");
-  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button><button class="member-action" type="button" data-rename-document>Rename</button><button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
+  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden>Needs attention · no address linked</span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button><button class="member-action" type="button" data-rename-document>Rename</button><button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
   const heading = card.querySelector<HTMLElement>("h3");
   const originalName = card.querySelector<HTMLElement>(
     ".document-original-name",
   );
   const category = card.querySelector<HTMLElement>(".document-category");
   const size = card.querySelector<HTMLElement>(".document-size");
+  const review = card.querySelector<HTMLElement>(".document-review-badge");
   if (heading) heading.textContent = document.displayName;
   if (originalName) originalName.textContent = document.fileName;
   if (category)
     category.textContent = DOCUMENT_CATEGORY_LABELS[document.category];
   if (size) size.textContent = formatDocumentBytes(document.size);
+  if (review)
+    review.hidden = !(
+      document.category === "address-proof" && !document.addressHistoryId
+    );
   for (const button of card.querySelectorAll<HTMLButtonElement>("button")) {
     button.dataset.documentId = document.id;
     const action = button.textContent?.trim();

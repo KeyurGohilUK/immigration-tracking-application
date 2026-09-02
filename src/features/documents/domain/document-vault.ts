@@ -265,6 +265,8 @@ export const DOCUMENT_VAULT_STATUS_LABELS: Record<DocumentVaultStatus, string> =
 export interface DocumentVaultProgressOptions {
   addressHistoryComplete?: boolean;
   addressHistoryEntryCount?: number;
+  addressHistoryHasCurrentAddress?: boolean;
+  addressHistoryHasUnlinkedEvidence?: boolean;
   lifeInUkComplete?: boolean;
   englishRequirementComplete?: boolean;
 }
@@ -333,7 +335,12 @@ function calculateSectionProgress(
 
   let status: DocumentVaultStatus;
   if (section.id === "address-history") {
-    if (options.addressHistoryComplete === true) status = "complete";
+    if (
+      options.addressHistoryHasCurrentAddress === false ||
+      options.addressHistoryHasUnlinkedEvidence === true
+    )
+      status = "needs-attention";
+    else if (options.addressHistoryComplete === true) status = "complete";
     else if ((options.addressHistoryEntryCount ?? 0) > 0) status = "partial";
     else status = "to-do";
   } else if (allLater) status = "required-later";
