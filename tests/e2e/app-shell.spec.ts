@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now shows saved addresses in order on the Document Vault page and uses matching Cancel and Save buttons.",
+      "Deleting an address now preserves and unlinks its evidence, while a missing current address is clearly flagged for review.",
     ),
   ).toBeVisible();
   await expect(
@@ -506,6 +506,64 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     dialog.getByText("Previous address 3", { exact: true }),
   ).toHaveCount(0);
+
+  const addressWithEvidence = dialog
+    .locator(".address-history-item")
+    .filter({ hasText: "3 Current Avenue, Bristol, BS3 3CC" });
+  page.once("dialog", async (confirmation) => {
+    expect(confirmation.message()).toContain(
+      "1 linked proof document will be kept, unlinked, and marked as needing attention",
+    );
+    await confirmation.accept();
+  });
+  await addressWithEvidence.getByRole("button", { name: "Delete" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(
+    dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
+  ).toHaveCount(0);
+  await dialog.getByRole("button", { name: "Close address history" }).click();
+  await expect(
+    page.getByText("Needs attention · no address linked", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    addressSection.getByText("Needs attention", { exact: true }),
+  ).toBeVisible();
+
+  if (
+    !(await addressSection.evaluate((section) => section.hasAttribute("open")))
+  )
+    await addressSection.locator("summary").click();
+  await addressSection.getByRole("button", { name: "Edit address" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  const currentAddress = dialog
+    .locator(".address-history-item")
+    .filter({ hasText: "4 New Home Close, Bristol, BS4 4DD" });
+  page.once("dialog", async (confirmation) => {
+    expect(confirmation.message()).toContain(
+      "Your timeline will have no current residence and will need attention",
+    );
+    expect(confirmation.message()).toContain(
+      "use Add new current address instead",
+    );
+    await confirmation.accept();
+  });
+  await currentAddress.getByRole("button", { name: "Delete" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(
+    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeVisible();
+  await expect(dialog.getByLabel("This is my current address")).toBeChecked();
+  await dialog.getByRole("button", { name: "Close address history" }).click();
+  if (
+    !(await addressSection.evaluate((section) => section.hasAttribute("open")))
+  )
+    await addressSection.locator("summary").click();
+  await expect(
+    addressSection.getByRole("button", { name: "Add current address" }),
+  ).toBeVisible();
+  await expect(
+    addressSection.getByText("No current address recorded", { exact: true }),
+  ).toBeVisible();
 });
 
 test("stores and manages encrypted documents for a profile", async ({
