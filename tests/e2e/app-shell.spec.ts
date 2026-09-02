@@ -300,10 +300,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
     "background-image",
     /linear-gradient/,
   );
-  await expect(filledIndicator).toHaveCSS(
-    "border-color",
-    "rgba(0, 0, 0, 0)",
-  );
+  await expect(filledIndicator).toHaveCSS("border-color", "rgba(0, 0, 0, 0)");
   await page.evaluate(() =>
     document.documentElement.setAttribute("data-theme", "light"),
   );
