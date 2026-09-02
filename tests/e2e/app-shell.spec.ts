@@ -358,6 +358,19 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByText("1 First Street, Bristol, BS1 1AA"),
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
+  const savedAddresses = addressSection.getByRole("list", {
+    name: "Saved addresses",
+  });
+  await expect(savedAddresses.getByRole("listitem")).toHaveCount(3);
+  await expect(savedAddresses.getByRole("listitem").nth(0)).toContainText(
+    "Current address3 Current Avenue, Bristol, BS3 3CCJan 2025 – Present",
+  );
+  await expect(savedAddresses.getByRole("listitem").nth(1)).toContainText(
+    "Previous address 12 Previous Road, Bristol, BS2 2BBJul 2023 – Dec 2024",
+  );
+  await expect(savedAddresses.getByRole("listitem").nth(2)).toContainText(
+    "Previous address 21 First Street, Bristol, BS1 1AASep 2021 – Jun 2023",
+  );
   await expect(
     dialog.getByRole("textbox", { name: "Previous address", exact: true }),
   ).toBeHidden();
