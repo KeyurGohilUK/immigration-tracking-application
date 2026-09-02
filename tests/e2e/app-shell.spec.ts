@@ -971,12 +971,12 @@ test("manages Employment documents independently in one dialog", async ({
   ).toBeVisible();
   await expect(
     dialog
-      .locator('[data-employment-upload="employer-letter"]')
+      .locator('[data-employment-panel="employer-letter"]')
       .getByText("Added", { exact: true }),
   ).toBeVisible();
   await expect(
     dialog
-      .locator('[data-employment-upload="employment-contract"]')
+      .locator('[data-employment-panel="employment-contract"]')
       .getByText("Pending", { exact: true }),
   ).toBeVisible();
 
