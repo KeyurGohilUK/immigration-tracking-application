@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.12.7";
+export const APP_VERSION = "3.13.0";
 
 export const RELEASE_NOTES = [
-  "Address History now keeps consistent spacing between the end-month field and optional evidence.",
+  "Address History now edits each saved address in place and shows a new-current-address form above the existing current address.",
 ] as const;
