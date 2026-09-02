@@ -47,6 +47,7 @@ export interface DocumentVaultSectionDefinition {
   description: string;
   icon: string;
   attentionWhenIncomplete?: boolean;
+  visibleInVault?: boolean;
   requirements: readonly DocumentRequirementDefinition[];
 }
 
@@ -83,6 +84,7 @@ export const DOCUMENT_VAULT_SECTIONS: readonly DocumentVaultSectionDefinition[] 
       label: "Identity & Immigration",
       description: "Identity and immigration-status evidence.",
       icon: "⌾",
+      visibleInVault: false,
       requirements: [
         {
           id: "passport",
@@ -275,9 +277,9 @@ export function calculateDocumentVaultProgress(
   documents: readonly DocumentMetadata[],
   options: DocumentVaultProgressOptions = {},
 ): DocumentVaultProgress {
-  const sections = DOCUMENT_VAULT_SECTIONS.map((section) =>
-    calculateSectionProgress(section, documents, options),
-  );
+  const sections = DOCUMENT_VAULT_SECTIONS.filter(
+    ({ visibleInVault }) => visibleInVault !== false,
+  ).map((section) => calculateSectionProgress(section, documents, options));
   const totalRequired = sections.reduce(
     (total, section) => total + section.totalRequired,
     0,
