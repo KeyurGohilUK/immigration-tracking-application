@@ -53,7 +53,7 @@ function renderEmploymentUploadForm(
       <div><h3>${label}</h3><p>${guidance}</p></div>
       <span class="employment-upload-state">${added ? "Added" : "Pending"}</span>
     </div>
-    <form class="employment-upload-form" data-employment-upload="${category}" novalidate>
+    <div class="employment-upload-form" data-employment-upload="${category}">
       <div class="family-field">
         <label for="employment-${category}-file">${label} file</label>
         <input id="employment-${category}-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required />
@@ -63,7 +63,7 @@ function renderEmploymentUploadForm(
         <input id="employment-${category}-name" name="displayName" maxlength="100" required />
       </div>
       <p class="form-error" data-employment-error role="alert" hidden></p>
-      <button class="primary-button family-save-button" type="submit">Encrypt and save ${label.toLowerCase()}</button>
-    </form>
+      <button class="primary-button family-save-button" type="button" data-employment-save>Encrypt and save ${label.toLowerCase()}</button>
+    </div>
   </section>`;
 }
