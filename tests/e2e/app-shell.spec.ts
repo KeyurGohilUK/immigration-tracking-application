@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Fixed native iPhone date controls so they stay visually contained inside Liquid Glass form cards.",
+      "Aligned iPhone date and select controls to the same Liquid Glass height with vertically centred date text.",
     ),
   ).toBeVisible();
   await expect(
@@ -307,11 +307,18 @@ test("stores and manages encrypted documents for a profile", async ({
     .locator(".life-english-panel")
     .first()
     .boundingBox();
+  const statusBox = await lifeEnglishDialog
+    .getByLabel("Status")
+    .first()
+    .boundingBox();
   const passedDateBox = await lifeEnglishDialog
     .getByLabel("Passed date")
     .boundingBox();
   expect(lifePanelBox).not.toBeNull();
+  expect(statusBox).not.toBeNull();
   expect(passedDateBox).not.toBeNull();
+  if (statusBox && passedDateBox)
+    expect(Math.round(passedDateBox.height)).toBe(Math.round(statusBox.height));
   if (lifePanelBox && passedDateBox) {
     expect(passedDateBox.x).toBeGreaterThanOrEqual(lifePanelBox.x);
     expect(passedDateBox.x + passedDateBox.width).toBeLessThanOrEqual(

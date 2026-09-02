@@ -1,6 +1,6 @@
 {
-  "version": "3.6.2",
+  "version": "3.6.3",
   "notes": [
-    "Fixed native iPhone date controls so they stay visually contained inside Liquid Glass form cards."
+    "Aligned iPhone date and select controls to the same Liquid Glass height with vertically centred date text."
   ]
 }

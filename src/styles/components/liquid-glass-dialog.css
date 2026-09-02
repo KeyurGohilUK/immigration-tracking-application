@@ -182,7 +182,10 @@
 
 .liquid-dialog-form input:not([type="checkbox"]),
 .liquid-dialog-form select {
+  height: 3.35rem;
   min-height: 3.35rem;
+  max-height: 3.35rem;
+  block-size: 3.35rem;
 }
 
 .liquid-dialog-form textarea {

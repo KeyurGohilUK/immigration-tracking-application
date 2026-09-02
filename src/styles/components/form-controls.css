@@ -2,7 +2,12 @@
 input[type="date"],
 input[type="month"],
 select:not([multiple]) {
-  min-height: 3rem;
+  height: 3.35rem;
+  min-height: 3.35rem;
+  max-height: 3.35rem;
+  block-size: 3.35rem;
+  min-block-size: 3.35rem;
+  max-block-size: 3.35rem;
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-small);
   color: var(--colour-text);
@@ -21,13 +26,17 @@ input[type="month"] {
   max-inline-size: 100%;
   box-sizing: border-box;
   overflow: hidden;
-  padding: 0 0.85rem;
+  padding: 0.72rem 0.85rem;
+  line-height: 1.2;
   text-align: left;
 }
 
 input[type="date"]::-webkit-date-and-time-value,
 input[type="month"]::-webkit-date-and-time-value {
-  min-height: 1.2em;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
   text-align: left;
 }
 
@@ -40,6 +49,7 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 
 select:not([multiple]) {
   width: 100%;
+  box-sizing: border-box;
   padding: 0 0.85rem;
   appearance: auto;
   -webkit-appearance: menulist;
@@ -78,7 +88,18 @@ html[data-theme="dark"] input[type="month"]::-webkit-calendar-picker-indicator {
   input[type="month"] {
     width: -webkit-fill-available;
     inline-size: -webkit-fill-available;
+    padding-top: 0.72rem;
+    padding-bottom: 0.72rem;
     -webkit-appearance: none;
     appearance: none;
+  }
+
+  select:not([multiple]) {
+    height: 3.35rem;
+    min-height: 3.35rem;
+    max-height: 3.35rem;
+    block-size: 3.35rem;
+    min-block-size: 3.35rem;
+    max-block-size: 3.35rem;
   }
 }
