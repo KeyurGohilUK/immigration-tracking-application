@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Added inline encrypted evidence attachments to the Life in the UK and English modal so users can save details and files in one flow.",
+      "Disabled empty Life in the UK and English saves until at least one meaningful status is selected.",
     ),
   ).toBeVisible();
   await expect(
@@ -299,9 +299,15 @@ test("stores and manages encrypted documents for a profile", async ({
     name: "Life in the UK & English",
   });
   await expect(lifeEnglishDialog).toBeVisible();
+  await expect(
+    lifeEnglishDialog.getByRole("button", { name: "Save details" }),
+  ).toBeDisabled();
   await expect(lifeEnglishDialog.getByLabel("Passed date")).toBeHidden();
   await expect(lifeEnglishDialog.getByLabel("Evidence type")).toBeHidden();
   await lifeEnglishDialog.getByLabel("Status").first().selectOption("passed");
+  await expect(
+    lifeEnglishDialog.getByRole("button", { name: "Save details" }),
+  ).toBeEnabled();
   await expect(lifeEnglishDialog.getByLabel("Passed date")).toBeVisible();
   const lifePanelBox = await lifeEnglishDialog
     .locator(".life-english-panel")
