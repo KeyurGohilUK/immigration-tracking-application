@@ -996,11 +996,12 @@ test("manages Employment documents independently in one dialog", async ({
   await expect(
     employmentSection.getByText("Complete", { exact: true }),
   ).toBeVisible();
+  const documentCollection = page.getByLabel("Document collection");
   await expect(
-    page.getByRole("heading", { name: "Employer letter" }),
+    documentCollection.getByRole("heading", { name: "Employer letter" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Employment contract" }),
+    documentCollection.getByRole("heading", { name: "Employment contract" }),
   ).toBeVisible();
 });
 
