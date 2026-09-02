@@ -110,9 +110,7 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
     "[data-life-passed-details]",
   ))
     field.hidden = lifeStatus !== "passed";
-  const lifeEvidence = form.querySelector<HTMLElement>(
-    "[data-life-evidence]",
-  );
+  const lifeEvidence = form.querySelector<HTMLElement>("[data-life-evidence]");
   if (lifeEvidence) lifeEvidence.hidden = lifeStatus === "not-recorded";
 
   const englishStatus = (
@@ -152,7 +150,6 @@ export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {
   };
 }
 
-
 export function readLifeEnglishEvidenceFiles(form: HTMLFormElement): {
   lifeEvidence: File | null;
   englishEvidence: File | null;
@@ -171,11 +168,7 @@ export function readLifeEnglishEvidenceFiles(form: HTMLFormElement): {
 
 export function syncLifeEnglishEvidenceNames(form: HTMLFormElement): void {
   syncEvidenceName(form, "lifeEvidenceFile", "[data-life-evidence-name]");
-  syncEvidenceName(
-    form,
-    "englishEvidenceFile",
-    "[data-english-evidence-name]",
-  );
+  syncEvidenceName(form, "englishEvidenceFile", "[data-english-evidence-name]");
 }
 
 function syncEvidenceName(
