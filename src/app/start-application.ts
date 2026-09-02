@@ -107,10 +107,12 @@ import {
   suggestDocumentName,
 } from "../features/documents/components/documents-page";
 import {
+  readAddressEvidenceFile,
   readAddressHistoryForm,
   resetAddressHistoryForm,
   showAddressHistoryForm,
   syncAddressEndState,
+  syncAddressEvidenceName,
 } from "../features/documents/components/address-history-dialog";
 import {
   readLifeEnglishEvidenceFiles,
@@ -724,7 +726,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               requiredAddressStartMonth,
               getUkCalendarDate().slice(0, 7),
             );
-            showAddressHistoryForm(root, undefined, nextStart);
+            showAddressHistoryForm(root, undefined, nextStart, documents);
             return;
           }
           if (sectionId === "life-english") {
@@ -931,6 +933,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       addressForm
         ?.querySelector<HTMLInputElement>("#address-current")
         ?.addEventListener("change", () => syncAddressEndState(addressForm));
+      addressForm
+        ?.querySelector<HTMLInputElement>("#address-evidence-file")
+        ?.addEventListener("change", () =>
+          syncAddressEvidenceName(addressForm),
+        );
       root
         .querySelector<HTMLButtonElement>("#address-history-reset")
         ?.addEventListener("click", () => {
@@ -949,17 +956,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const entry = addressHistory.find(
             ({ id }) => id === button.dataset.editAddress,
           );
-          if (entry) showAddressHistoryForm(root, entry);
-        });
-      }
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-add-address-proof]",
-      )) {
-        button.addEventListener("click", () => {
-          const addressId = button.dataset.addAddressProof;
-          if (!addressId) return;
-          addressDialog?.close();
-          showDocumentUploadForm(root, "address-proof", addressId);
+          if (entry) showAddressHistoryForm(root, entry, undefined, documents);
         });
       }
       for (const button of root.querySelectorAll<HTMLButtonElement>(
