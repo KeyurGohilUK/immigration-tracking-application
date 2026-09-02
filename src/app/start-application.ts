@@ -1044,7 +1044,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         }
 
         const existing = addressHistory.find(({ id }) => id === addressId);
-        const currentAddress = addressHistory.find(({ isCurrent }) => isCurrent);
+        const currentAddress = addressHistory.find(
+          ({ isCurrent }) => isCurrent,
+        );
         if (
           movingHome &&
           (!currentAddress || input.startMonth <= currentAddress.startMonth)
