@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now hides the previous-address form as soon as the route-required start month is fully covered.",
+      "Address History now keeps consistent spacing between the end-month field and optional evidence.",
     ),
   ).toBeVisible();
   await expect(
@@ -306,6 +306,13 @@ test("guides Address History from the current address backwards", async ({
     "true",
   );
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
+
+  const endMonthBox = await dialog.getByLabel("End month").boundingBox();
+  const evidenceBox = await dialog.locator("[data-address-evidence]").boundingBox();
+  expect(endMonthBox).not.toBeNull();
+  expect(evidenceBox).not.toBeNull();
+  if (endMonthBox && evidenceBox)
+    expect(evidenceBox.y - (endMonthBox.y + endMonthBox.height)).toBeGreaterThan(8);
 
   await dialog
     .getByLabel("Previous address")
