@@ -38,6 +38,7 @@ export function renderDocumentsPage(
   addressHistory: readonly AddressHistoryEntry[],
   addressCoverage: AddressHistoryCoverage,
   requiredAddressStartMonth: string | null,
+  addressMonthsRemaining: number | null,
   lifeEnglish: LifeEnglishRecord | null,
 ): void {
   const documents = allDocuments
@@ -92,6 +93,7 @@ export function renderDocumentsPage(
       addressHistory,
       addressCoverage,
       requiredAddressStartMonth,
+      addressMonthsRemaining,
       documents,
     )}
     ${renderLifeEnglishDialog(documents)}

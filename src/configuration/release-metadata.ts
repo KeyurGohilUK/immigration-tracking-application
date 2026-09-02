@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.9.0";
+export const APP_VERSION = "3.10.0";
 
 export const RELEASE_NOTES = [
-  "Address History now replaces notes with optional inline encrypted evidence so address details and proof can be saved in one flow.",
+  "Guided Address History now starts with the current address and works backwards month by month to the permission-derived required start.",
 ] as const;

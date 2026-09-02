@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateAddressHistoryCoverage,
+  getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
-  getNextUncoveredAddressMonth,
+  getLatestUncoveredAddressMonth,
   getRequiredAddressHistoryMonths,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
@@ -111,23 +112,50 @@ describe("address history", () => {
     });
   });
 
-  it("prefills the first uncovered month after a saved address", () => {
+  it("finds the latest uncovered month when working backwards", () => {
     expect(
-      getNextUncoveredAddressMonth(
-        [entry("one", "2021-09", "2023-06")],
+      getLatestUncoveredAddressMonth(
+        [entry("current", "2025-01", "", true)],
         "2021-09",
         "2026-09",
       ),
-    ).toBe("2023-07");
+    ).toBe("2024-12");
   });
 
-  it("returns no next month once the recorded timeline reaches present", () => {
+  it("moves the previous-address boundary backwards after each saved address", () => {
     expect(
-      getNextUncoveredAddressMonth(
-        [entry("one", "2021-09", "2023-06"), entry("two", "2023-07", "", true)],
+      getLatestUncoveredAddressMonth(
+        [
+          entry("previous", "2023-07", "2024-12"),
+          entry("current", "2025-01", "", true),
+        ],
+        "2021-09",
+        "2026-09",
+      ),
+    ).toBe("2023-06");
+  });
+
+  it("returns no uncovered month once history reaches the required start", () => {
+    expect(
+      getLatestUncoveredAddressMonth(
+        [
+          entry("oldest", "2021-09", "2023-06"),
+          entry("previous", "2023-07", "2024-12"),
+          entry("current", "2025-01", "", true),
+        ],
         "2021-09",
         "2026-09",
       ),
     ).toBeNull();
+  });
+
+  it("reports how many required months remain uncovered", () => {
+    expect(
+      getAddressHistoryMonthsRemaining(
+        [entry("current", "2025-01", "", true)],
+        "2021-09",
+        "2026-09",
+      ),
+    ).toBe(40);
   });
 });

@@ -151,8 +151,9 @@ import {
 } from "../features/documents/data/life-english-repository";
 import {
   calculateAddressHistoryCoverage,
+  getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
-  getNextUncoveredAddressMonth,
+  getLatestUncoveredAddressMonth,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
   type AddressHistoryEntry,
@@ -648,10 +649,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       requiredAddressStartMonth: string | null,
       lifeEnglish: LifeEnglishRecord | null,
     ): void => {
+      const asOfMonth = getUkCalendarDate().slice(0, 7);
       const addressCoverage = calculateAddressHistoryCoverage(
         addressHistory,
         requiredAddressMonths,
-        getUkCalendarDate().slice(0, 7),
+        asOfMonth,
+      );
+      const addressMonthsRemaining = getAddressHistoryMonthsRemaining(
+        addressHistory,
+        requiredAddressStartMonth,
+        asOfMonth,
       );
       renderDocumentsPage(
         root,
@@ -661,6 +668,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         addressHistory,
         addressCoverage,
         requiredAddressStartMonth,
+        addressMonthsRemaining,
         lifeEnglish,
       );
       wireAuthenticatedShell(profile, "Documents");
@@ -721,12 +729,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         button.addEventListener("click", () => {
           const sectionId = button.dataset.addVaultSection;
           if (sectionId === "address-history") {
-            const nextStart = getNextUncoveredAddressMonth(
-              addressHistory,
-              requiredAddressStartMonth,
-              getUkCalendarDate().slice(0, 7),
+            const hasCurrentAddress = addressHistory.some(
+              ({ isCurrent }) => isCurrent,
             );
-            showAddressHistoryForm(root, undefined, nextStart, documents);
+            const previousEndMonth = hasCurrentAddress
+              ? getLatestUncoveredAddressMonth(
+                  addressHistory,
+                  requiredAddressStartMonth,
+                  getUkCalendarDate().slice(0, 7),
+                )
+              : null;
+            showAddressHistoryForm(
+              root,
+              undefined,
+              previousEndMonth,
+              documents,
+              !hasCurrentAddress,
+            );
             return;
           }
           if (sectionId === "life-english") {
@@ -942,12 +961,21 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         .querySelector<HTMLButtonElement>("#address-history-reset")
         ?.addEventListener("click", () => {
           if (!addressForm) return;
-          const nextStart = getNextUncoveredAddressMonth(
-            addressHistory,
-            requiredAddressStartMonth,
-            getUkCalendarDate().slice(0, 7),
+          const hasCurrentAddress = addressHistory.some(
+            ({ isCurrent }) => isCurrent,
           );
-          resetAddressHistoryForm(addressForm, nextStart);
+          const previousEndMonth = hasCurrentAddress
+            ? getLatestUncoveredAddressMonth(
+                addressHistory,
+                requiredAddressStartMonth,
+                getUkCalendarDate().slice(0, 7),
+              )
+            : null;
+          resetAddressHistoryForm(
+            addressForm,
+            previousEndMonth,
+            !hasCurrentAddress,
+          );
         });
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-edit-address]",
@@ -1125,15 +1153,21 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               key,
             );
           addressHistoryCache.set(selectedProfileId, nextEntries);
-          const nextStart = getNextUncoveredAddressMonth(
+          const previousEndMonth = getLatestUncoveredAddressMonth(
             nextEntries,
             requiredAddressStartMonth,
             getUkCalendarDate().slice(0, 7),
           );
           addressDialog?.close();
           await showDocuments(profile);
-          if (!existing && nextStart)
-            showAddressHistoryForm(root, undefined, nextStart, documents);
+          if (!existing && previousEndMonth)
+            showAddressHistoryForm(
+              root,
+              undefined,
+              previousEndMonth,
+              documents,
+              false,
+            );
         } catch {
           if (error) {
             error.textContent =

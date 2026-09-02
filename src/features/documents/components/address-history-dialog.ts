@@ -10,6 +10,7 @@ export function renderAddressHistoryDialog(
   entries: readonly AddressHistoryEntry[],
   coverage: AddressHistoryCoverage,
   requiredStartMonth: string | null,
+  monthsRemaining: number | null,
   documents: readonly DocumentMetadata[],
 ): string {
   const requiredLabel =
@@ -18,8 +19,10 @@ export function renderAddressHistoryDialog(
       : `${Math.round(coverage.requiredMonths / 12)} years required · ${coverage.coveredMonths} of ${coverage.requiredMonths} months covered`;
   const coverageClass = coverage.complete ? "is-complete" : "needs-attention";
   const guidedStartLabel = requiredStartMonth
-    ? `Start from ${formatMonth(requiredStartMonth)} based on qualifying permission history.`
-    : "Start month will be entered manually until a supported qualifying permission is available.";
+    ? `Work backwards from your current address to ${formatMonth(requiredStartMonth)} based on qualifying permission history.`
+    : "Work backwards from your current address until a supported qualifying permission is available.";
+  const remainingLabel =
+    monthsRemaining === null ? "" : `${monthsRemaining} months remaining`;
   const gaps =
     coverage.gaps.length === 0
       ? coverage.complete
@@ -40,7 +43,7 @@ export function renderAddressHistoryDialog(
       '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4Z"/><path d="M9 20v-6h6v6"/></svg>',
     body: `<div class="address-history-modal">
       <section class="address-coverage-card ${coverageClass}" aria-label="Address timeline coverage">
-        <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span></div>
+        <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
         ${gaps}
       </section>
       <section class="address-history-list" aria-label="Recorded addresses">
@@ -92,20 +95,21 @@ function renderAddressList(
 export function showAddressHistoryForm(
   root: HTMLElement,
   entry?: AddressHistoryEntry,
-  suggestedStartMonth?: string | null,
+  guidedEndMonth?: string | null,
   documents: readonly DocumentMetadata[] = [],
+  firstAddress = false,
 ): void {
   const dialog = root.querySelector<HTMLDialogElement>(
     "#address-history-dialog",
   );
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
-  resetAddressHistoryForm(form, suggestedStartMonth);
+  resetAddressHistoryForm(form, guidedEndMonth, firstAddress);
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit)
     submit.textContent = entry
       ? "Save changes"
-      : suggestedStartMonth
+      : firstAddress || guidedEndMonth
         ? "Save & continue"
         : "Save address";
   if (entry) {
@@ -116,10 +120,13 @@ export function showAddressHistoryForm(
     start.value = entry.startMonth;
     start.readOnly = false;
     start.setAttribute("aria-readonly", "false");
-    (form.elements.namedItem("endMonth") as HTMLInputElement).value =
-      entry.endMonth;
-    (form.elements.namedItem("isCurrent") as HTMLInputElement).checked =
-      entry.isCurrent;
+    const end = form.elements.namedItem("endMonth") as HTMLInputElement;
+    end.value = entry.endMonth;
+    end.readOnly = false;
+    end.setAttribute("aria-readonly", "false");
+    const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
+    current.checked = entry.isCurrent;
+    current.disabled = false;
     syncAddressEndState(form);
   }
   syncAddressEvidenceState(form, entry?.id, documents);
@@ -128,16 +135,25 @@ export function showAddressHistoryForm(
 
 export function resetAddressHistoryForm(
   form: HTMLFormElement,
-  suggestedStartMonth?: string | null,
+  guidedEndMonth?: string | null,
+  firstAddress = false,
 ): void {
   form.reset();
   (form.elements.namedItem("addressId") as HTMLInputElement).value = "";
   const start = form.elements.namedItem("startMonth") as HTMLInputElement;
-  start.value = suggestedStartMonth ?? "";
-  start.readOnly = Boolean(suggestedStartMonth);
-  start.setAttribute("aria-readonly", suggestedStartMonth ? "true" : "false");
-  start.title = suggestedStartMonth
-    ? "Start month is set automatically from the first uncovered month."
+  start.value = "";
+  start.readOnly = false;
+  start.setAttribute("aria-readonly", "false");
+  start.title = "";
+  const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
+  const end = form.elements.namedItem("endMonth") as HTMLInputElement;
+  current.checked = firstAddress;
+  current.disabled = firstAddress || Boolean(guidedEndMonth);
+  end.value = guidedEndMonth ?? "";
+  end.readOnly = Boolean(guidedEndMonth);
+  end.setAttribute("aria-readonly", guidedEndMonth ? "true" : "false");
+  end.title = guidedEndMonth
+    ? "End month is set automatically to prevent a gap with the next address."
     : "";
   const error = form.querySelector<HTMLElement>("#address-history-error");
   if (error) {
