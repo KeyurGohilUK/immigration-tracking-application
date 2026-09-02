@@ -179,9 +179,11 @@ function renderVaultRequirement(
           : "Recommended";
   const completionLabel =
     requirement.id === "address-proof"
-      ? "Timeline complete"
+      ? "Timeline and evidence complete"
       : `${requirement.documentCount} added`;
-  return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}"><span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : priority}</small></li>`;
+  const incompleteLabel =
+    requirement.id === "address-proof" ? "Upload evidence" : priority;
+  return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}"><span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small></li>`;
 }
 
 function renderVaultStatusIcon(
