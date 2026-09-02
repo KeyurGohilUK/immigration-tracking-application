@@ -10,6 +10,7 @@ import { getHouseholdMembers } from "../../household/data/household-member-repos
 import { getImmigrationPermissions } from "../../immigration/data/immigration-permission-repository";
 import { getTrips } from "../../travel/data/trip-repository";
 import { getAddressHistory } from "../../documents/data/address-history-repository";
+import { getLifeEnglishRecord } from "../../documents/data/life-english-repository";
 import {
   BACKUP_FORMAT,
   BACKUP_KEY_DERIVATION_ITERATIONS,
@@ -53,7 +54,7 @@ export async function collectBackupData(
 ): Promise<BackupData> {
   const members = await getHouseholdMembers(vaultKey);
   const profileIds = members.map(({ id }) => id);
-  const [permissions, trips, addressHistory, documentMetadata] =
+  const [permissions, trips, addressHistory, lifeEnglish, documentMetadata] =
     await Promise.all([
       Promise.all(
         profileIds.map(async (profileId) => ({
@@ -73,6 +74,12 @@ export async function collectBackupData(
           records: await getAddressHistory(profileId, vaultKey),
         })),
       ),
+      Promise.all(
+        profileIds.map(async (profileId) => {
+          const record = await getLifeEnglishRecord(profileId, vaultKey);
+          return { profileId, records: record ? [record] : [] };
+        }),
+      ),
       getAllDocumentMetadata(vaultKey),
     ]);
   const documents = await Promise.all(
@@ -84,7 +91,14 @@ export async function collectBackupData(
       };
     }),
   );
-  return { members, permissions, trips, addressHistory, documents };
+  return {
+    members,
+    permissions,
+    trips,
+    addressHistory,
+    lifeEnglish,
+    documents,
+  };
 }
 
 export async function createEncryptedBackup(

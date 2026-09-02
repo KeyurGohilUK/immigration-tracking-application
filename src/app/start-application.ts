@@ -113,6 +113,11 @@ import {
   syncAddressEndState,
 } from "../features/documents/components/address-history-dialog";
 import {
+  readLifeEnglishForm,
+  showLifeEnglishForm,
+  syncLifeEnglishForm,
+} from "../features/documents/components/life-english-dialog";
+import {
   deleteDocument,
   getAllDocumentMetadata,
   getDocumentFile,
@@ -137,12 +142,20 @@ import {
   saveAddressHistory,
 } from "../features/documents/data/address-history-repository";
 import {
+  getLifeEnglishRecord,
+  saveLifeEnglishRecord,
+} from "../features/documents/data/life-english-repository";
+import {
   calculateAddressHistoryCoverage,
   getRequiredAddressHistoryMonths,
   validateAddressHistoryCollection,
   validateAddressHistoryInput,
   type AddressHistoryEntry,
 } from "../features/documents/domain/address-history";
+import {
+  validateLifeEnglishInput,
+  type LifeEnglishRecord,
+} from "../features/documents/domain/life-english";
 import { getDefaultCategoryForSection } from "../features/documents/domain/document-vault";
 import {
   renderIlrJourneyPage,
@@ -166,6 +179,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const permissionCache = new Map<string, ImmigrationPermission[]>();
     const tripCache = new Map<string, Trip[]>();
     const addressHistoryCache = new Map<string, AddressHistoryEntry[]>();
+    const lifeEnglishCache = new Map<string, LifeEnglishRecord | null>();
 
     const lock = (): void => {
       if (!sessionKey) return;
@@ -626,6 +640,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       documents: DocumentMetadata[],
       addressHistory: AddressHistoryEntry[],
       requiredAddressMonths: number | null,
+      lifeEnglish: LifeEnglishRecord | null,
     ): void => {
       const addressCoverage = calculateAddressHistoryCoverage(
         addressHistory,
@@ -639,6 +654,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         documents,
         addressHistory,
         addressCoverage,
+        lifeEnglish,
       );
       wireAuthenticatedShell(profile, "Documents");
       const uploadDialog =
@@ -656,6 +672,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       const addressForm = root.querySelector<HTMLFormElement>(
         "#address-history-form",
       );
+      const lifeEnglishDialog = root.querySelector<HTMLDialogElement>(
+        "#life-english-dialog",
+      );
+      const lifeEnglishForm =
+        root.querySelector<HTMLFormElement>("#life-english-form");
       root
         .querySelector<HTMLButtonElement>("#download-document-pack")
         ?.addEventListener("click", async (event) => {
@@ -696,12 +717,84 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             showAddressHistoryForm(root);
             return;
           }
+          if (sectionId === "life-english") {
+            showLifeEnglishForm(root, lifeEnglish);
+            return;
+          }
           const category = sectionId
             ? getDefaultCategoryForSection(sectionId)
             : null;
           showDocumentUploadForm(root, category ?? undefined);
         });
       }
+      lifeEnglishDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => lifeEnglishDialog.close());
+      lifeEnglishDialog?.addEventListener("click", (event) => {
+        if (event.target === lifeEnglishDialog) lifeEnglishDialog?.close();
+      });
+      lifeEnglishForm
+        ?.querySelector<HTMLSelectElement>("#life-status")
+        ?.addEventListener("change", () =>
+          syncLifeEnglishForm(lifeEnglishForm),
+        );
+      lifeEnglishForm
+        ?.querySelector<HTMLSelectElement>("#english-status")
+        ?.addEventListener("change", () =>
+          syncLifeEnglishForm(lifeEnglishForm),
+        );
+      lifeEnglishForm
+        ?.querySelector<HTMLButtonElement>("[data-add-life-evidence]")
+        ?.addEventListener("click", () => {
+          lifeEnglishDialog?.close();
+          showDocumentUploadForm(root, "life-in-uk");
+        });
+      lifeEnglishForm
+        ?.querySelector<HTMLButtonElement>("[data-add-english-evidence]")
+        ?.addEventListener("click", () => {
+          lifeEnglishDialog?.close();
+          showDocumentUploadForm(root, "english-language");
+        });
+      lifeEnglishForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const input = readLifeEnglishForm(lifeEnglishForm);
+        const error = lifeEnglishForm.querySelector<HTMLElement>(
+          "#life-english-error",
+        );
+        const validationError = validateLifeEnglishInput(input);
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const timestamp = new Date().toISOString();
+        const nextRecord: LifeEnglishRecord = {
+          version: 1,
+          profileId: selectedProfileId,
+          ...input,
+          createdAt: lifeEnglish?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        };
+        const submit = lifeEnglishForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveLifeEnglishRecord(selectedProfileId, nextRecord, key);
+          lifeEnglishCache.set(selectedProfileId, nextRecord);
+          lifeEnglishDialog?.close();
+          await showDocuments(profile);
+        } catch {
+          if (error) {
+            error.textContent =
+              "The encrypted Life in the UK and English details could not be saved.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
       addressDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => addressDialog.close());
@@ -1071,22 +1164,29 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       try {
         const cachedPermissions = permissionCache.get(selectedProfileId);
         const cachedAddressHistory = addressHistoryCache.get(selectedProfileId);
-        const [documents, permissions, addressHistory] = await Promise.all([
-          getAllDocumentMetadata(key),
-          cachedPermissions ??
-            getImmigrationPermissions(selectedProfileId, key),
-          cachedAddressHistory ?? getAddressHistory(selectedProfileId, key),
-        ]);
+        const hasCachedLifeEnglish = lifeEnglishCache.has(selectedProfileId);
+        const [documents, permissions, addressHistory, lifeEnglish] =
+          await Promise.all([
+            getAllDocumentMetadata(key),
+            cachedPermissions ??
+              getImmigrationPermissions(selectedProfileId, key),
+            cachedAddressHistory ?? getAddressHistory(selectedProfileId, key),
+            hasCachedLifeEnglish
+              ? Promise.resolve(lifeEnglishCache.get(selectedProfileId) ?? null)
+              : getLifeEnglishRecord(selectedProfileId, key),
+          ]);
         permissionCache.set(selectedProfileId, permissions);
         addressHistoryCache.set(selectedProfileId, addressHistory);
+        lifeEnglishCache.set(selectedProfileId, lifeEnglish);
         renderDocuments(
           profile,
           documents,
           addressHistory,
           getRequiredAddressHistoryMonths(permissions),
+          lifeEnglish,
         );
       } catch {
-        renderDocuments(profile, [], [], null);
+        renderDocuments(profile, [], [], null, null);
         const add = root.querySelector<HTMLButtonElement>("#add-document");
         if (add) add.disabled = true;
         showDocumentPageError(

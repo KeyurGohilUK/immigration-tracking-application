@@ -23,9 +23,9 @@ product roadmap.
       coverage plus supporting address proof.
 - [ ] Add dedicated requirement-specific Liquid Glass modals for all vault
       sections.
-- [ ] Capture Life in the UK status, pass date, UAN/reference number, and
+- [x] Capture Life in the UK status, pass date, UAN/reference number, and
       optional evidence.
-- [ ] Capture English requirement status, evidence type, certificate/reference
+- [x] Capture English requirement status, evidence type, certificate/reference
       number, and optional evidence.
 - [ ] Add structured employment metadata (employer, job title, sponsorship
       status, dates, salary) and time-aware final employer-letter status.

@@ -23,6 +23,12 @@ import type {
   AddressHistoryEntry,
 } from "../domain/address-history";
 import { renderAddressHistoryDialog } from "./address-history-dialog";
+import { renderLifeEnglishDialog } from "./life-english-dialog";
+import {
+  isEnglishRequirementComplete,
+  isLifeInUkComplete,
+  type LifeEnglishRecord,
+} from "../domain/life-english";
 
 export function renderDocumentsPage(
   root: HTMLElement,
@@ -31,6 +37,7 @@ export function renderDocumentsPage(
   allDocuments: DocumentMetadata[],
   addressHistory: readonly AddressHistoryEntry[],
   addressCoverage: AddressHistoryCoverage,
+  lifeEnglish: LifeEnglishRecord | null,
 ): void {
   const documents = allDocuments
     .filter(({ profileId }) => profileId === selectedProfileId)
@@ -49,6 +56,8 @@ export function renderDocumentsPage(
   );
   const vaultProgress = calculateDocumentVaultProgress(documents, {
     addressHistoryComplete: addressCoverage.complete,
+    lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
+    englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
   });
   renderAppShell(
     root,
@@ -79,6 +88,7 @@ export function renderDocumentsPage(
       closeLabel: "Close document form",
     })}
     ${renderAddressHistoryDialog(addressHistory, addressCoverage)}
+    ${renderLifeEnglishDialog()}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",

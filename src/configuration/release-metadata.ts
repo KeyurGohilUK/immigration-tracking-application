@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.5.1";
+export const APP_VERSION = "3.6.0";
 
 export const RELEASE_NOTES = [
-  "Fixed iPhone date and month controls so form fields stay within Liquid Glass modals.",
+  "Added structured Life in the UK and English evidence details, including pass date, UAN/reference capture, evidence type, and optional supporting uploads.",
 ] as const;
