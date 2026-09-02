@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Dark lock-screen PIN indicators now show the Ibiza accent colour as each digit is entered.",
+      "Identity & Immigration is hidden from the Document Vault checklist and no longer affects readiness progress; those document types remain available through Add document.",
     ),
   ).toBeVisible();
   await expect(
@@ -698,7 +698,7 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(page.getByText("No documents added yet")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Identity & Immigration" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Address History" }),
   ).toBeVisible();
@@ -832,24 +832,15 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "english test evidence" }),
   ).toBeVisible();
 
-  const identitySection = page.locator(
-    '[data-vault-section="identity-immigration"]',
-  );
-  await identitySection.locator("summary").click();
-  await identitySection.getByRole("button", { name: "Add document" }).click();
-  const sectionDocumentDialog = page.getByRole("dialog", {
-    name: "Add document",
-  });
-  await expect(sectionDocumentDialog.getByLabel("Category")).toHaveValue(
-    "passport",
-  );
-  await sectionDocumentDialog
-    .getByRole("button", { name: "Close document form" })
-    .click();
-
   await page.getByRole("button", { name: "Add document" }).first().click();
   const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
   await expect(addDocumentDialog).toHaveClass(/liquid-dialog/);
+  await expect(
+    addDocumentDialog.locator('option[value="passport"]'),
+  ).toHaveCount(1);
+  await expect(
+    addDocumentDialog.locator('option[value="immigration-evidence"]'),
+  ).toHaveCount(1);
   await addDocumentDialog.getByLabel("Document file").setInputFiles({
     name: "council-tax.png",
     mimeType: "image/png",
