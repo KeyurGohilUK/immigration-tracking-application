@@ -148,7 +148,10 @@ test("highlights the header control when an update is available", async ({
   await expect(trigger).toHaveCSS("background-image", /linear-gradient/);
   await expect(trigger).toHaveCSS("border-color", "rgba(255, 200, 61, 0.88)");
 
-  await trigger.click();
+  await trigger.evaluate((button: HTMLButtonElement) => button.click());
+  await expect(
+    page.getByRole("dialog", { name: "Install and updates" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Download update" }),
   ).toBeVisible();
