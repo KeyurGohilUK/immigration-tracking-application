@@ -994,6 +994,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       addressForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
         const { addressId, input } = readAddressHistoryForm(addressForm);
+        const evidenceFile = readAddressEvidenceFile(addressForm);
         const error = addressForm.querySelector<HTMLElement>(
           "#address-history-error",
         );
@@ -1005,16 +1006,102 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           return;
         }
+
         const existing = addressHistory.find(({ id }) => id === addressId);
+        const profileDocuments = documents.filter(
+          ({ profileId }) => profileId === selectedProfileId,
+        );
         const timestamp = new Date().toISOString();
         const entry: AddressHistoryEntry = {
           version: 1,
           id: existing?.id ?? crypto.randomUUID(),
           profileId: selectedProfileId,
           ...input,
+          notes: existing?.notes ?? "",
           createdAt: existing?.createdAt ?? timestamp,
           updatedAt: timestamp,
         };
+
+        let preparedEvidence:
+          | {
+              metadata: DocumentMetadata;
+              bytes: Uint8Array<ArrayBuffer>;
+            }
+          | null = null;
+        if (evidenceFile) {
+          if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
+            if (error) {
+              error.textContent =
+                "This profile already has the maximum of 25 documents.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const totalBytes = documents.reduce(
+            (total, document) => total + document.size,
+            0,
+          );
+          if (totalBytes + evidenceFile.size > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
+            if (error) {
+              error.textContent =
+                "Address evidence would exceed the 50 MB app storage limit.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const mimeType = resolveDocumentMimeType(
+            evidenceFile.name,
+            evidenceFile.type,
+          );
+          const displayName = suggestDocumentName(evidenceFile.name);
+          const uploadError = validateDocumentUploadInput({
+            displayName,
+            category: "address-proof",
+            fileName: evidenceFile.name,
+            mimeType: mimeType ?? evidenceFile.type,
+            size: evidenceFile.size,
+          });
+          if (uploadError || !mimeType) {
+            if (error) {
+              error.textContent =
+                uploadError ?? "Choose a PDF, JPG, or PNG evidence file.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const bytes = new Uint8Array(await evidenceFile.arrayBuffer());
+          const signatureError = validateDocumentSignature(mimeType, bytes);
+          if (signatureError) {
+            if (error) {
+              error.textContent = signatureError;
+              error.hidden = false;
+            }
+            return;
+          }
+          preparedEvidence = {
+            metadata: {
+              version: 1,
+              id: crypto.randomUUID(),
+              profileId: selectedProfileId,
+              displayName,
+              fileName: evidenceFile.name.trim(),
+              mimeType,
+              size: evidenceFile.size,
+              category: "address-proof",
+              addressHistoryId: entry.id,
+              sortOrder:
+                profileDocuments.reduce(
+                  (maximum, document) =>
+                    Math.max(maximum, document.sortOrder),
+                  -1,
+                ) + 1,
+              createdAt: timestamp,
+              updatedAt: timestamp,
+            },
+            bytes,
+          };
+        }
+
         const nextEntries = existing
           ? addressHistory.map((current) =>
               current.id === existing.id ? entry : current,
@@ -1034,6 +1121,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (submit) submit.disabled = true;
         try {
           await saveAddressHistory(selectedProfileId, nextEntries, key);
+          if (preparedEvidence)
+            await saveDocument(
+              preparedEvidence.metadata,
+              preparedEvidence.bytes,
+              key,
+            );
           addressHistoryCache.set(selectedProfileId, nextEntries);
           const nextStart = getNextUncoveredAddressMonth(
             nextEntries,
@@ -1043,11 +1136,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           addressDialog?.close();
           await showDocuments(profile);
           if (!existing && nextStart)
-            showAddressHistoryForm(root, undefined, nextStart);
+            showAddressHistoryForm(root, undefined, nextStart, documents);
         } catch {
           if (error) {
             error.textContent =
-              "The encrypted address history could not be saved.";
+              "The address or optional evidence could not be saved.";
             error.hidden = false;
           }
           if (submit) submit.disabled = false;
