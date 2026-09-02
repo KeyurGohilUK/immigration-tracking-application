@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  IMMIGRATION_ROUTES,
+  type ImmigrationRoute,
+} from "../../immigration/domain/immigration-permission";
+import {
   calculateAddressHistoryCoverage,
   getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
@@ -43,7 +47,7 @@ function entry(
 }
 
 function permission(
-  route: "skilled-worker" | "global-talent",
+  route: ImmigrationRoute,
   permissionStartDate = "2024-01-01",
 ) {
   return {
@@ -130,6 +134,7 @@ describe("address history", () => {
     const result = calculateAddressHistoryCoverage(
       [entry("one", "2021-09", "2023-12"), entry("two", "2024-02", "", true)],
       60,
+      "2021-10",
       "2026-09",
     );
     expect(result.complete).toBe(false);
@@ -140,17 +145,78 @@ describe("address history", () => {
     const result = calculateAddressHistoryCoverage(
       [entry("one", "2021-09", "", true)],
       60,
+      "2021-10",
       "2026-09",
     );
     expect(result.complete).toBe(true);
     expect(result.coveredMonths).toBe(60);
   });
 
-  it("uses a route rule instead of a global five-year constant", () => {
-    const skilledWorker = permission("skilled-worker");
-    const unsupported = permission("global-talent");
-    expect(getRequiredAddressHistoryMonths([skilledWorker])).toBe(60);
-    expect(getRequiredAddressHistoryMonths([unsupported])).toBeNull();
+  it("does not create gaps before the qualifying permission start", () => {
+    const result = calculateAddressHistoryCoverage(
+      [
+        entry("previous", "2023-06", "2024-10"),
+        entry("current", "2024-11", "", true),
+      ],
+      60,
+      "2023-06",
+      "2026-09",
+    );
+
+    expect(result).toEqual({
+      requiredMonths: 60,
+      applicableMonths: 40,
+      coveredMonths: 40,
+      complete: true,
+      gaps: [],
+    });
+  });
+
+  it("defines the expected address-history requirement for every immigration route", () => {
+    const expectedMonths: Record<ImmigrationRoute, number | null> = {
+      "skilled-worker": 60,
+      "health-and-care-worker": 60,
+      "tier-2-general": 60,
+      "global-talent": null,
+      "innovator-founder": 36,
+      "t2-minister-of-religion": 60,
+      "international-sportsperson": 60,
+      "representative-overseas-business": 60,
+      "tier-1": null,
+      "scale-up": 60,
+      other: null,
+    };
+
+    expect(Object.keys(expectedMonths).sort()).toEqual(
+      [...IMMIGRATION_ROUTES].sort(),
+    );
+
+    for (const route of IMMIGRATION_ROUTES)
+      expect(getRequiredAddressHistoryMonths([permission(route)])).toBe(
+        expectedMonths[route],
+      );
+  });
+
+  it("never creates address-history gaps before the qualifying start for any route", () => {
+    const entries = [
+      entry("previous", "2023-06", "2024-10"),
+      entry("current", "2024-11", "", true),
+    ];
+
+    for (const route of IMMIGRATION_ROUTES) {
+      const requirement = getAddressHistoryRequirement([
+        permission(route, "2023-06-15"),
+      ]);
+      const result = calculateAddressHistoryCoverage(
+        entries,
+        requirement.requiredMonths,
+        requirement.startMonth,
+        "2026-09",
+      );
+
+      expect(result.gaps, route).toEqual([]);
+      expect(result.complete, route).toBe(true);
+    }
   });
 
   it("starts the guided timeline from the earliest qualifying permission", () => {
@@ -164,11 +230,33 @@ describe("address history", () => {
     });
   });
 
+  it("caps guided coverage to a three-year route window", () => {
+    expect(
+      getAddressHistoryMonthsRemaining(
+        [entry("current", "2023-10", "", true)],
+        "2021-01",
+        36,
+        "2026-09",
+      ),
+    ).toBe(0);
+  });
+
+  it("tracks variable-period routes from their qualifying start without inventing a fixed duration", () => {
+    const requirement = getAddressHistoryRequirement([
+      permission("global-talent", "2024-04-12"),
+    ]);
+    expect(requirement).toEqual({
+      requiredMonths: null,
+      startMonth: "2024-04",
+    });
+  });
+
   it("finds the latest uncovered month when working backwards", () => {
     expect(
       getLatestUncoveredAddressMonth(
         [entry("current", "2025-01", "", true)],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBe("2024-12");
@@ -182,6 +270,7 @@ describe("address history", () => {
           entry("current", "2025-01", "", true),
         ],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBe("2023-06");
@@ -196,6 +285,7 @@ describe("address history", () => {
           entry("current", "2025-01", "", true),
         ],
         "2021-09",
+        60,
         "2026-09",
       ),
     ).toBeNull();
@@ -211,8 +301,9 @@ describe("address history", () => {
       getAddressHistoryMonthsRemaining(
         [entry("current", "2025-01", "", true)],
         "2021-09",
+        60,
         "2026-09",
       ),
-    ).toBe(40);
+    ).toBe(39);
   });
 });

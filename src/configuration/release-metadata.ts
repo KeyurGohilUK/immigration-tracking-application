@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.18.2";
+export const APP_VERSION = "3.19.0";
 
 export const RELEASE_NOTES = [
-  "Dialogs now open without visibly preselecting any control, and Address History uses even spacing around Add new current address.",
+  "Address History now uses route-aware qualifying windows and no longer reports gaps before the applicable settlement period.",
 ] as const;

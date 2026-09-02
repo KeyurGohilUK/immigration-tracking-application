@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Dialogs now open without visibly preselecting any control, and Address History uses even spacing around Add new current address.",
+      "Address History now uses route-aware qualifying windows and no longer reports gaps before the applicable settlement period.",
     ),
   ).toBeVisible();
   await expect(

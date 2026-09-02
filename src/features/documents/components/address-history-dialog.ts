@@ -17,8 +17,10 @@ export function renderAddressHistoryDialog(
 ): string {
   const requiredLabel =
     coverage.requiredMonths === null
-      ? "Required period will be based on the applicant’s supported settlement route."
-      : `${Math.round(coverage.requiredMonths / 12)} years required · ${coverage.coveredMonths} of ${coverage.requiredMonths} months covered`;
+      ? coverage.applicableMonths > 0
+        ? `Required period varies by route · ${coverage.coveredMonths} of ${coverage.applicableMonths} applicable months covered`
+        : "Required period will be based on the applicant’s supported settlement route."
+      : `${Math.round(coverage.requiredMonths / 12)} years required · ${coverage.coveredMonths} of ${coverage.applicableMonths} applicable months covered`;
   const coverageClass = coverage.complete ? "is-complete" : "needs-attention";
   const guidedStartLabel = requiredStartMonth
     ? `Work backwards from your current address to ${formatMonth(requiredStartMonth)} based on qualifying permission history.`
@@ -46,7 +48,7 @@ export function renderAddressHistoryDialog(
       '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4Z"/><path d="M9 20v-6h6v6"/></svg>',
     body: `<div class="address-history-modal">
       <section class="address-coverage-card ${coverageClass}" aria-label="Address timeline coverage">
-        <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
+        <div><strong>${coverage.complete ? "Timeline up to date" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
         ${gaps}
       </section>
       <div data-address-new-current-host></div>
