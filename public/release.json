@@ -1,8 +1,6 @@
 {
-  "version": "3.18.1",
+  "version": "3.18.2",
   "notes": [
-    "Address History now uses Save consistently when adding a new current address.",
-    "Security PIN now follows the app theme with a light Liquid Glass appearance in light mode.",
-    "Liquid Glass dialogs now focus their title on open instead of visually preselecting Close; Address History spacing is also tightened."
+    "Dialogs now open without visibly preselecting any control, and Address History uses even spacing around Add new current address."
   ]
 }
