@@ -88,7 +88,7 @@ export function renderDocumentsPage(
       closeLabel: "Close document form",
     })}
     ${renderAddressHistoryDialog(addressHistory, addressCoverage)}
-    ${renderLifeEnglishDialog()}
+    ${renderLifeEnglishDialog(documents)}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
