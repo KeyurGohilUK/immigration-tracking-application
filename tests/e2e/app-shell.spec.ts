@@ -459,7 +459,15 @@ test("stores and manages encrypted documents for a profile", async ({
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Council tax bill" }).click();
-  await expect(page.getByText("No documents added yet")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Council tax bill" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "life test evidence" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "english test evidence" }),
+  ).toBeVisible();
 });
 
 test("resets local data safely when the PIN is forgotten", async ({ page }) => {
