@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now keeps the dialog open after Save, Cancel, and Delete while updating the timeline in place.",
+      "Address History edit actions now use equal-width Cancel and Save buttons.",
     ),
   ).toBeVisible();
   await expect(
@@ -372,10 +372,20 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     currentCard.getByRole("textbox", { name: "Current address", exact: true }),
   ).toBeVisible();
-  await expect(
-    currentCard.getByRole("button", { name: "Save changes" }),
-  ).toBeVisible();
-  await currentCard.getByRole("button", { name: "Cancel" }).click();
+  const saveAddressButton = currentCard.getByRole("button", {
+    name: "Save",
+    exact: true,
+  });
+  const cancelAddressButton = currentCard.getByRole("button", {
+    name: "Cancel",
+  });
+  await expect(saveAddressButton).toBeVisible();
+  const saveAddressBox = await saveAddressButton.boundingBox();
+  const cancelAddressBox = await cancelAddressButton.boundingBox();
+  expect(saveAddressBox).not.toBeNull();
+  expect(cancelAddressBox).not.toBeNull();
+  expect(saveAddressBox?.width).toBeCloseTo(cancelAddressBox?.width ?? 0, 0);
+  await cancelAddressButton.click();
   await expect(
     currentCard.getByRole("textbox", { name: "Current address", exact: true }),
   ).toBeHidden();

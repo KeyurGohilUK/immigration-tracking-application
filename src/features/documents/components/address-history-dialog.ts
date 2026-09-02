@@ -125,7 +125,7 @@ export function showAddressHistoryForm(
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit)
     submit.textContent = entry
-      ? "Save changes"
+      ? "Save"
       : firstAddress || guidedEndMonth
         ? "Save & continue"
         : "Save address";
