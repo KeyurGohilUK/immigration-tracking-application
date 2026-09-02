@@ -110,6 +110,7 @@ import {
   readAddressEvidenceFile,
   readAddressHistoryForm,
   resetAddressHistoryForm,
+  restoreAddressHistoryOverview,
   showAddressHistoryForm,
   showNewCurrentAddressForm,
   syncAddressEndState,
@@ -968,6 +969,26 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ?.addEventListener("click", () =>
           showNewCurrentAddressForm(root, documents),
         );
+      addressForm
+        ?.querySelector<HTMLButtonElement>("[data-address-cancel]")
+        ?.addEventListener("click", () => {
+          const hasCurrentAddress = addressHistory.some(
+            ({ isCurrent }) => isCurrent,
+          );
+          const previousEndMonth = hasCurrentAddress
+            ? getLatestUncoveredAddressMonth(
+                addressHistory,
+                requiredAddressStartMonth,
+                getUkCalendarDate().slice(0, 7),
+              )
+            : null;
+          restoreAddressHistoryOverview(
+            root,
+            previousEndMonth,
+            !hasCurrentAddress,
+            addressMonthsRemaining !== 0,
+          );
+        });
       root
         .querySelector<HTMLButtonElement>("#address-history-reset")
         ?.addEventListener("click", () => {
