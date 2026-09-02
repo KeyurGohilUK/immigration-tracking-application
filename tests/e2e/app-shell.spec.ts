@@ -1135,8 +1135,6 @@ test("persists dark, system, and light segmented theme preferences", async ({
   await page.getByText("UrbanFox settings", { exact: true }).click();
 
   const light = page.getByRole("radio", { name: "Light" });
-  const dark = page.getByRole("radio", { name: "Dark" });
-  const system = page.getByRole("radio", { name: "System" });
   await expect(light).toBeChecked();
 
   await page.getByText("Dark", { exact: true }).click();
