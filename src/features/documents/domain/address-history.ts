@@ -8,7 +8,6 @@ export interface StructuredAddress {
   townCity: string;
   county: string;
   postcode: string;
-  country: string;
 }
 
 export interface AddressHistoryInput {
@@ -83,7 +82,6 @@ export function formatStructuredAddress(address: StructuredAddress): string {
     address.townCity,
     address.county,
     address.postcode.toUpperCase(),
-    address.country,
   ]
     .map((part) => part.trim())
     .filter(Boolean)
@@ -97,17 +95,10 @@ export function validateStructuredAddress(
     return "Enter the house number or house name.";
   if (!address.street.trim()) return "Enter the street.";
   if (!address.townCity.trim()) return "Enter the town or city.";
-  if (!address.country.trim()) return "Enter the country.";
-
-  const country = address.country.trim().toLowerCase();
-  const isUnitedKingdom =
-    country === "united kingdom" || country === "uk" || country === "great britain";
-  if (isUnitedKingdom) {
-    const postcode = address.postcode.trim();
-    if (!postcode) return "Enter the postcode.";
-    if (!UK_POSTCODE_PATTERN.test(postcode))
-      return "Enter a valid UK postcode, for example BS1 5AH.";
-  }
+  const postcode = address.postcode.trim();
+  if (!postcode) return "Enter the postcode.";
+  if (!UK_POSTCODE_PATTERN.test(postcode))
+    return "Enter a valid UK postcode, for example BS1 5AH.";
 
   const limits: Array<[string, string, number]> = [
     ["Flat / building", address.flatBuilding, 100],
@@ -117,7 +108,6 @@ export function validateStructuredAddress(
     ["Town / city", address.townCity, 100],
     ["County", address.county, 100],
     ["Postcode", address.postcode, 20],
-    ["Country", address.country, 100],
   ];
   for (const [label, value, maximum] of limits)
     if (value.trim().length > maximum)
