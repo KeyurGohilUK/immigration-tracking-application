@@ -1,6 +1,6 @@
 {
-  "version": "3.10.0",
+  "version": "3.10.1",
   "notes": [
-    "Guided Address History now starts with the current address and works backwards month by month to the permission-derived required start."
+    "Address History now shows Current address only for the first entry and hides End month while that address is current."
   ]
 }

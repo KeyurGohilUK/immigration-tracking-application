@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Guided Address History now starts with the current address and works backwards month by month to the permission-derived required start.",
+      "Address History now shows Current address only for the first entry and hides End month while that address is current.",
     ),
   ).toBeVisible();
   await expect(
@@ -263,7 +263,8 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
   await expect(dialog.getByLabel("Current address")).toBeChecked();
   await expect(dialog.getByLabel("Current address")).toBeDisabled();
-  await expect(dialog.getByLabel("End month")).toBeDisabled();
+  await expect(dialog.getByLabel("Current address")).toBeVisible();
+  await expect(dialog.getByLabel("End month")).toBeHidden();
   await expect(dialog.getByLabel("Notes")).toHaveCount(0);
 
   const addressEvidence = Buffer.from(
@@ -283,8 +284,8 @@ test("guides Address History from the current address backwards", async ({
 
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("Current address")).not.toBeChecked();
-  await expect(dialog.getByLabel("Current address")).toBeDisabled();
+  await expect(dialog.getByLabel("Current address")).toBeHidden();
+  await expect(dialog.getByLabel("End month")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toHaveValue("2024-12");
   await expect(dialog.getByLabel("End month")).toHaveAttribute(
     "aria-readonly",
@@ -362,12 +363,12 @@ test("stores and manages encrypted documents for a profile", async ({
   await addressSection.getByRole("button", { name: "Add document" }).click();
   const addressDialog = page.getByRole("dialog", { name: "Address History" });
   await expect(addressDialog).toBeVisible();
-  for (const label of ["Start month", "End month"]) {
-    const inputBox = await addressDialog.getByLabel(label).boundingBox();
-    const dialogBox = await addressDialog.boundingBox();
-    expect(inputBox).not.toBeNull();
-    expect(dialogBox).not.toBeNull();
-    if (!inputBox || !dialogBox) continue;
+  await expect(addressDialog.getByLabel("End month")).toBeHidden();
+  const inputBox = await addressDialog.getByLabel("Start month").boundingBox();
+  const dialogBox = await addressDialog.boundingBox();
+  expect(inputBox).not.toBeNull();
+  expect(dialogBox).not.toBeNull();
+  if (inputBox && dialogBox) {
     expect(inputBox.x).toBeGreaterThanOrEqual(dialogBox.x);
     expect(inputBox.x + inputBox.width).toBeLessThanOrEqual(
       dialogBox.x + dialogBox.width + 1,
