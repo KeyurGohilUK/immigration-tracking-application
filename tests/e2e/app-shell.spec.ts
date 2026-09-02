@@ -141,7 +141,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the experimental PDF address-reading feature; Address History continues to use manual address entry and evidence uploads.",
+      "Address History now uses structured UK address fields for house/building, street, locality, town/city, county, and postcode.",
     ),
   ).toBeVisible();
   await expect(
