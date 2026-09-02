@@ -98,7 +98,7 @@ function renderAddressList(
   return getDisplayAddresses(entries)
     .map(({ entry, label }) => {
       return `<article class="address-history-item" data-address-item="${entry.id}">
-          <div class="address-history-copy"><span class="address-number">${label}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
+          <div class="address-history-copy"><span class="address-number">${label}</span><strong>${escapeHtml(formatStructuredAddress(entry.address))}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></div>
           <div class="address-history-actions">
             <button type="button" class="member-action" data-edit-address="${entry.id}">Edit</button>
             <span class="address-proof-count">${renderEvidenceCount(documents, entry.id)}</span>
@@ -122,7 +122,7 @@ export function renderReadOnlyAddressList(
   )
     .map(
       ({ entry, label }) =>
-        `<li><span class="address-number">${label}</span><strong>${escapeHtml(entry.fullAddress)}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></li>`,
+        `<li><span class="address-number">${label}</span><strong>${escapeHtml(formatStructuredAddress(entry.address))}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></li>`,
     )
     .join("")}</ol></section>`;
 }
@@ -174,10 +174,7 @@ export function showAddressHistoryForm(
         : "Save address";
   if (entry) {
     (form.elements.namedItem("addressId") as HTMLInputElement).value = entry.id;
-    writeStructuredAddressFields(
-      form,
-      entry.address ?? parseLegacyAddress(entry.fullAddress),
-    );
+    writeStructuredAddressFields(form, entry.address);
     const start = form.elements.namedItem("startMonth") as HTMLInputElement;
     start.value = entry.startMonth;
     start.readOnly = false;
@@ -358,7 +355,6 @@ export function readAddressHistoryForm(form: HTMLFormElement): {
     addressId: String(data.get("addressId") ?? ""),
     movingHome: String(data.get("addressMoveMode") ?? "false") === "true",
     input: {
-      fullAddress: formatStructuredAddress(address),
       address,
       startMonth: String(data.get("startMonth") ?? ""),
       endMonth: current.checked ? "" : String(data.get("endMonth") ?? ""),
@@ -399,34 +395,6 @@ function writeStructuredAddressFields(
     const input = form.elements.namedItem(name) as HTMLInputElement | null;
     if (input) input.value = value;
   }
-}
-
-function parseLegacyAddress(fullAddress: string): StructuredAddress {
-  const parts = fullAddress
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
-  const postcodeIndex = parts.findIndex((part) =>
-    /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i.test(part),
-  );
-  const postcode = postcodeIndex >= 0 ? (parts[postcodeIndex] ?? "") : "";
-  const beforePostcode =
-    postcodeIndex >= 0 ? parts.slice(0, postcodeIndex) : [...parts];
-  return {
-    flatBuilding: "",
-    houseNumberName: beforePostcode[0] ?? fullAddress.trim(),
-    street: beforePostcode[1] ?? "",
-    locality: beforePostcode.length > 4 ? (beforePostcode[2] ?? "") : "",
-    townCity:
-      beforePostcode.length >= 3
-        ? (beforePostcode[beforePostcode.length - 2] ?? "")
-        : "",
-    county:
-      beforePostcode.length >= 2
-        ? (beforePostcode[beforePostcode.length - 1] ?? "")
-        : "",
-    postcode,
-  };
 }
 
 function formatMonth(value: string): string {
