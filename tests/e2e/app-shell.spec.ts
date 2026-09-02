@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now edits each saved address in place and shows a new-current-address form above the existing current address.",
+      "Address History edit and new-current forms now include Cancel so users can return to the saved timeline without making changes.",
     ),
   ).toBeVisible();
   await expect(
