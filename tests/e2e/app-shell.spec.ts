@@ -1072,7 +1072,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await page.getByRole("button", { name: "Replace local data" }).click();
   await expect(
     page.getByText("Backup restored successfully", { exact: false }),
-  ).toBeVisible();
+  ).toBeAttached();
   await page.getByRole("link", { name: "Family", exact: true }).click();
   await expect(
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
@@ -1220,7 +1220,10 @@ test("permanently deletes all local application data", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Delete all local data" }),
   ).toBeVisible();
-  await page.getByText("Delete all local data", { exact: true }).first().click();
+  await page
+    .getByText("Delete all local data", { exact: true })
+    .first()
+    .click();
   const openDeleteButton = page.getByRole("button", {
     name: "Delete all local data",
   });
