@@ -61,20 +61,24 @@ describe("Document Vault readiness", () => {
     ).toBe("complete");
   });
 
-  it("requires structured timeline coverage as well as Address Proof", () => {
-    const proofOnly = calculateDocumentVaultProgress([
-      documentFor("address-proof", 0),
-    ]);
-    const proofOnlyAddress = proofOnly.sections.find(
-      ({ id }) => id === "address-history",
-    );
-    expect(proofOnlyAddress?.status).toBe("to-do");
-    expect(proofOnlyAddress?.completedRequired).toBe(0);
+  it("moves Address History from to-do to partial to complete from structured coverage", () => {
+    const empty = calculateDocumentVaultProgress([]);
+    expect(
+      empty.sections.find(({ id }) => id === "address-history")?.status,
+    ).toBe("to-do");
 
-    const complete = calculateDocumentVaultProgress(
-      [documentFor("address-proof", 0)],
-      { addressHistoryComplete: true },
-    );
+    const partial = calculateDocumentVaultProgress([], {
+      addressHistoryEntryCount: 1,
+      addressHistoryComplete: false,
+    });
+    expect(
+      partial.sections.find(({ id }) => id === "address-history")?.status,
+    ).toBe("partial");
+
+    const complete = calculateDocumentVaultProgress([], {
+      addressHistoryEntryCount: 3,
+      addressHistoryComplete: true,
+    });
     const completeAddress = complete.sections.find(
       ({ id }) => id === "address-history",
     );
