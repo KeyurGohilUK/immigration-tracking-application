@@ -399,7 +399,9 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
   ).toBeVisible();
   await expect(
-    dialog.getByText("Current address", { exact: true }),
+    dialog
+      .getByLabel("Recorded addresses")
+      .getByText("Current address", { exact: true }),
   ).toBeVisible();
   await expect(
     dialog.getByText("Previous address 1", { exact: true }),
