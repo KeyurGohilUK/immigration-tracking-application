@@ -76,8 +76,7 @@ function renderAddressList(
   entries: readonly AddressHistoryEntry[],
   documents: readonly DocumentMetadata[],
 ): string {
-  if (entries.length === 0)
-    return '<div class="address-empty-state"><strong>No addresses recorded yet</strong><span>Add the applicant’s address timeline below.</span></div>';
+  if (entries.length === 0) return "";
   let previousAddressNumber = 0;
   return [...entries]
     .sort((left, right) => right.startMonth.localeCompare(left.startMonth))
