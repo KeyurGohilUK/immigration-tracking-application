@@ -312,8 +312,7 @@ function calculateSectionProgress(
     ).length;
     let complete = documentCount > 0;
     if (section.id === "address-history" && requirement.id === "address-proof")
-      complete =
-        options.addressHistoryComplete === true && documentCount > 0;
+      complete = options.addressHistoryComplete === true && documentCount > 0;
     if (section.id === "life-english" && requirement.id === "life-in-uk")
       complete = options.lifeInUkComplete === true;
     if (section.id === "life-english" && requirement.id === "english-language")
