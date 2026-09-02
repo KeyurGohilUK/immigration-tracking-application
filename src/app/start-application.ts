@@ -762,6 +762,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const error = lifeEnglishForm.querySelector<HTMLElement>(
           "#life-english-error",
         );
+        const hasMeaningfulStatus =
+          input.lifeInUkStatus !== "not-recorded" ||
+          input.englishStatus !== "not-recorded";
+        if (!hasMeaningfulStatus) {
+          if (error) {
+            error.textContent =
+              "Choose at least one Life in the UK or English status before saving.";
+            error.hidden = false;
+          }
+          return;
+        }
         const validationError = validateLifeEnglishInput(input);
         if (validationError) {
           if (error) {
