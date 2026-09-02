@@ -12,7 +12,10 @@ const ADDRESS_HINT_PATTERN =
 export async function extractLikelyUkAddressFromPdf(
   file: File,
 ): Promise<ExtractedUkAddress | null> {
-  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf"))
+  if (
+    file.type !== "application/pdf" &&
+    !file.name.toLowerCase().endsWith(".pdf")
+  )
     return null;
 
   const bytes = new Uint8Array(await file.arrayBuffer());
@@ -39,7 +42,9 @@ export function findLikelyUkAddress(
     const start = Math.max(0, index - 5);
     const candidateParts = cleaned.slice(start, index + 1).filter((part) => {
       const lower = part.toLowerCase();
-      return !/^(page|date|statement|account|reference|invoice|bill)\b/.test(lower);
+      return !/^(page|date|statement|account|reference|invoice|bill)\b/.test(
+        lower,
+      );
     });
 
     const postcode = normalizePostcode(postcodeMatch[0]);
@@ -96,7 +101,10 @@ async function decodeFlateStreams(bytes: Uint8Array): Promise<string[]> {
     }
 
     let dataEnd = streamEnd;
-    while (dataEnd > streamStart && (bytes[dataEnd - 1] === 10 || bytes[dataEnd - 1] === 13))
+    while (
+      dataEnd > streamStart &&
+      (bytes[dataEnd - 1] === 10 || bytes[dataEnd - 1] === 13)
+    )
       dataEnd -= 1;
 
     try {
@@ -144,7 +152,10 @@ function decodePdfLiteral(value: string): string {
 }
 
 function normalizeToken(value: string): string {
-  return value.replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim();
+  return value
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 function normalizePostcode(value: string): string {
