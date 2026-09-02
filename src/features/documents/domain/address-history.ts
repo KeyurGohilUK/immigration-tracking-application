@@ -133,7 +133,7 @@ export function getRequiredAddressHistoryMonths(
   return getAddressHistoryRequirement(permissions).requiredMonths;
 }
 
-export function getNextUncoveredAddressMonth(
+export function getLatestUncoveredAddressMonth(
   entries: readonly AddressHistoryEntry[],
   requiredStartMonth: string | null,
   asOfMonth: string,
@@ -157,10 +157,40 @@ export function getNextUncoveredAddressMonth(
       covered.add(month);
   }
 
-  for (let month = start; month <= end; month += 1) {
+  for (let month = end; month >= start; month -= 1) {
     if (!covered.has(month)) return indexToMonth(month);
   }
   return null;
+}
+
+export function getAddressHistoryMonthsRemaining(
+  entries: readonly AddressHistoryEntry[],
+  requiredStartMonth: string | null,
+  asOfMonth: string,
+): number | null {
+  if (!requiredStartMonth) return null;
+  if (!MONTH_PATTERN.test(requiredStartMonth) || !MONTH_PATTERN.test(asOfMonth))
+    throw new Error("Address-history month is invalid.");
+
+  const start = monthToIndex(requiredStartMonth);
+  const end = monthToIndex(asOfMonth);
+  if (start > end) return 0;
+
+  const covered = new Set<number>();
+  for (const entry of entries) {
+    const entryStart = Math.max(start, monthToIndex(entry.startMonth));
+    const entryEnd = Math.min(
+      end,
+      entry.isCurrent ? end : monthToIndex(entry.endMonth),
+    );
+    for (let month = entryStart; month <= entryEnd; month += 1)
+      covered.add(month);
+  }
+
+  let remaining = 0;
+  for (let month = start; month <= end; month += 1)
+    if (!covered.has(month)) remaining += 1;
+  return remaining;
 }
 
 export function calculateAddressHistoryCoverage(
