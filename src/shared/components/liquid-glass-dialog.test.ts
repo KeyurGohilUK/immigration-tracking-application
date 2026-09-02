@@ -23,6 +23,9 @@ describe("renderLiquidGlassDialog", () => {
     expect(markup).toContain('class="liquid-dialog-icon"');
     expect(markup).toContain('id="example-subtitle"');
     expect(markup).toContain('class="liquid-dialog-actions"');
+    expect(markup).toContain(
+      'id="example-title" tabindex="-1" autofocus',
+    );
     expect(markup).toContain('id="example-input"');
   });
 });
