@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now uses structured UK address fields for house/building, street, locality, town/city, county, and postcode.",
+      "Address History now uses Save consistently when adding a new current address.",
     ),
   ).toBeVisible();
   await expect(
@@ -513,7 +513,7 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
   await expect(
     reopenedNewCurrentHost.getByRole("button", {
-      name: "Save new current address",
+      name: "Save",
     }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
@@ -525,7 +525,7 @@ test("guides Address History from the current address backwards", async ({
   });
   await dialog.getByLabel("Start month").fill("2026-09");
   await dialog
-    .getByRole("button", { name: "Save new current address" })
+    .getByRole("button", { name: "Save" })
     .click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
