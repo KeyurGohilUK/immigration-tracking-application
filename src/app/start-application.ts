@@ -830,9 +830,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (file && nameInput && !nameInput.value.trim())
             nameInput.value = suggestDocumentName(file.name);
         });
-        panel
-          .querySelector<HTMLButtonElement>("[data-employment-save]")
-          ?.addEventListener("click", async () => {
+        const saveButton = panel.querySelector<HTMLButtonElement>(
+          "[data-employment-save]",
+        );
+        saveButton?.addEventListener("click", async () => {
           const category = panel.dataset.employmentUpload;
           if (
             category !== "employer-letter" &&
