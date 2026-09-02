@@ -868,17 +868,14 @@ html[data-theme="dark"] .vault-readiness-card {
 
 .address-context-actions {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.7rem;
 }
 
 .address-context-actions .secondary-button,
 .address-context-actions .family-save-button {
-  min-height: 3.2rem;
-}
-
-.address-context-actions .family-save-button {
   width: 100%;
+  min-height: 3.2rem;
 }
 
 .address-context-actions .secondary-button[hidden] {
