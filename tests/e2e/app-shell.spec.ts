@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History edit and new-current forms now include Cancel so users can return to the saved timeline without making changes.",
+      "Address History now keeps the dialog open after Save, Cancel, and Delete while updating the timeline in place.",
     ),
   ).toBeVisible();
   await expect(
