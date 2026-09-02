@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History can now suggest a UK address from uploaded text-based PDF evidence, with confirmation before it is used.",
+      "Removed the experimental PDF address-reading feature; Address History continues to use manual address entry and evidence uploads.",
     ),
   ).toBeVisible();
   await expect(

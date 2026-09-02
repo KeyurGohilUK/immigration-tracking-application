@@ -1,6 +1,6 @@
 {
-  "version": "3.16.0",
+  "version": "3.17.0",
   "notes": [
-    "Address History can now suggest a UK address from uploaded text-based PDF evidence, with confirmation before it is used."
+    "Removed the experimental PDF address-reading feature; Address History continues to use manual address entry and evidence uploads."
   ]
 }
