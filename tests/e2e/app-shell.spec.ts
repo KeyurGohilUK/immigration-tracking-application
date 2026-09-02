@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Guided Address History now starts from qualifying permission history and automatically continues from each next uncovered month.",
+      "Address History now replaces notes with optional inline encrypted evidence so address details and proof can be saved in one flow.",
     ),
   ).toBeVisible();
   await expect(
@@ -265,11 +265,25 @@ test("guides Address History from permission start to the next uncovered month",
     "aria-readonly",
     "true",
   );
+  await expect(dialog.getByLabel("Notes")).toHaveCount(0);
+  const addressEvidence = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+    "base64",
+  );
 
   await dialog
     .getByLabel("Full address")
     .fill("1 First Street, Bristol, BS1 1AA");
   await dialog.getByLabel("End month").fill("2023-06");
+  await dialog.getByLabel("Address evidence").setInputFiles({
+    name: "council-tax-proof.png",
+    mimeType: "image/png",
+    buffer: addressEvidence,
+  });
+  await expect(dialog.getByText("council-tax-proof.png")).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Add document" })).toHaveCount(
+    0,
+  );
   await dialog.getByRole("button", { name: "Save & continue" }).click();
 
   dialog = page.getByRole("dialog", { name: "Address History" });
@@ -293,6 +307,10 @@ test("guides Address History from permission start to the next uncovered month",
   await expect(
     dialog.getByText("2 Current Road, Bristol, BS2 2BB"),
   ).toBeVisible();
+  await expect(dialog.getByText("1 evidence file")).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Add proof" })).toHaveCount(
+    0,
+  );
 });
 
 test("stores and manages encrypted documents for a profile", async ({
