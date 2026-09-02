@@ -745,12 +745,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ?.addEventListener("change", () =>
           syncLifeEnglishForm(lifeEnglishForm),
         );
-      for (const evidenceInput of lifeEnglishForm?.querySelectorAll<HTMLInputElement>(
-        'input[type="file"]',
-      ) ?? []) {
-        evidenceInput.addEventListener("change", () =>
-          syncLifeEnglishEvidenceNames(lifeEnglishForm),
-        );
+      if (lifeEnglishForm) {
+        for (const evidenceInput of lifeEnglishForm.querySelectorAll<HTMLInputElement>(
+          'input[type="file"]',
+        )) {
+          evidenceInput.addEventListener("change", () =>
+            syncLifeEnglishEvidenceNames(lifeEnglishForm),
+          );
+        }
       }
       lifeEnglishForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
