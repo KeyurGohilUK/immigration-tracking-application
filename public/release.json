@@ -1,6 +1,6 @@
 {
-  "version": "3.10.2",
+  "version": "3.10.3",
   "notes": [
-    "Address History now labels the first address as Current address and subsequent entries as Previous address."
+    "Saved Address History now labels entries as Current address, Previous address 1, Previous address 2, and so on."
   ]
 }
