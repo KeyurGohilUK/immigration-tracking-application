@@ -1,7 +1,17 @@
 import type { ImmigrationPermission } from "../../immigration/domain/immigration-permission";
 
+export interface StructuredAddress {
+  flatBuilding: string;
+  houseNumberName: string;
+  street: string;
+  locality: string;
+  townCity: string;
+  county: string;
+  postcode: string;
+}
+
 export interface AddressHistoryInput {
-  fullAddress: string;
+  address: StructuredAddress;
   startMonth: string;
   endMonth: string;
   isCurrent: boolean;
@@ -29,6 +39,7 @@ export interface AddressHistoryRequirement {
 }
 
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+const UK_POSTCODE_PATTERN = /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
 const FIVE_YEAR_ROUTES = new Set([
   "skilled-worker",
   "health-and-care-worker",
@@ -38,9 +49,8 @@ const FIVE_YEAR_ROUTES = new Set([
 export function validateAddressHistoryInput(
   input: AddressHistoryInput,
 ): string | null {
-  const address = input.fullAddress.trim();
-  if (address.length < 5 || address.length > 300)
-    return "Enter the full address between 5 and 300 characters.";
+  const structuredError = validateStructuredAddress(input.address);
+  if (structuredError) return structuredError;
   if (!MONTH_PATTERN.test(input.startMonth))
     return "Enter a valid address start month.";
   if (input.isCurrent) {
@@ -56,6 +66,73 @@ export function validateAddressHistoryInput(
   return null;
 }
 
+export function formatStructuredAddress(address: StructuredAddress): string {
+  const streetLine = [address.houseNumberName, address.street]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
+  return [
+    address.flatBuilding,
+    streetLine,
+    address.locality,
+    address.townCity,
+    address.county,
+    normalizeUkPostcode(address.postcode),
+  ]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
+function normalizeUkPostcode(postcode: string): string {
+  const compact = postcode.toUpperCase().replace(/\s+/g, "");
+  return compact.length > 3
+    ? `${compact.slice(0, -3)} ${compact.slice(-3)}`
+    : compact;
+}
+
+export function validateStructuredAddress(
+  address: StructuredAddress,
+): string | null {
+  if (!address.houseNumberName.trim())
+    return "Enter the house number or house name.";
+  if (!address.street.trim()) return "Enter the street.";
+  if (!address.townCity.trim()) return "Enter the town or city.";
+  const postcode = address.postcode.trim();
+  if (!postcode) return "Enter the postcode.";
+  if (!UK_POSTCODE_PATTERN.test(postcode))
+    return "Enter a valid UK postcode, for example BS1 5AH.";
+
+  const limits: Array<[string, string, number]> = [
+    ["Flat / building", address.flatBuilding, 100],
+    ["House number / name", address.houseNumberName, 100],
+    ["Street", address.street, 120],
+    ["Locality", address.locality, 100],
+    ["Town / city", address.townCity, 100],
+    ["County", address.county, 100],
+    ["Postcode", address.postcode, 20],
+  ];
+  for (const [label, value, maximum] of limits)
+    if (value.trim().length > maximum)
+      return `${label} must be ${maximum} characters or fewer.`;
+
+  return null;
+}
+
+function isStructuredAddress(value: unknown): value is StructuredAddress {
+  if (!value || typeof value !== "object") return false;
+  const address = value as Partial<StructuredAddress>;
+  return (
+    typeof address.flatBuilding === "string" &&
+    typeof address.houseNumberName === "string" &&
+    typeof address.street === "string" &&
+    typeof address.locality === "string" &&
+    typeof address.townCity === "string" &&
+    typeof address.county === "string" &&
+    typeof address.postcode === "string"
+  );
+}
+
 export function isAddressHistoryEntry(
   value: unknown,
   profileId?: string,
@@ -68,7 +145,7 @@ export function isAddressHistoryEntry(
     entry.id.length === 0 ||
     typeof entry.profileId !== "string" ||
     (profileId !== undefined && entry.profileId !== profileId) ||
-    typeof entry.fullAddress !== "string" ||
+    !isStructuredAddress(entry.address) ||
     typeof entry.startMonth !== "string" ||
     typeof entry.endMonth !== "string" ||
     typeof entry.isCurrent !== "boolean" ||
