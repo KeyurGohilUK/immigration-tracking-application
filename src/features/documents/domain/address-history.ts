@@ -360,6 +360,14 @@ export function calculateAddressHistoryCoverage(
     (requiredStartMonth !== null && !MONTH_PATTERN.test(requiredStartMonth))
   )
     throw new Error("Address-history month is invalid.");
+  if (requiredMonths === null && requiredStartMonth === null)
+    return {
+      requiredMonths: null,
+      applicableMonths: 0,
+      coveredMonths: 0,
+      complete: false,
+      gaps: [],
+    };
 
   const end = monthToIndex(asOfMonth);
   const start =
