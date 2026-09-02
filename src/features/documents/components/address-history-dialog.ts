@@ -127,10 +127,7 @@ export function resetAddressHistoryForm(
   const start = form.elements.namedItem("startMonth") as HTMLInputElement;
   start.value = suggestedStartMonth ?? "";
   start.readOnly = Boolean(suggestedStartMonth);
-  start.setAttribute(
-    "aria-readonly",
-    suggestedStartMonth ? "true" : "false",
-  );
+  start.setAttribute("aria-readonly", suggestedStartMonth ? "true" : "false");
   start.title = suggestedStartMonth
     ? "Start month is set automatically from the first uncovered month."
     : "";
