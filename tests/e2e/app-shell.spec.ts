@@ -316,7 +316,9 @@ test("guides Address History from the current address backwards", async ({
   await addressSection.locator("summary").click();
   await addressSection.getByRole("button", { name: "Add document" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
-  await expect(dialog.getByText("Current address", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByText("Current address", { exact: true }),
+  ).toBeVisible();
   await expect(
     dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
   ).toBeVisible();
