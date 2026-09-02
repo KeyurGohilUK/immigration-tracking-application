@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now labels the first address as Current address and subsequent entries as Previous address.",
+      "Saved Address History now labels entries as Current address, Previous address 1, Previous address 2, and so on.",
     ),
   ).toBeVisible();
   await expect(
@@ -316,11 +316,18 @@ test("guides Address History from the current address backwards", async ({
   await addressSection.locator("summary").click();
   await addressSection.getByRole("button", { name: "Add document" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(dialog.getByText("Current address", { exact: true })).toBeVisible();
   await expect(
     dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
   ).toBeVisible();
   await expect(
+    dialog.getByText("Previous address 1", { exact: true }),
+  ).toBeVisible();
+  await expect(
     dialog.getByText("2 Previous Road, Bristol, BS2 2BB"),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText("Previous address 2", { exact: true }),
   ).toBeVisible();
   await expect(
     dialog.getByText("1 First Street, Bristol, BS1 1AA"),
