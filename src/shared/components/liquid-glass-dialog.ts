@@ -47,7 +47,7 @@ export function renderLiquidGlassDialog({
       <div class="${headerClasses}">
         ${iconSvg ? `<div class="liquid-dialog-icon" aria-hidden="true">${iconSvg}</div>` : ""}
         <p class="eyebrow">${eyebrow}</p>
-        <h2 id="${labelledBy}">${title}</h2>
+        <h2 id="${labelledBy}" tabindex="-1" autofocus>${title}</h2>
         ${subtitle ? `<p${subtitleId ? ` id="${subtitleId}"` : ""} class="liquid-dialog-subtitle">${subtitle}</p>` : ""}
       </div>
       <div class="liquid-dialog-body">

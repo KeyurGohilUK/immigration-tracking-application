@@ -191,6 +191,8 @@ export function showAddressHistoryForm(
   }
   syncAddressEvidenceState(form, entry?.id, documents);
   if (!dialog.open) dialog.showModal();
+  dialog.setAttribute("tabindex", "-1");
+  dialog.focus({ preventScroll: true });
 }
 
 export function showNewCurrentAddressForm(
