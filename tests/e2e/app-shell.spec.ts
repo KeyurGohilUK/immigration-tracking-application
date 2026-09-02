@@ -308,11 +308,15 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
 
   const endMonthBox = await dialog.getByLabel("End month").boundingBox();
-  const evidenceBox = await dialog.locator("[data-address-evidence]").boundingBox();
+  const evidenceBox = await dialog
+    .locator("[data-address-evidence]")
+    .boundingBox();
   expect(endMonthBox).not.toBeNull();
   expect(evidenceBox).not.toBeNull();
   if (endMonthBox && evidenceBox)
-    expect(evidenceBox.y - (endMonthBox.y + endMonthBox.height)).toBeGreaterThan(8);
+    expect(
+      evidenceBox.y - (endMonthBox.y + endMonthBox.height),
+    ).toBeGreaterThan(8);
 
   await dialog
     .getByLabel("Previous address")
