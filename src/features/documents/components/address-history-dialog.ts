@@ -43,11 +43,11 @@ export function renderAddressHistoryDialog(
     iconSvg:
       '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4Z"/><path d="M9 20v-6h6v6"/></svg>',
     body: `<div class="address-history-modal">
+      <div data-address-new-current-host></div>
       <section class="address-coverage-card ${coverageClass}" aria-label="Address timeline coverage">
         <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
         ${gaps}
       </section>
-      <div data-address-new-current-host></div>
       ${entries.some(({ isCurrent }) => isCurrent) ? '<button id="address-add-new-current" class="secondary-button" type="button">Add new current address</button>' : ""}
       <section class="address-history-list" aria-label="Recorded addresses">
         ${renderAddressList(entries, documents)}
@@ -145,7 +145,15 @@ export function showAddressHistoryForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, guidedEndMonth, firstAddress);
-  placeAddressEntryForm(form, entry?.id ? "edit" : "previous", entry?.id);
+  placeAddressEntryForm(
+    form,
+    entry?.isCurrent || firstAddress
+      ? "current"
+      : entry?.id
+        ? "edit"
+        : "previous",
+    entry?.id,
+  );
   setAddressContextMode(form, entry ? "edit" : "previous");
   setAddressEntryVisibility(form, true);
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
@@ -238,14 +246,14 @@ export function resetAddressHistoryForm(
 
 function placeAddressEntryForm(
   form: HTMLFormElement,
-  mode: "previous" | "new-current" | "edit",
+  mode: "current" | "previous" | "new-current" | "edit",
   addressId?: string,
 ): void {
   const fields = form.querySelector<HTMLElement>("[data-address-entry-fields]");
   if (!fields) return;
 
   const host =
-    mode === "new-current"
+    mode === "current" || mode === "new-current"
       ? form.querySelector<HTMLElement>("[data-address-new-current-host]")
       : mode === "edit" && addressId
         ? form.querySelector<HTMLElement>(
