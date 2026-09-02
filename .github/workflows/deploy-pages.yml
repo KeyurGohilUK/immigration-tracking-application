@@ -30,6 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build application
+        env:
+          VITE_IDEAL_POSTCODES_API_KEY: ${{ secrets.IDEAL_POSTCODES_API_KEY }}
         run: npm run build
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
