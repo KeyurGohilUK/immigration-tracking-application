@@ -18,7 +18,7 @@ export function renderAddressHistoryDialog(
   const requiredLabel =
     coverage.requiredMonths === null
       ? "Required period will be based on the applicant’s supported settlement route."
-      : `${Math.round(coverage.requiredMonths / 12)} years required · ${coverage.coveredMonths} of ${coverage.requiredMonths} months covered`;
+      : `${Math.round(coverage.requiredMonths / 12)} years required · ${coverage.coveredMonths} of ${coverage.applicableMonths} applicable months covered`;
   const coverageClass = coverage.complete ? "is-complete" : "needs-attention";
   const guidedStartLabel = requiredStartMonth
     ? `Work backwards from your current address to ${formatMonth(requiredStartMonth)} based on qualifying permission history.`
