@@ -11,8 +11,7 @@ export interface StructuredAddress {
 }
 
 export interface AddressHistoryInput {
-  fullAddress: string;
-  address?: StructuredAddress;
+  address: StructuredAddress;
   startMonth: string;
   endMonth: string;
   isCurrent: boolean;
@@ -51,13 +50,8 @@ const FIVE_YEAR_ROUTES = new Set([
 export function validateAddressHistoryInput(
   input: AddressHistoryInput,
 ): string | null {
-  const address = input.fullAddress.trim();
-  if (address.length < 5 || address.length > 300)
-    return "Enter a complete address between 5 and 300 characters.";
-  if (input.address) {
-    const structuredError = validateStructuredAddress(input.address);
-    if (structuredError) return structuredError;
-  }
+  const structuredError = validateStructuredAddress(input.address);
+  if (structuredError) return structuredError;
   if (!MONTH_PATTERN.test(input.startMonth))
     return "Enter a valid address start month.";
   if (input.isCurrent) {
@@ -142,8 +136,7 @@ export function isAddressHistoryEntry(
     entry.id.length === 0 ||
     typeof entry.profileId !== "string" ||
     (profileId !== undefined && entry.profileId !== profileId) ||
-    typeof entry.fullAddress !== "string" ||
-    (entry.address !== undefined && !isStructuredAddress(entry.address)) ||
+    !isStructuredAddress(entry.address) ||
     typeof entry.startMonth !== "string" ||
     typeof entry.endMonth !== "string" ||
     typeof entry.isCurrent !== "boolean" ||
