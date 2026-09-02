@@ -377,7 +377,7 @@ test("guides Address History from the current address backwards", async ({
   ).toBeVisible();
   await expect(
     addressSection.getByText(
-      "Address timeline is complete. Upload supporting address evidence to complete this section.",
+      "Address History is partly recorded. Continue the timeline and add supporting evidence.",
       { exact: true },
     ),
   ).toBeVisible();
