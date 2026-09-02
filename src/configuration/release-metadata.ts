@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.13.1";
+export const APP_VERSION = "3.13.2";
 
 export const RELEASE_NOTES = [
-  "Address History edit and new-current forms now include Cancel so users can return to the saved timeline without making changes.",
+  "Address History now keeps the dialog open after Save, Cancel, and Delete while updating the timeline in place.",
 ] as const;
