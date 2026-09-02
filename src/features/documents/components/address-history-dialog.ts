@@ -51,10 +51,10 @@ export function renderAddressHistoryDialog(
       </section>
       <input name="addressId" type="hidden" />
       <div class="family-form-fields address-history-fields">
-        <div class="family-field family-field-wide"><label for="address-full">Full address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
+        <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
         <div class="family-field" data-address-end-field><label for="address-end">End month</label><input id="address-end" name="endMonth" type="month" /></div>
-        <label class="address-current-toggle family-field-wide" data-address-current-field><input id="address-current" name="isCurrent" type="checkbox" /><span>Current address</span></label>
+        <label class="address-current-toggle family-field-wide" data-address-current-field><input id="address-current" name="isCurrent" type="checkbox" /><span>This is my current address</span></label>
       </div>
       <div class="inline-evidence-attachment" data-address-evidence>
         <div class="inline-evidence-copy"><strong>Address evidence</strong><span>Optional · council tax, tenancy, bank, utility or other proof · PDF, JPG or PNG · up to 5 MB</span><small data-address-existing-evidence>No evidence attached yet</small></div>
@@ -177,6 +177,13 @@ export function syncAddressGuidedFields(
   const endField = form.querySelector<HTMLElement>("[data-address-end-field]");
   if (currentField) currentField.hidden = !isCurrentAddress;
   if (endField) endField.hidden = isCurrentAddress;
+  const addressLabel = form.querySelector<HTMLLabelElement>(
+    "[data-address-full-label]",
+  );
+  if (addressLabel)
+    addressLabel.textContent = isCurrentAddress
+      ? "Current address"
+      : "Previous address";
 
   const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
   if (!editing) current.disabled = true;
