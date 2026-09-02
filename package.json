@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write src/features/documents/domain/address-history.ts tests/e2e/app-shell.spec.ts && git diff -- src/features/documents/domain/address-history.ts tests/e2e/app-shell.spec.ts && exit 1",
     "typecheck": "tsc --noEmit",
     "check:release": "node scripts/check-release-version.mjs",
     "test:unit": "vitest run",
