@@ -336,8 +336,7 @@ test("guides Address History from the current address backwards", async ({
         (element) =>
           document.activeElement?.classList.contains(
             "liquid-dialog-initial-focus",
-          ) === true &&
-          element.contains(document.activeElement),
+          ) === true && element.contains(document.activeElement),
       ),
     )
     .toBe(true);
