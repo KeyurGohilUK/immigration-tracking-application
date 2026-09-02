@@ -1,6 +1,6 @@
 {
-  "version": "3.13.3",
+  "version": "3.14.0",
   "notes": [
-    "Address History now shows saved addresses in order on the Document Vault page and uses matching Cancel and Save buttons."
+    "Deleting an address now preserves and unlinks its evidence, while a missing current address is clearly flagged for review."
   ]
 }
