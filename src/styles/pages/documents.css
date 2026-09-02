@@ -834,6 +834,11 @@ html[data-theme="dark"] .vault-readiness-card {
   padding: 0.85rem;
 }
 
+.address-history-modal [data-address-entry-fields] {
+  display: grid;
+  gap: 1rem;
+}
+
 .address-history-fields {
   align-items: start;
 }
