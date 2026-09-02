@@ -924,6 +924,86 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 });
 
+test("manages Employment documents independently in one dialog", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Vault" }).first().click();
+
+  const employmentSection = page.locator('[data-vault-section="employment"]');
+  await expect(
+    employmentSection.getByText("To do", { exact: true }),
+  ).toBeVisible();
+  await employmentSection.locator("summary").click();
+  await employmentSection.getByRole("button", { name: "Add document" }).click();
+
+  let dialog = page.getByRole("dialog", { name: "Add employment documents" });
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.locator('[data-employment-upload="employer-letter"]'),
+  ).toBeVisible();
+  await expect(
+    dialog.locator('[data-employment-upload="employment-contract"]'),
+  ).toBeVisible();
+
+  const tinyPng = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+    "base64",
+  );
+  const employerForm = dialog.locator(
+    '[data-employment-upload="employer-letter"]',
+  );
+  await employerForm.getByLabel("Employer letter file").setInputFiles({
+    name: "employer-letter.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await employerForm.getByLabel("Document name").fill("Employer letter");
+  await employerForm
+    .getByRole("button", { name: "Encrypt and save employer letter" })
+    .click();
+
+  dialog = page.getByRole("dialog", { name: "Add employment documents" });
+  await expect(dialog).toBeVisible();
+  await expect(
+    employmentSection.getByText("Partial", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog
+      .locator('[data-employment-upload="employer-letter"]')
+      .getByText("Added", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog
+      .locator('[data-employment-upload="employment-contract"]')
+      .getByText("Pending", { exact: true }),
+  ).toBeVisible();
+
+  const contractForm = dialog.locator(
+    '[data-employment-upload="employment-contract"]',
+  );
+  await contractForm.getByLabel("Employment contract file").setInputFiles({
+    name: "employment-contract.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await contractForm.getByLabel("Document name").fill("Employment contract");
+  await contractForm
+    .getByRole("button", { name: "Encrypt and save employment contract" })
+    .click();
+
+  await expect(
+    employmentSection.getByText("Complete", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Employer letter" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Employment contract" }),
+  ).toBeVisible();
+});
+
 test("resets local data safely when the PIN is forgotten", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
