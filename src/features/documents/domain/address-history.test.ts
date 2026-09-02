@@ -7,6 +7,7 @@ import {
   getPreviousCalendarMonth,
   getRequiredAddressHistoryMonths,
   validateAddressHistoryCollection,
+  formatStructuredAddress,
   validateAddressHistoryInput,
   type AddressHistoryEntry,
 } from "./address-history";
@@ -23,7 +24,15 @@ function entry(
     version: 1,
     id,
     profileId: "owner",
-    fullAddress: `${id} Example Street, Bristol, BS1 1AA`,
+    address: {
+      flatBuilding: "",
+      houseNumberName: id,
+      street: "Example Street",
+      locality: "",
+      townCity: "Bristol",
+      county: "",
+      postcode: "BS1 1AA",
+    },
     startMonth,
     endMonth,
     isCurrent,
@@ -57,13 +66,55 @@ describe("address history", () => {
   it("requires complete month ranges for previous addresses", () => {
     expect(
       validateAddressHistoryInput({
-        fullAddress: "1 Example Street, Bristol",
+        address: {
+          flatBuilding: "",
+          houseNumberName: "1",
+          street: "Example Street",
+          locality: "",
+          townCity: "Bristol",
+          county: "",
+          postcode: "BS1 1AA",
+        },
         startMonth: "2023-01",
         endMonth: "",
         isCurrent: false,
         notes: "",
       }),
     ).toContain("end month");
+  });
+
+  it("formats structured UK addresses without empty optional parts", () => {
+    expect(
+      formatStructuredAddress({
+        flatBuilding: "Flat 4",
+        houseNumberName: "27",
+        street: "Blackhorse Lane",
+        locality: "",
+        townCity: "Bristol",
+        county: "",
+        postcode: "bs16 3xx",
+      }),
+    ).toBe("Flat 4, 27, Blackhorse Lane, Bristol, BS16 3XX");
+  });
+
+  it("rejects an invalid UK postcode", () => {
+    expect(
+      validateAddressHistoryInput({
+        address: {
+          flatBuilding: "",
+          houseNumberName: "1",
+          street: "Example Street",
+          locality: "",
+          townCity: "Bristol",
+          county: "",
+          postcode: "NOT A POSTCODE",
+        },
+        startMonth: "2025-01",
+        endMonth: "",
+        isCurrent: true,
+        notes: "",
+      }),
+    ).toContain("valid UK postcode");
   });
 
   it("rejects overlapping address periods", () => {
