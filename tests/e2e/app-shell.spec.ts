@@ -140,17 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now uses Save consistently when adding a new current address.",
-    ),
-  ).toBeVisible();
-  await expect(
-    page.getByText(
-      "Security PIN now follows the app theme with a light Liquid Glass appearance in light mode.",
-    ),
-  ).toBeVisible();
-  await expect(
-    page.getByText(
-      "Liquid Glass dialogs now focus their title on open instead of visually preselecting Close; Address History spacing is also tightened.",
+      "Dialogs now open without visibly preselecting any control, and Address History uses even spacing around Add new current address.",
     ),
   ).toBeVisible();
   await expect(
