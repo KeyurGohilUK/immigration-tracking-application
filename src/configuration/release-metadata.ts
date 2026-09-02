@@ -1,5 +1,6 @@
-export const APP_VERSION = "3.19.5";
+export const APP_VERSION = "3.20.0";
 
 export const RELEASE_NOTES = [
-  "Identity & Immigration is hidden from the Document Vault checklist and no longer affects readiness progress; those document types remain available through Add document.",
+  "Profile & Settings is organised into collapsed-by-default sections so controls only appear when needed.",
+  "Theme selection now uses a three-position Dark, System, Light segmented control with System in the centre.",
 ] as const;
