@@ -125,8 +125,9 @@ export function showAddressHistoryForm(
     end.value = entry.endMonth;
     end.readOnly = false;
     end.setAttribute("aria-readonly", "false");
-    (form.elements.namedItem("isCurrent") as HTMLInputElement).checked =
-      entry.isCurrent;
+    const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
+    current.checked = entry.isCurrent;
+    current.disabled = false;
     syncAddressEndState(form);
   }
   syncAddressEvidenceState(form, entry?.id, documents);
@@ -148,6 +149,7 @@ export function resetAddressHistoryForm(
   const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
   const end = form.elements.namedItem("endMonth") as HTMLInputElement;
   current.checked = firstAddress;
+  current.disabled = firstAddress || Boolean(guidedEndMonth);
   end.value = guidedEndMonth ?? "";
   end.readOnly = Boolean(guidedEndMonth);
   end.setAttribute("aria-readonly", guidedEndMonth ? "true" : "false");
