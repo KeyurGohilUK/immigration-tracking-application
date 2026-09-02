@@ -5,6 +5,12 @@ import {
   type AddressHistoryInput,
 } from "../domain/address-history";
 import type { DocumentMetadata } from "../domain/document";
+import {
+  isUkAddressLookupConfigured,
+  lookupUkAddresses,
+  normalizeUkPostcode,
+  type UkAddressSuggestion,
+} from "../services/uk-address-lookup";
 
 export function renderAddressHistoryDialog(
   entries: readonly AddressHistoryEntry[],
@@ -57,7 +63,17 @@ export function renderAddressHistoryDialog(
       <div data-address-previous-host>
       <div data-address-entry-fields${requiredTimelineReached ? " hidden" : ""}>
       <div class="family-form-fields address-history-fields">
-        <div class="family-field family-field-wide"><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3" required></textarea></div>
+        <section class="address-postcode-card family-field-wide" aria-labelledby="address-postcode-label">
+          <div class="address-postcode-copy"><strong id="address-postcode-label">Find your UK address</strong><span>Enter the postcode, then choose the correct address.</span><small>Lookup uses Ideal Postcodes. Only the postcode is sent when you search.</small></div>
+          <div class="address-postcode-row">
+            <div class="family-field"><label for="address-postcode">UK postcode</label><input id="address-postcode" name="addressPostcode" type="text" maxlength="8" autocomplete="postal-code" autocapitalize="characters" spellcheck="false" placeholder="e.g. BS1 5AH" /></div>
+            <button class="secondary-button" data-address-postcode-lookup type="button">Find address</button>
+          </div>
+          <p class="field-guidance address-lookup-status" data-address-lookup-status aria-live="polite">Enter your postcode to find the address.</p>
+          <div class="family-field" data-address-lookup-results hidden><label for="address-result">Select address</label><select id="address-result" data-address-result><option value="">Choose an address</option></select></div>
+          <button class="member-action address-manual-toggle" data-address-manual-toggle type="button">Enter address manually</button>
+        </section>
+        <div class="family-field family-field-wide" data-address-manual-fields><label for="address-full" data-address-full-label>Current address</label><textarea id="address-full" name="fullAddress" maxlength="300" rows="3"></textarea></div>
         <div class="family-field"><label for="address-start">Start month</label><input id="address-start" name="startMonth" type="month" required /></div>
         <div class="family-field" data-address-end-field><label for="address-end">End month</label><input id="address-end" name="endMonth" type="month" /></div>
         <label class="address-current-toggle family-field-wide" data-address-current-field><input id="address-current" name="isCurrent" type="checkbox" /><span>This is my current address</span></label>
@@ -145,6 +161,7 @@ export function showAddressHistoryForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, guidedEndMonth, firstAddress);
+  resetAddressLookupUi(form, Boolean(entry));
   placeAddressEntryForm(
     form,
     entry?.isCurrent || firstAddress
@@ -195,6 +212,7 @@ export function showNewCurrentAddressForm(
   const form = root.querySelector<HTMLFormElement>("#address-history-form");
   if (!dialog || !form) throw new Error("Address History form is unavailable.");
   resetAddressHistoryForm(form, null, true);
+  resetAddressLookupUi(form, false);
   placeAddressEntryForm(form, "new-current");
   setAddressContextMode(form, "new-current");
   setAddressEntryVisibility(form, true);
@@ -242,6 +260,7 @@ export function resetAddressHistoryForm(
   syncAddressGuidedFields(form, firstAddress, false);
   syncAddressEndState(form);
   syncAddressEvidenceState(form, undefined, []);
+  resetAddressLookupUi(form, false);
 }
 
 function placeAddressEntryForm(
@@ -325,6 +344,166 @@ export function syncAddressGuidedFields(
 
   const current = form.elements.namedItem("isCurrent") as HTMLInputElement;
   if (!editing) current.disabled = true;
+}
+
+export function wireAddressPostcodeLookup(form: HTMLFormElement): void {
+  const lookupButton = form.querySelector<HTMLButtonElement>(
+    "[data-address-postcode-lookup]",
+  );
+  const postcodeInput = form.elements.namedItem(
+    "addressPostcode",
+  ) as HTMLInputElement | null;
+  const resultField = form.querySelector<HTMLElement>(
+    "[data-address-lookup-results]",
+  );
+  const resultSelect = form.querySelector<HTMLSelectElement>(
+    "[data-address-result]",
+  );
+  const status = form.querySelector<HTMLElement>(
+    "[data-address-lookup-status]",
+  );
+  const manualToggle = form.querySelector<HTMLButtonElement>(
+    "[data-address-manual-toggle]",
+  );
+  const fullAddress = form.elements.namedItem(
+    "fullAddress",
+  ) as HTMLTextAreaElement | null;
+
+  if (
+    !lookupButton ||
+    !postcodeInput ||
+    !resultField ||
+    !resultSelect ||
+    !status ||
+    !manualToggle ||
+    !fullAddress
+  )
+    return;
+
+  let suggestions: UkAddressSuggestion[] = [];
+
+  const showManual = (): void => {
+    setAddressManualEntry(form, true);
+    manualToggle.textContent = "Use postcode lookup";
+    fullAddress.focus();
+  };
+
+  manualToggle.addEventListener("click", () => {
+    const manualFields = form.querySelector<HTMLElement>(
+      "[data-address-manual-fields]",
+    );
+    const isManual = !manualFields?.hidden;
+    if (isManual && isUkAddressLookupConfigured()) {
+      setAddressManualEntry(form, false);
+      manualToggle.textContent = "Enter address manually";
+      postcodeInput.focus();
+      return;
+    }
+    showManual();
+  });
+
+  postcodeInput.addEventListener("blur", () => {
+    postcodeInput.value = normalizeUkPostcode(postcodeInput.value);
+  });
+
+  resultSelect.addEventListener("change", () => {
+    const selected = suggestions.find(({ id }) => id === resultSelect.value);
+    if (!selected) return;
+    fullAddress.value = selected.fullAddress;
+    setAddressManualEntry(form, false);
+    manualToggle.textContent = "Enter address manually";
+    status.textContent = "Address selected. You can now add the dates and save.";
+  });
+
+  lookupButton.addEventListener("click", async () => {
+    lookupButton.disabled = true;
+    status.textContent = "Finding addresses…";
+    resultField.hidden = true;
+    resultSelect.replaceChildren(new Option("Choose an address", ""));
+    suggestions = [];
+    try {
+      suggestions = await lookupUkAddresses(postcodeInput.value);
+      postcodeInput.value = normalizeUkPostcode(postcodeInput.value);
+      if (suggestions.length === 0) {
+        status.textContent =
+          "No addresses were found for that postcode. Enter the address manually.";
+        showManual();
+        return;
+      }
+      for (const suggestion of suggestions)
+        resultSelect.add(new Option(suggestion.label, suggestion.id));
+      resultField.hidden = false;
+      status.textContent = `${suggestions.length} address${suggestions.length === 1 ? "" : "es"} found. Choose yours from the list.`;
+      resultSelect.focus();
+    } catch (error) {
+      status.textContent =
+        error instanceof Error
+          ? error.message
+          : "Address lookup is temporarily unavailable. Enter the address manually.";
+      showManual();
+    } finally {
+      lookupButton.disabled = false;
+    }
+  });
+}
+
+function resetAddressLookupUi(
+  form: HTMLFormElement,
+  editingExistingAddress: boolean,
+): void {
+  const postcodeInput = form.elements.namedItem(
+    "addressPostcode",
+  ) as HTMLInputElement | null;
+  const resultField = form.querySelector<HTMLElement>(
+    "[data-address-lookup-results]",
+  );
+  const resultSelect = form.querySelector<HTMLSelectElement>(
+    "[data-address-result]",
+  );
+  const status = form.querySelector<HTMLElement>(
+    "[data-address-lookup-status]",
+  );
+  const manualToggle = form.querySelector<HTMLButtonElement>(
+    "[data-address-manual-toggle]",
+  );
+
+  if (postcodeInput) postcodeInput.value = "";
+  if (resultField) resultField.hidden = true;
+  if (resultSelect)
+    resultSelect.replaceChildren(new Option("Choose an address", ""));
+
+  const lookupConfigured = isUkAddressLookupConfigured();
+  setAddressManualEntry(form, editingExistingAddress || !lookupConfigured);
+
+  if (manualToggle)
+    manualToggle.textContent =
+      editingExistingAddress || !lookupConfigured
+        ? lookupConfigured
+          ? "Use postcode lookup"
+          : "Address lookup unavailable"
+        : "Enter address manually";
+  if (manualToggle) manualToggle.disabled = !lookupConfigured;
+
+  if (status)
+    status.textContent = !lookupConfigured
+      ? "Postcode lookup is not configured on this deployment. Enter the address manually."
+      : editingExistingAddress
+        ? "You can edit this address manually or use a postcode to replace it."
+        : "Enter your postcode to find the address.";
+}
+
+function setAddressManualEntry(
+  form: HTMLFormElement,
+  visible: boolean,
+): void {
+  const fields = form.querySelector<HTMLElement>(
+    "[data-address-manual-fields]",
+  );
+  const fullAddress = form.elements.namedItem(
+    "fullAddress",
+  ) as HTMLTextAreaElement | null;
+  if (fields) fields.hidden = !visible;
+  if (fullAddress) fullAddress.required = visible;
 }
 
 export function syncAddressEndState(form: HTMLFormElement): void {
