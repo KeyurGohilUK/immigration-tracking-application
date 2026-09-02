@@ -27,6 +27,8 @@ product roadmap.
       optional evidence.
 - [x] Capture English requirement status, evidence type, certificate/reference
       number, and optional evidence.
+- [x] Keep Life in the UK and English evidence uploads inline within the
+      requirement modal instead of opening a second upload modal.
 - [ ] Add structured employment metadata (employer, job title, sponsorship
       status, dates, salary) and time-aware final employer-letter status.
 - [ ] Add explicit Not applicable handling for conditional requirements.
@@ -54,3 +56,5 @@ product roadmap.
   requirement.
 - Keep all document and structured evidence data encrypted and local to the
   device.
+- Requirement-specific modals should keep related evidence uploads inline where
+  practical; avoid nested upload modals.

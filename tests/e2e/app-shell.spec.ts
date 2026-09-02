@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Aligned iPhone date and select controls to the same Liquid Glass height with vertically centred date text.",
+      "Added inline encrypted evidence attachments to the Life in the UK and English modal so users can save details and files in one flow.",
     ),
   ).toBeVisible();
   await expect(
@@ -340,9 +340,38 @@ test("stores and manages encrypted documents for a profile", async ({
   await lifeEnglishDialog
     .getByLabel("Certificate / reference number")
     .fill("ENG-TEST-456");
+  const tinyPng = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+    "base64",
+  );
+  await lifeEnglishDialog.getByLabel("Life in the UK evidence").setInputFiles({
+    name: "life-test-evidence.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await lifeEnglishDialog.getByLabel("English evidence").setInputFiles({
+    name: "english-test-evidence.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await expect(
+    lifeEnglishDialog.getByText("life-test-evidence.png"),
+  ).toBeVisible();
+  await expect(
+    lifeEnglishDialog.getByText("english-test-evidence.png"),
+  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Add document" })).toHaveCount(
+    0,
+  );
   await lifeEnglishDialog.getByRole("button", { name: "Save details" }).click();
   await expect(
     page.locator('[data-vault-section="life-english"]').getByText("Complete"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "life test evidence" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "english test evidence" }),
   ).toBeVisible();
 
   const identitySection = page.locator(
@@ -430,7 +459,15 @@ test("stores and manages encrypted documents for a profile", async ({
 
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete Council tax bill" }).click();
-  await expect(page.getByText("No documents added yet")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Council tax bill" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "life test evidence" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "english test evidence" }),
+  ).toBeVisible();
 });
 
 test("resets local data safely when the PIN is forgotten", async ({ page }) => {

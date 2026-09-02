@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.6.3";
+export const APP_VERSION = "3.7.0";
 
 export const RELEASE_NOTES = [
-  "Aligned iPhone date and select controls to the same Liquid Glass height with vertically centred date text.",
+  "Added inline encrypted evidence attachments to the Life in the UK and English modal so users can save details and files in one flow.",
 ] as const;

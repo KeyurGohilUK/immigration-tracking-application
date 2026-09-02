@@ -113,8 +113,10 @@ import {
   syncAddressEndState,
 } from "../features/documents/components/address-history-dialog";
 import {
+  readLifeEnglishEvidenceFiles,
   readLifeEnglishForm,
   showLifeEnglishForm,
+  syncLifeEnglishEvidenceNames,
   syncLifeEnglishForm,
 } from "../features/documents/components/life-english-dialog";
 import {
@@ -743,21 +745,20 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ?.addEventListener("change", () =>
           syncLifeEnglishForm(lifeEnglishForm),
         );
-      lifeEnglishForm
-        ?.querySelector<HTMLButtonElement>("[data-add-life-evidence]")
-        ?.addEventListener("click", () => {
-          lifeEnglishDialog?.close();
-          showDocumentUploadForm(root, "life-in-uk");
-        });
-      lifeEnglishForm
-        ?.querySelector<HTMLButtonElement>("[data-add-english-evidence]")
-        ?.addEventListener("click", () => {
-          lifeEnglishDialog?.close();
-          showDocumentUploadForm(root, "english-language");
-        });
+      if (lifeEnglishForm) {
+        for (const evidenceInput of lifeEnglishForm.querySelectorAll<HTMLInputElement>(
+          'input[type="file"]',
+        )) {
+          evidenceInput.addEventListener("change", () =>
+            syncLifeEnglishEvidenceNames(lifeEnglishForm),
+          );
+        }
+      }
       lifeEnglishForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
         const input = readLifeEnglishForm(lifeEnglishForm);
+        const { lifeEvidence, englishEvidence } =
+          readLifeEnglishEvidenceFiles(lifeEnglishForm);
         const error = lifeEnglishForm.querySelector<HTMLElement>(
           "#life-english-error",
         );
@@ -769,6 +770,108 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           return;
         }
+        const evidenceUploads = [
+          lifeEvidence
+            ? { file: lifeEvidence, category: "life-in-uk" as const }
+            : null,
+          englishEvidence
+            ? { file: englishEvidence, category: "english-language" as const }
+            : null,
+        ].filter(
+          (
+            upload,
+          ): upload is {
+            file: File;
+            category: "life-in-uk" | "english-language";
+          } => upload !== null,
+        );
+        const profileDocuments = documents.filter(
+          ({ profileId }) => profileId === selectedProfileId,
+        );
+        if (
+          profileDocuments.length + evidenceUploads.length >
+          MAXIMUM_DOCUMENTS_PER_PROFILE
+        ) {
+          if (error) {
+            error.textContent =
+              "This profile has reached the maximum number of stored documents.";
+            error.hidden = false;
+          }
+          return;
+        }
+        const existingBytes = documents.reduce(
+          (total, document) => total + document.size,
+          0,
+        );
+        const addedBytes = evidenceUploads.reduce(
+          (total, { file }) => total + file.size,
+          0,
+        );
+        if (existingBytes + addedBytes > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
+          if (error) {
+            error.textContent =
+              "These evidence files would exceed the 50 MB encrypted storage limit.";
+            error.hidden = false;
+          }
+          return;
+        }
+
+        const preparedEvidence: {
+          metadata: DocumentMetadata;
+          bytes: Uint8Array<ArrayBuffer>;
+        }[] = [];
+        const nextSortOrder =
+          Math.max(-1, ...profileDocuments.map(({ sortOrder }) => sortOrder)) +
+          1;
+        for (const [index, upload] of evidenceUploads.entries()) {
+          const mimeType = resolveDocumentMimeType(
+            upload.file.name,
+            upload.file.type,
+          );
+          const displayName = suggestDocumentName(upload.file.name);
+          const uploadError = validateDocumentUploadInput({
+            displayName,
+            category: upload.category,
+            fileName: upload.file.name,
+            mimeType: mimeType ?? upload.file.type,
+            size: upload.file.size,
+          });
+          if (uploadError || !mimeType) {
+            if (error) {
+              error.textContent =
+                uploadError ?? "Choose a PDF, JPG, or PNG evidence file.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const bytes = new Uint8Array(await upload.file.arrayBuffer());
+          const signatureError = validateDocumentSignature(mimeType, bytes);
+          if (signatureError) {
+            if (error) {
+              error.textContent = signatureError;
+              error.hidden = false;
+            }
+            return;
+          }
+          const timestamp = new Date().toISOString();
+          preparedEvidence.push({
+            metadata: {
+              version: 1,
+              id: crypto.randomUUID(),
+              profileId: selectedProfileId,
+              displayName,
+              fileName: upload.file.name,
+              mimeType,
+              size: upload.file.size,
+              category: upload.category,
+              sortOrder: nextSortOrder + index,
+              createdAt: timestamp,
+              updatedAt: timestamp,
+            },
+            bytes,
+          });
+        }
+
         const timestamp = new Date().toISOString();
         const nextRecord: LifeEnglishRecord = {
           version: 1,
@@ -782,6 +885,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
         if (submit) submit.disabled = true;
         try {
+          await Promise.all(
+            preparedEvidence.map(({ metadata, bytes }) =>
+              saveDocument(metadata, bytes, key),
+            ),
+          );
           await saveLifeEnglishRecord(selectedProfileId, nextRecord, key);
           lifeEnglishCache.set(selectedProfileId, nextRecord);
           lifeEnglishDialog?.close();
@@ -789,7 +897,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         } catch {
           if (error) {
             error.textContent =
-              "The encrypted Life in the UK and English details could not be saved.";
+              "The Life in the UK and English details or evidence could not be saved.";
             error.hidden = false;
           }
           if (submit) submit.disabled = false;

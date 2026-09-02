@@ -1,6 +1,6 @@
 {
-  "version": "3.6.3",
+  "version": "3.7.0",
   "notes": [
-    "Aligned iPhone date and select controls to the same Liquid Glass height with vertically centred date text."
+    "Added inline encrypted evidence attachments to the Life in the UK and English modal so users can save details and files in one flow."
   ]
 }

@@ -5,8 +5,17 @@ import {
   type LifeEnglishRecord,
   type LifeInUkStatus,
 } from "../domain/life-english";
+import type { DocumentMetadata } from "../domain/document";
 
-export function renderLifeEnglishDialog(): string {
+export function renderLifeEnglishDialog(
+  documents: readonly DocumentMetadata[],
+): string {
+  const lifeEvidence = documents.filter(
+    ({ category }) => category === "life-in-uk",
+  );
+  const englishEvidence = documents.filter(
+    ({ category }) => category === "english-language",
+  );
   return renderLiquidGlassDialog({
     id: "life-english-dialog",
     labelledBy: "life-english-title",
@@ -25,7 +34,13 @@ export function renderLifeEnglishDialog(): string {
           <div class="family-field family-field-wide" data-life-passed-details><label for="life-pass-date">Passed date</label><input id="life-pass-date" name="lifeInUkPassedDate" type="date" /></div>
           <div class="family-field family-field-wide" data-life-passed-details><label for="life-reference">UAN / reference number <span class="optional-label">Optional</span></label><input id="life-reference" name="lifeInUkReference" maxlength="120" autocomplete="off" /></div>
         </div>
-        <button type="button" class="secondary-button" data-add-life-evidence>Add Life in the UK evidence</button>
+        ${renderEvidenceAttachment(
+          "life-evidence-file",
+          "lifeEvidenceFile",
+          "Life in the UK evidence",
+          lifeEvidence,
+          "life",
+        )}
       </section>
       <section class="life-english-panel">
         <div class="section-heading"><div><p class="eyebrow">English requirement</p><h3>Evidence details</h3></div></div>
@@ -34,7 +49,13 @@ export function renderLifeEnglishDialog(): string {
           <div class="family-field family-field-wide" data-english-met-details><label for="english-evidence-type">Evidence type</label><input id="english-evidence-type" name="englishEvidenceType" maxlength="120" placeholder="e.g. approved qualification" /></div>
           <div class="family-field family-field-wide" data-english-met-details><label for="english-reference">Certificate / reference number <span class="optional-label">Optional</span></label><input id="english-reference" name="englishReference" maxlength="120" autocomplete="off" /></div>
         </div>
-        <button type="button" class="secondary-button" data-add-english-evidence>Add English evidence</button>
+        ${renderEvidenceAttachment(
+          "english-evidence-file",
+          "englishEvidenceFile",
+          "English evidence",
+          englishEvidence,
+          "english",
+        )}
       </section>
       <div class="family-field"><label for="life-english-notes">Notes <span class="optional-label">Optional</span></label><textarea id="life-english-notes" name="notes" maxlength="500" rows="3"></textarea></div>
       <p id="life-english-error" class="form-error" role="alert" hidden></p>
@@ -89,9 +110,7 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
     "[data-life-passed-details]",
   ))
     field.hidden = lifeStatus !== "passed";
-  const lifeEvidence = form.querySelector<HTMLButtonElement>(
-    "[data-add-life-evidence]",
-  );
+  const lifeEvidence = form.querySelector<HTMLElement>("[data-life-evidence]");
   if (lifeEvidence) lifeEvidence.hidden = lifeStatus === "not-recorded";
 
   const englishStatus = (
@@ -107,8 +126,8 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
     "[data-english-met-details]",
   ))
     field.hidden = englishStatus !== "met";
-  const englishEvidence = form.querySelector<HTMLButtonElement>(
-    "[data-add-english-evidence]",
+  const englishEvidence = form.querySelector<HTMLElement>(
+    "[data-english-evidence]",
   );
   if (englishEvidence)
     englishEvidence.hidden = englishStatus === "not-recorded";
@@ -129,4 +148,65 @@ export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {
     englishReference: String(data.get("englishReference") ?? "").trim(),
     notes: String(data.get("notes") ?? "").trim(),
   };
+}
+
+export function readLifeEnglishEvidenceFiles(form: HTMLFormElement): {
+  lifeEvidence: File | null;
+  englishEvidence: File | null;
+} {
+  const lifeInput = form.elements.namedItem(
+    "lifeEvidenceFile",
+  ) as HTMLInputElement | null;
+  const englishInput = form.elements.namedItem(
+    "englishEvidenceFile",
+  ) as HTMLInputElement | null;
+  return {
+    lifeEvidence: lifeInput?.files?.[0] ?? null,
+    englishEvidence: englishInput?.files?.[0] ?? null,
+  };
+}
+
+export function syncLifeEnglishEvidenceNames(form: HTMLFormElement): void {
+  syncEvidenceName(form, "lifeEvidenceFile", "[data-life-evidence-name]");
+  syncEvidenceName(form, "englishEvidenceFile", "[data-english-evidence-name]");
+}
+
+function syncEvidenceName(
+  form: HTMLFormElement,
+  inputName: string,
+  selector: string,
+): void {
+  const input = form.elements.namedItem(inputName) as HTMLInputElement | null;
+  const label = form.querySelector<HTMLElement>(selector);
+  if (!label || !input) return;
+  label.textContent = input.files?.[0]?.name ?? "No new file selected";
+}
+
+function renderEvidenceAttachment(
+  id: string,
+  name: string,
+  label: string,
+  existing: readonly DocumentMetadata[],
+  type: "life" | "english",
+): string {
+  const existingLabel =
+    existing.length === 0
+      ? "No evidence attached yet"
+      : existing.length === 1
+        ? `Attached: ${escapeHtml(existing[0]?.displayName ?? "")}`
+        : `${existing.length} evidence files already attached`;
+  return `<div class="inline-evidence-attachment" data-${type}-evidence>
+    <div class="inline-evidence-copy"><strong>${label}</strong><span>Optional · PDF, JPG or PNG · up to 5 MB</span><small>${existingLabel}</small></div>
+    <label class="inline-evidence-picker" for="${id}"><span>Choose file</span><input id="${id}" name="${name}" type="file" aria-label="${label}" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label>
+    <span class="inline-evidence-file-name" data-${type}-evidence-name>No new file selected</span>
+  </div>`;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
