@@ -933,7 +933,6 @@ html[data-theme="dark"] .vault-readiness-card {
   display: none;
 }
 
-
 [data-address-new-current-host] > [data-address-entry-fields] {
   padding: 0.85rem;
   border: 1px solid var(--glass-border);
