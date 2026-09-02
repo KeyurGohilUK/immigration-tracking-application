@@ -140,7 +140,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now shows Partial while supporting evidence is still outstanding and reserves Needs attention for timeline issues.",
+      "Address History now explains why a section is Partial when the timeline is complete but supporting evidence is still missing.",
     ),
   ).toBeVisible();
   await expect(
