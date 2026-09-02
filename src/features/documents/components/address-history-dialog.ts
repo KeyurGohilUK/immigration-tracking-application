@@ -43,11 +43,11 @@ export function renderAddressHistoryDialog(
     iconSvg:
       '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4Z"/><path d="M9 20v-6h6v6"/></svg>',
     body: `<div class="address-history-modal">
-      <div data-address-new-current-host></div>
       <section class="address-coverage-card ${coverageClass}" aria-label="Address timeline coverage">
         <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
         ${gaps}
       </section>
+      <div data-address-new-current-host></div>
       ${entries.some(({ isCurrent }) => isCurrent) ? '<button id="address-add-new-current" class="secondary-button" type="button">Add new current address</button>' : ""}
       <section class="address-history-list" aria-label="Recorded addresses">
         ${renderAddressList(entries, documents)}
