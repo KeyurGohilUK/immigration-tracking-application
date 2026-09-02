@@ -731,6 +731,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         button.addEventListener("click", () => {
           const sectionId = button.dataset.addVaultSection;
           if (sectionId === "address-history") {
+            if (addressCoverage.complete) {
+              addressDialog?.showModal();
+              return;
+            }
             const hasCurrentAddress = addressHistory.some(
               ({ isCurrent }) => isCurrent,
             );
