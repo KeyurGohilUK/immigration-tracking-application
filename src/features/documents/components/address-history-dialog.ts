@@ -193,8 +193,6 @@ export function showAddressHistoryForm(
   if (!dialog.open) dialog.showModal();
   dialog.setAttribute("tabindex", "-1");
   dialog.focus({ preventScroll: true });
-  dialog.setAttribute("tabindex", "-1");
-  dialog.focus({ preventScroll: true });
 }
 
 export function showNewCurrentAddressForm(
