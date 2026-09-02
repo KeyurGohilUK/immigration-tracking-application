@@ -332,7 +332,13 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog).toBeVisible();
   await expect
     .poll(() =>
-      dialog.evaluate((element) => document.activeElement === element),
+      dialog.evaluate(
+        (element) =>
+          document.activeElement?.classList.contains(
+            "liquid-dialog-initial-focus",
+          ) === true &&
+          element.contains(document.activeElement),
+      ),
     )
     .toBe(true);
   await expect(dialog.getByText("No addresses recorded yet")).toHaveCount(0);
