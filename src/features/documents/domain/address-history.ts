@@ -68,18 +68,28 @@ export function validateAddressHistoryInput(
 }
 
 export function formatStructuredAddress(address: StructuredAddress): string {
+  const streetLine = [address.houseNumberName, address.street]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
   return [
     address.flatBuilding,
-    address.houseNumberName,
-    address.street,
+    streetLine,
     address.locality,
     address.townCity,
     address.county,
-    address.postcode.toUpperCase(),
+    normalizeUkPostcode(address.postcode),
   ]
     .map((part) => part.trim())
     .filter(Boolean)
     .join(", ");
+}
+
+function normalizeUkPostcode(postcode: string): string {
+  const compact = postcode.toUpperCase().replace(/\s+/g, "");
+  return compact.length > 3
+    ? `${compact.slice(0, -3)} ${compact.slice(-3)}`
+    : compact;
 }
 
 export function validateStructuredAddress(
