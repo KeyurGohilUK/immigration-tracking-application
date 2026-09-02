@@ -296,8 +296,14 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await page.getByRole("button", { name: "Enter 1" }).click();
   const filledIndicator = page.locator("[data-pin-indicator].is-filled");
   await expect(filledIndicator).toHaveCount(1);
-  await expect(filledIndicator).toHaveCSS("background-image", /linear-gradient/);
-  await expect(filledIndicator).toHaveCSS("border-color", "rgba(0, 0, 0, 0)");
+  await expect(filledIndicator).toHaveCSS(
+    "background-image",
+    /linear-gradient/,
+  );
+  await expect(filledIndicator).toHaveCSS(
+    "border-color",
+    "rgba(0, 0, 0, 0)",
+  );
   await page.evaluate(() =>
     document.documentElement.setAttribute("data-theme", "light"),
   );
