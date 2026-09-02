@@ -728,9 +728,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           .querySelector<HTMLDialogElement>("#address-history-dialog")
           ?.showModal();
       };
-      const employmentDialog = root.querySelector<HTMLDialogElement>(
-        "#employment-dialog",
-      );
+      const employmentDialog =
+        root.querySelector<HTMLDialogElement>("#employment-dialog");
       const lifeEnglishDialog = root.querySelector<HTMLDialogElement>(
         "#life-english-dialog",
       );
