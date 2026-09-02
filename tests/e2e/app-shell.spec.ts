@@ -512,9 +512,7 @@ test("guides Address History from the current address backwards", async ({
     reopenedNewCurrentHost.getByLabel("House number / name"),
   ).toBeVisible();
   await expect(
-    reopenedNewCurrentHost.getByRole("button", {
-      name: "Save",
-    }),
+    reopenedNewCurrentHost.getByRole("button", { name: "Save" }),
   ).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeHidden();
   await fillStructuredAddress(reopenedNewCurrentHost, {
@@ -524,9 +522,7 @@ test("guides Address History from the current address backwards", async ({
     postcode: "BS4 4DD",
   });
   await dialog.getByLabel("Start month").fill("2026-09");
-  await dialog
-    .getByRole("button", { name: "Save" })
-    .click();
+  await dialog.getByRole("button", { name: "Save" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
   await expect(
