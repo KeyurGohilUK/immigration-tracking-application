@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Identity & Immigration is hidden from the Document Vault checklist and no longer affects readiness progress; those document types remain available through Add document.",
+      "Employment now uses one dialog with independent Employer letter and Employment contract uploads, progressing from To do to Partial to Complete.",
     ),
   ).toBeVisible();
   await expect(
