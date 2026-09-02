@@ -1,6 +1,6 @@
 {
-  "version": "3.19.2",
+  "version": "3.19.3",
   "notes": [
-    "Address History now explains why a section is Partial when the timeline is complete but supporting evidence is still missing."
+    "Mobile zoom is now locked to keep the app viewport stable during use."
   ]
 }

@@ -169,8 +169,8 @@ const htmlRequirements = [
   [/^<!doctype html>/i, "index.html must declare the HTML5 doctype."],
   [/<html\s+lang="en-GB">/i, 'index.html must declare lang="en-GB".'],
   [
-    /<meta\s+name="viewport"[^>]*viewport-fit=cover/i,
-    "index.html must keep the responsive viewport metadata including viewport-fit=cover.",
+    /<meta\s+name="viewport"[^>]*maximum-scale=1(?:\.0)?[^>]*user-scalable=no[^>]*viewport-fit=cover/i,
+    "index.html must keep the locked mobile viewport metadata including maximum-scale=1, user-scalable=no, and viewport-fit=cover.",
   ],
   [/<title>[^<]+<\/title>/i, "index.html must have a document title."],
   [
