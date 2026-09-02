@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Saved Address History now labels entries as Current address, Previous address 1, Previous address 2, and so on.",
+      "Address History now shows Partial as soon as an address is saved and Complete when the required timeline is fully covered.",
     ),
   ).toBeVisible();
   await expect(
@@ -287,6 +287,9 @@ test("guides Address History from the current address backwards", async ({
 
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(dialog).toBeVisible();
+  await expect(
+    addressSection.getByText("Partial", { exact: true }),
+  ).toBeVisible();
   await expect(dialog.getByLabel("This is my current address")).toBeHidden();
   await expect(dialog.getByLabel("Previous address")).toBeVisible();
   await expect(dialog.getByLabel("End month")).toBeVisible();
@@ -312,6 +315,9 @@ test("guides Address History from the current address backwards", async ({
   await dialog.getByLabel("Start month").fill("2021-09");
   await dialog.getByRole("button", { name: "Save & continue" }).click();
   await expect(dialog).toHaveCount(0);
+  await expect(
+    addressSection.getByText("Complete", { exact: true }),
+  ).toBeVisible();
 
   await addressSection.locator("summary").click();
   await addressSection.getByRole("button", { name: "Add document" }).click();
