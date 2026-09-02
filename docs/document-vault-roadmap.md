@@ -58,3 +58,6 @@ product roadmap.
   device.
 - Requirement-specific modals should keep related evidence uploads inline where
   practical; avoid nested upload modals.
+- Requirement-specific modals must not allow a save when no meaningful
+  requirement state has been entered. Disable the primary save action for empty
+  states, and use inline validation for incomplete or contradictory states.
