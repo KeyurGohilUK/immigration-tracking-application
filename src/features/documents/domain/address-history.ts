@@ -116,6 +116,20 @@ export function validateStructuredAddress(
   return null;
 }
 
+function isStructuredAddress(value: unknown): value is StructuredAddress {
+  if (!value || typeof value !== "object") return false;
+  const address = value as Partial<StructuredAddress>;
+  return (
+    typeof address.flatBuilding === "string" &&
+    typeof address.houseNumberName === "string" &&
+    typeof address.street === "string" &&
+    typeof address.locality === "string" &&
+    typeof address.townCity === "string" &&
+    typeof address.county === "string" &&
+    typeof address.postcode === "string"
+  );
+}
+
 export function isAddressHistoryEntry(
   value: unknown,
   profileId?: string,
@@ -129,6 +143,7 @@ export function isAddressHistoryEntry(
     typeof entry.profileId !== "string" ||
     (profileId !== undefined && entry.profileId !== profileId) ||
     typeof entry.fullAddress !== "string" ||
+    (entry.address !== undefined && !isStructuredAddress(entry.address)) ||
     typeof entry.startMonth !== "string" ||
     typeof entry.endMonth !== "string" ||
     typeof entry.isCurrent !== "boolean" ||
