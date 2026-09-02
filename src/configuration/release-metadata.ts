@@ -1,4 +1,4 @@
-export const APP_VERSION = "3.20.0";
+export const APP_VERSION = "3.20.1";
 
 export const RELEASE_NOTES = [
   "Profile & Settings is organised into collapsed-by-default sections so controls only appear when needed.",
