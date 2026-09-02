@@ -193,7 +193,6 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#039;");
 }
 
-
 export function readAddressEvidenceFile(form: HTMLFormElement): File | null {
   const input = form.elements.namedItem(
     "addressEvidenceFile",
