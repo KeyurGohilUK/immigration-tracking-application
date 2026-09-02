@@ -117,7 +117,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History now shows Partial as soon as an address is saved and Complete when the required timeline is fully covered.",
+      "Address History now supports moving home by adding a new current address and automatically closing the previous current address.",
     ),
   ).toBeVisible();
   await expect(
@@ -341,6 +341,44 @@ test("guides Address History from the current address backwards", async ({
     dialog.getByText("1 First Street, Bristol, BS1 1AA"),
   ).toBeVisible();
   await expect(dialog.getByText("1 evidence file")).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Add new current address" }).click();
+  await expect(
+    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeVisible();
+  await expect(dialog.getByLabel("End month")).toBeHidden();
+  await dialog
+    .getByRole("textbox", { name: "Current address", exact: true })
+    .fill("4 New Home Close, Bristol, BS4 4DD");
+  await dialog.getByLabel("Start month").fill("2026-09");
+  await dialog
+    .getByRole("button", { name: "Save new current address" })
+    .click();
+  await expect(dialog).toHaveCount(0);
+  await expect(
+    addressSection.getByText("Complete", { exact: true }),
+  ).toBeVisible();
+
+  await addressSection.locator("summary").click();
+  await addressSection.getByRole("button", { name: "Add document" }).click();
+  dialog = page.getByRole("dialog", { name: "Address History" });
+  await expect(
+    dialog.getByText("4 New Home Close, Bristol, BS4 4DD"),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText("3 Current Avenue, Bristol, BS3 3CC"),
+  ).toBeVisible();
+  await expect(dialog.getByText("Current address", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByText("Previous address 1", { exact: true }),
+  ).toBeVisible();
+  await expect(dialog.getByText(/Jan 2025.*Aug 2026/)).toBeVisible();
+  await expect(
+    dialog.getByText("Previous address 2", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByText("Previous address 3", { exact: true }),
+  ).toBeVisible();
 });
 
 test("stores and manages encrypted documents for a profile", async ({
