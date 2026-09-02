@@ -731,7 +731,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         button.addEventListener("click", () => {
           const sectionId = button.dataset.addVaultSection;
           if (sectionId === "address-history") {
-            if (addressCoverage.complete) {
+            if (addressMonthsRemaining === 0) {
               addressDialog?.showModal();
               return;
             }
