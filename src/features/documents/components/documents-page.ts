@@ -92,6 +92,7 @@ export function renderDocumentsPage(
       addressHistory,
       addressCoverage,
       requiredAddressStartMonth,
+      documents,
     )}
     ${renderLifeEnglishDialog(documents)}
     ${renderLiquidGlassDialog({

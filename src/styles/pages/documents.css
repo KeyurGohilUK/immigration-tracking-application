@@ -1030,3 +1030,17 @@ html[data-theme="dark"] .vault-readiness-card {
 .inline-evidence-file-name {
   overflow-wrap: anywhere;
 }
+
+.address-proof-count {
+  display: inline-flex;
+  min-height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.7rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  background: var(--ibiza-glass-soft);
+  font-size: 0.7rem;
+  font-weight: 750;
+}

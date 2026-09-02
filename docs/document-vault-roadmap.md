@@ -23,6 +23,9 @@ product roadmap.
       coverage plus supporting address proof.
 - [x] Guide Address History from qualifying permission start month and
       automatically continue from each next uncovered month until Present.
+- [x] Replace Address History notes with optional inline encrypted evidence;
+      saved addresses show their linked evidence count and avoid nested proof
+      upload dialogs.
 - [ ] Add UK postcode lookup with provider-backed address selection and manual
       entry fallback.
 - [ ] Add dedicated requirement-specific Liquid Glass modals for all vault
