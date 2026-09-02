@@ -20,8 +20,7 @@ interface IdealPostcodesResponse {
   message?: string;
 }
 
-const POSTCODE_PATTERN =
-  /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
+const POSTCODE_PATTERN = /^(GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i;
 
 export function normalizeUkPostcode(value: string): string {
   const compact = value.trim().toUpperCase().replace(/\s+/g, "");
