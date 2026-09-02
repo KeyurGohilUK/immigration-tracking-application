@@ -266,7 +266,10 @@ test("guides Address History from the current address backwards", async ({
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");
   await expect(
-    dialog.getByRole("textbox", { name: "Current address", exact: true }),
+    reopenedNewCurrentHost.getByRole("textbox", {
+      name: "Current address",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(dialog.getByLabel("This is my current address")).toBeChecked();
   await expect(dialog.getByLabel("This is my current address")).toBeDisabled();
@@ -378,6 +381,13 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     currentCard.getByRole("button", { name: "Save changes" }),
   ).toBeVisible();
+  await currentCard.getByRole("button", { name: "Cancel" }).click();
+  await expect(
+    currentCard.getByRole("textbox", { name: "Current address", exact: true }),
+  ).toBeHidden();
+  await expect(
+    dialog.getByRole("button", { name: "Add new current address" }),
+  ).toBeVisible();
 
   await dialog.getByRole("button", { name: "Add new current address" }).click();
   const newCurrentHost = dialog.locator("[data-address-new-current-host]");
@@ -390,7 +400,24 @@ test("guides Address History from the current address backwards", async ({
   await expect(
     dialog.getByRole("button", { name: "Add new current address" }),
   ).toBeHidden();
-  const newCurrentFormBox = await newCurrentHost.boundingBox();
+  await expect(
+    newCurrentHost.getByRole("button", { name: "Cancel" }),
+  ).toBeVisible();
+  await newCurrentHost
+    .getByRole("textbox", { name: "Current address", exact: true })
+    .fill("Temporary address");
+  await newCurrentHost.getByRole("button", { name: "Cancel" }).click();
+  await expect(newCurrentHost.getByRole("textbox")).toHaveCount(0);
+  await expect(
+    dialog.getByRole("button", { name: "Add new current address" }),
+  ).toBeVisible();
+  await expect(
+    currentCard.getByText("3 Current Avenue, Bristol, BS3 3CC"),
+  ).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Add new current address" }).click();
+  const reopenedNewCurrentHost = dialog.locator("[data-address-new-current-host]");
+  const newCurrentFormBox = await reopenedNewCurrentHost.boundingBox();
   const currentCardBox = await currentCard.boundingBox();
   expect(newCurrentFormBox).not.toBeNull();
   expect(currentCardBox).not.toBeNull();
