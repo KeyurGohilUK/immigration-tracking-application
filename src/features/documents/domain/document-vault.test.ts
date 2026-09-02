@@ -75,16 +75,33 @@ describe("Document Vault readiness", () => {
       partial.sections.find(({ id }) => id === "address-history")?.status,
     ).toBe("partial");
 
-    const complete = calculateDocumentVaultProgress([], {
-      addressHistoryEntryCount: 3,
-      addressHistoryComplete: true,
-    });
+    const complete = calculateDocumentVaultProgress(
+      [documentFor("address-proof", 0)],
+      {
+        addressHistoryEntryCount: 3,
+        addressHistoryComplete: true,
+      },
+    );
     const completeAddress = complete.sections.find(
       ({ id }) => id === "address-history",
     );
     expect(completeAddress?.status).toBe("complete");
     expect(completeAddress?.completedRequired).toBe(1);
     expect(complete.readinessPercent).toBe(17);
+  });
+
+  it("keeps a fully covered timeline Partial while address evidence is still outstanding", () => {
+    const progress = calculateDocumentVaultProgress([], {
+      addressHistoryEntryCount: 3,
+      addressHistoryComplete: true,
+      addressHistoryHasCurrentAddress: true,
+    });
+
+    const addressSection = progress.sections.find(
+      ({ id }) => id === "address-history",
+    );
+    expect(addressSection?.status).toBe("partial");
+    expect(addressSection?.requirements[0]?.complete).toBe(false);
   });
 
   it("marks Address History as needing attention without a current address", () => {
@@ -99,7 +116,7 @@ describe("Document Vault readiness", () => {
     ).toBe("needs-attention");
   });
 
-  it("keeps complete Address History complete when an address-proof file is unlinked", () => {
+  it("keeps complete Address History complete when address evidence is present", () => {
     const unlinkedProof = documentFor("address-proof", 0);
     const progress = calculateDocumentVaultProgress([unlinkedProof], {
       addressHistoryEntryCount: 3,
