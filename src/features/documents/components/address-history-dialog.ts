@@ -46,10 +46,10 @@ export function renderAddressHistoryDialog(
         <div><strong>${coverage.complete ? "Timeline complete" : "Timeline needs attention"}</strong><span>${escapeHtml(requiredLabel)}</span><span>${escapeHtml(guidedStartLabel)}</span>${remainingLabel ? `<span>${escapeHtml(remainingLabel)}</span>` : ""}</div>
         ${gaps}
       </section>
+      ${entries.some(({ isCurrent }) => isCurrent) ? '<button id="address-add-new-current" class="secondary-button" type="button">Add new current address</button>' : ""}
       <section class="address-history-list" aria-label="Recorded addresses">
         ${renderAddressList(entries, documents)}
       </section>
-      ${entries.some(({ isCurrent }) => isCurrent) ? '<button id="address-add-new-current" class="secondary-button" type="button">Add new current address</button>' : ""}
       <input name="addressId" type="hidden" />
       <input name="addressMoveMode" type="hidden" value="false" />
       <div class="family-form-fields address-history-fields">
@@ -66,7 +66,7 @@ export function renderAddressHistoryDialog(
       <p id="address-history-error" class="form-error" role="alert" hidden></p>
     </div>`,
     actions:
-      '<button id="address-history-reset" class="secondary-button" type="button">New address</button><button class="primary-button family-save-button liquid-dialog-save" type="submit">Save & continue</button>',
+      '<button id="address-history-reset" class="secondary-button" type="button">Previous address</button><button class="primary-button family-save-button liquid-dialog-save" type="submit">Save & continue</button>',
     dialogClass: "address-history-dialog",
     closeLabel: "Close address history",
   });
