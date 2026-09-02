@@ -223,6 +223,10 @@ function placeAddressEntryForm(
         : form.querySelector<HTMLElement>("[data-address-previous-host]");
 
   host?.append(fields);
+  const addCurrent = form.querySelector<HTMLButtonElement>(
+    "#address-add-new-current",
+  );
+  if (addCurrent) addCurrent.hidden = mode === "new-current";
 }
 
 function setAddressEntryVisibility(
