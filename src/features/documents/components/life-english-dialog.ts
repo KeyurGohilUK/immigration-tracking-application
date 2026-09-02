@@ -110,7 +110,8 @@ export function syncLifeEnglishForm(form: HTMLFormElement): void {
   const englishEvidence = form.querySelector<HTMLButtonElement>(
     "[data-add-english-evidence]",
   );
-  if (englishEvidence) englishEvidence.hidden = englishStatus === "not-recorded";
+  if (englishEvidence)
+    englishEvidence.hidden = englishStatus === "not-recorded";
 }
 
 export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {
