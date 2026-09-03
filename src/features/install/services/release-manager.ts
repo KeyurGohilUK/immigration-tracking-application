@@ -128,13 +128,16 @@ export function initialiseReleaseManager(
   const updateInstallState = (): void => {
     if (!install || !guidance) return;
     const standalone = window.matchMedia("(display-mode: standalone)").matches;
-    install.disabled = standalone || !installController.canInstall();
-    install.textContent = standalone ? "App installed" : "Install app";
-    guidance.textContent = standalone
-      ? "UrbanFox ILR is installed on this device."
-      : installController.canInstall()
-        ? "Chrome is ready to install the app."
-        : "If installation is supported, use Chrome’s Install app option after eligibility is detected.";
+    install.hidden = standalone;
+    if (standalone) {
+      guidance.textContent = "UrbanFox ILR is installed on this device.";
+      return;
+    }
+    install.disabled = !installController.canInstall();
+    install.textContent = "Install app";
+    guidance.textContent = installController.canInstall()
+      ? "Chrome is ready to install the app."
+      : "If installation is supported, use Chrome’s Install app option after eligibility is detected.";
   };
 
   const showRelease = async (): Promise<ReleaseManifest | null> => {
