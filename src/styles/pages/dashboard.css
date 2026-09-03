@@ -350,37 +350,35 @@
   margin-top: 0;
 }
 
-.app-information-list {
+.standalone-settings-card {
+  padding: 0.95rem;
+}
+
+.standalone-settings-heading {
   display: grid;
-  gap: 0.7rem;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.app-information-list .settings-row {
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-medium);
-  background: rgb(255 255 255 / 42%);
-}
-
-.app-information-list .settings-row + .settings-row {
-  border-top: 1px solid var(--glass-border);
-}
-
-.appearance-settings-row {
   grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.standalone-settings-heading h2 {
+  margin: 0.08rem 0 0.15rem;
+  font-size: 1.05rem;
+}
+
+.standalone-settings-heading p:last-child {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
 }
 
 .appearance-choice-grid {
   display: grid;
-  grid-column: 1 / -1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.45rem;
+  gap: 0.5rem;
   width: 100%;
   min-width: 0;
-  margin: 0.15rem 0 0;
+  margin: 0.85rem 0 0;
   padding: 0;
   border: 0;
 }
@@ -400,16 +398,18 @@
 }
 
 .appearance-choice {
+  position: relative;
   display: grid;
-  min-height: 3.9rem;
+  min-height: 4rem;
   gap: 0.3rem;
   place-items: center;
   padding: 0.55rem 0.35rem;
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--colour-border);
   border-radius: 1rem;
-  color: var(--colour-text-muted);
-  background: var(--glass-surface-strong);
-  font-size: 0.68rem;
+  color: var(--colour-text);
+  background: var(--colour-surface-strong);
+  box-shadow: 0 0.15rem 0.5rem rgb(0 0 0 / 8%);
+  font-size: 0.7rem;
   text-align: center;
   transition:
     border-color 160ms ease,
@@ -420,8 +420,8 @@
 }
 
 .appearance-choice svg {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.25rem;
+  height: 1.25rem;
   fill: none;
   stroke: currentcolor;
   stroke-linecap: round;
@@ -433,7 +433,7 @@
   border-color: var(--colour-strong);
   color: var(--colour-on-strong);
   background: var(--colour-strong);
-  box-shadow: 0 0.3rem 0.9rem rgb(0 0 0 / 16%);
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 18%);
 }
 
 .appearance-choice-grid input:checked + .appearance-choice::after {
@@ -450,8 +450,17 @@
   outline-offset: 2px;
 }
 
+.legal-settings-heading {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.legal-settings-heading .settings-row-action {
+  align-self: center;
+}
+
 @media (hover: hover) {
   .appearance-choice-grid label:hover .appearance-choice {
+    border-color: var(--colour-strong);
     transform: translateY(-1px);
   }
 }
