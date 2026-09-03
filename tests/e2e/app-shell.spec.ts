@@ -1291,9 +1291,7 @@ test("animates expandable sections when opening and closing", async ({
   expect(openAnimationIds).toContain("urbanfox-disclosure");
   await expect(settingsDetails).toHaveAttribute("open", "");
   await expect
-    .poll(() =>
-      settingsDetails.getAttribute("data-disclosure-animating"),
-    )
+    .poll(() => settingsDetails.getAttribute("data-disclosure-animating"))
     .toBeNull();
 
   const closeAnimationIds = await settingsDetails.evaluate((element) => {
