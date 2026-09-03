@@ -227,8 +227,8 @@ function safeFileStem(value: string): string {
 function formatMonth(month: string): string {
   const [yearText, monthText] = month.split("-");
   const year = Number(yearText);
-  const month = Number(monthText);
-  const label = MONTH_NAMES[month - 1];
+  const monthNumber = Number(monthText);
+  const label = MONTH_NAMES[monthNumber - 1];
   return label && Number.isInteger(year) ? `${label} ${year}` : month;
 }
 
