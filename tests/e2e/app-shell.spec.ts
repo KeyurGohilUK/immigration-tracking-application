@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "The unselected centre ILR hero icon now uses the bright Ibiza pink-to-orange gradient in both light and dark themes.",
+      "Employment checklist items now open focused evidence dialogs with matching Cancel and Save actions.",
     ),
   ).toBeVisible();
   await expect(
