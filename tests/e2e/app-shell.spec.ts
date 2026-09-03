@@ -1263,7 +1263,10 @@ test("keeps profile settings sections collapsed until requested", async ({
     page.getByRole("heading", { name: "Appearance", level: 2 }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Terms, privacy, and licence", level: 2 }),
+    page.getByRole("heading", {
+      name: "Terms, privacy, and licence",
+      level: 2,
+    }),
   ).toBeVisible();
   await expect(page.getByRole("radio", { name: "System" })).toBeVisible();
   await expect(page.locator("#open-install-settings")).toHaveCount(0);
