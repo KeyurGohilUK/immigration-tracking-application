@@ -1,6 +1,6 @@
 {
-  "version": "3.22.7",
+  "version": "3.22.8",
   "notes": [
-    "Expandable sections now open and close with smoother motion across settings and the Document Vault."
+    "Downloaded app updates now restart UrbanFox immediately so the new release is applied."
   ]
 }
