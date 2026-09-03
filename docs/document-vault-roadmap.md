@@ -27,8 +27,9 @@ product roadmap.
 - [x] Replace Address History notes with optional inline encrypted evidence;
       saved addresses show their linked evidence count and avoid nested proof
       upload dialogs.
-- [ ] Add UK postcode lookup with provider-backed address selection and manual
-      entry fallback.
+- [x] UK postcode lookup cancelled — no suitable open-source solution is
+      available for provider-backed address selection. Keep manual structured
+      address entry as the supported approach.
 - [ ] Add dedicated requirement-specific Liquid Glass modals for all vault
       sections.
 - [x] Capture Life in the UK status, pass date, UAN/reference number, and
