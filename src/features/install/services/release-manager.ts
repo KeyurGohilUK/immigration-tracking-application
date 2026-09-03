@@ -42,20 +42,10 @@ async function fetchLatestRelease(): Promise<ReleaseManifest> {
   return value;
 }
 
-async function clearApplicationCaches(): Promise<void> {
-  if ("caches" in window) {
-    const keys = await caches.keys();
-    await Promise.all(
-      keys
-        .filter((key) => key.startsWith("urbanfox-shell"))
-        .map((key) => caches.delete(key)),
-    );
-  }
-  if ("serviceWorker" in navigator) {
-    const registration = await navigator.serviceWorker.getRegistration();
-    await registration?.update();
-    registration?.waiting?.postMessage({ type: "SKIP_WAITING" });
-  }
+async function downloadApplicationUpdate(): Promise<void> {
+  if (!("serviceWorker" in navigator)) return;
+  const registration = await navigator.serviceWorker.getRegistration();
+  await registration?.update();
 }
 
 export function initialiseReleaseManager(
@@ -213,7 +203,7 @@ export function initialiseReleaseManager(
       message.textContent =
         "Downloading the latest app files… Your local records will be preserved.";
     try {
-      await clearApplicationCaches();
+      await downloadApplicationUpdate();
       download.disabled = false;
       if (message)
         message.textContent =
