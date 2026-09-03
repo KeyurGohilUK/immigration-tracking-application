@@ -1967,7 +1967,11 @@ test("opens the centre ILR hero journey for the household", async ({
         'a[data-navigation="ILR"]:not([aria-current="page"]) .navigation-hero-icon',
       )
       .evaluate((element) => window.getComputedStyle(element).stroke),
-  ).toContain("mobile-ilr-icon-gradient");
+  ).toContain(
+    testInfo.project.name === "mobile-chromium"
+      ? "mobile-ilr-icon-gradient"
+      : "desktop-ilr-icon-gradient",
+  );
   await ilrLinks.first().click();
 
   await expect(navigation).toHaveClass(/is-hero-active/);
