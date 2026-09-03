@@ -2119,7 +2119,10 @@ test("glides the active mobile navigation capsule between sections", async ({
     navigation.locator('a[data-navigation="Trips"]'),
   ).toHaveAttribute("aria-current", "page");
   await expect(navigation).not.toHaveClass(/is-hero-active/);
-  await expect(indicator).toHaveCSS("border-color", "rgba(182, 0, 90, 0.22)");
+  await expect(indicator).toHaveCSS(
+    "border-color",
+    "rgba(182, 0, 90, 0.22)",
+  );
   await expect(
     navigation.locator('a[data-navigation="Trips"]'),
   ).toHaveCSS("color", "rgb(182, 0, 90)");
