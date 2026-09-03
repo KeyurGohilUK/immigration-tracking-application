@@ -1,6 +1,6 @@
 {
-  "version": "3.22.6",
+  "version": "3.22.7",
   "notes": [
-    "Removed the duplicate Appearance label above the Dark, System, and Light controls."
+    "Expandable sections now open and close with smoother motion across settings and the Document Vault."
   ]
 }

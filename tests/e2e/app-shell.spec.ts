@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the duplicate Appearance label above the Dark, System, and Light controls.",
+      "Expandable sections now open and close with smoother motion across settings and the Document Vault.",
     ),
   ).toBeVisible();
   await expect(
@@ -1271,6 +1271,53 @@ test("keeps profile settings sections collapsed until requested", async ({
   ).toBeVisible();
   await expect(page.getByRole("radio", { name: "System" })).toBeVisible();
   await expect(page.locator("#open-install-settings")).toHaveCount(0);
+});
+
+test("animates expandable sections when opening and closing", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+
+  const settingsDetails = page
+    .locator("details")
+    .filter({ hasText: "Protect this device" });
+
+  const openAnimationIds = await settingsDetails.evaluate((element) => {
+    const summary = element.querySelector<HTMLElement>(":scope > summary");
+    summary?.click();
+    return element.getAnimations().map((animation) => animation.id);
+  });
+
+  expect(openAnimationIds).toContain("urbanfox-disclosure");
+  await expect(settingsDetails).toHaveAttribute("open", "");
+  await expect(settingsDetails).not.toHaveAttribute(
+    "data-disclosure-animating",
+    "true",
+  );
+
+  const closeAnimationIds = await settingsDetails.evaluate((element) => {
+    const summary = element.querySelector<HTMLElement>(":scope > summary");
+    summary?.click();
+    return element.getAnimations().map((animation) => animation.id);
+  });
+
+  expect(closeAnimationIds).toContain("urbanfox-disclosure");
+  await expect(settingsDetails).not.toHaveAttribute("open", "");
+
+  await page.getByRole("link", { name: "Vault", exact: true }).click();
+
+  const vaultDetails = page.locator("details.vault-section-card").first();
+  await expect(vaultDetails).toBeVisible();
+
+  const vaultAnimationIds = await vaultDetails.evaluate((element) => {
+    const summary = element.querySelector<HTMLElement>(":scope > summary");
+    summary?.click();
+    return element.getAnimations().map((animation) => animation.id);
+  });
+
+  expect(vaultAnimationIds).toContain("urbanfox-disclosure");
 });
 
 test("persists dark, system, and light appearance preferences", async ({

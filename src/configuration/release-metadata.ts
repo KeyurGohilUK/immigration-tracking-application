@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.22.6";
+export const APP_VERSION = "3.22.7";
 
 export const RELEASE_NOTES = [
-  "Removed the duplicate Appearance label above the Dark, System, and Light controls.",
+  "Expandable sections now open and close with smoother motion across settings and the Document Vault.",
 ] as const;

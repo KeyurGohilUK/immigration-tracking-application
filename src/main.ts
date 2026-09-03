@@ -1,3 +1,4 @@
+import { initialiseDisclosureMotion } from "./app/disclosure-motion";
 import { startApplication } from "./app/start-application";
 import { initialiseScrollChrome } from "./app/scroll-chrome";
 import {
@@ -16,6 +17,7 @@ if (!root) {
   throw new Error("Application root was not found.");
 }
 
+initialiseDisclosureMotion(root);
 const installController = initialiseInstallPrompt(root);
 initialiseReleaseManager(root, installController);
 initialiseScrollChrome(root);
