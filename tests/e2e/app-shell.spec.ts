@@ -1128,9 +1128,9 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByText("UrbanFox settings", { exact: true }).click();
-  await page.getByRole("button", { name: "Open", exact: true }).click();
-  await expect(page.locator("#app-manager-title")).toBeVisible();
-  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Install and updates" }),
+  ).toHaveCount(0);
   await page.getByText("Backup and restore", { exact: true }).click();
   await page.getByRole("button", { name: "Create encrypted backup" }).click();
   await expect(
@@ -1268,6 +1268,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await page.getByText("UrbanFox settings", { exact: true }).click();
   await expect(appSettings).toHaveAttribute("open", "");
   await expect(page.getByRole("radio", { name: "System" })).toBeVisible();
+  await expect(page.locator("#open-install-settings")).toHaveCount(0);
 });
 
 test("persists dark, system, and light segmented theme preferences", async ({
