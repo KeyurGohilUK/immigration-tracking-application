@@ -1041,6 +1041,7 @@ test("opens focused Employment evidence dialogs from each checklist item", async
   await expect(
     employmentSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
+  await employmentSection.locator("summary").click();
   await employmentSection
     .getByRole("button", { name: "Add employment contract" })
     .click();
