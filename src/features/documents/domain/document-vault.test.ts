@@ -37,10 +37,10 @@ describe("Document Vault readiness", () => {
     ).toBe(false);
     expect(
       progress.sections.find(({ id }) => id === "salary-tax")?.status,
-    ).toBe("needs-attention");
+    ).toBe("to-do");
     expect(
       progress.sections.find(({ id }) => id === "final-application")?.status,
-    ).toBe("required-later");
+    ).toBe("to-do");
   });
 
   it("excludes Identity and Immigration documents from vault readiness", () => {
@@ -157,6 +157,29 @@ describe("Document Vault readiness", () => {
     expect(completeEmployment?.status).toBe("complete");
     expect(completeEmployment?.completedRequired).toBe(2);
     expect(completeEmployment?.totalRequired).toBe(2);
+  });
+
+  it("uses To do, Partial, and Complete for every non-address section", () => {
+    const emptySalary = calculateDocumentVaultProgress([]).sections.find(
+      ({ id }) => id === "salary-tax",
+    );
+    expect(emptySalary?.status).toBe("to-do");
+
+    const partialSalary = calculateDocumentVaultProgress([
+      documentFor("payslip", 0),
+    ]).sections.find(({ id }) => id === "salary-tax");
+    expect(partialSalary?.status).toBe("partial");
+
+    const completeSalary = calculateDocumentVaultProgress([
+      documentFor("payslip", 0),
+      documentFor("tax-document", 1),
+    ]).sections.find(({ id }) => id === "salary-tax");
+    expect(completeSalary?.status).toBe("complete");
+
+    const partialFinal = calculateDocumentVaultProgress([
+      documentFor("application-form", 0),
+    ]).sections.find(({ id }) => id === "final-application");
+    expect(partialFinal?.status).toBe("partial");
   });
 
   it("does not make conditional or later evidence reduce readiness", () => {

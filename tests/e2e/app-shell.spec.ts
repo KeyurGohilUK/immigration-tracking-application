@@ -773,14 +773,10 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeDisabled();
   await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
   await expect(
-    page
-      .locator('[data-vault-section="salary-tax"]')
-      .getByText("Needs attention"),
+    page.locator('[data-vault-section="salary-tax"]').getByText("To do"),
   ).toBeVisible();
   await expect(
-    page
-      .locator('[data-vault-section="final-application"]')
-      .getByText("Required later"),
+    page.locator('[data-vault-section="final-application"]').getByText("To do"),
   ).toBeVisible();
 
   const addressSection = page.locator('[data-vault-section="address-history"]');

@@ -46,7 +46,6 @@ export interface DocumentVaultSectionDefinition {
   label: string;
   description: string;
   icon: string;
-  attentionWhenIncomplete?: boolean;
   visibleInVault?: boolean;
   requirements: readonly DocumentRequirementDefinition[];
 }
@@ -146,7 +145,6 @@ export const DOCUMENT_VAULT_SECTIONS: readonly DocumentVaultSectionDefinition[] 
       label: "Salary & Tax",
       description: "Pay and tax evidence supporting employment history.",
       icon: "£",
-      attentionWhenIncomplete: true,
       requirements: [
         {
           id: "payslip",
@@ -331,10 +329,6 @@ function calculateSectionProgress(
   );
   const completedRequired = required.filter(({ complete }) => complete).length;
   const completedItems = requirements.filter(({ complete }) => complete).length;
-  const allLater =
-    requirements.length > 0 &&
-    requirements.every(({ priority }) => priority === "later");
-
   let status: DocumentVaultStatus;
   let statusMessage: string | undefined;
   if (section.id === "address-history") {
@@ -359,22 +353,9 @@ function calculateSectionProgress(
       statusMessage =
         "Add the applicant’s address history and supporting evidence.";
     }
-  } else if (section.id === "employment") {
-    if (completedItems === 0) status = "to-do";
-    else if (completedItems < requirements.length) status = "partial";
-    else status = "complete";
-  } else if (allLater) status = "required-later";
-  else if (
-    (required.length > 0 && completedRequired === required.length) ||
-    (required.length === 0 &&
-      requirements.length > 0 &&
-      requirements.every(({ complete }) => complete))
-  )
-    status = "complete";
-  else if (section.attentionWhenIncomplete && required.length > 0)
-    status = "needs-attention";
-  else if (completedItems > 0) status = "partial";
-  else status = "to-do";
+  } else if (completedItems === 0) status = "to-do";
+  else if (completedItems < requirements.length) status = "partial";
+  else status = "complete";
 
   return {
     ...section,
