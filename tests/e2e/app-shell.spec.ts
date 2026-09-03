@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Employment checklist items now open focused evidence dialogs with matching Cancel and Save actions.",
+      "Appearance and legal settings now use separate Liquid Glass capsules, with clearer Dark, System, and Light appearance controls.",
     ),
   ).toBeVisible();
   await expect(
