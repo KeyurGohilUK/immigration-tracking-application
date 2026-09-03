@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Appearance and legal settings now use separate Liquid Glass capsules, with clearer Dark, System, and Light appearance controls.",
+      "Appearance and legal settings now sit as independent Liquid Glass capsules, with clear active Dark, System, and Light controls.",
     ),
   ).toBeVisible();
   await expect(
@@ -1127,7 +1127,6 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByRole("heading", { name: "Stored only on this device" }),
   ).toBeVisible();
 
-  await page.getByText("UrbanFox settings", { exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Install and updates" }),
   ).toHaveCount(0);
@@ -1226,7 +1225,6 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toHaveCount(0);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
-  await page.getByText("UrbanFox settings", { exact: true }).click();
   await page.getByRole("button", { name: "View legal information" }).click();
   await expect(
     page.getByRole("heading", { name: "Terms and privacy" }),
@@ -1253,7 +1251,6 @@ test("keeps profile settings sections collapsed until requested", async ({
   const sections = [
     "Protect this device",
     "Backup and restore",
-    "UrbanFox settings",
     "Delete all local data",
   ];
 
@@ -1262,11 +1259,15 @@ test("keeps profile settings sections collapsed until requested", async ({
     await expect(details).not.toHaveAttribute("open", "");
   }
 
-  const appSettings = page
-    .locator("details")
-    .filter({ hasText: "UrbanFox settings" });
-  await page.getByText("UrbanFox settings", { exact: true }).click();
-  await expect(appSettings).toHaveAttribute("open", "");
+  await expect(
+    page.getByRole("heading", { name: "Appearance", level: 2 }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Terms, privacy, and licence",
+      level: 2,
+    }),
+  ).toBeVisible();
   await expect(page.getByRole("radio", { name: "System" })).toBeVisible();
   await expect(page.locator("#open-install-settings")).toHaveCount(0);
 });
@@ -1277,7 +1278,6 @@ test("persists dark, system, and light appearance preferences", async ({
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
-  await page.getByText("UrbanFox settings", { exact: true }).click();
 
   const light = page.getByRole("radio", { name: "Light" });
   await expect(light).toBeChecked();
@@ -1341,7 +1341,6 @@ test("persists dark, system, and light appearance preferences", async ({
   ).toBeLessThanOrEqual(1);
   await page.getByRole("button", { name: "Close family form" }).click();
   await page.getByRole("link", { name: "Profile", exact: true }).click();
-  await page.getByText("UrbanFox settings", { exact: true }).click();
 
   await page.getByText("System", { exact: true }).click();
   await expect
@@ -1354,7 +1353,6 @@ test("persists dark, system, and light appearance preferences", async ({
   await page.reload();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
-  await page.getByText("UrbanFox settings", { exact: true }).click();
   await expect(page.getByRole("radio", { name: "Light" })).toBeChecked();
 });
 
