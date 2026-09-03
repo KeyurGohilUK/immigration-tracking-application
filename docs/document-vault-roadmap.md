@@ -11,7 +11,7 @@ product roadmap.
 - [x] Complete, Partial, Needs attention, To do, and Required later states.
 - [x] Encrypted local PDF/JPG/PNG storage.
 - [x] Additional Documents category.
-- [x] Basic combined PDF pack export.
+- [x] Section-based Document Vault ZIP bundle export for an individual applicant.
 - [x] Structured Address History domain, encrypted storage, route-aware required
       period, and gap/overlap calculation.
 
@@ -43,13 +43,14 @@ product roadmap.
 - [ ] Add explicit Not applicable handling for conditional requirements.
 - [ ] Add richer Additional Documents metadata: custom tag/category, document
       date, expiry date, notes, and reclassification.
-- [ ] Add Download Application Bundle ZIP export with review/select UI, category
-      folders, safe filenames, and manifest/checklist.
-- [ ] Add individual applicant bundle first, then optional combined household
-      bundle.
-- [ ] Create consolidated Address History & Evidence PDF.
-- [ ] Generate a first-page address index with Address #, From, To, Full address,
-      supporting document, and final merged PDF page numbers.
+- [x] Add Download Application Bundle ZIP export with section folders and safe
+      filenames. Review/select UI and a manifest/checklist can be added later.
+- [x] Add individual applicant bundle first.
+- [ ] Add optional combined household bundle.
+- [x] Export Address History evidence as individually named files using Current
+      address / Previous address prefixes.
+- [x] Generate a separate paged Address History Index PDF with address periods,
+      full address, evidence filenames, and Page X of Y numbering.
 - [ ] Integrate Document Vault readiness into the central ILR journey/readiness
       view.
 - [ ] Add focused unit/browser coverage for each completed Document Vault
