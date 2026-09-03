@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.21.1";
+export const APP_VERSION = "3.22.0";
 
 export const RELEASE_NOTES = [
-  "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold.",
+  "Document Vault now downloads a ZIP bundle with one folder per visible section, including the Address History index and prefixed address evidence files.",
 ] as const;
