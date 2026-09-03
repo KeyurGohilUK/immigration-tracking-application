@@ -101,6 +101,7 @@ function createMemberPill(
 
 function createPermissionHistory(
   permissions: ImmigrationPermission[],
+  period: QualifyingPeriodResult,
 ): HTMLElement {
   const list = document.createElement("div");
   list.className = "ilr-permission-list";
@@ -123,10 +124,14 @@ function createPermissionHistory(
     const role = item.querySelector<HTMLElement>("small");
     if (title) title.textContent = getPermissionRouteLabel(permission);
     if (dates)
-      dates.textContent = `${formatDate(permission.permissionStartDate)} – ${formatDate(permission.permissionExpiryDate)}`;
-    if (role)
-      role.textContent =
-        permission.role === "dependant" ? "Dependant" : "Main applicant";
+      dates.textContent = `${permission.permissionStartDate.slice(0, 4)} – ${permission.permissionExpiryDate.slice(0, 4)}`;
+    if (role) {
+      const isQualifying = period.relevantPermissionIds.includes(permission.id);
+      role.textContent = isQualifying
+        ? "Qualifying (5-year)"
+        : "Not in 5-year calculation";
+      role.classList.toggle("is-qualifying", isQualifying);
+    }
     list.append(item);
   }
   return list;
@@ -243,7 +248,7 @@ function renderSelectedJourney(
   }
   root
     .querySelector<HTMLElement>("#ilr-permission-history")
-    ?.replaceChildren(createPermissionHistory(permissions));
+    ?.replaceChildren(createPermissionHistory(permissions, period));
 }
 
 export function renderIlrJourneyPage(
@@ -263,7 +268,7 @@ export function renderIlrJourneyPage(
     <section class="ilr-cohort" aria-labelledby="ilr-cohort-title"><div class="ilr-section-label"><span id="ilr-cohort-title">Household cohort</span><strong id="ilr-active-name"></strong></div><div id="ilr-person-switcher" class="ilr-person-switcher" role="group" aria-label="Choose household member"></div></section>
     <section class="ilr-active-card glass-panel-floating" aria-labelledby="ilr-active-route"><div class="ilr-gradient-edge" aria-hidden="true"></div><div class="ilr-active-heading"><div><span class="ilr-kicker">Active visa permission</span><h1 id="ilr-active-route"></h1><p id="ilr-active-role"></p></div><span class="ilr-status-chip"><i aria-hidden="true"></i><span id="ilr-active-status"></span></span></div><div class="ilr-progress-summary"><div><span>Qualifying-period progress</span><strong id="ilr-progress-value"></strong></div><div id="ilr-progress-bar" class="ilr-progress-track" role="progressbar" aria-label="Estimated qualifying-period progress"><span></span></div></div><div class="ilr-date-grid"><div><span>Estimated application window</span><strong id="ilr-application-date"></strong><small>Up to 28 days before the qualifying period</small></div><div><span>Countdown</span><strong id="ilr-countdown"></strong><small>Based on today’s recorded data</small></div></div></section>
     <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div></div></section>
-    <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">↺</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-manage-permissions" class="ilr-text-action" type="button">Manage visas</button></div><div id="ilr-permission-history"></div></section>
+      <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-manage-permissions" class="ilr-text-action" type="button">+ Add past visa</button></div><div id="ilr-permission-history"></div></section>
     <aside class="notice ilr-notice" aria-labelledby="ilr-notice-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="ilr-notice-title">Estimate only—not an eligibility decision</h2><p>UrbanFox uses information recorded on this device. Always verify current GOV.UK rules and supporting evidence before applying.</p></div></aside>
   </main>`,
   );
