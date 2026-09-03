@@ -1,6 +1,6 @@
 {
-  "version": "3.22.13",
+  "version": "3.22.14",
   "notes": [
-    "Security PIN keypad numbers now compress and spring back when tapped or entered from a keyboard."
+    "File controls in standard document upload forms now keep the Choose File button vertically centred."
   ]
 }

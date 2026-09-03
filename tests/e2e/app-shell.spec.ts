@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Security PIN keypad numbers now compress and spring back when tapped or entered from a keyboard.",
+      "File controls in standard document upload forms now keep the Choose File button vertically centred.",
     ),
   ).toBeVisible();
   await expect(
@@ -1024,7 +1024,24 @@ test("adds and edits documents from non-address checklist items", async ({
 
   let dialog = page.getByRole("dialog", { name: "Add Employer letter" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("Document file")).toBeVisible();
+  const documentFile = dialog.getByLabel("Document file");
+  await expect(documentFile).toBeVisible();
+  const fileControlMetrics = await documentFile.evaluate((input) => {
+    const control = getComputedStyle(input);
+    const button = getComputedStyle(input, "::file-selector-button");
+    return {
+      controlHeight: Number.parseFloat(control.height),
+      paddingTop: Number.parseFloat(control.paddingTop),
+      paddingBottom: Number.parseFloat(control.paddingBottom),
+      buttonHeight: Number.parseFloat(button.height),
+      buttonVerticalAlign: button.verticalAlign,
+    };
+  });
+  expect(fileControlMetrics.paddingTop).toBe(fileControlMetrics.paddingBottom);
+  expect(fileControlMetrics.buttonHeight).toBeLessThan(
+    fileControlMetrics.controlHeight,
+  );
+  expect(fileControlMetrics.buttonVerticalAlign).toBe("middle");
   const cancelBox = await dialog
     .getByRole("button", { name: "Cancel" })
     .boundingBox();
