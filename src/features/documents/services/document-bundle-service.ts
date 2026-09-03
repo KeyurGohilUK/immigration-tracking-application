@@ -48,7 +48,7 @@ export function buildDocumentBundlePlan(
     );
     if (addresses.length > 0) {
       items.push({
-        path: \`\${folder}/\${getAddressHistoryIndexFileName(profileName)}\`,
+        path: `${folder}/${getAddressHistoryIndexFileName(profileName)}`,
         generated: "address-index",
       });
     }
@@ -57,7 +57,7 @@ export function buildDocumentBundlePlan(
     for (const evidence of addressPlan.evidenceFiles) {
       linkedIds.add(evidence.documentId);
       items.push({
-        path: \`\${folder}/\${evidence.exportedFileName}\`,
+        path: `${folder}/${evidence.exportedFileName}`,
         documentId: evidence.documentId,
       });
     }
@@ -70,11 +70,11 @@ export function buildDocumentBundlePlan(
     for (const { metadata } of unlinked) {
       const fileName = getUniqueFileName(
         folder,
-        \`Unlinked address evidence - \${metadata.fileName}\`,
+        `Unlinked address evidence - ${metadata.fileName}`,
         usedNamesByFolder,
       );
       items.push({
-        path: \`\${folder}/\${fileName}\`,
+        path: `${folder}/${fileName}`,
         documentId: metadata.id,
       });
     }
@@ -100,7 +100,7 @@ export function buildDocumentBundlePlan(
         usedNamesByFolder,
       );
       items.push({
-        path: \`\${folder}/\${fileName}\`,
+        path: `${folder}/${fileName}`,
         documentId: metadata.id,
       });
     }
@@ -119,7 +119,7 @@ export async function createDocumentBundle(
     documents.map((file) => [file.metadata.id, file] as const),
   );
   const entries: ZipEntry[] = plan.folders.map((folder) => ({
-    path: \`\${folder}/\`,
+    path: `${folder}/`,
     bytes: new Uint8Array(),
     directory: true,
   }));
@@ -150,7 +150,7 @@ export async function createDocumentBundle(
 
 export function getDocumentBundleFileName(profileName: string): string {
   const safeName = safeFileStem(profileName || "UrbanFox");
-  return \`\${safeName}-ILR-Document-Bundle.zip\`;
+  return `${safeName}-ILR-Document-Bundle.zip`;
 }
 
 export function downloadDocumentBundle(
@@ -193,10 +193,10 @@ function getUniqueFileName(
   const stem = dot > 0 ? cleaned.slice(0, dot) : cleaned;
   const extension = dot > 0 ? cleaned.slice(dot) : "";
   let counter = 2;
-  let candidate = \`\${stem} (\${counter})\${extension}\`;
+  let candidate = `${stem} (${counter})${extension}`;
   while (usedNames.has(candidate.toLowerCase())) {
     counter += 1;
-    candidate = \`\${stem} (\${counter})\${extension}\`;
+    candidate = `${stem} (${counter})${extension}`;
   }
   usedNames.add(candidate.toLowerCase());
   return candidate;
