@@ -47,18 +47,21 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
           </div>
         </details>
 
-        <details class="more-card settings-group app-settings-card collapsible-settings-section">
-          <summary class="more-card-heading settings-group-heading">
-            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg></span>
-            <div><p class="eyebrow">App and information</p><h2>UrbanFox settings</h2></div>
-          </summary>
-          <div class="settings-section-content">
-            <div class="settings-list app-information-list">
-            <div class="settings-row appearance-settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg></span><div class="appearance-settings-copy"><h3>Appearance</h3><p>Choose how UrbanFox looks. System follows your device setting.</p></div><fieldset class="appearance-choice-grid" aria-label="Appearance"><legend class="visually-hidden">Appearance</legend><label><input type="radio" name="theme-preference" value="dark" /><span class="appearance-choice"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg><strong>Dark</strong></span></label><label><input type="radio" name="theme-preference" value="system" /><span class="appearance-choice"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M8 20h8M12 16v4"/></svg><strong>System</strong></span></label><label><input type="radio" name="theme-preference" value="light" /><span class="appearance-choice"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg><strong>Light</strong></span></label></fieldset></div>
-            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg></span><div><h3 id="legal-title">Terms, privacy, and licence</h3><p>Review the tracking disclaimer, privacy notice and proprietary licence.</p></div><button id="view-legal" class="settings-row-action" type="button" aria-label="View legal information">View</button></div>
-            </div>
+        <section class="more-card standalone-settings-card appearance-card" aria-labelledby="appearance-title">
+          <div class="standalone-settings-heading">
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg></span>
+            <div><p class="eyebrow">Display</p><h2 id="appearance-title">Appearance</h2><p>Choose how UrbanFox looks. System follows your device setting.</p></div>
           </div>
-        </details>
+          <fieldset class="appearance-choice-grid" aria-label="Appearance"><legend class="visually-hidden">Appearance</legend><label><input type="radio" name="theme-preference" value="dark" /><span class="appearance-choice"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg><strong>Dark</strong></span></label><label><input type="radio" name="theme-preference" value="system" /><span class="appearance-choice"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M8 20h8M12 16v4"/></svg><strong>System</strong></span></label><label><input type="radio" name="theme-preference" value="light" /><span class="appearance-choice"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg><strong>Light</strong></span></label></fieldset>
+        </section>
+
+        <section class="more-card standalone-settings-card legal-card" aria-labelledby="legal-title">
+          <div class="standalone-settings-heading legal-settings-heading">
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg></span>
+            <div><p class="eyebrow">Information</p><h2 id="legal-title">Terms, privacy, and licence</h2><p>Review the tracking disclaimer, privacy notice and proprietary licence.</p></div>
+            <button id="view-legal" class="settings-row-action" type="button" aria-label="View legal information">View</button>
+          </div>
+        </section>
 
         <details class="more-card danger-zone collapsible-settings-section">
           <summary class="more-card-heading">
