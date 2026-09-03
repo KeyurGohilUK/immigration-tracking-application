@@ -1,13 +1,25 @@
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
+import type { DocumentMetadata } from "../domain/document";
 import {
   type EnglishRequirementStatus,
   type LifeEnglishInput,
   type LifeEnglishRecord,
   type LifeInUkStatus,
 } from "../domain/life-english";
-import type { DocumentMetadata } from "../domain/document";
 
-export function renderLifeEnglishDialog(
+export interface LifeInUkFormInput {
+  status: LifeInUkStatus;
+  passedDate: string;
+  reference: string;
+}
+
+export interface EnglishLanguageFormInput {
+  status: EnglishRequirementStatus;
+  evidenceType: string;
+  reference: string;
+}
+
+export function renderLifeEnglishDialogs(
   documents: readonly DocumentMetadata[],
 ): string {
   const lifeEvidence = documents.filter(
@@ -16,139 +28,153 @@ export function renderLifeEnglishDialog(
   const englishEvidence = documents.filter(
     ({ category }) => category === "english-language",
   );
-  return renderLiquidGlassDialog({
-    id: "life-english-dialog",
-    labelledBy: "life-english-title",
-    formId: "life-english-form",
-    eyebrow: "Structured ILR evidence",
-    title: "Life in the UK & English",
+  return `${renderLiquidGlassDialog({
+    id: "life-in-uk-dialog",
+    labelledBy: "life-in-uk-title",
+    formId: "life-in-uk-form",
+    eyebrow: "Life in the UK",
+    title: "Add Life in the UK evidence",
     subtitle:
-      "Store the result details and references you may need when preparing the application.",
+      "Record the test result or exemption and attach supporting evidence.",
     iconSvg:
       '<svg viewBox="0 0 24 24"><path d="M7 4h10v16H7z"/><path d="M10 8h4M10 12h4M10 16h2"/></svg>',
-    body: `<div class="life-english-modal">
-      <section class="life-english-panel">
-        <div class="section-heading"><div><p class="eyebrow">Life in the UK</p><h3>Test details</h3></div></div>
-        <div class="family-form-fields">
-          <div class="family-field family-field-wide"><label for="life-status">Status</label><select id="life-status" name="lifeInUkStatus"><option value="not-recorded">Not recorded</option><option value="passed">Passed</option><option value="exempt">Exempt / not required</option></select></div>
-          <div class="family-field family-field-wide" data-life-passed-details><label for="life-pass-date">Passed date</label><input id="life-pass-date" name="lifeInUkPassedDate" type="date" /></div>
-          <div class="family-field family-field-wide" data-life-passed-details><label for="life-reference">UAN / reference number <span class="optional-label">Optional</span></label><input id="life-reference" name="lifeInUkReference" maxlength="120" autocomplete="off" /></div>
-        </div>
-        ${renderEvidenceAttachment(
-          "life-evidence-file",
-          "lifeEvidenceFile",
-          "Life in the UK evidence",
-          lifeEvidence,
-          "life",
-        )}
-      </section>
-      <section class="life-english-panel">
-        <div class="section-heading"><div><p class="eyebrow">English requirement</p><h3>Evidence details</h3></div></div>
-        <div class="family-form-fields">
-          <div class="family-field family-field-wide"><label for="english-status">Status</label><select id="english-status" name="englishStatus"><option value="not-recorded">Not recorded</option><option value="met">Requirement met</option><option value="exempt">Exempt / not required</option></select></div>
-          <div class="family-field family-field-wide" data-english-met-details><label for="english-evidence-type">Evidence type</label><input id="english-evidence-type" name="englishEvidenceType" maxlength="120" placeholder="e.g. approved qualification" /></div>
-          <div class="family-field family-field-wide" data-english-met-details><label for="english-reference">Certificate / reference number <span class="optional-label">Optional</span></label><input id="english-reference" name="englishReference" maxlength="120" autocomplete="off" /></div>
-        </div>
-        ${renderEvidenceAttachment(
-          "english-evidence-file",
-          "englishEvidenceFile",
-          "English evidence",
-          englishEvidence,
-          "english",
-        )}
-      </section>
-      <div class="family-field"><label for="life-english-notes">Notes <span class="optional-label">Optional</span></label><textarea id="life-english-notes" name="notes" maxlength="500" rows="3"></textarea></div>
-      <p id="life-english-error" class="form-error" role="alert" hidden></p>
-    </div>`,
+    body: `<div class="life-english-modal"><section class="life-english-panel"><div class="family-form-fields"><div class="family-field family-field-wide"><label for="life-status">Status</label><select id="life-status" name="status"><option value="not-recorded">Not recorded</option><option value="passed">Passed</option><option value="exempt">Exempt / not required</option></select></div><div class="family-field family-field-wide" data-life-passed-details><label for="life-pass-date">Passed date</label><input id="life-pass-date" name="passedDate" type="date" /></div><div class="family-field family-field-wide" data-life-passed-details><label for="life-reference">UAN / reference number <span class="optional-label">Optional</span></label><input id="life-reference" name="reference" maxlength="120" autocomplete="off" /></div></div>${renderEvidenceAttachment("life-evidence-file", "evidenceFile", "Life in the UK evidence", lifeEvidence)}</section><p id="life-in-uk-error" class="form-error" role="alert" hidden></p></div>`,
     actions:
-      '<button class="primary-button liquid-dialog-save" type="submit">Save details</button>',
+      '<button class="secondary-button" data-form-cancel type="button">Cancel</button><button class="primary-button liquid-dialog-save" type="submit">Save</button>',
     dialogClass: "life-english-dialog",
-    closeLabel: "Close Life in the UK and English",
-  });
+    formClass: "document-evidence-form",
+    closeLabel: "Close Life in the UK evidence",
+  })}${renderLiquidGlassDialog({
+    id: "english-language-dialog",
+    labelledBy: "english-language-title",
+    formId: "english-language-form",
+    eyebrow: "English language",
+    title: "Add English-language evidence",
+    subtitle:
+      "Record how the English requirement is met or the applicable exemption.",
+    iconSvg:
+      '<svg viewBox="0 0 24 24"><path d="M7 4h10v16H7z"/><path d="M10 8h4M10 12h4M10 16h2"/></svg>',
+    body: `<div class="life-english-modal"><section class="life-english-panel"><div class="family-form-fields"><div class="family-field family-field-wide"><label for="english-status">Status</label><select id="english-status" name="status"><option value="not-recorded">Not recorded</option><option value="met">Requirement met</option><option value="exempt">Exempt / not required</option></select></div><div class="family-field family-field-wide" data-english-met-details><label for="english-evidence-type">Evidence type</label><input id="english-evidence-type" name="evidenceType" maxlength="120" placeholder="e.g. approved qualification" /></div><div class="family-field family-field-wide" data-english-met-details><label for="english-reference">Certificate / reference number <span class="optional-label">Optional</span></label><input id="english-reference" name="reference" maxlength="120" autocomplete="off" /></div></div>${renderEvidenceAttachment("english-evidence-file", "evidenceFile", "English evidence", englishEvidence)}</section><p id="english-language-error" class="form-error" role="alert" hidden></p></div>`,
+    actions:
+      '<button class="secondary-button" data-form-cancel type="button">Cancel</button><button class="primary-button liquid-dialog-save" type="submit">Save</button>',
+    dialogClass: "life-english-dialog",
+    formClass: "document-evidence-form",
+    closeLabel: "Close English-language evidence",
+  })}`;
 }
 
-export function showLifeEnglishForm(
+export function showLifeInUkForm(
   root: HTMLElement,
   record: LifeEnglishRecord | null,
 ): void {
-  const dialog = root.querySelector<HTMLDialogElement>("#life-english-dialog");
-  const form = root.querySelector<HTMLFormElement>("#life-english-form");
-  if (!dialog || !form)
-    throw new Error("Life in the UK and English form is unavailable.");
+  const dialog = root.querySelector<HTMLDialogElement>("#life-in-uk-dialog");
+  const form = root.querySelector<HTMLFormElement>("#life-in-uk-form");
+  if (!dialog || !form) throw new Error("Life in the UK form is unavailable.");
   form.reset();
   if (record) {
-    (form.elements.namedItem("lifeInUkStatus") as HTMLSelectElement).value =
-      record.lifeInUkStatus;
-    (form.elements.namedItem("lifeInUkPassedDate") as HTMLInputElement).value =
-      record.lifeInUkPassedDate;
-    (form.elements.namedItem("lifeInUkReference") as HTMLInputElement).value =
-      record.lifeInUkReference;
-    (form.elements.namedItem("englishStatus") as HTMLSelectElement).value =
-      record.englishStatus;
-    (form.elements.namedItem("englishEvidenceType") as HTMLInputElement).value =
-      record.englishEvidenceType;
-    (form.elements.namedItem("englishReference") as HTMLInputElement).value =
-      record.englishReference;
-    (form.elements.namedItem("notes") as HTMLTextAreaElement).value =
-      record.notes;
+    setValue(form, "status", record.lifeInUkStatus);
+    setValue(form, "passedDate", record.lifeInUkPassedDate);
+    setValue(form, "reference", record.lifeInUkReference);
   }
-  syncLifeEnglishForm(form);
-  if (!dialog.open) dialog.showModal();
+  syncLifeInUkForm(form);
+  setDialogTitle(dialog, !!record && record.lifeInUkStatus !== "not-recorded");
+  dialog.showModal();
 }
 
-export function syncLifeEnglishForm(form: HTMLFormElement): void {
-  const lifeStatus = (
-    form.elements.namedItem("lifeInUkStatus") as HTMLSelectElement
-  ).value as LifeInUkStatus;
-  const passDate = form.elements.namedItem(
-    "lifeInUkPassedDate",
-  ) as HTMLInputElement;
-  passDate.disabled = lifeStatus !== "passed";
-  passDate.required = lifeStatus === "passed";
-  if (lifeStatus !== "passed") passDate.value = "";
+export function showEnglishLanguageForm(
+  root: HTMLElement,
+  record: LifeEnglishRecord | null,
+): void {
+  const dialog = root.querySelector<HTMLDialogElement>(
+    "#english-language-dialog",
+  );
+  const form = root.querySelector<HTMLFormElement>("#english-language-form");
+  if (!dialog || !form)
+    throw new Error("English-language form is unavailable.");
+  form.reset();
+  if (record) {
+    setValue(form, "status", record.englishStatus);
+    setValue(form, "evidenceType", record.englishEvidenceType);
+    setValue(form, "reference", record.englishReference);
+  }
+  syncEnglishLanguageForm(form);
+  setDialogTitle(dialog, !!record && record.englishStatus !== "not-recorded");
+  dialog.showModal();
+}
+
+export function syncLifeInUkForm(form: HTMLFormElement): void {
+  const status = getValue(form, "status") as LifeInUkStatus;
+  const passedDate = form.elements.namedItem("passedDate") as HTMLInputElement;
+  passedDate.disabled = status !== "passed";
+  passedDate.required = status === "passed";
+  if (status !== "passed") passedDate.value = "";
   for (const field of form.querySelectorAll<HTMLElement>(
     "[data-life-passed-details]",
   ))
-    field.hidden = lifeStatus !== "passed";
-  const lifeEvidence = form.querySelector<HTMLElement>("[data-life-evidence]");
-  if (lifeEvidence) lifeEvidence.hidden = lifeStatus === "not-recorded";
+    field.hidden = status !== "passed";
+  setSubmitAvailability(form, status !== "not-recorded");
+}
 
-  const englishStatus = (
-    form.elements.namedItem("englishStatus") as HTMLSelectElement
-  ).value as EnglishRequirementStatus;
+export function syncEnglishLanguageForm(form: HTMLFormElement): void {
+  const status = getValue(form, "status") as EnglishRequirementStatus;
   const evidenceType = form.elements.namedItem(
-    "englishEvidenceType",
+    "evidenceType",
   ) as HTMLInputElement;
-  evidenceType.disabled = englishStatus !== "met";
-  evidenceType.required = englishStatus === "met";
-  if (englishStatus !== "met") evidenceType.value = "";
+  evidenceType.disabled = status !== "met";
+  evidenceType.required = status === "met";
+  if (status !== "met") evidenceType.value = "";
   for (const field of form.querySelectorAll<HTMLElement>(
     "[data-english-met-details]",
   ))
-    field.hidden = englishStatus !== "met";
-  const englishEvidence = form.querySelector<HTMLElement>(
-    "[data-english-evidence]",
-  );
-  if (englishEvidence)
-    englishEvidence.hidden = englishStatus === "not-recorded";
-
-  const saveButton = form.querySelector<HTMLButtonElement>(
-    'button[type="submit"]',
-  );
-  if (saveButton) {
-    const hasMeaningfulStatus =
-      lifeStatus !== "not-recorded" || englishStatus !== "not-recorded";
-    saveButton.disabled = !hasMeaningfulStatus;
-    saveButton.setAttribute(
-      "aria-disabled",
-      hasMeaningfulStatus ? "false" : "true",
-    );
-    saveButton.title = hasMeaningfulStatus
-      ? ""
-      : "Choose at least one status before saving.";
-  }
+    field.hidden = status !== "met";
+  setSubmitAvailability(form, status !== "not-recorded");
 }
 
+export function readLifeInUkForm(form: HTMLFormElement): LifeInUkFormInput {
+  return {
+    status: getValue(form, "status") as LifeInUkStatus,
+    passedDate: getValue(form, "passedDate", ""),
+    reference: getValue(form, "reference", "").trim(),
+  };
+}
+
+export function readEnglishLanguageForm(
+  form: HTMLFormElement,
+): EnglishLanguageFormInput {
+  return {
+    status: getValue(form, "status") as EnglishRequirementStatus,
+    evidenceType: getValue(form, "evidenceType", "").trim(),
+    reference: getValue(form, "reference", "").trim(),
+  };
+}
+
+export function readEvidenceFile(form: HTMLFormElement): File | null {
+  return (
+    (form.elements.namedItem("evidenceFile") as HTMLInputElement | null)
+      ?.files?.[0] ?? null
+  );
+}
+
+export function syncEvidenceName(form: HTMLFormElement): void {
+  const input = form.elements.namedItem(
+    "evidenceFile",
+  ) as HTMLInputElement | null;
+  const label = form.querySelector<HTMLElement>("[data-evidence-name]");
+  if (label && input)
+    label.textContent = input.files?.[0]?.name ?? "No new file selected";
+}
+
+// Compatibility helpers for the previous combined form wiring. The combined
+// dialog is no longer rendered; these can be removed when the page controller
+// is split into feature-specific controllers.
+export const showLifeEnglishForm = showLifeInUkForm;
+export function syncLifeEnglishForm(form: HTMLFormElement): void {
+  if (form.id === "life-in-uk-form") syncLifeInUkForm(form);
+  if (form.id === "english-language-form") syncEnglishLanguageForm(form);
+}
+export function syncLifeEnglishEvidenceNames(form: HTMLFormElement): void {
+  syncEvidenceName(form);
+}
 export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {
   const data = new FormData(form);
   return {
@@ -165,37 +191,50 @@ export function readLifeEnglishForm(form: HTMLFormElement): LifeEnglishInput {
     notes: String(data.get("notes") ?? "").trim(),
   };
 }
-
 export function readLifeEnglishEvidenceFiles(form: HTMLFormElement): {
   lifeEvidence: File | null;
   englishEvidence: File | null;
 } {
-  const lifeInput = form.elements.namedItem(
-    "lifeEvidenceFile",
-  ) as HTMLInputElement | null;
-  const englishInput = form.elements.namedItem(
-    "englishEvidenceFile",
-  ) as HTMLInputElement | null;
   return {
-    lifeEvidence: lifeInput?.files?.[0] ?? null,
-    englishEvidence: englishInput?.files?.[0] ?? null,
+    lifeEvidence:
+      (form.elements.namedItem("lifeEvidenceFile") as HTMLInputElement | null)
+        ?.files?.[0] ?? null,
+    englishEvidence:
+      (
+        form.elements.namedItem(
+          "englishEvidenceFile",
+        ) as HTMLInputElement | null
+      )?.files?.[0] ?? null,
   };
 }
 
-export function syncLifeEnglishEvidenceNames(form: HTMLFormElement): void {
-  syncEvidenceName(form, "lifeEvidenceFile", "[data-life-evidence-name]");
-  syncEvidenceName(form, "englishEvidenceFile", "[data-english-evidence-name]");
+function setValue(form: HTMLFormElement, name: string, value: string): void {
+  (
+    form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement
+  ).value = value;
 }
 
-function syncEvidenceName(
+function getValue(
   form: HTMLFormElement,
-  inputName: string,
-  selector: string,
-): void {
-  const input = form.elements.namedItem(inputName) as HTMLInputElement | null;
-  const label = form.querySelector<HTMLElement>(selector);
-  if (!label || !input) return;
-  label.textContent = input.files?.[0]?.name ?? "No new file selected";
+  name: string,
+  fallback = "not-recorded",
+): string {
+  return String(new FormData(form).get(name) ?? fallback);
+}
+
+function setSubmitAvailability(form: HTMLFormElement, enabled: boolean): void {
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submit) submit.disabled = !enabled;
+}
+
+function setDialogTitle(dialog: HTMLDialogElement, edit: boolean): void {
+  const title = dialog.querySelector<HTMLElement>("h2");
+  if (!title) return;
+  const subject =
+    dialog.id === "life-in-uk-dialog"
+      ? "Life in the UK evidence"
+      : "English-language evidence";
+  title.textContent = `${edit ? "Edit" : "Add"} ${subject}`;
 }
 
 function renderEvidenceAttachment(
@@ -203,7 +242,6 @@ function renderEvidenceAttachment(
   name: string,
   label: string,
   existing: readonly DocumentMetadata[],
-  type: "life" | "english",
 ): string {
   const existingLabel =
     existing.length === 0
@@ -211,11 +249,7 @@ function renderEvidenceAttachment(
       : existing.length === 1
         ? `Attached: ${escapeHtml(existing[0]?.displayName ?? "")}`
         : `${existing.length} evidence files already attached`;
-  return `<div class="inline-evidence-attachment" data-${type}-evidence>
-    <div class="inline-evidence-copy"><strong>${label}</strong><span>Optional · PDF, JPG or PNG · up to 5 MB</span><small>${existingLabel}</small></div>
-    <label class="inline-evidence-picker" for="${id}"><span>Choose file</span><input id="${id}" name="${name}" type="file" aria-label="${label}" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label>
-    <span class="inline-evidence-file-name" data-${type}-evidence-name>No new file selected</span>
-  </div>`;
+  return `<div class="inline-evidence-attachment"><div class="inline-evidence-copy"><strong>${label}</strong><span>Optional · PDF, JPG or PNG · up to 5 MB</span><small>${existingLabel}</small></div><label class="inline-evidence-picker" for="${id}"><span>Choose file</span><input id="${id}" name="${name}" type="file" aria-label="${label}" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" /></label><span class="inline-evidence-file-name" data-evidence-name>No new file selected</span></div>`;
 }
 
 function escapeHtml(value: string): string {
