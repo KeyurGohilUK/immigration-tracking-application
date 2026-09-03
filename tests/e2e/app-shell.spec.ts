@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Document checklist items now change from Add to Edit after upload and open the saved document for editing.",
+      "Security PIN keypad numbers now compress and spring back when tapped or entered from a keyboard.",
     ),
   ).toBeVisible();
   await expect(
