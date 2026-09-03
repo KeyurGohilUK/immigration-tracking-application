@@ -77,7 +77,7 @@ export function showLifeInUkForm(
     setValue(form, "reference", record.lifeInUkReference);
   }
   syncLifeInUkForm(form);
-  setDialogTitle(dialog, record?.lifeInUkStatus !== "not-recorded");
+  setDialogTitle(dialog, !!record && record.lifeInUkStatus !== "not-recorded");
   dialog.showModal();
 }
 
@@ -98,7 +98,7 @@ export function showEnglishLanguageForm(
     setValue(form, "reference", record.englishReference);
   }
   syncEnglishLanguageForm(form);
-  setDialogTitle(dialog, record?.englishStatus !== "not-recorded");
+  setDialogTitle(dialog, !!record && record.englishStatus !== "not-recorded");
   dialog.showModal();
 }
 
