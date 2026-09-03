@@ -181,6 +181,12 @@
   transform: translateY(-0.05rem);
 }
 
+.mobile-navigation
+  a[data-navigation="ILR"]:not([aria-current="page"])
+  .navigation-hero-icon {
+  stroke: url("#mobile-ilr-icon-gradient");
+}
+
 .mobile-navigation a[data-navigation="ILR"][aria-current="page"] {
   color: #ffffff;
 }
@@ -210,6 +216,12 @@
   color: var(--ibiza-pink);
   background: transparent;
   box-shadow: none;
+}
+
+.desktop-navigation
+  a[data-navigation="ILR"]:not([aria-current="page"])
+  .navigation-hero-icon {
+  stroke: url("#desktop-ilr-icon-gradient");
 }
 
 .desktop-navigation.is-hero-active a[data-navigation="ILR"] {
