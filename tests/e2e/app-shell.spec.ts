@@ -165,6 +165,46 @@ test("shows install and update controls in every device header", async ({
   ).toHaveCount(0);
 });
 
+test("hides the install action when the app is already installed", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: (query: string): MediaQueryList => {
+        if (query !== "(display-mode: standalone)")
+          return nativeMatchMedia(query);
+        return {
+          matches: true,
+          media: query,
+          onchange: null,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          dispatchEvent: () => false,
+        };
+      },
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Install and updates" }).click();
+
+  await expect(page.getByRole("button", { name: "App installed" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: "Install app" })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByText("UrbanFox ILR is installed on this device."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Check for updates" }),
+  ).toBeVisible();
+});
+
 test("highlights the header control when an update is available", async ({
   page,
 }) => {
