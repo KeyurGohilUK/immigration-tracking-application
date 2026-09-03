@@ -2055,7 +2055,9 @@ test("registers the offline app service worker", async ({ page }) => {
   expect(registrationScope).toContain("127.0.0.1:4173");
 });
 
-test("keeps an authenticated session open across temporary system UI", async ({ page }) => {
+test("keeps an authenticated session open across temporary system UI", async ({
+  page,
+}) => {
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Vault" }).first().click();
@@ -2076,10 +2078,14 @@ test("keeps an authenticated session open across temporary system UI", async ({ 
   await expect(
     page.getByRole("heading", { name: "Document Vault", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(
+    0,
+  );
 });
 
-test("downloads an available update without reloading the unlocked session", async ({ page }) => {
+test("downloads an available update without reloading the unlocked session", async ({
+  page,
+}) => {
   await page.route("**/release.json?check=*", async (route) => {
     await route.fulfill({
       status: 200,
@@ -2093,7 +2099,9 @@ test("downloads an available update without reloading the unlocked session", asy
   await page.goto("/");
   await createLocalProfile(page);
 
-  await page.getByRole("button", { name: /Install and updates|Update .* available/ }).click();
+  await page
+    .getByRole("button", { name: /Install and updates|Update .* available/ })
+    .click();
   const dialog = page.getByRole("dialog", { name: "Install and updates" });
   await expect(dialog.getByText("Update 9.9.9 available")).toBeVisible();
   await dialog.getByRole("button", { name: "Download update" }).click();
