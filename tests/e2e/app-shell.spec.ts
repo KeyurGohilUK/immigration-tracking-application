@@ -1348,18 +1348,23 @@ test("animates expandable sections when opening and closing", async ({
   expect(vaultAnimationIds).toContain("urbanfox-disclosure");
 });
 
-test("persists dark, system, and light appearance preferences", async ({
+test("uses a three-state sliding appearance toggle and persists preferences", async ({
   page,
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
+  const toggle = page.locator(".appearance-toggle-track");
+  const thumb = page.locator(".appearance-toggle-thumb");
   const light = page.getByRole("radio", { name: "Light" });
   await expect(light).toBeChecked();
+  await expect(toggle).toHaveCSS("--appearance-index", "2");
 
   await page.getByText("Dark", { exact: true }).click();
+  await expect(toggle).toHaveCSS("--appearance-index", "0");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(thumb).toHaveCSS("background-image", /linear-gradient/);
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("dark");
@@ -1419,11 +1424,13 @@ test("persists dark, system, and light appearance preferences", async ({
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await page.getByText("System", { exact: true }).click();
+  await expect(toggle).toHaveCSS("--appearance-index", "1");
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("system");
 
   await page.getByText("Light", { exact: true }).click();
+  await expect(toggle).toHaveCSS("--appearance-index", "2");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 
   await page.reload();
