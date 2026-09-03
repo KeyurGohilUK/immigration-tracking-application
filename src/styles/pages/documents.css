@@ -552,6 +552,17 @@
   font-weight: 850;
 }
 
+.vault-download-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
 .vault-download-button:disabled {
   opacity: 0.5;
   filter: saturate(0.55);

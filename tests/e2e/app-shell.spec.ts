@@ -783,7 +783,7 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "Final Application Documents" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Download doc bundle" }),
+    page.getByRole("button", { name: "DOWNLOAD ZIP BUNDLE" }),
   ).toBeDisabled();
   await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
   await expect(
@@ -964,10 +964,19 @@ test("stores and manages encrypted documents for a profile", async ({
   expect((await downloadPromise).suggestedFilename()).toBe("council-tax.png");
 
   const bundleDownloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download doc bundle" }).click();
+  const bundleButton = page.getByRole("button", {
+    name: "DOWNLOAD ZIP BUNDLE",
+  });
+  await expect(bundleButton.locator("svg")).toHaveCount(1);
+  await expect(bundleButton.locator("path")).toHaveCount(2);
+  await expect(bundleButton.locator("rect")).toHaveCount(1);
+  await bundleButton.click();
   expect((await bundleDownloadPromise).suggestedFilename()).toBe(
     "Urban-Fox-Test-User-ILR-Document-Bundle.zip",
   );
+  await expect(
+    page.getByRole("button", { name: "ZIP BUNDLE DOWNLOADED" }),
+  ).toBeVisible();
 
   await page
     .getByRole("button", { name: "Rename Council tax statement" })
