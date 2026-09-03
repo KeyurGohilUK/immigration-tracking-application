@@ -27,7 +27,6 @@ import {
   renderReadOnlyAddressList,
 } from "./address-history-dialog";
 import { renderLifeEnglishDialog } from "./life-english-dialog";
-import { renderEmploymentDialog } from "./employment-dialog";
 import {
   isEnglishRequirementComplete,
   isLifeInUkComplete,
@@ -76,7 +75,7 @@ export function renderDocumentsPage(
       <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true">▣</span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div><div class="record-heading-actions document-heading-actions"><button id="add-document" class="vault-add-button" type="button"><span aria-hidden="true">＋</span> Add document</button></div></section>
       <section class="documents-profile-picker vault-profile-picker" aria-label="Choose a profile for documents">${renderVaultMemberStrip(members, selectedProfileId)}<div class="documents-profile-select">${renderPersonSwitcherMarkup()}</div></section>
       <section class="document-summary-grid vault-summary-grid" aria-label="Local document summary"><article class="document-summary-card vault-readiness-card"><p class="eyebrow">Selected profile</p><div class="vault-readiness-line"><p class="document-summary-value"><span id="vault-readiness-percent">${vaultProgress.readinessPercent}%</span><small>ready</small></p><span class="vault-ready-label">${vaultProgress.completedRequired} of ${vaultProgress.totalRequired} core items</span></div><div class="vault-readiness-track" role="progressbar" aria-label="Document Vault readiness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${vaultProgress.readinessPercent}"><span style="--vault-readiness-progress: ${vaultProgress.readinessPercent}%"></span></div><p>${vaultProgress.completedSections} of ${vaultProgress.sections.length} sections complete. Conditional and later items do not reduce readiness.</p></article><article class="document-summary-card vault-storage-card"><p class="eyebrow">Encrypted storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
-      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory)}</section>
+      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory, documents)}</section>
 <section class="vault-download-panel"><button id="download-document-bundle" class="vault-download-button" type="button" ${documents.length === 0 && addressHistory.length === 0 ? "disabled" : ""}><span aria-hidden="true">⇩</span> Download doc bundle</button></section>
 <aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups include documents</h2><p>Encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
       <section class="documents-panel" aria-labelledby="document-list-title"><div class="section-heading"><div><p class="eyebrow">Selected profile</p><h2 id="document-list-title">Document collection</h2></div></div><div id="document-list" class="document-list"></div></section>
@@ -91,9 +90,9 @@ export function renderDocumentsPage(
       subtitle: "PDF, JPG, or PNG · Maximum 5 MB",
       iconSvg:
         '<svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg>',
-      body: `<div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file">Document file</label><input name="addressHistoryId" type="hidden" /><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance">The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><optgroup label="Identity & Immigration"><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option></optgroup><optgroup label="Address History"><option value="address-proof">Address proof</option></optgroup><optgroup label="Employment"><option value="employer-letter">Employer letter</option><option value="employment-contract">Employment contract</option></optgroup><optgroup label="Salary & Tax"><option value="payslip">Payslip</option><option value="tax-document">Tax document</option></optgroup><optgroup label="Travel & Absences"><option value="travel-evidence">Travel evidence</option></optgroup><optgroup label="Life in the UK & English"><option value="life-in-uk">Life in the UK evidence</option><option value="english-language">English-language evidence</option></optgroup><optgroup label="Family / Dependants"><option value="relationship-evidence">Relationship evidence</option></optgroup><optgroup label="Final Application Documents"><option value="application-form">Application form</option><option value="declaration-consent">Declaration or consent</option></optgroup><optgroup label="Additional Documents"><option value="additional-document">Additional supporting document</option></optgroup></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
+      body: `<input name="documentId" type="hidden" /><div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file" data-document-file-label>Document file</label><input name="addressHistoryId" type="hidden" /><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance" data-document-file-guidance>The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><optgroup label="Identity & Immigration"><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option></optgroup><optgroup label="Address History"><option value="address-proof">Address proof</option></optgroup><optgroup label="Employment"><option value="employer-letter">Employer letter</option><option value="employment-contract">Employment contract</option></optgroup><optgroup label="Salary & Tax"><option value="payslip">Payslip</option><option value="tax-document">Tax document</option></optgroup><optgroup label="Travel & Absences"><option value="travel-evidence">Travel evidence</option></optgroup><optgroup label="Life in the UK & English"><option value="life-in-uk">Life in the UK evidence</option><option value="english-language">English-language evidence</option></optgroup><optgroup label="Family / Dependants"><option value="relationship-evidence">Relationship evidence</option></optgroup><optgroup label="Final Application Documents"><option value="application-form">Application form</option><option value="declaration-consent">Declaration or consent</option></optgroup><optgroup label="Additional Documents"><option value="additional-document">Additional supporting document</option></optgroup></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
       actions:
-        '<button class="primary-button family-save-button liquid-dialog-save" type="submit">Encrypt and save document</button>',
+        '<button class="secondary-button" type="button" data-document-cancel>Cancel</button><button class="primary-button family-save-button liquid-dialog-save" type="submit" data-document-submit>Encrypt and save document</button>',
       dialogClass: "document-dialog",
       closeLabel: "Close document form",
     })}
@@ -105,7 +104,6 @@ export function renderDocumentsPage(
       documents,
     )}
     ${renderLifeEnglishDialog(documents)}
-    ${renderEmploymentDialog()}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
@@ -143,6 +141,7 @@ export function renderDocumentsPage(
 function renderVaultCategoryRows(
   sections: readonly DocumentVaultSectionProgress[],
   addressHistory: readonly AddressHistoryEntry[],
+  documents: readonly DocumentMetadata[],
 ): string {
   return sections
     .map((section) => {
@@ -170,7 +169,7 @@ function renderVaultCategoryRows(
         section.id === "employment"
           ? ""
           : `<button class="vault-section-add${missingCurrentAddress ? " is-attention-action" : ""}" type="button" data-add-vault-section="${section.id}">${actionLabel}</button>`;
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id)).join("")}</ul>${addressList}</div></details>`;
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
@@ -178,6 +177,7 @@ function renderVaultCategoryRows(
 function renderVaultRequirement(
   requirement: DocumentVaultSectionProgress["requirements"][number],
   sectionId: string,
+  documents: readonly DocumentMetadata[],
 ): string {
   const priority =
     requirement.priority === "required"
@@ -193,10 +193,14 @@ function renderVaultRequirement(
       : `${requirement.documentCount} added`;
   const incompleteLabel =
     requirement.id === "address-proof" ? "Upload evidence" : priority;
-  const content = `<span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small>`;
-  if (sectionId === "employment") {
+  const existingDocument = documents.find((document) =>
+    requirement.categories.includes(document.category),
+  );
+  const actionLabel = `${existingDocument ? "Edit" : "Add"} ${requirement.label}`;
+  const content = `<span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${sectionId === "address-history" ? requirement.label : actionLabel}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small>`;
+  if (sectionId !== "address-history") {
     const category = requirement.categories[0];
-    return `<li class="vault-requirement-item vault-requirement-action${requirement.complete ? " is-complete" : ""}"><button type="button" data-employment-evidence="${category}" aria-label="${requirement.complete ? "Add another" : "Add"} ${requirement.label.toLowerCase()}">${content}</button></li>`;
+    return `<li class="vault-requirement-item vault-requirement-action${requirement.complete ? " is-complete" : ""}"><button type="button" data-document-evidence="${category}"${existingDocument ? ` data-document-id="${existingDocument.id}"` : ""} aria-label="${actionLabel}">${content}</button></li>`;
   }
   return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}">${content}</li>`;
 }
@@ -307,19 +311,59 @@ export function showDocumentUploadForm(
   root: HTMLElement,
   category?: DocumentCategory,
   addressHistoryId?: string,
+  existingDocument?: DocumentMetadata,
 ): void {
   const dialog = root.querySelector<HTMLDialogElement>("#document-dialog");
   const form = root.querySelector<HTMLFormElement>("#document-form");
   if (!dialog || !form) throw new Error("Document form is unavailable.");
   form.reset();
+  const documentId = form.elements.namedItem("documentId") as HTMLInputElement;
+  documentId.value = existingDocument?.id ?? "";
   const categorySelect = form.elements.namedItem(
     "category",
   ) as HTMLSelectElement | null;
-  if (category && categorySelect) categorySelect.value = category;
+  if (categorySelect)
+    categorySelect.value = existingDocument?.category ?? category ?? "";
   const addressId = form.elements.namedItem(
     "addressHistoryId",
   ) as HTMLInputElement | null;
   if (addressId) addressId.value = addressHistoryId ?? "";
+  const displayName = form.elements.namedItem(
+    "displayName",
+  ) as HTMLInputElement;
+  displayName.value = existingDocument?.displayName ?? "";
+  const fileInput = form.elements.namedItem("documentFile") as HTMLInputElement;
+  fileInput.required = !existingDocument;
+  const title = dialog.querySelector<HTMLElement>("#document-form-title");
+  if (title)
+    title.textContent = existingDocument
+      ? `Edit ${DOCUMENT_CATEGORY_LABELS[existingDocument.category]}`
+      : category
+        ? `Add ${DOCUMENT_CATEGORY_LABELS[category]}`
+        : "Add document";
+  const fileLabel = dialog.querySelector<HTMLElement>(
+    "[data-document-file-label]",
+  );
+  if (fileLabel)
+    fileLabel.textContent = existingDocument
+      ? "Replacement file (optional)"
+      : "Document file";
+  const fileGuidance = dialog.querySelector<HTMLElement>(
+    "[data-document-file-guidance]",
+  );
+  if (fileGuidance)
+    fileGuidance.textContent = existingDocument
+      ? `Current file: ${existingDocument.fileName}. Choose a replacement only if needed.`
+      : "The file is encrypted before it is stored in this browser.";
+  const submit = dialog.querySelector<HTMLButtonElement>(
+    "[data-document-submit]",
+  );
+  if (submit) {
+    submit.disabled = false;
+    submit.textContent = existingDocument
+      ? "Save changes"
+      : "Encrypt and save document";
+  }
   const error = form.querySelector<HTMLElement>("#document-form-error");
   if (error) {
     error.textContent = "";
@@ -335,6 +379,7 @@ export function suggestDocumentName(fileName: string): string {
 }
 
 export function readDocumentUploadForm(form: HTMLFormElement): {
+  documentId?: string;
   displayName: string;
   category: DocumentCategory;
   addressHistoryId?: string;
@@ -343,6 +388,7 @@ export function readDocumentUploadForm(form: HTMLFormElement): {
   const data = new FormData(form);
   const input = form.elements.namedItem("documentFile") as HTMLInputElement;
   return {
+    documentId: String(data.get("documentId") ?? "") || undefined,
     displayName: String(data.get("displayName") ?? "").trim(),
     category: String(data.get("category") ?? "") as DocumentCategory,
     addressHistoryId: String(data.get("addressHistoryId") ?? "") || undefined,

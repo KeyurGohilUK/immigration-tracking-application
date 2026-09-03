@@ -131,7 +131,6 @@ import {
   saveDocumentMetadataBatch,
 } from "../features/documents/data/document-repository";
 import {
-  DOCUMENT_CATEGORY_LABELS,
   MAXIMUM_DOCUMENTS_PER_PROFILE,
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   resolveDocumentMimeType,
@@ -730,8 +729,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           .querySelector<HTMLDialogElement>("#address-history-dialog")
           ?.showModal();
       };
-      const employmentDialog =
-        root.querySelector<HTMLDialogElement>("#employment-dialog");
       const lifeEnglishDialog = root.querySelector<HTMLDialogElement>(
         "#life-english-dialog",
       );
@@ -859,161 +856,19 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           showDocumentUploadForm(root, category ?? undefined);
         });
       }
-      employmentDialog
-        ?.querySelector<HTMLButtonElement>(".dialog-close")
-        ?.addEventListener("click", () => employmentDialog.close());
-      employmentDialog?.addEventListener("click", (event) => {
-        if (event.target === employmentDialog) employmentDialog.close();
-      });
-      const employmentForm = employmentDialog?.querySelector<HTMLFormElement>(
-        "#employment-evidence-form",
-      );
-      const employmentFile = employmentForm?.querySelector<HTMLInputElement>(
-        'input[name="documentFile"]',
-      );
-      const employmentName = employmentForm?.querySelector<HTMLInputElement>(
-        'input[name="displayName"]',
-      );
-      const employmentCategory =
-        employmentForm?.querySelector<HTMLInputElement>(
-          'input[name="category"]',
-        );
-      const employmentError = employmentForm?.querySelector<HTMLElement>(
-        "#employment-evidence-error",
-      );
-      employmentDialog
-        ?.querySelector<HTMLButtonElement>("[data-employment-cancel]")
-        ?.addEventListener("click", () => employmentDialog.close());
       for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-employment-evidence]",
+        "[data-document-evidence]",
       )) {
         button.addEventListener("click", () => {
-          const category = button.dataset.employmentEvidence;
-          if (
-            category !== "employer-letter" &&
-            category !== "employment-contract"
-          )
-            return;
-          const label = DOCUMENT_CATEGORY_LABELS[category];
-          employmentForm?.reset();
-          if (employmentCategory) employmentCategory.value = category;
-          if (employmentError) {
-            employmentError.textContent = "";
-            employmentError.hidden = true;
-          }
-          const title = employmentDialog?.querySelector<HTMLElement>(
-            "#employment-dialog-title",
+          const category = button.dataset.documentEvidence as
+            DocumentMetadata["category"] | undefined;
+          if (!category) return;
+          const existingDocument = documents.find(
+            ({ id }) => id === button.dataset.documentId,
           );
-          const fileLabel = employmentDialog?.querySelector<HTMLElement>(
-            "[data-employment-file-label]",
-          );
-          if (title) title.textContent = `Save ${label.toLowerCase()}`;
-          if (fileLabel) fileLabel.textContent = `${label} file`;
-          employmentDialog?.showModal();
+          showDocumentUploadForm(root, category, undefined, existingDocument);
         });
       }
-      employmentFile?.addEventListener("change", () => {
-        const file = employmentFile.files?.[0];
-        if (file && employmentName && !employmentName.value.trim())
-          employmentName.value = suggestDocumentName(file.name);
-      });
-      employmentForm?.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const category = employmentCategory?.value;
-        if (
-          category !== "employer-letter" &&
-          category !== "employment-contract"
-        )
-          return;
-        const file = employmentFile?.files?.[0];
-        const displayName = employmentName?.value.trim() ?? "";
-        const mimeType = file
-          ? resolveDocumentMimeType(file.name, file.type)
-          : null;
-        const validationError = file
-          ? validateDocumentUploadInput({
-              displayName,
-              category,
-              fileName: file.name,
-              mimeType: mimeType ?? file.type,
-              size: file.size,
-            })
-          : "Choose a PDF, JPG, or PNG file.";
-        if (validationError || !file || !mimeType) {
-          if (employmentError) {
-            employmentError.textContent =
-              validationError ?? "Choose a PDF, JPG, or PNG file.";
-            employmentError.hidden = false;
-          }
-          return;
-        }
-        const profileDocuments = documents.filter(
-          ({ profileId }) => profileId === selectedProfileId,
-        );
-        const totalBytes = documents.reduce(
-          (total, document) => total + document.size,
-          0,
-        );
-        if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
-          if (employmentError) {
-            employmentError.textContent =
-              "This profile already has the maximum of 25 documents.";
-            employmentError.hidden = false;
-          }
-          return;
-        }
-        if (totalBytes + file.size > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
-          if (employmentError) {
-            employmentError.textContent =
-              "Document storage would exceed the 50 MB app limit.";
-            employmentError.hidden = false;
-          }
-          return;
-        }
-        const bytes = new Uint8Array(await file.arrayBuffer());
-        const signatureError = validateDocumentSignature(mimeType, bytes);
-        if (signatureError) {
-          if (employmentError) {
-            employmentError.textContent = signatureError;
-            employmentError.hidden = false;
-          }
-          return;
-        }
-        const timestamp = new Date().toISOString();
-        const metadata: DocumentMetadata = {
-          version: 1,
-          id: crypto.randomUUID(),
-          profileId: selectedProfileId,
-          displayName,
-          fileName: file.name.trim(),
-          mimeType,
-          size: file.size,
-          category,
-          sortOrder:
-            profileDocuments.reduce(
-              (maximum, document) => Math.max(maximum, document.sortOrder),
-              -1,
-            ) + 1,
-          createdAt: timestamp,
-          updatedAt: timestamp,
-        };
-        const submit = employmentForm.querySelector<HTMLButtonElement>(
-          'button[type="submit"]',
-        );
-        if (submit) submit.disabled = true;
-        try {
-          await saveDocument(metadata, bytes, key);
-          employmentDialog?.close();
-          await showDocuments(profile);
-        } catch {
-          if (employmentError) {
-            employmentError.textContent =
-              "The employment document could not be encrypted and saved.";
-            employmentError.hidden = false;
-          }
-          if (submit) submit.disabled = false;
-        }
-      });
       lifeEnglishDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => lifeEnglishDialog.close());
@@ -1504,6 +1359,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       uploadDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => uploadDialog.close());
+      uploadDialog
+        ?.querySelector<HTMLButtonElement>("[data-document-cancel]")
+        ?.addEventListener("click", () => uploadDialog.close());
       renameDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => renameDialog.close());
@@ -1528,8 +1386,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const error = uploadForm.querySelector<HTMLElement>(
           "#document-form-error",
         );
-        const { displayName, category, addressHistoryId, file } =
+        const { documentId, displayName, category, addressHistoryId, file } =
           readDocumentUploadForm(uploadForm);
+        const existingDocument = documents.find(({ id }) => id === documentId);
         const mimeType = file
           ? resolveDocumentMimeType(file.name, file.type)
           : null;
@@ -1541,8 +1400,14 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               mimeType: mimeType ?? file.type,
               size: file.size,
             })
-          : "Choose a PDF, JPG, or PNG file.";
-        if (validationError || !file || !mimeType) {
+          : existingDocument
+            ? validateDocumentName(displayName)
+            : "Choose a PDF, JPG, or PNG file.";
+        if (
+          validationError ||
+          (!file && !existingDocument) ||
+          (file && !mimeType)
+        ) {
           if (error) {
             error.textContent =
               validationError ?? "Choose a PDF, JPG, or PNG file.";
@@ -1557,7 +1422,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           (total, document) => total + document.size,
           0,
         );
-        if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
+        if (
+          !existingDocument &&
+          profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE
+        ) {
           if (error) {
             error.textContent =
               "This profile already has the maximum of 25 documents.";
@@ -1565,7 +1433,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           return;
         }
-        if (totalBytes + file.size > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
+        const nextFileSize = file?.size ?? existingDocument?.size ?? 0;
+        const replacedFileSize = existingDocument?.size ?? 0;
+        if (
+          totalBytes - replacedFileSize + nextFileSize >
+          MAXIMUM_TOTAL_DOCUMENT_BYTES
+        ) {
           if (error) {
             error.textContent =
               "Document storage would exceed the 50 MB app limit.";
@@ -1573,7 +1446,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
           return;
         }
-        if (navigator.storage?.estimate) {
+        if (file && navigator.storage?.estimate) {
           const estimate = await navigator.storage.estimate();
           if (
             estimate.quota &&
@@ -1587,32 +1460,41 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             return;
           }
         }
-        const bytes = new Uint8Array(await file.arrayBuffer());
-        const signatureError = validateDocumentSignature(mimeType, bytes);
-        if (signatureError) {
-          if (error) {
-            error.textContent = signatureError;
-            error.hidden = false;
+        const bytes = file
+          ? new Uint8Array(await file.arrayBuffer())
+          : undefined;
+        if (bytes && mimeType) {
+          const signatureError = validateDocumentSignature(mimeType, bytes);
+          if (signatureError) {
+            if (error) {
+              error.textContent = signatureError;
+              error.hidden = false;
+            }
+            return;
           }
-          return;
         }
         const timestamp = new Date().toISOString();
         const metadata: DocumentMetadata = {
           version: 1,
-          id: crypto.randomUUID(),
+          id: existingDocument?.id ?? crypto.randomUUID(),
           profileId: selectedProfileId,
           displayName,
-          fileName: file.name.trim(),
-          mimeType,
-          size: file.size,
+          fileName: file?.name.trim() ?? existingDocument?.fileName ?? "",
+          mimeType: mimeType ?? existingDocument?.mimeType ?? "application/pdf",
+          size: file?.size ?? existingDocument?.size ?? 0,
           category,
-          ...(addressHistoryId ? { addressHistoryId } : {}),
+          ...(addressHistoryId
+            ? { addressHistoryId }
+            : existingDocument?.addressHistoryId
+              ? { addressHistoryId: existingDocument.addressHistoryId }
+              : {}),
           sortOrder:
+            existingDocument?.sortOrder ??
             profileDocuments.reduce(
               (maximum, document) => Math.max(maximum, document.sortOrder),
               -1,
             ) + 1,
-          createdAt: timestamp,
+          createdAt: existingDocument?.createdAt ?? timestamp,
           updatedAt: timestamp,
         };
         const submit = uploadForm.querySelector<HTMLButtonElement>(
@@ -1620,7 +1502,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
         if (submit) submit.disabled = true;
         try {
-          await saveDocument(metadata, bytes, key);
+          if (bytes) await saveDocument(metadata, bytes, key);
+          else await saveDocumentMetadataBatch([metadata], key);
           uploadDialog?.close();
           await showDocuments(profile);
         } catch {
