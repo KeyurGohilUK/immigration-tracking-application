@@ -44,3 +44,25 @@
   min-height: 3.5rem;
   margin: 0;
 }
+
+#document-file,
+#employment-evidence-file {
+  padding: 0.3rem 0.45rem;
+  line-height: 2.55rem;
+}
+
+#document-file::file-selector-button,
+#employment-evidence-file::file-selector-button {
+  height: 2.55rem;
+  margin: 0 0.75rem 0 0;
+  padding: 0 0.9rem;
+  border: 1px solid var(--ibiza-border-soft);
+  border-radius: 0.75rem;
+  color: var(--ibiza-text);
+  background: var(--ibiza-glass-soft);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}

@@ -798,6 +798,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         .querySelector<HTMLButtonElement>("#download-document-bundle")
         ?.addEventListener("click", async (event) => {
           const button = event.currentTarget as HTMLButtonElement;
+          const label = button.querySelector<HTMLElement>(
+            "[data-vault-download-label]",
+          );
+          if (!label) return;
           const selectedDocuments = documents
             .filter(({ profileId }) => profileId === selectedProfileId)
             .sort(
@@ -808,7 +812,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (selectedDocuments.length === 0 && addressHistory.length === 0)
             return;
           button.disabled = true;
-          button.textContent = "Creating ZIP…";
+          label.textContent = "CREATING ZIP…";
           try {
             const files = await Promise.all(
               selectedDocuments.map(({ id }) => getDocumentFile(id, key)),
@@ -822,18 +826,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
               profileName,
             );
             downloadDocumentBundle(bytes, profileName);
-            button.textContent = "Doc bundle downloaded";
+            label.textContent = "ZIP BUNDLE DOWNLOADED";
           } catch {
             button.disabled = false;
-            button.textContent = "⇩ Download doc bundle";
+            label.textContent = "DOWNLOAD ZIP BUNDLE";
             showDocumentPageError(
               "The document bundle could not be created. Check that every stored file can be opened.",
             );
           }
         });
-      root
-        .querySelector<HTMLButtonElement>("#add-document")
-        ?.addEventListener("click", () => showDocumentUploadForm(root));
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-add-vault-section]",
       )) {
@@ -1885,8 +1886,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
       } catch {
         renderDocuments(profile, [], [], null, null, null);
-        const add = root.querySelector<HTMLButtonElement>("#add-document");
-        if (add) add.disabled = true;
         showDocumentPageError(
           "Encrypted Document Vault data could not be opened on this device.",
         );
