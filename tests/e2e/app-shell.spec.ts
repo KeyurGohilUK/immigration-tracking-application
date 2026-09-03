@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History can now download a separate paged index PDF plus individually named evidence files using Current address and Previous address prefixes.",
+      "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold.",
     ),
   ).toBeVisible();
   await expect(
