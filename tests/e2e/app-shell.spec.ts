@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Active sessions now stay unlocked when iOS opens download/system UI, and downloading an app update no longer forces a reload or PIN screen.",
+      "The centre ILR hero icon now keeps its bright Ibiza accent when unselected in both light and dark themes.",
     ),
   ).toBeVisible();
   await expect(
