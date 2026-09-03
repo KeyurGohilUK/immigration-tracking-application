@@ -172,7 +172,7 @@
 
 .mobile-navigation a[data-navigation="ILR"] {
   min-height: 3.4rem;
-  color: var(--ibiza-primary);
+  color: var(--ibiza-pink);
 }
 
 .mobile-navigation a[data-navigation="ILR"] svg {
@@ -207,7 +207,7 @@
 }
 
 .desktop-navigation a[data-navigation="ILR"] {
-  color: var(--ibiza-primary);
+  color: var(--ibiza-pink);
   background: transparent;
   box-shadow: none;
 }
