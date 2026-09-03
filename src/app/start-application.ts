@@ -144,6 +144,12 @@ import {
   downloadDocumentPack,
 } from "../features/documents/services/document-pack-service";
 import {
+  buildAddressEvidenceExportPlan,
+  createAddressHistoryIndexPdf,
+  downloadAddressEvidenceFile,
+  downloadAddressHistoryIndex,
+} from "../features/documents/services/address-evidence-export-service";
+import {
   getAddressHistory,
   saveAddressHistory,
 } from "../features/documents/data/address-history-repository";
@@ -737,6 +743,48 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       );
       const lifeEnglishForm =
         root.querySelector<HTMLFormElement>("#life-english-form");
+      root
+        .querySelector<HTMLButtonElement>("[data-download-address-evidence]")
+        ?.addEventListener("click", async (event) => {
+          const button = event.currentTarget as HTMLButtonElement;
+          const selectedDocuments = documents
+            .filter(({ profileId }) => profileId === selectedProfileId)
+            .sort(
+              (left, right) =>
+                left.sortOrder - right.sortOrder ||
+                left.createdAt.localeCompare(right.createdAt),
+            );
+          const plan = buildAddressEvidenceExportPlan(
+            addressHistory,
+            selectedDocuments,
+          );
+          const profileName =
+            familyMembers.find(({ id }) => id === selectedProfileId)
+              ?.fullName ?? "UrbanFox";
+          button.disabled = true;
+          button.textContent = "Preparing address downloads…";
+          try {
+            const indexBytes = await createAddressHistoryIndexPdf(
+              plan.indexRows,
+              profileName,
+            );
+            downloadAddressHistoryIndex(indexBytes, profileName);
+            for (const item of plan.evidenceFiles) {
+              const file = await getDocumentFile(item.documentId, key);
+              downloadAddressEvidenceFile(file, item.exportedFileName);
+            }
+            button.textContent =
+              plan.evidenceFiles.length > 0
+                ? "Address files downloaded"
+                : "Address index downloaded";
+          } catch {
+            button.disabled = false;
+            button.textContent = "Download address files + index";
+            showDocumentPageError(
+              "The Address History downloads could not be created. Check that the linked evidence files can still be opened.",
+            );
+          }
+        });
       root
         .querySelector<HTMLButtonElement>("#download-document-pack")
         ?.addEventListener("click", async (event) => {

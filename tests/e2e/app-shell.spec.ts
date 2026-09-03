@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Profile & Settings is organised into collapsed-by-default sections so controls only appear when needed.",
+      "Address History can now download a separate paged index PDF plus individually named evidence files using Current address and Previous address prefixes.",
     ),
   ).toBeVisible();
   await expect(
@@ -496,6 +496,22 @@ test("guides Address History from the current address backwards", async ({
   await expect(savedAddresses.getByRole("listitem").nth(2)).toContainText(
     "Previous address 21 First Street, Bristol, BS1 1AASept 2021 – Jun 2023",
   );
+
+  const addressDownloads: import("@playwright/test").Download[] = [];
+  page.on("download", (download) => addressDownloads.push(download));
+  await addressSection
+    .getByRole("button", { name: "Download address files + index" })
+    .click();
+  await expect.poll(() => addressDownloads.length).toBe(2);
+  expect(
+    addressDownloads.map((download) => download.suggestedFilename()),
+  ).toEqual(
+    expect.arrayContaining([
+      "Urban-Fox-Test-User-Address-History-Index.pdf",
+      "Current address - current-address-proof.png",
+    ]),
+  );
+
   await addressSection.getByRole("button", { name: "Edit address" }).click();
   dialog = page.getByRole("dialog", { name: "Address History" });
   await expect(
