@@ -1283,35 +1283,40 @@ test("animates expandable sections when opening and closing", async ({
   const settingsDetails = page
     .locator("details")
     .filter({ hasText: "Protect this device" });
+
   const openAnimationIds = await settingsDetails.evaluate((element) => {
-    const summary = element.querySelector(":scope > summary") as HTMLElement;
-    summary.click();
+    const summary = element.querySelector<HTMLElement>(":scope > summary");
+    summary?.click();
     return element.getAnimations().map((animation) => animation.id);
   });
+
   expect(openAnimationIds).toContain("urbanfox-disclosure");
   await expect(settingsDetails).toHaveAttribute("open", "");
-  await expect
-    .poll(() => settingsDetails.getAttribute("data-disclosure-animating"))
-    .toBeNull();
+  await expect(settingsDetails).not.toHaveAttribute(
+    "data-disclosure-animating",
+    "true",
+  );
 
   const closeAnimationIds = await settingsDetails.evaluate((element) => {
-    const summary = element.querySelector(":scope > summary") as HTMLElement;
-    summary.click();
+    const summary = element.querySelector<HTMLElement>(":scope > summary");
+    summary?.click();
     return element.getAnimations().map((animation) => animation.id);
   });
+
   expect(closeAnimationIds).toContain("urbanfox-disclosure");
-  await expect
-    .poll(() => settingsDetails.getAttribute("open"))
-    .toBeNull();
+  await expect(settingsDetails).not.toHaveAttribute("open", "");
 
   await page.getByRole("link", { name: "Vault", exact: true }).click();
+
   const vaultDetails = page.locator("details.vault-section-card").first();
   await expect(vaultDetails).toBeVisible();
+
   const vaultAnimationIds = await vaultDetails.evaluate((element) => {
-    const summary = element.querySelector(":scope > summary") as HTMLElement;
-    summary.click();
+    const summary = element.querySelector<HTMLElement>(":scope > summary");
+    summary?.click();
     return element.getAnimations().map((animation) => animation.id);
   });
+
   expect(vaultAnimationIds).toContain("urbanfox-disclosure");
 });
 
