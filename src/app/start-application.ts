@@ -367,13 +367,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }),
         );
       root
-        .querySelector<HTMLButtonElement>("#open-install-settings")
-        ?.addEventListener("click", () =>
-          document
-            .querySelector<HTMLButtonElement>(".app-manager-trigger")
-            ?.click(),
-        );
-      root
         .querySelector<HTMLButtonElement>("#view-legal")
         ?.addEventListener("click", () =>
           showLegal(false, () => renderMore(profile)),
