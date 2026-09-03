@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Document Vault now downloads a ZIP bundle with one folder per visible section, including the Address History index and prefixed address evidence files.",
+      "Active sessions now stay unlocked when iOS opens download/system UI, and downloading an app update no longer forces a reload or PIN screen.",
     ),
   ).toBeVisible();
   await expect(
@@ -2053,4 +2053,55 @@ test("registers the offline app service worker", async ({ page }) => {
   });
 
   expect(registrationScope).toContain("127.0.0.1:4173");
+});
+
+test("keeps an authenticated session open across temporary system UI", async ({ page }) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Vault" }).first().click();
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "visible",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+
+  await expect(
+    page.getByRole("heading", { name: "Document Vault", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(0);
+});
+
+test("downloads an available update without reloading the unlocked session", async ({ page }) => {
+  await page.route("**/release.json?check=*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        version: "9.9.9",
+        notes: ["Test update"],
+      }),
+    });
+  });
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await page.getByRole("button", { name: /Install and updates|Update .* available/ }).click();
+  const dialog = page.getByRole("dialog", { name: "Install and updates" });
+  await expect(dialog.getByText("Update 9.9.9 available")).toBeVisible();
+  await dialog.getByRole("button", { name: "Download update" }).click();
+
+  await expect(
+    dialog.getByText(
+      "Update downloaded. It will be used the next time UrbanFox starts; you can keep working now.",
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(0);
 });
