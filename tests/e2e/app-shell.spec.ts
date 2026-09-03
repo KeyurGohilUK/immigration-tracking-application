@@ -1290,9 +1290,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(
     page.getByRole("heading", { name: "Appearance", level: 2 }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("group", { name: "Appearance" }),
-  ).toBeVisible();
+  await expect(page.getByRole("group", { name: "Appearance" })).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Terms, privacy, and licence",
