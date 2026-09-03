@@ -126,7 +126,7 @@ export function renderReadOnlyAddressList(
       ({ entry, label }) =>
         `<li><span class="address-number">${label}</span><strong>${escapeHtml(formatStructuredAddress(entry.address))}</strong><small>${formatMonth(entry.startMonth)} – ${entry.isCurrent ? "Present" : formatMonth(entry.endMonth)}</small></li>`,
     )
-    .join("")}</ol></section>`;
+    .join("")}</ol><button class="vault-section-add" type="button" data-download-address-evidence>Download address files + index</button></section>`;
 }
 
 function getDisplayAddresses(
