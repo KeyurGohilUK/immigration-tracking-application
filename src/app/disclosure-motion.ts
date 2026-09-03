@@ -81,7 +81,9 @@ function animateDisclosure(
       details.style.removeProperty("height");
       details.style.removeProperty("overflow");
       delete details.dataset.disclosureAnimating;
-      contentAnimations.forEach((contentAnimation) => contentAnimation.cancel());
+      contentAnimations.forEach((contentAnimation) =>
+        contentAnimation.cancel(),
+      );
     });
 }
 
