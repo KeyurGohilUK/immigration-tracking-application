@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "The centre ILR hero icon now keeps its bright Ibiza accent when unselected in both light and dark themes.",
+      "The unselected centre ILR hero icon now uses the bright Ibiza pink-to-orange gradient in both light and dark themes.",
     ),
   ).toBeVisible();
   await expect(
@@ -1921,6 +1921,13 @@ test("opens the centre ILR hero journey for the household", async ({
   await expect(
     navigation.locator('a[data-navigation="ILR"]:not([aria-current="page"])'),
   ).toHaveCSS("color", "rgb(238, 9, 121)");
+  expect(
+    await navigation
+      .locator(
+        'a[data-navigation="ILR"]:not([aria-current="page"]) .navigation-hero-icon',
+      )
+      .evaluate((element) => window.getComputedStyle(element).stroke),
+  ).toContain("mobile-ilr-icon-gradient");
   await ilrLinks.first().click();
 
   await expect(navigation).toHaveClass(/is-hero-active/);
