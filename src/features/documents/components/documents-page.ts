@@ -94,6 +94,7 @@ export function renderDocumentsPage(
       actions:
         '<button class="secondary-button" type="button" data-document-cancel>Cancel</button><button class="primary-button family-save-button liquid-dialog-save" type="submit" data-document-submit>Encrypt and save document</button>',
       dialogClass: "document-dialog",
+      formClass: "document-evidence-form",
       closeLabel: "Close document form",
     })}
     ${renderAddressHistoryDialog(

@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Downloaded app updates now restart UrbanFox immediately so the new release is applied.",
+      "Document checklist items now change from Add to Edit after upload and open the saved document for editing.",
     ),
   ).toBeVisible();
   await expect(

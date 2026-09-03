@@ -33,11 +33,13 @@
   outline-offset: -2px;
 }
 
-.employment-evidence-form .liquid-dialog-actions {
+.employment-evidence-form .liquid-dialog-actions,
+.document-evidence-form .liquid-dialog-actions {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.employment-evidence-form .liquid-dialog-actions > button {
+.employment-evidence-form .liquid-dialog-actions > button,
+.document-evidence-form .liquid-dialog-actions > button {
   width: 100%;
   min-height: 3.5rem;
   margin: 0;
