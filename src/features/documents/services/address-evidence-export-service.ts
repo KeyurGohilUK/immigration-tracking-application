@@ -140,7 +140,11 @@ export function downloadAddressHistoryIndex(
   bytes: Uint8Array<ArrayBuffer>,
   profileName: string,
 ): void {
-  downloadBytes(bytes, "application/pdf", getAddressHistoryIndexFileName(profileName));
+  downloadBytes(
+    bytes,
+    "application/pdf",
+    getAddressHistoryIndexFileName(profileName),
+  );
 }
 
 export function downloadAddressEvidenceFile(
@@ -211,11 +215,13 @@ function sanitizeFileName(value: string): string {
 }
 
 function safeFileStem(value: string): string {
-  return value
-    .normalize("NFKD")
-    .replace(/[^a-zA-Z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80) || "UrbanFox";
+  return (
+    value
+      .normalize("NFKD")
+      .replace(/[^a-zA-Z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || "UrbanFox"
+  );
 }
 
 function formatMonth(month: string): string {
@@ -266,14 +272,18 @@ function drawPageHeader(
 }
 
 function estimateRowHeight(row: AddressHistoryIndexRow, font: PDFFont): number {
-  const addressLines = wrapText(toPdfText(row.fullAddress), 490, font, 9).length;
+  const addressLines = wrapText(
+    toPdfText(row.fullAddress),
+    490,
+    font,
+    9,
+  ).length;
   const evidenceLines = (
     row.evidenceFileNames.length > 0
       ? row.evidenceFileNames
       : ["No evidence attached"]
   ).reduce(
-    (total, name) =>
-      total + wrapText(toPdfText(name), 470, font, 8).length,
+    (total, name) => total + wrapText(toPdfText(name), 470, font, 8).length,
     0,
   );
   return 46 + addressLines * 11 + evidenceLines * 10 + ROW_GAP;
