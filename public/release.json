@@ -1,6 +1,6 @@
 {
-  "version": "3.22.5",
+  "version": "3.22.6",
   "notes": [
-    "Appearance and legal settings now sit as independent Liquid Glass capsules, with clear active Dark, System, and Light controls."
+    "Removed the duplicate Appearance label above the Dark, System, and Light controls."
   ]
 }

@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Appearance and legal settings now sit as independent Liquid Glass capsules, with clear active Dark, System, and Light controls.",
+      "Removed the duplicate Appearance label above the Dark, System, and Light controls.",
     ),
   ).toBeVisible();
   await expect(
@@ -1262,6 +1262,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(
     page.getByRole("heading", { name: "Appearance", level: 2 }),
   ).toBeVisible();
+  await expect(page.getByText("Appearance", { exact: true })).toHaveCount(1);
   await expect(
     page.getByRole("heading", {
       name: "Terms, privacy, and licence",
