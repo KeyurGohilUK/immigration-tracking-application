@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Downloaded app updates now restart UrbanFox immediately so the new release is applied.",
+      "Document checklist items now change from Add to Edit after upload and open the saved document for editing.",
     ),
   ).toBeVisible();
   await expect(
@@ -987,7 +987,7 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 });
 
-test("opens focused Employment evidence dialogs from each checklist item", async ({
+test("adds and edits documents from non-address checklist items", async ({
   page,
 }) => {
   await page.goto("/");
@@ -1006,15 +1006,14 @@ test("opens focused Employment evidence dialogs from each checklist item", async
     .getByRole("button", { name: "Add employer letter" })
     .click();
 
-  let dialog = page.getByRole("dialog", { name: "Save employer letter" });
+  let dialog = page.getByRole("dialog", { name: "Add Employer letter" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("Employer letter file")).toBeVisible();
-  await expect(dialog.getByLabel("Employment contract file")).toHaveCount(0);
+  await expect(dialog.getByLabel("Document file")).toBeVisible();
   const cancelBox = await dialog
     .getByRole("button", { name: "Cancel" })
     .boundingBox();
   const saveBox = await dialog
-    .getByRole("button", { name: "Save" })
+    .getByRole("button", { name: "Encrypt and save document" })
     .boundingBox();
   expect(cancelBox?.width).toBe(saveBox?.width);
   expect(cancelBox?.height).toBe(saveBox?.height);
@@ -1028,14 +1027,16 @@ test("opens focused Employment evidence dialogs from each checklist item", async
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64",
   );
-  dialog = page.getByRole("dialog", { name: "Save employer letter" });
-  await dialog.getByLabel("Employer letter file").setInputFiles({
+  dialog = page.getByRole("dialog", { name: "Add Employer letter" });
+  await dialog.getByLabel("Document file").setInputFiles({
     name: "employer-letter.png",
     mimeType: "image/png",
     buffer: tinyPng,
   });
   await dialog.getByLabel("Document name").fill("Employer letter");
-  await dialog.getByRole("button", { name: "Save" }).click();
+  await dialog
+    .getByRole("button", { name: "Encrypt and save document" })
+    .click();
 
   await expect(dialog).not.toBeVisible();
   await expect(
@@ -1043,25 +1044,44 @@ test("opens focused Employment evidence dialogs from each checklist item", async
   ).toBeVisible();
   await employmentSection.locator("summary").click();
   await employmentSection
+    .getByRole("button", { name: "Edit Employer letter" })
+    .click();
+  dialog = page.getByRole("dialog", { name: "Edit Employer letter" });
+  await expect(dialog.getByLabel("Document name")).toHaveValue(
+    "Employer letter",
+  );
+  await expect(dialog.getByLabel("Replacement file (optional)")).toBeVisible();
+  await dialog.getByLabel("Document name").fill("Updated employer letter");
+  await dialog.getByRole("button", { name: "Save changes" }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Updated employer letter" }),
+  ).toBeVisible();
+
+  await employmentSection.locator("summary").click();
+  await employmentSection
     .getByRole("button", { name: "Add employment contract" })
     .click();
-  dialog = page.getByRole("dialog", { name: "Save employment contract" });
+  dialog = page.getByRole("dialog", { name: "Add Employment contract" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel("Employer letter file")).toHaveCount(0);
-  await dialog.getByLabel("Employment contract file").setInputFiles({
+  await dialog.getByLabel("Document file").setInputFiles({
     name: "employment-contract.png",
     mimeType: "image/png",
     buffer: tinyPng,
   });
   await dialog.getByLabel("Document name").fill("Employment contract");
-  await dialog.getByRole("button", { name: "Save" }).click();
+  await dialog
+    .getByRole("button", { name: "Encrypt and save document" })
+    .click();
 
   await expect(
     employmentSection.getByText("Complete", { exact: true }),
   ).toBeVisible();
   const documentCollection = page.getByLabel("Document collection");
   await expect(
-    documentCollection.getByRole("heading", { name: "Employer letter" }),
+    documentCollection.getByRole("heading", {
+      name: "Updated employer letter",
+    }),
   ).toBeVisible();
   await expect(
     documentCollection.getByRole("heading", { name: "Employment contract" }),
