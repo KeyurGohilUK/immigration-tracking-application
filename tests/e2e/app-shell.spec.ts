@@ -2099,9 +2099,11 @@ test("downloads an available update without reloading the unlocked session", asy
   await page.goto("/");
   await createLocalProfile(page);
 
-  await page
-    .getByRole("button", { name: /Install and updates|Update .* available/ })
-    .click();
+  const updateTrigger = page.getByRole("button", {
+    name: "Update 9.9.9 available",
+  });
+  await expect(updateTrigger).toBeVisible();
+  await updateTrigger.click();
   const dialog = page.getByRole("dialog", { name: "Install and updates" });
   await expect(dialog.getByText("Update 9.9.9 available")).toBeVisible();
   await dialog.getByRole("button", { name: "Download update" }).click();
