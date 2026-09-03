@@ -33,6 +33,7 @@ const expectedImports = [
   '@import "./styles/components/dialog-compat.css";',
   '@import "./styles/pages/setup.css";',
   '@import "./styles/pages/documents.css";',
+  '@import "./styles/components/employment-evidence.css";',
   '@import "./styles/pages/household-dashboard.css";',
   '@import "./styles/components/navigation.css";',
   '@import "./styles/pages/household.css";',
