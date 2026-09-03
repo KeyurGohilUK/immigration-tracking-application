@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Employment checklist items now open focused evidence dialogs with matching Cancel and Save actions.",
+      "Appearance and legal settings now use separate Liquid Glass capsules, with clearer Dark, System, and Light appearance controls.",
     ),
   ).toBeVisible();
   await expect(
@@ -1271,7 +1271,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(page.locator("#open-install-settings")).toHaveCount(0);
 });
 
-test("persists dark, system, and light segmented theme preferences", async ({
+test("persists dark, system, and light appearance preferences", async ({
   page,
 }) => {
   await page.goto("/");

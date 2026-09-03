@@ -1,6 +1,6 @@
 {
-  "version": "3.22.4",
+  "version": "3.22.5",
   "notes": [
-    "Employment checklist items now open focused evidence dialogs with matching Cancel and Save actions."
+    "Appearance and legal settings now use separate Liquid Glass capsules, with clearer Dark, System, and Light appearance controls."
   ]
 }
