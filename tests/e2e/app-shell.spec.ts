@@ -2098,6 +2098,15 @@ test("downloads an available update without reloading the unlocked session", asy
   });
   await page.goto("/");
   await createLocalProfile(page);
+  await page.evaluate(() => {
+    const serviceWorker = navigator.serviceWorker;
+    Object.defineProperty(serviceWorker, "getRegistration", {
+      configurable: true,
+      value: async () => ({
+        update: async () => undefined,
+      }),
+    });
+  });
 
   const updateTrigger = page.getByRole("button", {
     name: "Update 9.9.9 available",
