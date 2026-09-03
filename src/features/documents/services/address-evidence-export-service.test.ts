@@ -87,7 +87,9 @@ describe("Address evidence export", () => {
       ],
     );
 
-    expect(plan.evidenceFiles.map(({ exportedFileName }) => exportedFileName)).toEqual([
+    expect(
+      plan.evidenceFiles.map(({ exportedFileName }) => exportedFileName),
+    ).toEqual([
       "Current address - council-tax.pdf",
       "Previous address 1 - tenancy.pdf",
       "Previous address 2 - bank.pdf",
@@ -134,15 +136,15 @@ describe("Address evidence export", () => {
       ],
     );
 
-    expect(plan.evidenceFiles.map(({ exportedFileName }) => exportedFileName)).toEqual([
-      "Current address - bank.pdf",
-      "Current address - bank (2).pdf",
-    ]);
+    expect(
+      plan.evidenceFiles.map(({ exportedFileName }) => exportedFileName),
+    ).toEqual(["Current address - bank.pdf", "Current address - bank (2).pdf"]);
   });
 
   it("paginates a long Address History index and keeps PDF page numbering", async () => {
     const rows = Array.from({ length: 30 }, (_, index) => ({
-      addressLabel: index === 0 ? "Current address" : `Previous address ${index}`,
+      addressLabel:
+        index === 0 ? "Current address" : `Previous address ${index}`,
       from: "Jan 2020",
       to: index === 0 ? "Present" : "Dec 2020",
       fullAddress:
@@ -152,9 +154,8 @@ describe("Address evidence export", () => {
       ],
     }));
 
-    const { createAddressHistoryIndexPdf } = await import(
-      "./address-evidence-export-service"
-    );
+    const { createAddressHistoryIndexPdf } =
+      await import("./address-evidence-export-service");
     const bytes = await createAddressHistoryIndexPdf(rows, "Test User");
     const pdf = await PDFDocument.load(bytes);
 
