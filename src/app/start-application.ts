@@ -117,11 +117,19 @@ import {
   syncAddressEvidenceName,
 } from "../features/documents/components/address-history-dialog";
 import {
+  readEnglishLanguageForm,
+  readEvidenceFile,
   readLifeEnglishEvidenceFiles,
   readLifeEnglishForm,
+  readLifeInUkForm,
+  showEnglishLanguageForm,
   showLifeEnglishForm,
+  showLifeInUkForm,
+  syncEnglishLanguageForm,
+  syncEvidenceName,
   syncLifeEnglishEvidenceNames,
   syncLifeEnglishForm,
+  syncLifeInUkForm,
 } from "../features/documents/components/life-english-dialog";
 import {
   deleteDocument,
@@ -729,6 +737,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           .querySelector<HTMLDialogElement>("#address-history-dialog")
           ?.showModal();
       };
+      const lifeInUkDialog =
+        root.querySelector<HTMLDialogElement>("#life-in-uk-dialog");
+      const lifeInUkForm =
+        root.querySelector<HTMLFormElement>("#life-in-uk-form");
+      const englishLanguageDialog = root.querySelector<HTMLDialogElement>(
+        "#english-language-dialog",
+      );
+      const englishLanguageForm = root.querySelector<HTMLFormElement>(
+        "#english-language-form",
+      );
       const lifeEnglishDialog = root.querySelector<HTMLDialogElement>(
         "#life-english-dialog",
       );
@@ -869,6 +887,216 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           showDocumentUploadForm(root, category, undefined, existingDocument);
         });
       }
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-life-english-form]",
+      )) {
+        button.addEventListener("click", () => {
+          if (button.dataset.lifeEnglishForm === "life-in-uk")
+            showLifeInUkForm(root, lifeEnglish);
+          if (button.dataset.lifeEnglishForm === "english-language")
+            showEnglishLanguageForm(root, lifeEnglish);
+        });
+      }
+      const wireIndependentDialog = (
+        dialog: HTMLDialogElement | null,
+      ): void => {
+        dialog
+          ?.querySelector<HTMLButtonElement>(".dialog-close")
+          ?.addEventListener("click", () => dialog.close());
+        dialog
+          ?.querySelector<HTMLButtonElement>("[data-form-cancel]")
+          ?.addEventListener("click", () => dialog.close());
+        dialog?.addEventListener("click", (event) => {
+          if (event.target === dialog) dialog.close();
+        });
+      };
+      wireIndependentDialog(lifeInUkDialog);
+      wireIndependentDialog(englishLanguageDialog);
+      lifeInUkForm
+        ?.querySelector<HTMLSelectElement>("#life-status")
+        ?.addEventListener("change", () => syncLifeInUkForm(lifeInUkForm));
+      englishLanguageForm
+        ?.querySelector<HTMLSelectElement>("#english-status")
+        ?.addEventListener("change", () =>
+          syncEnglishLanguageForm(englishLanguageForm),
+        );
+      for (const form of [lifeInUkForm, englishLanguageForm])
+        form
+          ?.querySelector<HTMLInputElement>('input[type="file"]')
+          ?.addEventListener("change", () => syncEvidenceName(form));
+
+      const saveIndependentLifeEnglishForm = async (
+        form: HTMLFormElement,
+        dialog: HTMLDialogElement | null,
+        category: "life-in-uk" | "english-language",
+        nextRecord: LifeEnglishRecord,
+      ): Promise<void> => {
+        const error = form.querySelector<HTMLElement>(".form-error");
+        const validationError = validateLifeEnglishInput(nextRecord);
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const file = readEvidenceFile(form);
+        const existingEvidence = documents.find(
+          (document) =>
+            document.profileId === selectedProfileId &&
+            document.category === category,
+        );
+        let preparedEvidence:
+          | { metadata: DocumentMetadata; bytes: Uint8Array<ArrayBuffer> }
+          | undefined;
+        if (file) {
+          const mimeType = resolveDocumentMimeType(file.name, file.type);
+          const displayName = suggestDocumentName(file.name);
+          const uploadError = validateDocumentUploadInput({
+            displayName,
+            category,
+            fileName: file.name,
+            mimeType: mimeType ?? file.type,
+            size: file.size,
+          });
+          const profileDocuments = documents.filter(
+            ({ profileId }) => profileId === selectedProfileId,
+          );
+          const totalBytes = documents.reduce(
+            (total, document) => total + document.size,
+            0,
+          );
+          if (
+            !existingEvidence &&
+            profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE
+          ) {
+            if (error) {
+              error.textContent =
+                "This profile has reached the maximum number of stored documents.";
+              error.hidden = false;
+            }
+            return;
+          }
+          if (
+            totalBytes - (existingEvidence?.size ?? 0) + file.size >
+            MAXIMUM_TOTAL_DOCUMENT_BYTES
+          ) {
+            if (error) {
+              error.textContent =
+                "This evidence file would exceed the encrypted storage limit.";
+              error.hidden = false;
+            }
+            return;
+          }
+          if (uploadError || !mimeType) {
+            if (error) {
+              error.textContent =
+                uploadError ?? "Choose a PDF, JPG, or PNG evidence file.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const bytes = new Uint8Array(await file.arrayBuffer());
+          const signatureError = validateDocumentSignature(mimeType, bytes);
+          if (signatureError) {
+            if (error) {
+              error.textContent = signatureError;
+              error.hidden = false;
+            }
+            return;
+          }
+          const timestamp = new Date().toISOString();
+          preparedEvidence = {
+            metadata: {
+              version: 1,
+              id: existingEvidence?.id ?? crypto.randomUUID(),
+              profileId: selectedProfileId,
+              displayName,
+              fileName: file.name,
+              mimeType,
+              size: file.size,
+              category,
+              sortOrder:
+                existingEvidence?.sortOrder ??
+                Math.max(
+                  -1,
+                  ...profileDocuments.map(({ sortOrder }) => sortOrder),
+                ) + 1,
+              createdAt: existingEvidence?.createdAt ?? timestamp,
+              updatedAt: timestamp,
+            },
+            bytes,
+          };
+        }
+        const submit = form.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          if (preparedEvidence)
+            await saveDocument(
+              preparedEvidence.metadata,
+              preparedEvidence.bytes,
+              key,
+            );
+          await saveLifeEnglishRecord(selectedProfileId, nextRecord, key);
+          lifeEnglishCache.set(selectedProfileId, nextRecord);
+          dialog?.close();
+          await showDocuments(profile);
+        } catch {
+          if (error) {
+            error.textContent = "The evidence details could not be saved.";
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      };
+      lifeInUkForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = readLifeInUkForm(lifeInUkForm);
+        const timestamp = new Date().toISOString();
+        void saveIndependentLifeEnglishForm(
+          lifeInUkForm,
+          lifeInUkDialog,
+          "life-in-uk",
+          {
+            version: 1,
+            profileId: selectedProfileId,
+            lifeInUkStatus: input.status,
+            lifeInUkPassedDate: input.passedDate,
+            lifeInUkReference: input.reference,
+            englishStatus: lifeEnglish?.englishStatus ?? "not-recorded",
+            englishEvidenceType: lifeEnglish?.englishEvidenceType ?? "",
+            englishReference: lifeEnglish?.englishReference ?? "",
+            notes: lifeEnglish?.notes ?? "",
+            createdAt: lifeEnglish?.createdAt ?? timestamp,
+            updatedAt: timestamp,
+          },
+        );
+      });
+      englishLanguageForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = readEnglishLanguageForm(englishLanguageForm);
+        const timestamp = new Date().toISOString();
+        void saveIndependentLifeEnglishForm(
+          englishLanguageForm,
+          englishLanguageDialog,
+          "english-language",
+          {
+            version: 1,
+            profileId: selectedProfileId,
+            lifeInUkStatus: lifeEnglish?.lifeInUkStatus ?? "not-recorded",
+            lifeInUkPassedDate: lifeEnglish?.lifeInUkPassedDate ?? "",
+            lifeInUkReference: lifeEnglish?.lifeInUkReference ?? "",
+            englishStatus: input.status,
+            englishEvidenceType: input.evidenceType,
+            englishReference: input.reference,
+            notes: lifeEnglish?.notes ?? "",
+            createdAt: lifeEnglish?.createdAt ?? timestamp,
+            updatedAt: timestamp,
+          },
+        );
+      });
       lifeEnglishDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => lifeEnglishDialog.close());

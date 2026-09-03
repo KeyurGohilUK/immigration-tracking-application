@@ -808,30 +808,19 @@ test("stores and manages encrypted documents for a profile", async ({
   );
   await lifeEnglishSection.locator("summary").click();
   await lifeEnglishSection
-    .getByRole("button", { name: "Add document" })
+    .getByRole("button", { name: "Add Life in the UK evidence" })
     .click();
   const lifeEnglishDialog = page.getByRole("dialog", {
-    name: "Life in the UK & English",
+    name: "Add Life in the UK evidence",
   });
   await expect(lifeEnglishDialog).toBeVisible();
-  await expect(
-    lifeEnglishDialog.getByRole("button", { name: "Save details" }),
-  ).toBeDisabled();
   await expect(lifeEnglishDialog.getByLabel("Passed date")).toBeHidden();
-  await expect(lifeEnglishDialog.getByLabel("Evidence type")).toBeHidden();
-  await lifeEnglishDialog.getByLabel("Status").first().selectOption("passed");
-  await expect(
-    lifeEnglishDialog.getByRole("button", { name: "Save details" }),
-  ).toBeEnabled();
+  await lifeEnglishDialog.getByLabel("Status").selectOption("passed");
   await expect(lifeEnglishDialog.getByLabel("Passed date")).toBeVisible();
   const lifePanelBox = await lifeEnglishDialog
     .locator(".life-english-panel")
-    .first()
     .boundingBox();
-  const statusBox = await lifeEnglishDialog
-    .getByLabel("Status")
-    .first()
-    .boundingBox();
+  const statusBox = await lifeEnglishDialog.getByLabel("Status").boundingBox();
   const passedDateBox = await lifeEnglishDialog
     .getByLabel("Passed date")
     .boundingBox();
@@ -853,14 +842,6 @@ test("stores and manages encrypted documents for a profile", async ({
   await lifeEnglishDialog
     .getByLabel("UAN / reference number")
     .fill("UAN-TEST-123");
-  await lifeEnglishDialog.getByLabel("Status").nth(1).selectOption("met");
-  await expect(lifeEnglishDialog.getByLabel("Evidence type")).toBeVisible();
-  await lifeEnglishDialog
-    .getByLabel("Evidence type")
-    .fill("Approved qualification");
-  await lifeEnglishDialog
-    .getByLabel("Certificate / reference number")
-    .fill("ENG-TEST-456");
   const tinyPng = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64",
@@ -870,21 +851,43 @@ test("stores and manages encrypted documents for a profile", async ({
     mimeType: "image/png",
     buffer: tinyPng,
   });
-  await lifeEnglishDialog.getByLabel("English evidence").setInputFiles({
+  await expect(
+    lifeEnglishDialog.getByText("life-test-evidence.png"),
+  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Add document" })).toHaveCount(
+    0,
+  );
+  await lifeEnglishDialog.getByRole("button", { name: "Save" }).click();
+  await expect(
+    page.locator('[data-vault-section="life-english"]').getByText("Partial"),
+  ).toBeVisible();
+
+  const updatedLifeEnglishSection = page.locator(
+    '[data-vault-section="life-english"]',
+  );
+  await updatedLifeEnglishSection.locator("summary").click();
+  await updatedLifeEnglishSection
+    .getByRole("button", { name: "Add English-language evidence" })
+    .click();
+  const englishDialog = page.getByRole("dialog", {
+    name: "Add English-language evidence",
+  });
+  await englishDialog.getByLabel("Status").selectOption("met");
+  await englishDialog
+    .getByLabel("Evidence type")
+    .fill("Approved qualification");
+  await englishDialog
+    .getByLabel("Certificate / reference number")
+    .fill("ENG-TEST-456");
+  await englishDialog.getByLabel("English evidence").setInputFiles({
     name: "english-test-evidence.png",
     mimeType: "image/png",
     buffer: tinyPng,
   });
   await expect(
-    lifeEnglishDialog.getByText("life-test-evidence.png"),
+    englishDialog.getByText("english-test-evidence.png"),
   ).toBeVisible();
-  await expect(
-    lifeEnglishDialog.getByText("english-test-evidence.png"),
-  ).toBeVisible();
-  await expect(page.getByRole("dialog", { name: "Add document" })).toHaveCount(
-    0,
-  );
-  await lifeEnglishDialog.getByRole("button", { name: "Save details" }).click();
+  await englishDialog.getByRole("button", { name: "Save" }).click();
   await expect(
     page.locator('[data-vault-section="life-english"]').getByText("Complete"),
   ).toBeVisible();
@@ -1001,6 +1004,11 @@ test("adds and edits documents from non-address checklist items", async ({
   await employmentSection.locator("summary").click();
   await expect(
     employmentSection.getByRole("button", { name: "Add document" }),
+  ).toHaveCount(0);
+  await expect(
+    page
+      .locator(".vault-category-list")
+      .getByRole("button", { name: "Add document" }),
   ).toHaveCount(0);
   await employmentSection
     .getByRole("button", { name: "Add employer letter" })
