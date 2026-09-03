@@ -297,6 +297,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         familyMembers.map(async (member): Promise<IlrJourneyMember> => {
           let permissions = permissionCache.get(member.id);
           let trips = tripCache.get(member.id);
+          let lifeEnglish = lifeEnglishCache.get(member.id) ?? null;
           try {
             if (!permissions)
               permissions = await getImmigrationPermissions(member.id, key);
@@ -308,8 +309,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           } catch {
             trips = [];
           }
+          try {
+            if (!lifeEnglishCache.has(member.id))
+              lifeEnglish = await getLifeEnglishRecord(member.id, key);
+          } catch {
+            lifeEnglish = null;
+          }
           permissionCache.set(member.id, permissions);
           tripCache.set(member.id, trips);
+          lifeEnglishCache.set(member.id, lifeEnglish);
 
           const latestPermission = [...permissions].sort((left, right) =>
             right.permissionStartDate.localeCompare(left.permissionStartDate),
@@ -325,6 +333,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
           return {
             member,
+            permissions,
+            lifeEnglish,
             period: isDependant
               ? calculateSkilledWorkerDependantQualifyingPeriod(
                   permissions,
@@ -340,8 +350,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           };
         }),
       );
-      renderIlrJourneyPage(root, journeys, asOfDate);
+      renderIlrJourneyPage(root, journeys, selectedProfileId, asOfDate);
       wireAuthenticatedShell(profile, "ILR");
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-ilr-profile]",
+      )) {
+        button.addEventListener("click", () => {
+          const profileId = button.dataset.ilrProfile;
+          if (!profileId || !isKnownProfileId(profileId, familyMembers)) return;
+          const member = familyMembers.find(({ id }) => id === profileId);
+          if (!member) return;
+          selectedProfileId = profileId;
+          void showIlrJourney(member);
+        });
+      }
+      root
+        .querySelector<HTMLButtonElement>("#ilr-manage-permissions")
+        ?.addEventListener("click", () => void showPermissions(profile));
     };
 
     const renderMore = (profile: HouseholdMember): void => {

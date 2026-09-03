@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "File controls in standard document upload forms now keep the Choose File button vertically centred.",
+      "The ILR page now presents the selected household member in a focused visa-permission hero card.",
     ),
   ).toBeVisible();
   await expect(
@@ -2115,12 +2115,16 @@ test("opens the centre ILR hero journey for the household", async ({
   }
 
   await expect(
-    page.getByRole("heading", { name: "Your ILR journey" }),
+    page.getByRole("heading", { name: "Permission not recorded" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Final ILR timeline" }),
+    page.getByRole("heading", { name: "ILR milestone track" }),
   ).toBeVisible();
-  await expect(page.getByText(TEST_PROFILE.name)).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: `Show ${TEST_PROFILE.name}'s ILR journey`,
+    }),
+  ).toBeVisible();
   await expect(page.getByText("Setup incomplete")).toBeVisible();
   await expect(page.getByText("Not available yet").first()).toBeVisible();
 });
