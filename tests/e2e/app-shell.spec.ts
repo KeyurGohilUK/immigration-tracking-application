@@ -1271,7 +1271,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(page.locator("#open-install-settings")).toHaveCount(0);
 });
 
-test("persists dark, system, and light segmented theme preferences", async ({
+test("persists dark, system, and light appearance preferences", async ({
   page,
 }) => {
   await page.goto("/");
