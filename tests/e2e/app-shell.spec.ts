@@ -846,11 +846,13 @@ test("stores and manages encrypted documents for a profile", async ({
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64",
   );
-  await lifeEnglishDialog.getByLabel("Life in the UK evidence").setInputFiles({
-    name: "life-test-evidence.png",
-    mimeType: "image/png",
-    buffer: tinyPng,
-  });
+  await lifeEnglishDialog
+    .getByLabel("Life in the UK evidence", { exact: true })
+    .setInputFiles({
+      name: "life-test-evidence.png",
+      mimeType: "image/png",
+      buffer: tinyPng,
+    });
   await expect(
     lifeEnglishDialog.getByText("life-test-evidence.png"),
   ).toBeVisible();
@@ -879,11 +881,13 @@ test("stores and manages encrypted documents for a profile", async ({
   await englishDialog
     .getByLabel("Certificate / reference number")
     .fill("ENG-TEST-456");
-  await englishDialog.getByLabel("English evidence").setInputFiles({
-    name: "english-test-evidence.png",
-    mimeType: "image/png",
-    buffer: tinyPng,
-  });
+  await englishDialog
+    .getByLabel("English evidence", { exact: true })
+    .setInputFiles({
+      name: "english-test-evidence.png",
+      mimeType: "image/png",
+      buffer: tinyPng,
+    });
   await expect(
     englishDialog.getByText("english-test-evidence.png"),
   ).toBeVisible();
