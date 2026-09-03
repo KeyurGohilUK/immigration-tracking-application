@@ -1298,7 +1298,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(
     page.getByRole("heading", { name: "Appearance", level: 2 }),
   ).toBeVisible();
-  await expect(page.getByText("Appearance", { exact: true })).toHaveCount(1);
+  await expect(page.getByRole("group", { name: "Appearance" })).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Terms, privacy, and licence",
@@ -1356,18 +1356,23 @@ test("animates expandable sections when opening and closing", async ({
   expect(vaultAnimationIds).toContain("urbanfox-disclosure");
 });
 
-test("persists dark, system, and light appearance preferences", async ({
+test("uses a three-state sliding appearance toggle and persists preferences", async ({
   page,
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
+  const toggle = page.locator(".appearance-toggle-track");
+  const thumb = page.locator(".appearance-toggle-thumb");
   const light = page.getByRole("radio", { name: "Light" });
   await expect(light).toBeChecked();
+  await expect(toggle).toHaveCSS("--appearance-index", "2");
 
   await page.getByText("Dark", { exact: true }).click();
+  await expect(toggle).toHaveCSS("--appearance-index", "0");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(thumb).toHaveCSS("background-image", /linear-gradient/);
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("dark");
@@ -1427,11 +1432,13 @@ test("persists dark, system, and light appearance preferences", async ({
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await page.getByText("System", { exact: true }).click();
+  await expect(toggle).toHaveCSS("--appearance-index", "1");
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("urbanfox-theme")))
     .toBe("system");
 
   await page.getByText("Light", { exact: true }).click();
+  await expect(toggle).toHaveCSS("--appearance-index", "2");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 
   await page.reload();
@@ -2113,9 +2120,9 @@ test("glides the active mobile navigation capsule between sections", async ({
     (element) => window.getComputedStyle(element).transform,
   );
   await page.getByRole("link", { name: "Travel", exact: true }).click();
-  await expect(
-    navigation.locator('a[data-navigation="Trips"]'),
-  ).toHaveAttribute("aria-current", "page");
+  const tripsLink = navigation.locator('a[data-navigation="Trips"]');
+  await expect(tripsLink).toHaveAttribute("aria-current", "page");
+  await expect(tripsLink).toHaveCSS("color", "rgb(182, 0, 90)");
   await expect
     .poll(() =>
       navigation.evaluate((element) =>

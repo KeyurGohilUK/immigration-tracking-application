@@ -1,5 +1,5 @@
 {
-  "version": "3.22.10",
+  "version": "3.22.13",
   "notes": [
     "Security PIN keypad numbers now compress and spring back when tapped or entered from a keyboard."
   ]
