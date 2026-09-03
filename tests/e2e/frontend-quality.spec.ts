@@ -203,6 +203,12 @@ test("keeps the mobile navigation visual contract stable", async ({
   const ilr = navigation.getByRole("link", { name: "ILR", exact: true });
   await expect(ilr).toBeVisible();
   await expect(ilr).toHaveCSS("color", "rgb(238, 9, 121)");
+  const heroIcon = ilr.locator(".navigation-hero-icon");
+  expect(
+    await heroIcon.evaluate(
+      (element) => window.getComputedStyle(element).stroke,
+    ),
+  ).toContain("mobile-ilr-icon-gradient");
   expect(
     await ilr.evaluate(
       (element) => window.getComputedStyle(element).backgroundImage,
@@ -217,4 +223,9 @@ test("keeps the mobile navigation visual contract stable", async ({
     "rgba(26, 11, 46, 0.86)",
   );
   await expect(ilr).toHaveCSS("color", "rgb(238, 9, 121)");
+  expect(
+    await heroIcon.evaluate(
+      (element) => window.getComputedStyle(element).stroke,
+    ),
+  ).toContain("mobile-ilr-icon-gradient");
 });
