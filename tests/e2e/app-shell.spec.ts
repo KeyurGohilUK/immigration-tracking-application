@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Removed the duplicate visible Appearance label while keeping the three-state control accessible.",
+      "Light theme now gives selected non-ILR navigation items a clearer tinted glass capsule, stronger icon contrast, and a subtle accent marker.",
     ),
   ).toBeVisible();
   await expect(
@@ -2112,9 +2112,9 @@ test("glides the active mobile navigation capsule between sections", async ({
     (element) => window.getComputedStyle(element).transform,
   );
   await page.getByRole("link", { name: "Travel", exact: true }).click();
-  await expect(
-    navigation.locator('a[data-navigation="Trips"]'),
-  ).toHaveAttribute("aria-current", "page");
+  const tripsLink = navigation.locator('a[data-navigation="Trips"]');
+  await expect(tripsLink).toHaveAttribute("aria-current", "page");
+  await expect(tripsLink).toHaveCSS("color", "rgb(182, 0, 90)");
   await expect
     .poll(() =>
       navigation.evaluate((element) =>
