@@ -214,7 +214,11 @@ export function initialiseReleaseManager(
         "Downloading the latest app files… Your local records will be preserved.";
     try {
       await clearApplicationCaches();
-      window.location.reload();
+      download.disabled = false;
+      if (message)
+        message.textContent =
+          "Update downloaded. It will be used the next time UrbanFox starts; you can keep working now.";
+      updateReleaseControls(null);
     } catch {
       download.disabled = false;
       if (message)
