@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Light theme now gives selected non-ILR navigation items a clearer tinted glass capsule, stronger icon contrast, and a subtle accent marker.",
+      "Security PIN keypad numbers now compress and spring back when tapped or entered from a keyboard.",
     ),
   ).toBeVisible();
   await expect(
@@ -368,6 +368,14 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   );
   await expect(page.locator(".pin-digit")).toHaveCount(4);
   await expect(page.locator(".security-keypad-key")).toHaveCount(10);
+  const numberOne = page.getByRole("button", { name: "Enter 1" });
+  const didStartPopAnimation = await numberOne.evaluate((button) => {
+    button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    return button.classList.contains("is-popping");
+  });
+  expect(didStartPopAnimation).toBe(true);
+  await numberOne.evaluate((button) => button.classList.add("is-popping"));
+  await expect(numberOne).toHaveCSS("animation-name", "security-key-pop");
   await expect(page.locator("[data-pin-indicator]")).toHaveCount(4);
 });
 

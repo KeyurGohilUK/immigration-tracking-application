@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.22.12";
+export const APP_VERSION = "3.22.13";
 
 export const RELEASE_NOTES = [
-  "Light theme now gives selected non-ILR navigation items a clearer tinted glass capsule, stronger icon contrast, and a subtle accent marker.",
+  "Security PIN keypad numbers now compress and spring back when tapped or entered from a keyboard.",
 ] as const;

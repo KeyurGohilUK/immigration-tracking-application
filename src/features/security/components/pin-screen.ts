@@ -145,10 +145,22 @@ function initialiseUnlockKeypad(form: HTMLFormElement): void {
     updateUnlockIndicators(form);
   };
 
+  const popKey = (button: HTMLButtonElement): void => {
+    button.classList.remove("is-popping");
+    void button.offsetWidth;
+    button.classList.add("is-popping");
+    button.addEventListener(
+      "animationend",
+      () => button.classList.remove("is-popping"),
+      { once: true },
+    );
+  };
+
   for (const button of form.querySelectorAll<HTMLButtonElement>(
     "[data-pin-key]",
   )) {
     button.addEventListener("click", () => {
+      popKey(button);
       const digit = button.dataset.pinKey;
       if (digit) enterDigit(digit);
     });
@@ -162,6 +174,10 @@ function initialiseUnlockKeypad(form: HTMLFormElement): void {
   keypad?.addEventListener("keydown", (event) => {
     if (/^[0-9]$/.test(event.key)) {
       event.preventDefault();
+      const button = form.querySelector<HTMLButtonElement>(
+        `[data-pin-key="${event.key}"]`,
+      );
+      if (button) popKey(button);
       enterDigit(event.key);
     } else if (event.key === "Backspace") {
       event.preventDefault();
