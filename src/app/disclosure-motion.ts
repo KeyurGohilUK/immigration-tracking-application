@@ -99,11 +99,12 @@ export function initialiseDisclosureMotion(root: HTMLElement): void {
     )
       return;
 
-    if (
-      window.matchMedia(REDUCED_MOTION_QUERY).matches ||
-      details.dataset.disclosureAnimating === "true"
-    )
+    if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+
+    if (details.dataset.disclosureAnimating === "true") {
+      event.preventDefault();
       return;
+    }
 
     event.preventDefault();
     animateDisclosure(details, !details.open);
