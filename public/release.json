@@ -1,6 +1,6 @@
 {
-  "version": "3.21.1",
+  "version": "3.22.0",
   "notes": [
-    "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold."
+    "Document Vault now downloads a ZIP bundle with one folder per visible section, including the Address History index and prefixed address evidence files."
   ]
 }

@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold.",
+      "Document Vault now downloads a ZIP bundle with one folder per visible section, including the Address History index and prefixed address evidence files.",
     ),
   ).toBeVisible();
   await expect(
@@ -729,7 +729,7 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "Final Application Documents" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Download PDF pack" }),
+    page.getByRole("button", { name: "Download doc bundle" }),
   ).toBeDisabled();
   await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
   await expect(
@@ -916,10 +916,10 @@ test("stores and manages encrypted documents for a profile", async ({
     .click();
   expect((await downloadPromise).suggestedFilename()).toBe("council-tax.png");
 
-  const packDownloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download PDF pack" }).click();
-  expect((await packDownloadPromise).suggestedFilename()).toBe(
-    "Urban-Fox-Test-User-ILR-Document-Pack.pdf",
+  const bundleDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download doc bundle" }).click();
+  expect((await bundleDownloadPromise).suggestedFilename()).toBe(
+    "Urban-Fox-Test-User-ILR-Document-Bundle.zip",
   );
 
   await page
