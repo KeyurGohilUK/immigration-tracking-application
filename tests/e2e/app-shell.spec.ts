@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "The ILR page now presents the selected household member in a focused visa-permission hero card.",
+      "Permission history now keeps visa names, year ranges, and calculation status aligned in responsive cards.",
     ),
   ).toBeVisible();
   await expect(
