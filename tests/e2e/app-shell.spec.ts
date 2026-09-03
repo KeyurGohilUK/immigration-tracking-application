@@ -2111,10 +2111,24 @@ test("glides the active mobile navigation capsule between sections", async ({
   const initialTransform = await indicator.evaluate(
     (element) => window.getComputedStyle(element).transform,
   );
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "light"),
+  );
   await page.getByRole("link", { name: "Travel", exact: true }).click();
   await expect(
     navigation.locator('a[data-navigation="Trips"]'),
   ).toHaveAttribute("aria-current", "page");
+  await expect(navigation).not.toHaveClass(/is-hero-active/);
+  await expect(indicator).toHaveCSS("border-color", "rgba(182, 0, 90, 0.22)");
+  await expect(
+    navigation.locator('a[data-navigation="Trips"]'),
+  ).toHaveCSS("color", "rgb(182, 0, 90)");
+  expect(
+    await indicator.evaluate(
+      (element) =>
+        window.getComputedStyle(element, "::after").backgroundColor,
+    ),
+  ).toBe("rgb(238, 9, 121)");
   await expect
     .poll(() =>
       navigation.evaluate((element) =>
