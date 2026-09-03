@@ -63,6 +63,7 @@ function renderNavigation(
     ? `style="--mobile-navigation-offset: ${previousMobileNavigationIndex * 100}%"`
     : "";
   const heroClass = resolvedNavigation === "ILR" ? " is-hero-active" : "";
+  const heroGradientId = `${isMobile ? "mobile" : "desktop"}-ilr-icon-gradient`;
 
   return `
     <nav class="primary-navigation ${className}${heroClass}" aria-label="Primary navigation" ${navigationStyle}>
@@ -71,7 +72,11 @@ function renderNavigation(
         .map(
           ({ id, label, icon }) => `
             <a href="#${id.toLowerCase()}" data-navigation="${id}" ${id === resolvedNavigation ? 'aria-current="page"' : ""}>
-              <svg aria-hidden="true" viewBox="0 0 24 24">${icon}</svg>
+              <svg aria-hidden="true" viewBox="0 0 24 24">${
+                id === "ILR"
+                  ? `<defs><linearGradient id="${heroGradientId}" x1="5" y1="4" x2="19" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ee0979"/><stop offset="1" stop-color="#ff6a00"/></linearGradient></defs><g class="navigation-hero-icon">${icon}</g>`
+                  : icon
+              }</svg>
               <span class="navigation-label">${label}</span>
             </a>`,
         )

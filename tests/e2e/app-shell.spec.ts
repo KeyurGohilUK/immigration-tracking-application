@@ -157,12 +157,52 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "The centre ILR hero icon now keeps its bright Ibiza accent when unselected in both light and dark themes.",
+      "The unselected centre ILR hero icon now uses the bright Ibiza pink-to-orange gradient in both light and dark themes.",
     ),
   ).toBeVisible();
   await expect(
     page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
   ).toHaveCount(0);
+});
+
+test("hides the install action when the app is already installed", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: (query: string): MediaQueryList => {
+        if (query !== "(display-mode: standalone)")
+          return nativeMatchMedia(query);
+        return {
+          matches: true,
+          media: query,
+          onchange: null,
+          addListener: () => undefined,
+          removeListener: () => undefined,
+          addEventListener: () => undefined,
+          removeEventListener: () => undefined,
+          dispatchEvent: () => false,
+        };
+      },
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Install and updates" }).click();
+
+  await expect(page.getByRole("button", { name: "App installed" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: "Install app" })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByText("UrbanFox ILR is installed on this device."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Check for updates" }),
+  ).toBeVisible();
 });
 
 test("highlights the header control when an update is available", async ({
@@ -1088,9 +1128,9 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toBeVisible();
 
   await page.getByText("UrbanFox settings", { exact: true }).click();
-  await page.getByRole("button", { name: "Open", exact: true }).click();
-  await expect(page.locator("#app-manager-title")).toBeVisible();
-  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Install and updates" }),
+  ).toHaveCount(0);
   await page.getByText("Backup and restore", { exact: true }).click();
   await page.getByRole("button", { name: "Create encrypted backup" }).click();
   await expect(
@@ -1228,6 +1268,7 @@ test("keeps profile settings sections collapsed until requested", async ({
   await page.getByText("UrbanFox settings", { exact: true }).click();
   await expect(appSettings).toHaveAttribute("open", "");
   await expect(page.getByRole("radio", { name: "System" })).toBeVisible();
+  await expect(page.locator("#open-install-settings")).toHaveCount(0);
 });
 
 test("persists dark, system, and light segmented theme preferences", async ({
@@ -1921,6 +1962,17 @@ test("opens the centre ILR hero journey for the household", async ({
   await expect(
     navigation.locator('a[data-navigation="ILR"]:not([aria-current="page"])'),
   ).toHaveCSS("color", "rgb(238, 9, 121)");
+  expect(
+    await navigation
+      .locator(
+        'a[data-navigation="ILR"]:not([aria-current="page"]) .navigation-hero-icon',
+      )
+      .evaluate((element) => window.getComputedStyle(element).stroke),
+  ).toContain(
+    testInfo.project.name === "mobile-chromium"
+      ? "mobile-ilr-icon-gradient"
+      : "desktop-ilr-icon-gradient",
+  );
   await ilrLinks.first().click();
 
   await expect(navigation).toHaveClass(/is-hero-active/);
