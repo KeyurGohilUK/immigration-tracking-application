@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.22.4";
+export const APP_VERSION = "3.22.5";
 
 export const RELEASE_NOTES = [
-  "Employment checklist items now open focused evidence dialogs with matching Cancel and Save actions.",
+  "Appearance and legal settings now use separate Liquid Glass capsules, with clearer Dark, System, and Light appearance controls.",
 ] as const;
