@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { PDFDocument } from "pdf-lib";
 import type { AddressHistoryEntry } from "../domain/address-history";
 import type { DocumentMetadata } from "../domain/document";
 import {
@@ -137,6 +138,27 @@ describe("Address evidence export", () => {
       "Current address - bank.pdf",
       "Current address - bank (2).pdf",
     ]);
+  });
+
+  it("paginates a long Address History index and keeps PDF page numbering", async () => {
+    const rows = Array.from({ length: 30 }, (_, index) => ({
+      addressLabel: index === 0 ? "Current address" : `Previous address ${index}`,
+      from: "Jan 2020",
+      to: index === 0 ? "Present" : "Dec 2020",
+      fullAddress:
+        "Flat 12, 100 Example House, Long Example Street, Example Locality, Bristol, BS1 1AA",
+      evidenceFileNames: [
+        `${index === 0 ? "Current address" : `Previous address ${index}`} - council-tax-statement.pdf`,
+      ],
+    }));
+
+    const { createAddressHistoryIndexPdf } = await import(
+      "./address-evidence-export-service"
+    );
+    const bytes = await createAddressHistoryIndexPdf(rows, "Test User");
+    const pdf = await PDFDocument.load(bytes);
+
+    expect(pdf.getPageCount()).toBeGreaterThan(1);
   });
 
   it("uses a stable applicant-specific index filename", () => {
