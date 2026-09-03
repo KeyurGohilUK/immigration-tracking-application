@@ -42,10 +42,12 @@ async function fetchLatestRelease(): Promise<ReleaseManifest> {
   return value;
 }
 
-async function downloadApplicationUpdate(): Promise<void> {
-  if (!("serviceWorker" in navigator)) return;
+async function installApplicationUpdate(): Promise<void> {
+  if (!("serviceWorker" in navigator))
+    throw new Error("Service workers are unavailable.");
   const registration = await navigator.serviceWorker.getRegistration();
-  await registration?.update();
+  if (!registration) throw new Error("The app is not registered for updates.");
+  await registration.update();
 }
 
 export function initialiseReleaseManager(
@@ -204,14 +206,10 @@ export function initialiseReleaseManager(
     }
     if (message)
       message.textContent =
-        "Downloading the latest app files… Your local records will be preserved.";
+        "Downloading and installing the update… UrbanFox will restart and may ask for your PIN. Your local records will be preserved.";
     try {
-      await downloadApplicationUpdate();
-      download.disabled = false;
-      if (message)
-        message.textContent =
-          "Update downloaded. It will be used the next time UrbanFox starts; you can keep working now.";
-      updateReleaseControls(null);
+      await installApplicationUpdate();
+      window.location.reload();
     } catch {
       download.disabled = false;
       if (message)

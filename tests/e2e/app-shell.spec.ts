@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Expandable sections now open and close with smoother motion across settings and the Document Vault.",
+      "Downloaded app updates now restart UrbanFox immediately so the new release is applied.",
     ),
   ).toBeVisible();
   await expect(
@@ -2181,7 +2181,7 @@ test("keeps an authenticated session open across temporary system UI", async ({
   );
 });
 
-test("downloads an available update without reloading the unlocked session", async ({
+test("restarts the app after downloading an available update", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -2227,14 +2227,13 @@ test("downloads an available update without reloading the unlocked session", asy
 
   const dialog = page.getByRole("dialog", { name: "Install and updates" });
   await expect(dialog.getByText("Update 9.9.9 available")).toBeVisible();
+  const restart = page.waitForEvent(
+    "framenavigated",
+    (frame) => frame === page.mainFrame(),
+  );
   await dialog.getByRole("button", { name: "Download update" }).click();
 
-  await expect(
-    dialog.getByText(
-      "Update downloaded. It will be used the next time UrbanFox starts; you can keep working now.",
-    ),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(
-    0,
-  );
+  await restart;
+  await page.waitForLoadState("domcontentloaded");
+  await expect(dialog).not.toBeVisible();
 });
