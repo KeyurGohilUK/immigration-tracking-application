@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Appearance now uses a three-state sliding Dark, System, Light control styled with the UrbanFox Ibiza Sunset Liquid Glass theme.",
+      "Removed the duplicate visible Appearance label while keeping the three-state control accessible.",
     ),
   ).toBeVisible();
   await expect(

@@ -1,6 +1,6 @@
 {
-  "version": "3.22.10",
+  "version": "3.22.11",
   "notes": [
-    "Appearance now uses a three-state sliding Dark, System, Light control styled with the UrbanFox Ibiza Sunset Liquid Glass theme."
+    "Removed the duplicate visible Appearance label while keeping the three-state control accessible."
   ]
 }

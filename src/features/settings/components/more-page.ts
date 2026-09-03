@@ -53,7 +53,6 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
             <div><p class="eyebrow">Display</p><h2 id="appearance-title">Appearance</h2><p>Choose how UrbanFox looks. System follows your device setting.</p></div>
           </div>
           <fieldset class="appearance-toggle" aria-label="Appearance">
-            <legend class="visually-hidden">Appearance</legend>
             <div class="appearance-toggle-track">
               <span class="appearance-toggle-thumb" aria-hidden="true"></span>
               <label class="appearance-toggle-option">
