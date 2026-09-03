@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Address History can now download a separate paged index PDF plus individually named evidence files using Current address and Previous address prefixes.",
+      "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold.",
     ),
   ).toBeVisible();
   await expect(
@@ -186,7 +186,14 @@ test("highlights the header control when an update is available", async ({
     "Update 99.0.0 available",
   );
   await expect(trigger).toHaveCSS("background-image", /linear-gradient/);
-  await expect(trigger).toHaveCSS("border-color", "rgba(255, 200, 61, 0.88)");
+  await expect(trigger).toHaveCSS("border-color", "rgba(182, 0, 90, 0.62)");
+  await expect(trigger).toHaveCSS("box-shadow", /238, 9, 121/);
+
+  await page.evaluate(() =>
+    document.documentElement.setAttribute("data-theme", "dark"),
+  );
+  await expect(trigger).toHaveCSS("border-color", "rgba(255, 177, 197, 0.78)");
+  await expect(trigger).toHaveCSS("box-shadow", /238, 9, 121/);
 
   await expect(page.locator("#download-update")).toHaveText("Download update");
 });

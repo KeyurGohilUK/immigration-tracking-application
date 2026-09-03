@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.21.0";
+export const APP_VERSION = "3.21.1";
 
 export const RELEASE_NOTES = [
-  "Address History can now download a separate paged index PDF plus individually named evidence files using Current address and Previous address prefixes.",
+  "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold.",
 ] as const;

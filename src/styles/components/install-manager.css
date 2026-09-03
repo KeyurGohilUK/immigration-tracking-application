@@ -18,13 +18,24 @@
 }
 
 .app-manager-trigger.is-update-available {
-  border-color: rgb(255 200 61 / 88%);
+  --app-manager-update-border: rgb(182 0 90 / 62%);
+  --app-manager-update-ring: rgb(238 9 121 / 24%);
+  --app-manager-update-glow: rgb(238 9 121 / 42%);
+  --app-manager-update-shine: rgb(255 210 230 / 72%);
+  border-color: var(--app-manager-update-border);
   box-shadow:
-    0 0 0 0.18rem rgb(255 200 61 / 34%),
-    0 0 1.15rem 0.38rem rgb(255 184 0 / 58%),
+    0 0 0 0.18rem var(--app-manager-update-ring),
+    0 0 1.15rem 0.38rem var(--app-manager-update-glow),
     0 0.45rem 1.2rem rgb(238 9 121 / 20%),
     inset 0 1px 0 rgb(255 255 255 / 24%);
   animation: app-manager-update-glow 1.8s ease-in-out infinite alternate;
+}
+
+html[data-theme="dark"] .app-manager-trigger.is-update-available {
+  --app-manager-update-border: rgb(255 177 197 / 78%);
+  --app-manager-update-ring: rgb(255 177 197 / 28%);
+  --app-manager-update-glow: rgb(238 9 121 / 58%);
+  --app-manager-update-shine: rgb(255 210 230 / 82%);
 }
 
 .app-manager-trigger.is-update-available::after {
@@ -34,7 +45,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgb(255 240 166 / 78%),
+    var(--app-manager-update-shine),
     transparent
   );
   content: "";
@@ -61,8 +72,8 @@
 @keyframes app-manager-update-glow {
   to {
     box-shadow:
-      0 0 0 0.25rem rgb(255 200 61 / 44%),
-      0 0 1.55rem 0.52rem rgb(255 184 0 / 74%),
+      0 0 0 0.25rem var(--app-manager-update-ring),
+      0 0 1.55rem 0.52rem var(--app-manager-update-glow),
       0 0.45rem 1.2rem rgb(238 9 121 / 20%),
       inset 0 1px 0 rgb(255 255 255 / 24%);
   }
