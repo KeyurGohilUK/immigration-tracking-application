@@ -2111,5 +2111,7 @@ test("downloads an available update without reloading the unlocked session", asy
       "Update downloaded. It will be used the next time UrbanFox starts; you can keep working now.",
     ),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(
+    0,
+  );
 });
