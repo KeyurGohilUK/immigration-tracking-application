@@ -105,7 +105,7 @@ export function renderDocumentsPage(
       documents,
     )}
     ${renderLifeEnglishDialog(documents)}
-    ${renderEmploymentDialog(documents)}
+    ${renderEmploymentDialog()}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
@@ -166,13 +166,18 @@ function renderVaultCategoryRows(
       const statusMessage = section.statusMessage
         ? `<p class="vault-section-status-message">${section.statusMessage}</p>`
         : "";
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div><button class="vault-section-add${missingCurrentAddress ? " is-attention-action" : ""}" type="button" data-add-vault-section="${section.id}">${actionLabel}</button></div><ul class="vault-requirement-list">${section.requirements.map(renderVaultRequirement).join("")}</ul>${addressList}</div></details>`;
+      const sectionAction =
+        section.id === "employment"
+          ? ""
+          : `<button class="vault-section-add${missingCurrentAddress ? " is-attention-action" : ""}" type="button" data-add-vault-section="${section.id}">${actionLabel}</button>`;
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id)).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
 
 function renderVaultRequirement(
   requirement: DocumentVaultSectionProgress["requirements"][number],
+  sectionId: string,
 ): string {
   const priority =
     requirement.priority === "required"
@@ -188,7 +193,12 @@ function renderVaultRequirement(
       : `${requirement.documentCount} added`;
   const incompleteLabel =
     requirement.id === "address-proof" ? "Upload evidence" : priority;
-  return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}"><span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small></li>`;
+  const content = `<span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${requirement.label}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small>`;
+  if (sectionId === "employment") {
+    const category = requirement.categories[0];
+    return `<li class="vault-requirement-item vault-requirement-action${requirement.complete ? " is-complete" : ""}"><button type="button" data-employment-evidence="${category}" aria-label="${requirement.complete ? "Add another" : "Add"} ${requirement.label.toLowerCase()}">${content}</button></li>`;
+  }
+  return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}">${content}</li>`;
 }
 
 function renderVaultStatusIcon(

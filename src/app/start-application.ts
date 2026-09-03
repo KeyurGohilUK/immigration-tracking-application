@@ -131,6 +131,7 @@ import {
   saveDocumentMetadataBatch,
 } from "../features/documents/data/document-repository";
 import {
+  DOCUMENT_CATEGORY_LABELS,
   MAXIMUM_DOCUMENTS_PER_PROFILE,
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   resolveDocumentMimeType,
@@ -848,10 +849,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             return;
           }
-          if (sectionId === "employment") {
-            employmentDialog?.showModal();
-            return;
-          }
           if (sectionId === "life-english") {
             showLifeEnglishForm(root, lifeEnglish);
             return;
@@ -868,128 +865,155 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       employmentDialog?.addEventListener("click", (event) => {
         if (event.target === employmentDialog) employmentDialog.close();
       });
-      for (const panel of root.querySelectorAll<HTMLElement>(
-        "[data-employment-upload]",
+      const employmentForm = employmentDialog?.querySelector<HTMLFormElement>(
+        "#employment-evidence-form",
+      );
+      const employmentFile = employmentForm?.querySelector<HTMLInputElement>(
+        'input[name="documentFile"]',
+      );
+      const employmentName = employmentForm?.querySelector<HTMLInputElement>(
+        'input[name="displayName"]',
+      );
+      const employmentCategory =
+        employmentForm?.querySelector<HTMLInputElement>(
+          'input[name="category"]',
+        );
+      const employmentError = employmentForm?.querySelector<HTMLElement>(
+        "#employment-evidence-error",
+      );
+      employmentDialog
+        ?.querySelector<HTMLButtonElement>("[data-employment-cancel]")
+        ?.addEventListener("click", () => employmentDialog.close());
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-employment-evidence]",
       )) {
-        const fileInput = panel.querySelector<HTMLInputElement>(
-          'input[name="documentFile"]',
-        );
-        const nameInput = panel.querySelector<HTMLInputElement>(
-          'input[name="displayName"]',
-        );
-        fileInput?.addEventListener("change", () => {
-          const file = fileInput.files?.[0];
-          if (file && nameInput && !nameInput.value.trim())
-            nameInput.value = suggestDocumentName(file.name);
-        });
-        const saveButton = panel.querySelector<HTMLButtonElement>(
-          "[data-employment-save]",
-        );
-        saveButton?.addEventListener("click", async () => {
-          const category = panel.dataset.employmentUpload;
+        button.addEventListener("click", () => {
+          const category = button.dataset.employmentEvidence;
           if (
             category !== "employer-letter" &&
             category !== "employment-contract"
           )
             return;
-          const error = panel.querySelector<HTMLElement>(
-            "[data-employment-error]",
+          const label = DOCUMENT_CATEGORY_LABELS[category];
+          employmentForm?.reset();
+          if (employmentCategory) employmentCategory.value = category;
+          if (employmentError) {
+            employmentError.textContent = "";
+            employmentError.hidden = true;
+          }
+          const title = employmentDialog?.querySelector<HTMLElement>(
+            "#employment-dialog-title",
           );
-          const file = fileInput?.files?.[0];
-          const displayName = nameInput?.value.trim() ?? "";
-          const mimeType = file
-            ? resolveDocumentMimeType(file.name, file.type)
-            : null;
-          const validationError = file
-            ? validateDocumentUploadInput({
-                displayName,
-                category,
-                fileName: file.name,
-                mimeType: mimeType ?? file.type,
-                size: file.size,
-              })
-            : "Choose a PDF, JPG, or PNG file.";
-          if (validationError || !file || !mimeType) {
-            if (error) {
-              error.textContent =
-                validationError ?? "Choose a PDF, JPG, or PNG file.";
-              error.hidden = false;
-            }
-            return;
-          }
-
-          const profileDocuments = documents.filter(
-            ({ profileId }) => profileId === selectedProfileId,
+          const fileLabel = employmentDialog?.querySelector<HTMLElement>(
+            "[data-employment-file-label]",
           );
-          const totalBytes = documents.reduce(
-            (total, document) => total + document.size,
-            0,
-          );
-          if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
-            if (error) {
-              error.textContent =
-                "This profile already has the maximum of 25 documents.";
-              error.hidden = false;
-            }
-            return;
-          }
-          if (totalBytes + file.size > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
-            if (error) {
-              error.textContent =
-                "Document storage would exceed the 50 MB app limit.";
-              error.hidden = false;
-            }
-            return;
-          }
-
-          const bytes = new Uint8Array(await file.arrayBuffer());
-          const signatureError = validateDocumentSignature(mimeType, bytes);
-          if (signatureError) {
-            if (error) {
-              error.textContent = signatureError;
-              error.hidden = false;
-            }
-            return;
-          }
-
-          const timestamp = new Date().toISOString();
-          const metadata: DocumentMetadata = {
-            version: 1,
-            id: crypto.randomUUID(),
-            profileId: selectedProfileId,
-            displayName,
-            fileName: file.name.trim(),
-            mimeType,
-            size: file.size,
-            category,
-            sortOrder:
-              profileDocuments.reduce(
-                (maximum, document) => Math.max(maximum, document.sortOrder),
-                -1,
-              ) + 1,
-            createdAt: timestamp,
-            updatedAt: timestamp,
-          };
-          const submit = panel.querySelector<HTMLButtonElement>(
-            "[data-employment-save]",
-          );
-          if (submit) submit.disabled = true;
-          try {
-            await saveDocument(metadata, bytes, key);
-            await showDocuments(profile);
-            root
-              .querySelector<HTMLDialogElement>("#employment-dialog")
-              ?.showModal();
-          } catch {
-            if (error) {
-              error.textContent =
-                "The employment document could not be encrypted and saved.";
-              error.hidden = false;
-            }
-            if (submit) submit.disabled = false;
-          }
+          if (title) title.textContent = `Save ${label.toLowerCase()}`;
+          if (fileLabel) fileLabel.textContent = `${label} file`;
+          employmentDialog?.showModal();
         });
       }
+      employmentFile?.addEventListener("change", () => {
+        const file = employmentFile.files?.[0];
+        if (file && employmentName && !employmentName.value.trim())
+          employmentName.value = suggestDocumentName(file.name);
+      });
+      employmentForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const category = employmentCategory?.value;
+        if (
+          category !== "employer-letter" &&
+          category !== "employment-contract"
+        )
+          return;
+        const file = employmentFile?.files?.[0];
+        const displayName = employmentName?.value.trim() ?? "";
+        const mimeType = file
+          ? resolveDocumentMimeType(file.name, file.type)
+          : null;
+        const validationError = file
+          ? validateDocumentUploadInput({
+              displayName,
+              category,
+              fileName: file.name,
+              mimeType: mimeType ?? file.type,
+              size: file.size,
+            })
+          : "Choose a PDF, JPG, or PNG file.";
+        if (validationError || !file || !mimeType) {
+          if (employmentError) {
+            employmentError.textContent =
+              validationError ?? "Choose a PDF, JPG, or PNG file.";
+            employmentError.hidden = false;
+          }
+          return;
+        }
+        const profileDocuments = documents.filter(
+          ({ profileId }) => profileId === selectedProfileId,
+        );
+        const totalBytes = documents.reduce(
+          (total, document) => total + document.size,
+          0,
+        );
+        if (profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE) {
+          if (employmentError) {
+            employmentError.textContent =
+              "This profile already has the maximum of 25 documents.";
+            employmentError.hidden = false;
+          }
+          return;
+        }
+        if (totalBytes + file.size > MAXIMUM_TOTAL_DOCUMENT_BYTES) {
+          if (employmentError) {
+            employmentError.textContent =
+              "Document storage would exceed the 50 MB app limit.";
+            employmentError.hidden = false;
+          }
+          return;
+        }
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const signatureError = validateDocumentSignature(mimeType, bytes);
+        if (signatureError) {
+          if (employmentError) {
+            employmentError.textContent = signatureError;
+            employmentError.hidden = false;
+          }
+          return;
+        }
+        const timestamp = new Date().toISOString();
+        const metadata: DocumentMetadata = {
+          version: 1,
+          id: crypto.randomUUID(),
+          profileId: selectedProfileId,
+          displayName,
+          fileName: file.name.trim(),
+          mimeType,
+          size: file.size,
+          category,
+          sortOrder:
+            profileDocuments.reduce(
+              (maximum, document) => Math.max(maximum, document.sortOrder),
+              -1,
+            ) + 1,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        };
+        const submit = employmentForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveDocument(metadata, bytes, key);
+          employmentDialog?.close();
+          await showDocuments(profile);
+        } catch {
+          if (employmentError) {
+            employmentError.textContent =
+              "The employment document could not be encrypted and saved.";
+            employmentError.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
       lifeEnglishDialog
         ?.querySelector<HTMLButtonElement>(".dialog-close")
         ?.addEventListener("click", () => lifeEnglishDialog.close());

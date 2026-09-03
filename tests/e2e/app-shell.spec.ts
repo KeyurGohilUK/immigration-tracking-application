@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "The unselected centre ILR hero icon now uses the bright Ibiza pink-to-orange gradient in both light and dark themes.",
+      "Employment checklist items now open focused evidence dialogs with matching Cancel and Save actions.",
     ),
   ).toBeVisible();
   await expect(
@@ -987,7 +987,7 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 });
 
-test("manages Employment documents independently in one dialog", async ({
+test("opens focused Employment evidence dialogs from each checklist item", async ({
   page,
 }) => {
   await page.goto("/");
@@ -999,62 +999,62 @@ test("manages Employment documents independently in one dialog", async ({
     employmentSection.getByText("To do", { exact: true }),
   ).toBeVisible();
   await employmentSection.locator("summary").click();
-  await employmentSection.getByRole("button", { name: "Add document" }).click();
+  await expect(
+    employmentSection.getByRole("button", { name: "Add document" }),
+  ).toHaveCount(0);
+  await employmentSection
+    .getByRole("button", { name: "Add employer letter" })
+    .click();
 
-  let dialog = page.getByRole("dialog", { name: "Add employment documents" });
+  let dialog = page.getByRole("dialog", { name: "Save employer letter" });
   await expect(dialog).toBeVisible();
-  await expect(
-    dialog.locator('[data-employment-upload="employer-letter"]'),
-  ).toBeVisible();
-  await expect(
-    dialog.locator('[data-employment-upload="employment-contract"]'),
-  ).toBeVisible();
+  await expect(dialog.getByLabel("Employer letter file")).toBeVisible();
+  await expect(dialog.getByLabel("Employment contract file")).toHaveCount(0);
+  const cancelBox = await dialog
+    .getByRole("button", { name: "Cancel" })
+    .boundingBox();
+  const saveBox = await dialog
+    .getByRole("button", { name: "Save" })
+    .boundingBox();
+  expect(cancelBox?.width).toBe(saveBox?.width);
+  expect(cancelBox?.height).toBe(saveBox?.height);
+  await dialog.getByRole("button", { name: "Cancel" }).click();
+  await expect(dialog).not.toBeVisible();
+  await employmentSection
+    .getByRole("button", { name: "Add employer letter" })
+    .click();
 
   const tinyPng = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
     "base64",
   );
-  const employerForm = dialog.locator(
-    '[data-employment-upload="employer-letter"]',
-  );
-  await employerForm.getByLabel("Employer letter file").setInputFiles({
+  dialog = page.getByRole("dialog", { name: "Save employer letter" });
+  await dialog.getByLabel("Employer letter file").setInputFiles({
     name: "employer-letter.png",
     mimeType: "image/png",
     buffer: tinyPng,
   });
-  await employerForm.getByLabel("Document name").fill("Employer letter");
-  await employerForm
-    .getByRole("button", { name: "Encrypt and save employer letter" })
-    .click();
+  await dialog.getByLabel("Document name").fill("Employer letter");
+  await dialog.getByRole("button", { name: "Save" }).click();
 
-  dialog = page.getByRole("dialog", { name: "Add employment documents" });
-  await expect(dialog).toBeVisible();
+  await expect(dialog).not.toBeVisible();
   await expect(
     employmentSection.getByText("Partial", { exact: true }),
   ).toBeVisible();
-  await expect(
-    dialog
-      .locator('[data-employment-panel="employer-letter"]')
-      .getByText("Added", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    dialog
-      .locator('[data-employment-panel="employment-contract"]')
-      .getByText("Pending", { exact: true }),
-  ).toBeVisible();
-
-  const contractForm = dialog.locator(
-    '[data-employment-upload="employment-contract"]',
-  );
-  await contractForm.getByLabel("Employment contract file").setInputFiles({
+  await employmentSection.locator("summary").click();
+  await employmentSection
+    .getByRole("button", { name: "Add employment contract" })
+    .click();
+  dialog = page.getByRole("dialog", { name: "Save employment contract" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel("Employer letter file")).toHaveCount(0);
+  await dialog.getByLabel("Employment contract file").setInputFiles({
     name: "employment-contract.png",
     mimeType: "image/png",
     buffer: tinyPng,
   });
-  await contractForm.getByLabel("Document name").fill("Employment contract");
-  await contractForm
-    .getByRole("button", { name: "Encrypt and save employment contract" })
-    .click();
+  await dialog.getByLabel("Document name").fill("Employment contract");
+  await dialog.getByRole("button", { name: "Save" }).click();
 
   await expect(
     employmentSection.getByText("Complete", { exact: true }),
