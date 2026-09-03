@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Active sessions now stay unlocked when iOS opens download/system UI, and downloading an app update no longer forces a reload or PIN screen.",
+      "The centre ILR hero icon now keeps its bright Ibiza accent when unselected in both light and dark themes.",
     ),
   ).toBeVisible();
   await expect(
@@ -1920,7 +1920,7 @@ test("opens the centre ILR hero journey for the household", async ({
   );
   await expect(
     navigation.locator('a[data-navigation="ILR"]:not([aria-current="page"])'),
-  ).toHaveCSS("color", "rgb(255, 177, 197)");
+  ).toHaveCSS("color", "rgb(238, 9, 121)");
   await ilrLinks.first().click();
 
   await expect(navigation).toHaveClass(/is-hero-active/);
