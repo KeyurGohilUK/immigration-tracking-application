@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Update-available install glow now uses UrbanFox theme colours in both light and dark mode instead of gold.",
+      "Document Vault now downloads a ZIP bundle with one folder per visible section, including the Address History index and prefixed address evidence files.",
     ),
   ).toBeVisible();
   await expect(
