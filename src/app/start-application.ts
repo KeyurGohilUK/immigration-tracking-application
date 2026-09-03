@@ -140,9 +140,9 @@ import {
   type DocumentMetadata,
 } from "../features/documents/domain/document";
 import {
-  createDocumentPack,
-  downloadDocumentPack,
-} from "../features/documents/services/document-pack-service";
+  createDocumentBundle,
+  downloadDocumentBundle,
+} from "../features/documents/services/document-bundle-service";
 import {
   buildAddressEvidenceExportPlan,
   createAddressHistoryIndexPdf,
@@ -786,30 +786,39 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           }
         });
       root
-        .querySelector<HTMLButtonElement>("#download-document-pack")
+        .querySelector<HTMLButtonElement>("#download-document-bundle")
         ?.addEventListener("click", async (event) => {
           const button = event.currentTarget as HTMLButtonElement;
           const selectedDocuments = documents
             .filter(({ profileId }) => profileId === selectedProfileId)
-            .sort((left, right) => left.sortOrder - right.sortOrder);
-          if (selectedDocuments.length === 0) return;
+            .sort(
+              (left, right) =>
+                left.sortOrder - right.sortOrder ||
+                left.createdAt.localeCompare(right.createdAt),
+            );
+          if (selectedDocuments.length === 0 && addressHistory.length === 0)
+            return;
           button.disabled = true;
-          button.textContent = "Creating PDF…";
+          button.textContent = "Creating ZIP…";
           try {
             const files = await Promise.all(
               selectedDocuments.map(({ id }) => getDocumentFile(id, key)),
             );
-            const bytes = await createDocumentPack(files);
             const profileName =
               familyMembers.find(({ id }) => id === selectedProfileId)
                 ?.fullName ?? "UrbanFox";
-            downloadDocumentPack(bytes, profileName);
-            button.textContent = "PDF pack downloaded";
+            const bytes = await createDocumentBundle(
+              files,
+              addressHistory,
+              profileName,
+            );
+            downloadDocumentBundle(bytes, profileName);
+            button.textContent = "Doc bundle downloaded";
           } catch {
             button.disabled = false;
-            button.textContent = "⇩ Download PDF pack";
+            button.textContent = "⇩ Download doc bundle";
             showDocumentPageError(
-              "The PDF pack could not be created. Check that every stored file can be opened.",
+              "The document bundle could not be created. Check that every stored file can be opened.",
             );
           }
         });
