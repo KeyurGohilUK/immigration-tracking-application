@@ -503,7 +503,9 @@ test("guides Address History from the current address backwards", async ({
     .getByRole("button", { name: "Download address files + index" })
     .click();
   await expect.poll(() => addressDownloads.length).toBe(2);
-  expect(addressDownloads.map((download) => download.suggestedFilename())).toEqual(
+  expect(
+    addressDownloads.map((download) => download.suggestedFilename()),
+  ).toEqual(
     expect.arrayContaining([
       "Urban-Fox-Test-User-Address-History-Index.pdf",
       "Current address - current-address-proof.png",
