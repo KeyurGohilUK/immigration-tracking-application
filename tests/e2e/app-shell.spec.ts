@@ -157,7 +157,7 @@ test("shows install and update controls in every device header", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Document checklist items now change from Add to Edit after upload and open the saved document for editing.",
+      "Appearance now uses a three-state sliding Dark, System, Light control styled with the UrbanFox Ibiza Sunset Liquid Glass theme.",
     ),
   ).toBeVisible();
   await expect(
@@ -1290,7 +1290,9 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(
     page.getByRole("heading", { name: "Appearance", level: 2 }),
   ).toBeVisible();
-  await expect(page.getByText("Appearance", { exact: true })).toHaveCount(1);
+  await expect(
+    page.getByRole("group", { name: "Appearance" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Terms, privacy, and licence",
