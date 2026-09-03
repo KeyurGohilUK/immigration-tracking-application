@@ -64,8 +64,7 @@ export function buildDocumentBundlePlan(
 
     const unlinked = documents.filter(
       ({ metadata }) =>
-        metadata.category === "address-proof" &&
-        !linkedIds.has(metadata.id),
+        metadata.category === "address-proof" && !linkedIds.has(metadata.id),
     );
     for (const { metadata } of unlinked) {
       const fileName = getUniqueFileName(
