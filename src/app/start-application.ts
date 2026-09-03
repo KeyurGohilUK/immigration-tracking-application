@@ -759,8 +759,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             selectedDocuments,
           );
           const profileName =
-            familyMembers.find(({ id }) => id === selectedProfileId)?.fullName ??
-            "UrbanFox";
+            familyMembers.find(({ id }) => id === selectedProfileId)
+              ?.fullName ?? "UrbanFox";
           button.disabled = true;
           button.textContent = "Preparing address downloads…";
           try {
