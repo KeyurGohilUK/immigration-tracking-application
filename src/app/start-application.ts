@@ -831,9 +831,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
           }
         });
-      root
-        .querySelector<HTMLButtonElement>("#add-document")
-        ?.addEventListener("click", () => showDocumentUploadForm(root));
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-add-vault-section]",
       )) {
@@ -1885,8 +1882,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
       } catch {
         renderDocuments(profile, [], [], null, null, null);
-        const add = root.querySelector<HTMLButtonElement>("#add-document");
-        if (add) add.disabled = true;
         showDocumentPageError(
           "Encrypted Document Vault data could not be opened on this device.",
         );

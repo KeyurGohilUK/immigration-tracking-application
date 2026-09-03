@@ -766,6 +766,12 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(
     page.getByRole("heading", { name: "Document Vault", exact: true }),
   ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add document" })).toHaveCount(
+    0,
+  );
+  const vaultHeaderIcon = page.locator(".vault-heading-icon");
+  await expect(vaultHeaderIcon.locator("svg")).toHaveCount(1);
+  await expect(vaultHeaderIcon.locator("path")).toHaveCount(2);
   await expect(page.getByText("No documents added yet")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Identity & Immigration" }),
@@ -906,8 +912,10 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "english test evidence" }),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: "Add document" }).first().click();
-  const addDocumentDialog = page.getByRole("dialog", { name: "Add document" });
+  const salarySection = page.locator('[data-vault-section="salary-tax"]');
+  await salarySection.locator("summary").click();
+  await salarySection.getByRole("button", { name: "Add Payslip" }).click();
+  const addDocumentDialog = page.getByRole("dialog", { name: "Add Payslip" });
   await expect(addDocumentDialog).toHaveClass(/liquid-dialog/);
   await expect(
     addDocumentDialog.locator('option[value="passport"]'),
@@ -926,22 +934,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await addDocumentDialog
     .getByLabel("Document name")
     .fill("Council tax statement");
-  await addDocumentDialog.getByLabel("Category").selectOption("address-proof");
   await page.getByRole("button", { name: "Encrypt and save document" }).click();
   await expect(
     page.getByRole("heading", { name: "Council tax statement" }),
   ).toBeVisible();
-  const addressRow = page
-    .locator(".vault-category-row")
-    .filter({ hasText: "Address History" });
-  await expect(addressRow.getByText("To do")).toBeVisible();
-  await expect(
-    page.locator(".document-review-badge:visible", {
-      hasText: "Needs attention · no address linked",
-    }),
-  ).toBeVisible();
-  await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
-
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 8);

@@ -1,6 +1,7 @@
 {
   "version": "3.22.14",
   "notes": [
-    "File controls in standard document upload forms now keep the Choose File button vertically centred."
+    "File controls in standard document upload forms now keep the Choose File button vertically centred.",
+    "The Document Vault header now uses a document-folder icon and no longer shows the redundant add button."
   ]
 }
