@@ -118,9 +118,9 @@ describe("encrypted repository save boundaries", () => {
       updatedAt: timestamp,
     };
 
-    await expect(saveAddressHistory("member-1", [address], key)).rejects.toThrow(
-      "Address history is invalid",
-    );
+    await expect(
+      saveAddressHistory("member-1", [address], key),
+    ).rejects.toThrow("Address history is invalid");
     await expect(
       saveLifeEnglishRecord("member-1", lifeEnglish, key),
     ).rejects.toThrow("Life in the UK and English data is invalid");
@@ -144,9 +144,9 @@ describe("encrypted repository save boundaries", () => {
       updatedAt: timestamp,
     };
 
-    await expect(
-      saveDocument(document, png, key, "member-1"),
-    ).rejects.toThrow("different household profile");
+    await expect(saveDocument(document, png, key, "member-1")).rejects.toThrow(
+      "different household profile",
+    );
     await expect(
       saveDocumentMetadataBatch([document], key, "member-1"),
     ).rejects.toThrow("different household profile");
