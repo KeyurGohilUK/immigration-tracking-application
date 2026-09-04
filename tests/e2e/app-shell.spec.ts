@@ -2556,8 +2556,9 @@ test("shares household selection and progress styling across ILR, Vault, and Tra
   await expect(otherPill).toContainText("0%");
 });
 
-
-test("locks from Profile settings and requires the PIN again", async ({ page }) => {
+test("locks from Profile settings and requires the PIN again", async ({
+  page,
+}) => {
   await page.goto("/");
   await createLocalProfile(page);
 
@@ -2590,7 +2591,9 @@ test("enforces a cooldown after five consecutive incorrect PIN attempts", async 
     "Too many attempts. Try again in 30 seconds.",
   );
   await expect(page.getByRole("button", { name: "Enter 0" })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Forgot PIN?" })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Forgot PIN?" }),
+  ).toBeDisabled();
 });
 
 test("forgotten PIN reset removes the vault and encrypted profile records", async ({
@@ -2636,7 +2639,6 @@ test("forgotten PIN reset removes the vault and encrypted profile records", asyn
   await page.reload();
   await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
 });
-
 
 test("rejects mismatched PIN confirmation during private-space setup", async ({
   page,
