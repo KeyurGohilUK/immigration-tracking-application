@@ -79,6 +79,21 @@ describe("recorded absence check", () => {
     });
   });
 
+  it("counts same-day and next-day travel as zero whole absence days", () => {
+    const sameDay = calculateRecordedAbsenceCheck({
+      permissions: [permission],
+      trips: [trip("same-day", "2024-01-01", "2024-01-01")],
+      asOfDate: "2026-08-30",
+    });
+    const nextDay = calculateRecordedAbsenceCheck({
+      permissions: [permission],
+      trips: [trip("next-day", "2024-01-01", "2024-01-02")],
+      asOfDate: "2026-08-30",
+    });
+    expect(sameDay.maximumRecordedDays).toBe(0);
+    expect(nextDay.maximumRecordedDays).toBe(0);
+  });
+
   it("uses calendar dates across leap years", () => {
     const result = calculateRecordedAbsenceCheck({
       permissions: [permission],
@@ -86,6 +101,27 @@ describe("recorded absence check", () => {
       asOfDate: "2026-08-30",
     });
     expect(result.maximumRecordedDays).toBe(2);
+  });
+
+  it("handles month ends, year ends, and UK daylight-saving boundaries as civil dates", () => {
+    const monthEnd = calculateRecordedAbsenceCheck({
+      permissions: [permission],
+      trips: [trip("month-end", "2024-01-30", "2024-02-02")],
+      asOfDate: "2026-08-30",
+    });
+    const yearEnd = calculateRecordedAbsenceCheck({
+      permissions: [permission],
+      trips: [trip("year-end", "2024-12-30", "2025-01-02")],
+      asOfDate: "2026-08-30",
+    });
+    const dst = calculateRecordedAbsenceCheck({
+      permissions: [permission],
+      trips: [trip("dst", "2024-03-30", "2024-04-02")],
+      asOfDate: "2026-08-30",
+    });
+    expect(monthEnd.maximumRecordedDays).toBe(2);
+    expect(yearEnd.maximumRecordedDays).toBe(2);
+    expect(dst.maximumRecordedDays).toBe(2);
   });
 
   it("counts pre-entry days from the recorded entry-clearance grant", () => {
@@ -115,19 +151,110 @@ describe("recorded absence check", () => {
     expect(result.issues).toContain("open-trip");
   });
 
-  it("requires manual review for flagged absences and pre-2018 records", () => {
+  it("requires manual review for a potentially permitted absence", () => {
     const flagged = calculateRecordedAbsenceCheck({
       permissions: [permission],
       trips: [trip("trip-1", "2024-01-01", "2024-01-10", true)],
       asOfDate: "2026-08-30",
     });
-    const transitional = calculateRecordedAbsenceCheck({
-      permissions: [{ ...permission, grantDate: "2017-12-01" }],
-      trips: [],
-      asOfDate: "2026-08-30",
-    });
     expect(flagged.status).toBe("manual-review");
-    expect(transitional.status).toBe("manual-review");
+  });
+
+  it("uses application-date-anchored periods for pre-11-January-2018 permission", () => {
+    const transitionalPermission = {
+      ...permission,
+      grantDate: "2015-07-01",
+      permissionStartDate: "2015-07-01",
+      permissionExpiryDate: "2018-07-28",
+      actualUkArrivalDate: "",
+    };
+    const result = calculateRecordedAbsenceCheck({
+      permissions: [transitionalPermission],
+      trips: [
+        trip("trip-1", "2017-03-01", "2017-06-30"),
+        trip("trip-2", "2017-07-01", "2017-10-30"),
+      ],
+      asOfDate: "2020-06-30",
+    });
+    expect(result.status).toBe("within-recorded-limit");
+    expect(result.maximumRecordedDays).toBe(120);
+    expect(result.maximumWindow).toEqual({
+      startDate: "2017-07-01",
+      endDate: "2018-06-30",
+      daysOutside: 120,
+    });
+    expect(result.issues).toContain("pre-2018-record");
+  });
+
+  it("anchors transitional periods to the prospective application date rather than today", () => {
+    const result = calculateRecordedAbsenceCheck({
+      permissions: [
+        {
+          ...permission,
+          grantDate: "2015-07-01",
+          permissionStartDate: "2015-07-01",
+          permissionExpiryDate: "2018-07-28",
+          actualUkArrivalDate: "",
+        },
+      ],
+      trips: [
+        trip("trip-1", "2017-03-01", "2017-06-30"),
+        trip("trip-2", "2017-07-01", "2017-10-30"),
+      ],
+      asOfDate: "2019-12-31",
+      applicationDate: "2020-06-30",
+    });
+    expect(result.maximumRecordedDays).toBe(120);
+    expect(result.maximumWindow).toEqual({
+      startDate: "2017-07-01",
+      endDate: "2018-06-30",
+      daysOutside: 120,
+    });
+  });
+
+  it("still flags a transitional fixed period when it exceeds 180 days", () => {
+    const result = calculateRecordedAbsenceCheck({
+      permissions: [
+        {
+          ...permission,
+          grantDate: "2015-07-01",
+          permissionStartDate: "2015-07-01",
+          permissionExpiryDate: "2018-07-28",
+          actualUkArrivalDate: "",
+        },
+      ],
+      trips: [trip("trip-1", "2016-07-01", "2017-01-01")],
+      asOfDate: "2020-06-30",
+    });
+    expect(result.maximumRecordedDays).toBe(183);
+    expect(result.status).toBe("potentially-over-limit");
+  });
+
+  it("switches to rolling windows for absence days under a later grant", () => {
+    const result = calculateRecordedAbsenceCheck({
+      permissions: [
+        {
+          ...permission,
+          id: "old",
+          grantDate: "2015-07-01",
+          permissionStartDate: "2015-07-01",
+          permissionExpiryDate: "2018-07-28",
+          actualUkArrivalDate: "",
+        },
+        {
+          ...permission,
+          id: "new",
+          grantDate: "2018-07-29",
+          permissionStartDate: "2018-07-29",
+          permissionExpiryDate: "2021-07-29",
+          actualUkArrivalDate: "",
+        },
+      ],
+      trips: [trip("trip-1", "2018-08-01", "2019-02-01")],
+      asOfDate: "2020-06-30",
+    });
+    expect(result.maximumRecordedDays).toBe(183);
+    expect(result.status).toBe("potentially-over-limit");
   });
 
   it("reports a missing grant date as incomplete", () => {

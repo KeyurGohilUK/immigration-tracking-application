@@ -1,8 +1,8 @@
 import type { ImmigrationRoute } from "../../immigration/domain/immigration-permission";
 
 export const ABSENCE_RULE = {
-  id: "skilled-worker-main-applicant-absence-v1",
-  version: 1,
+  id: "skilled-worker-main-applicant-absence-v2",
+  version: 2,
   supportedRoutes: [
     "skilled-worker",
     "health-and-care-worker",
@@ -13,7 +13,7 @@ export const ABSENCE_RULE = {
   maximumDays: 180,
   rollingMonths: 12,
   effectiveFrom: "2018-01-11",
-  verifiedAt: "2026-08-30",
+  verifiedAt: "2026-09-04",
   guidanceLastUpdated: "2026-06-08",
   sources: [
     {

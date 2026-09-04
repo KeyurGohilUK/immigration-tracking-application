@@ -330,25 +330,27 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const isDependant = latestPermission
             ? latestPermission.role === "dependant"
             : member.immigrationRole === "dependant";
+          const period = isDependant
+            ? calculateSkilledWorkerDependantQualifyingPeriod(
+                permissions,
+                asOfDate,
+              )
+            : calculateSkilledWorkerQualifyingPeriod({
+                permissions,
+                asOfDate,
+              });
           const absenceInput = {
             permissions,
             trips,
             asOfDate,
+            applicationDate: period.earliestApplicationDate ?? asOfDate,
           };
 
           return {
             member,
             permissions,
             lifeEnglish,
-            period: isDependant
-              ? calculateSkilledWorkerDependantQualifyingPeriod(
-                  permissions,
-                  asOfDate,
-                )
-              : calculateSkilledWorkerQualifyingPeriod({
-                  permissions,
-                  asOfDate,
-                }),
+            period,
             absence: isDependant
               ? calculateRecordedDependantAbsenceCheck(absenceInput)
               : calculateRecordedAbsenceCheck(absenceInput),
@@ -2237,13 +2239,18 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         right.permissionStartDate.localeCompare(left.permissionStartDate),
       )[0];
       const isDependant = latestPermission?.role === "dependant";
-      const input = { permissions, trips, asOfDate };
-      const absence = isDependant
-        ? calculateRecordedDependantAbsenceCheck(input)
-        : calculateRecordedAbsenceCheck(input);
       const period = isDependant
         ? calculateSkilledWorkerDependantQualifyingPeriod(permissions, asOfDate)
         : calculateSkilledWorkerQualifyingPeriod({ permissions, asOfDate });
+      const input = {
+        permissions,
+        trips,
+        asOfDate,
+        applicationDate: period.earliestApplicationDate ?? asOfDate,
+      };
+      const absence = isDependant
+        ? calculateRecordedDependantAbsenceCheck(input)
+        : calculateRecordedAbsenceCheck(input);
       return {
         maximumRecordedDays: permissions.length
           ? absence.maximumRecordedDays

@@ -19,7 +19,7 @@ export const SKILLED_WORKER_QUALIFYING_PERIOD_RULE = {
     "scale-up",
   ],
   supportedRole: "main-applicant",
-  verifiedAt: "2026-08-30",
+  verifiedAt: "2026-09-04",
   sources: [
     {
       label: "Immigration Rules Appendix Skilled Worker",

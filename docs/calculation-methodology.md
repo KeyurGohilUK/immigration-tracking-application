@@ -8,8 +8,10 @@ instead of current GOV.UK guidance or qualified legal advice.
 
 - Qualifying-period rule:
   `skilled-worker-main-applicant-qualifying-period-v1`
-- Absence rule: `skilled-worker-main-applicant-absence-v1`
-- Verified: 30 August 2026
+- Absence rule: `skilled-worker-main-applicant-absence-v2`
+- Verified: 4 September 2026
+- Immigration Rules Appendix Continuous Residence checked against the version
+  updated 3 August 2026.
 - Home Office continuous-residence guidance last updated when verified: 8 June
   2026
 
@@ -76,16 +78,46 @@ its departure and return. An open trip contributes completed dates through the
 day before the check date, but the result is marked incomplete. Recorded days
 between an entry-clearance grant and actual UK arrival are also included.
 
-The engine checks every candidate rolling period beginning on a recorded whole
-absence day and ending 12 calendar months later. It reports the period with the
-largest combined total. Exactly 180 days is shown as within the recorded limit;
-more than 180 is shown as a potential limit issue, not as an eligibility
-failure.
+For absence days falling under permission granted on or after 11 January 2018,
+the engine checks every candidate rolling period beginning on a recorded whole
+absence day and ending 12 calendar months later.
+
+For absence days falling under permission granted before 11 January 2018, the
+engine applies the transitional method in Appendix Continuous Residence CR 3.2:
+those days are grouped into consecutive 12-month periods ending on the same
+month and day as the prospective application date. UrbanFox uses the calculated
+earliest application date when one is available; otherwise it uses the current
+check date as the tracking anchor. This is still an estimate because the actual
+application date may differ.
+
+Where a historical permission spans beyond 11 January 2018, absences remain on
+the transitional method until that permission ends; absences under a later grant
+are evaluated on the rolling method. The engine reports whichever relevant
+12-month period contains the largest recorded total. Exactly 180 days is shown
+as within the recorded limit; more than 180 is shown as a potential limit issue,
+not as an eligibility failure.
 
 Trips flagged as potentially permitted or exceptional remain in the displayed
-total and force manual review. A permission granted before 11 January 2018 also
-forces manual review because UrbanFox does not yet apply the transitional
-consecutive-period method.
+total and force manual review. Pre-11-January-2018 permission is retained as an
+informational issue in the structured result but no longer forces manual review
+by itself because the transitional calculation is now implemented.
+
+## Verification review — 4 September 2026
+
+The calculation was manually reviewed against the current official GOV.UK
+sources for the supported Skilled Worker scope. The review confirmed:
+
+- SW 21.1 requires a five-year continuous period.
+- SW 21.2 permits the configured combination of qualifying routes, excluding
+  dependant permission. The narrow SW 21.2(i) COVID-era provision remains
+  deliberately unautomated.
+- Appendix Continuous Residence CR 1.1 supports the 28-day application timing
+  estimate.
+- CR 3.1 applies the 180-day limit to rolling 12-month periods.
+- CR 3.2 requires absences under permission granted before 11 January 2018 to
+  use consecutive 12-month periods ending on the application-date anniversary.
+- Current caseworker guidance confirms that whole days only are counted and that
+  time between entry-clearance grant and UK arrival counts as absence.
 
 ## Deliberate limitations
 

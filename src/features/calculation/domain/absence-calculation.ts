@@ -40,6 +40,12 @@ interface AbsenceCalculationInput {
   permissions: ImmigrationPermission[];
   trips: Trip[];
   asOfDate: string;
+  applicationDate?: string;
+}
+
+interface ClassifiedAbsenceDays {
+  rolling: number[];
+  transitional: number[];
 }
 
 function parseDate(value: string): number {
@@ -64,12 +70,49 @@ function formatDate(timestamp: number): string {
   return new Date(timestamp).toISOString().slice(0, 10);
 }
 
-function addTwelveCalendarMonths(timestamp: number): number {
+function addCalendarYears(timestamp: number, years: number): number {
   const date = new Date(timestamp);
-  return Date.UTC(
-    date.getUTCFullYear() + 1,
-    date.getUTCMonth(),
-    date.getUTCDate(),
+  const year = date.getUTCFullYear() + years;
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
+  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  return Date.UTC(year, month, Math.min(day, lastDay));
+}
+
+function addTwelveCalendarMonths(timestamp: number): number {
+  return addCalendarYears(timestamp, 1);
+}
+
+function countingStart(permission: ImmigrationPermission): number {
+  return parseDate(
+    permission.actualUkArrivalDate && permission.grantDate
+      ? permission.grantDate
+      : permission.permissionStartDate,
+  );
+}
+
+function permissionForDay(
+  day: number,
+  permissions: ImmigrationPermission[],
+): ImmigrationPermission | null {
+  return (
+    [...permissions]
+      .sort((left, right) =>
+        right.permissionStartDate.localeCompare(left.permissionStartDate),
+      )
+      .find(
+        (permission) =>
+          day >= countingStart(permission) &&
+          day <= parseDate(permission.permissionExpiryDate),
+      ) ?? null
+  );
+}
+
+function isTransitionalPermission(
+  permission: ImmigrationPermission | null,
+): boolean {
+  return Boolean(
+    permission?.grantDate && permission.grantDate < ABSENCE_RULE.effectiveFrom,
   );
 }
 
@@ -77,9 +120,18 @@ function collectWholeAbsenceDays(
   trips: Trip[],
   permissions: ImmigrationPermission[],
   asOfDate: string,
-): number[] {
+): ClassifiedAbsenceDays {
   const asOf = parseDate(asOfDate);
-  const days = new Set<number>();
+  const classified = new Map<number, "rolling" | "transitional">();
+
+  const classify = (day: number, permission?: ImmigrationPermission): void => {
+    const activePermission = permission ?? permissionForDay(day, permissions);
+    classified.set(
+      day,
+      isTransitionalPermission(activePermission) ? "transitional" : "rolling",
+    );
+  };
+
   for (const trip of trips) {
     const departure = parseDate(trip.departureDate);
     const returned = trip.returnDate ? parseDate(trip.returnDate) : asOf;
@@ -88,8 +140,9 @@ function collectWholeAbsenceDays(
       day < returned;
       day += DAY_IN_MILLISECONDS
     )
-      days.add(day);
+      classify(day);
   }
+
   for (const permission of permissions) {
     if (!permission.actualUkArrivalDate || !permission.grantDate) continue;
     const granted = parseDate(permission.grantDate);
@@ -99,12 +152,20 @@ function collectWholeAbsenceDays(
       day < arrived && day <= asOf;
       day += DAY_IN_MILLISECONDS
     )
-      days.add(day);
+      classify(day, permission);
   }
-  return [...days].sort((left, right) => left - right);
+
+  const rolling: number[] = [];
+  const transitional: number[] = [];
+  for (const [day, method] of classified) {
+    (method === "transitional" ? transitional : rolling).push(day);
+  }
+  rolling.sort((left, right) => left - right);
+  transitional.sort((left, right) => left - right);
+  return { rolling, transitional };
 }
 
-function findMaximumWindow(absenceDays: number[]): AbsenceWindow | null {
+function findMaximumRollingWindow(absenceDays: number[]): AbsenceWindow | null {
   const firstAbsenceDay = absenceDays[0];
   if (firstAbsenceDay === undefined) return null;
   let maximumStart = firstAbsenceDay;
@@ -135,11 +196,50 @@ function findMaximumWindow(absenceDays: number[]): AbsenceWindow | null {
   };
 }
 
+function findMaximumApplicationAnchoredWindow(
+  absenceDays: number[],
+  applicationDate: string,
+): AbsenceWindow | null {
+  const firstAbsenceDay = absenceDays[0];
+  if (firstAbsenceDay === undefined) return null;
+
+  let end = parseDate(applicationDate);
+  let maximum: AbsenceWindow | null = null;
+
+  while (end >= firstAbsenceDay) {
+    const previousEnd = addCalendarYears(end, -1);
+    const start = previousEnd + DAY_IN_MILLISECONDS;
+    const daysOutside = absenceDays.filter(
+      (day) => day >= start && day <= end,
+    ).length;
+    if (!maximum || daysOutside > maximum.daysOutside) {
+      maximum = {
+        startDate: formatDate(start),
+        endDate: formatDate(end),
+        daysOutside,
+      };
+    }
+    end = previousEnd;
+  }
+
+  return maximum;
+}
+
+function largerWindow(
+  left: AbsenceWindow | null,
+  right: AbsenceWindow | null,
+): AbsenceWindow | null {
+  if (!left) return right;
+  if (!right) return left;
+  return right.daysOutside > left.daysOutside ? right : left;
+}
+
 function calculateAbsenceForRole(
-  { permissions, trips, asOfDate }: AbsenceCalculationInput,
+  { permissions, trips, asOfDate, applicationDate }: AbsenceCalculationInput,
   supportedRole: "main-applicant" | "dependant",
 ): AbsenceCheckResult {
   parseDate(asOfDate);
+  if (applicationDate) parseDate(applicationDate);
   const qualifyingPermissions = permissions
     .filter(
       ({ route, role }) =>
@@ -166,7 +266,12 @@ function calculateAbsenceForRole(
     qualifyingPermissions,
     asOfDate,
   );
-  const maximumWindow = findMaximumWindow(absenceDays);
+  const rollingWindow = findMaximumRollingWindow(absenceDays.rolling);
+  const transitionalWindow = findMaximumApplicationAnchoredWindow(
+    absenceDays.transitional,
+    applicationDate ?? asOfDate,
+  );
+  const maximumWindow = largerWindow(rollingWindow, transitionalWindow);
   const maximumRecordedDays = maximumWindow?.daysOutside ?? 0;
   const issues: AbsenceCheckResult["issues"] = [];
   if (trips.some(({ returnDate }) => !returnDate)) issues.push("open-trip");
@@ -184,11 +289,7 @@ function calculateAbsenceForRole(
   let status: AbsenceCheckStatus;
   if (permissions.length === 0) status = "incomplete";
   else if (!latestPermission) status = "unsupported";
-  else if (
-    issues.includes("potentially-permitted") ||
-    issues.includes("pre-2018-record")
-  )
-    status = "manual-review";
+  else if (issues.includes("potentially-permitted")) status = "manual-review";
   else if (
     issues.includes("missing-grant-date") ||
     issues.includes("open-trip")

@@ -11,7 +11,7 @@ export const SKILLED_WORKER_DEPENDANT_PERIOD_RULE = {
     "tier-2-general",
   ],
   supportedRole: "dependant",
-  verifiedAt: "2026-08-31",
+  verifiedAt: "2026-09-04",
   sources: [
     {
       label: "Immigration Rules Appendix Skilled Worker",
