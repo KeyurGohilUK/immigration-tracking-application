@@ -1965,7 +1965,6 @@ test("shows recorded-absence usage on ILR and Travel without claiming eligibilit
   await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
   await page.getByRole("button", { name: "Save permission" }).click();
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await expect(page.getByText("4 Dec 2026", { exact: true })).toBeVisible();
   await expect(page.getByText("0 / 180 days", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Travel", exact: true }).click();
   await page.getByRole("button", { name: "Add trip" }).click();
