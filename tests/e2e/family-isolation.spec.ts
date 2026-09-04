@@ -26,7 +26,9 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
   await page.getByRole("button", { name: "Save household member" }).click();
 
   await page.getByRole("link", { name: "ILR", exact: true }).first().click();
-  await page.getByRole("button", { name: "Show Isolation Owner's ILR journey" }).click();
+  await page
+    .getByRole("button", { name: "Show Isolation Owner's ILR journey" })
+    .click();
   await page.getByRole("button", { name: "+ Add past visa" }).click();
   await page.getByRole("button", { name: "Add permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
@@ -38,20 +40,30 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
   await page.getByRole("button", { name: "Save permission" }).click();
 
   await page.getByRole("link", { name: "Travel", exact: true }).first().click();
-  await page.getByRole("button", { name: "Show Isolation Owner's travel" }).click();
+  await page
+    .getByRole("button", { name: "Show Isolation Owner's travel" })
+    .click();
   await page.getByRole("button", { name: "Add trip" }).click();
   await page.getByLabel("UK departure date").fill("2024-02-01");
   await page.getByLabel(/UK return date/).fill("2024-02-10");
   await page.getByLabel("Destination").fill("Owner-only trip");
   await page.getByRole("button", { name: "Save trip" }).click();
-  await expect(page.getByText("Owner-only trip", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Owner-only trip", { exact: true }),
+  ).toBeVisible();
 
-  await page.getByRole("button", { name: "Show Isolation Dependant's travel" }).click();
-  await expect(page.getByText("Owner-only trip", { exact: true })).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Show Isolation Dependant's travel" })
+    .click();
+  await expect(page.getByText("Owner-only trip", { exact: true })).toHaveCount(
+    0,
+  );
   await expect(page.getByText("No trips recorded")).toBeVisible();
 
   await page.getByRole("link", { name: "ILR", exact: true }).first().click();
-  await page.getByRole("button", { name: "Show Isolation Dependant's ILR journey" }).click();
+  await page
+    .getByRole("button", { name: "Show Isolation Dependant's ILR journey" })
+    .click();
   await expect(
     page.getByRole("region", { name: "Permission not recorded", exact: true }),
   ).toBeVisible();
