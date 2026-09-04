@@ -1,3 +1,5 @@
+import { StorageFailure, toStorageFailure } from "./storage-error";
+
 export const DATABASE_STORES = {
   security: "security",
   profiles: "profiles",
@@ -16,7 +18,29 @@ const DATABASE_VERSION = 8;
 
 export function openAppDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+    if (!globalThis.indexedDB) {
+      reject(
+        new StorageFailure(
+          "unavailable",
+          "Private storage is unavailable in this browser.",
+        ),
+      );
+      return;
+    }
+
+    let request: IDBOpenDBRequest;
+    try {
+      request = globalThis.indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+    } catch (error) {
+      reject(
+        toStorageFailure(
+          error,
+          "unavailable",
+          "Private storage could not be opened.",
+        ),
+      );
+      return;
+    }
     request.onupgradeneeded = (event) => {
       for (const store of Object.values(DATABASE_STORES)) {
         if (!request.result.objectStoreNames.contains(store))
@@ -32,6 +56,21 @@ export function openAppDatabase(): Promise<IDBDatabase> {
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () =>
-      reject(new Error("Private storage could not be opened."));
+      reject(
+        toStorageFailure(
+          request.error,
+          request.transaction ? "migration-failed" : "unavailable",
+          request.transaction
+            ? "Private storage could not be upgraded safely."
+            : "Private storage could not be opened.",
+        ),
+      );
+    request.onblocked = () =>
+      reject(
+        new StorageFailure(
+          "unavailable",
+          "Private storage is busy in another app session. Close other UrbanFox ILR tabs and try again.",
+        ),
+      );
   });
 }
