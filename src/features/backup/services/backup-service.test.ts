@@ -140,7 +140,9 @@ describe("encrypted backup", () => {
       ciphertext: replacement + backup.ciphertext.slice(1),
     };
 
-    await expect(decryptAndValidateBackup(tampered, password)).rejects.toThrow();
+    await expect(
+      decryptAndValidateBackup(tampered, password),
+    ).rejects.toThrow();
   });
 
   it("rejects readable metadata that does not match the encrypted payload", async () => {
