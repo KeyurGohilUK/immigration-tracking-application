@@ -1,6 +1,8 @@
 {
-  "version": "3.25.3",
+  "version": "3.25.4",
   "notes": [
-    "Roadmap now includes optional email-OTP PIN recovery with wrapped-key architecture as a low-priority future enhancement."
+    "Family-member isolation is now explicitly regression-tested across permissions, trips, calculations, address history, Life in the UK/English data, and documents.",
+    "Document read, write, rename, and delete actions can now be scoped to the selected household profile and reject cross-profile access.",
+    "Browser coverage verifies that switching family members does not expose another profile's travel or ILR state."
   ]
 }

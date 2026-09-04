@@ -37,7 +37,7 @@ Document Vault-specific work is tracked separately in
 - [x] Test IndexedDB migrations and interrupted writes.
 - [x] Test PIN setup, unlock, incorrect attempts, auto-lock, manual lock, and
       forgotten-PIN data reset.
-- [ ] Test family-member isolation so records and calculations cannot be mixed.
+- [x] Test family-member isolation so records and calculations cannot be mixed.
 - [ ] Test backup round trips and malicious or corrupted import files.
 - [ ] Verify that no personal data is sent in network requests.
 
