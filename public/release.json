@@ -1,6 +1,6 @@
 {
-  "version": "3.24.0",
+  "version": "3.24.1",
   "notes": [
-    "Travel now shares the household selector, absence summary styling, and page spacing, with a clearer trip history and departure-year filters."
+    "Family Overview now uses shared page spacing, factual household metrics, and clearer member and selected-profile status cards."
   ]
 }
