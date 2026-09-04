@@ -1184,9 +1184,9 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await page.goto("/");
   await createLocalProfile(page);
 
-  await expect(
-    page.getByText("On this device", { exact: true }),
-  ).toBeAttached();
+  await expect(page.getByText("On this device", { exact: true })).toHaveCount(
+    0,
+  );
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
   await expect(

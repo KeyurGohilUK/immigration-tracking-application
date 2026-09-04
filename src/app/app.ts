@@ -99,12 +99,8 @@ export function renderAppShell(
         </a>
         ${renderNavigation("desktop-navigation", activeNavigation)}
         <div class="header-actions">
-          <span class="device-storage-indicator" title="Data stored on this device">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 8.5h14v10H5zM8 8.5V6a4 4 0 0 1 8 0v2.5" /></svg>
-            <span>On this device</span>
-          </span>
-          <button class="icon-button" type="button" aria-label="Lock app">
-            <span aria-hidden="true">⌑</span>
+          <button class="icon-button" type="button" aria-label="Lock app" title="Lock app">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></svg>
           </button>
         </div>
       </header>

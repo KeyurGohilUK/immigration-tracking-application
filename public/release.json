@@ -1,6 +1,6 @@
 {
-  "version": "3.23.5",
+  "version": "3.23.6",
   "notes": [
-    "ILR and Document Vault now share consistent page padding, content widths, and spacing between the household selector and progress sections."
+    "The app header now has a larger logo, equally sized action buttons, and no padlock storage indicator."
   ]
 }
