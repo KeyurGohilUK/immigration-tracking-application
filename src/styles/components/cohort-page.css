@@ -1,6 +1,8 @@
 .cohort-page {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   width: min(100%, 31rem);
   min-height: 0;
   gap: 1.35rem;

@@ -2463,7 +2463,29 @@ test("shares household selection and progress styling across ILR and Vault", asy
       name: `Show ${otherName}'s ILR journey`,
     });
     await expect(journeyPill).toHaveAttribute("aria-pressed", "true");
-    expect(await readCohortSpacing(page)).toEqual(vaultSpacing);
+    const ilrSpacing = await readCohortSpacing(page);
+    const layoutDetails =
+      ilrSpacing.sectionGap === vaultSpacing.sectionGap
+        ? ""
+        : await page.getByRole("main").evaluate((main) =>
+            JSON.stringify(
+              [...main.children].map((child) => {
+                const style = getComputedStyle(child);
+                const box = child.getBoundingClientRect();
+                return {
+                  tag: child.tagName,
+                  className: child.className,
+                  top: box.top,
+                  bottom: box.bottom,
+                  position: style.position,
+                  margin: style.margin,
+                  gridRow: style.gridRow,
+                  gridColumn: style.gridColumn,
+                };
+              }),
+            ),
+          );
+    expect(ilrSpacing, layoutDetails).toEqual(vaultSpacing);
     const ilrCard = page.getByRole("region", {
       name: "Permission not recorded",
       exact: true,
