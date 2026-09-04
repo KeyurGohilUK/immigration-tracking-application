@@ -501,23 +501,6 @@ p {
     padding: 1.5rem;
   }
 
-  .device-storage-indicator {
-    gap: 0.45rem;
-    min-height: 2.75rem;
-    padding: 0 0.75rem;
-  }
-
-  .device-storage-indicator > span {
-    position: static;
-    width: auto;
-    height: auto;
-    overflow: visible;
-    clip: auto;
-    font-size: 0.72rem;
-    font-weight: 750;
-    white-space: normal;
-  }
-
   .record-heading {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;

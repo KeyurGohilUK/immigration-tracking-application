@@ -55,6 +55,8 @@ html[data-theme="dark"] .app-manager-trigger.is-update-available {
 }
 
 .header-actions .app-manager-trigger {
+  width: var(--header-control-size);
+  height: var(--header-control-size);
   margin-left: 0;
 }
 .app-manager-trigger svg {
