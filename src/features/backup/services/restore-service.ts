@@ -92,7 +92,7 @@ export async function replaceAllLocalData(
         DATABASE_STORES.trips,
         DATABASE_STORES.addressHistory,
         DATABASE_STORES.lifeEnglish,
-        ...(documents ? [DATABASE_STORES.documents] : []),
+        DATABASE_STORES.documents,
       ],
       "readwrite",
     );
@@ -107,9 +107,7 @@ export async function replaceAllLocalData(
     const lifeEnglishStore = transaction.objectStore(
       DATABASE_STORES.lifeEnglish,
     );
-    const documentStore = documents
-      ? transaction.objectStore(DATABASE_STORES.documents)
-      : null;
+    const documentStore = transaction.objectStore(DATABASE_STORES.documents);
     transaction.oncomplete = () => {
       database.close();
       resolve();
@@ -127,7 +125,7 @@ export async function replaceAllLocalData(
       tripStore.clear();
       addressHistoryStore.clear();
       lifeEnglishStore.clear();
-      documentStore?.clear();
+      documentStore.clear();
       profileStore.put(members, HOUSEHOLD_MEMBERS_RECORD_KEY);
       for (const item of permissions)
         permissionStore.put(item.encrypted, item.profileId);
@@ -137,7 +135,7 @@ export async function replaceAllLocalData(
       for (const item of lifeEnglish)
         lifeEnglishStore.put(item.encrypted, item.profileId);
       for (const item of documents ?? [])
-        documentStore?.put(item.encrypted, item.id);
+        documentStore.put(item.encrypted, item.id);
     } catch {
       transaction.abort();
     }
