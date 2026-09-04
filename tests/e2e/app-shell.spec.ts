@@ -1820,7 +1820,6 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
   await page.getByRole("link", { name: "Travel", exact: true }).click();
 
   await expect(
@@ -1880,7 +1879,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("Manual review", { exact: true })).toBeVisible();
   await expect(page.getByText("8 Days", { exact: true })).toBeVisible();
-  const storedTrip = await page.evaluate(async (profileId) => {
+  const storedTrip = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
@@ -1890,11 +1889,11 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
       const request = database
         .transaction("trips", "readonly")
         .objectStore("trips")
-        .get(profileId);
+        .getAll();
       request.onsuccess = () => resolve(JSON.stringify(request.result));
       request.onerror = () => reject(request.error);
     });
-  }, tripProfileId);
+  });
   expect(storedTrip).not.toContain("India");
   expect(storedTrip).toContain("ciphertext");
 
@@ -2369,7 +2368,7 @@ async function readCohortSpacing(page: import("@playwright/test").Page) {
     });
 }
 
-test("shares household selection and progress styling across ILR and Vault", async ({
+test("shares household selection and progress styling across ILR, Vault, and Travel", async ({
   page,
 }) => {
   await page.goto("/");
