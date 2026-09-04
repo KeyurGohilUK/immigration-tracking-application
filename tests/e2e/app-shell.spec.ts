@@ -1251,6 +1251,35 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
     page.getByRole("button", { name: "Edit Temporary Family Member" }),
   ).toBeVisible();
 
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  await page
+    .getByRole("button", { name: `Show ${TEST_PROFILE.name}'s documents` })
+    .click();
+  await page.getByRole("heading", { name: "Employment", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Add Employer letter", exact: true })
+    .click();
+  const postBackupDocumentDialog = page.getByRole("dialog", {
+    name: "Add Employer letter",
+  });
+  await postBackupDocumentDialog.getByLabel("Document file").setInputFiles({
+    name: "post-backup.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+  await postBackupDocumentDialog
+    .getByLabel("Document name")
+    .fill("Created after backup");
+  await postBackupDocumentDialog
+    .getByRole("button", { name: "Encrypt and save document" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Created after backup" }),
+  ).toBeVisible();
+
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByText("Backup and restore", { exact: true }).click();
   await page.getByRole("button", { name: "Restore encrypted backup" }).click();
@@ -1299,6 +1328,10 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Edit Temporary Family Member" }),
+  ).toHaveCount(0);
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "Created after backup" }),
   ).toHaveCount(0);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
 
