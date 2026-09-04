@@ -793,7 +793,9 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(
     page.getByRole("button", { name: "DOWNLOAD ZIP BUNDLE" }),
   ).toBeDisabled();
-  await expect(page.locator("#vault-readiness-percent")).toHaveText("0%");
+  await expect(
+    page.getByRole("progressbar", { name: "Document Vault readiness" }),
+  ).toHaveAttribute("aria-valuenow", "0");
   await expect(
     page.locator('[data-vault-section="salary-tax"]').getByText("To do"),
   ).toBeVisible();
@@ -2315,4 +2317,133 @@ test("restarts the app after downloading an available update", async ({
   await restart;
   await page.waitForLoadState("domcontentloaded");
   await expect(dialog).not.toBeVisible();
+});
+
+test("shares household selection and progress styling across ILR and Vault", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  const otherName = "Freddy Second Profile";
+  await page.getByRole("button", { name: "Add Household Member" }).click();
+  await page.getByLabel("Full name").fill(otherName);
+  await page.getByLabel("Date of birth").fill("2005-06-15");
+  await page.getByLabel("Immigration role").selectOption("dependant");
+  await page.getByRole("button", { name: "Save household member" }).click();
+  await expect(
+    page.getByRole("button", { name: `Edit ${otherName}` }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  const ownerPill = page.getByRole("button", {
+    name: `Show ${TEST_PROFILE.name}'s documents`,
+  });
+  const otherPill = page.getByRole("button", {
+    name: `Show ${otherName}'s documents`,
+  });
+  await ownerPill.click();
+  await expect(ownerPill).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("progressbar", { name: "Document Vault readiness" }),
+  ).toHaveAttribute("aria-valuenow", "0");
+  await page.getByText("Life in the UK & English", { exact: true }).click();
+  await page
+    .getByRole("button", { name: "Add Life in the UK evidence" })
+    .click();
+  const lifeDialog = page.getByRole("dialog", {
+    name: "Add Life in the UK evidence",
+  });
+  await lifeDialog.getByLabel("Status").selectOption("exempt");
+  await lifeDialog.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(ownerPill).toContainText("20%");
+  await expect(otherPill).toContainText("0%");
+  await expect(
+    page.getByRole("progressbar", { name: "Document Vault readiness" }),
+  ).toHaveAttribute("aria-valuenow", "20");
+  // Keyboard selection must show only the selected person's evidence and progress.
+  await otherPill.focus();
+  await otherPill.press("Enter");
+  await expect(otherPill).toHaveAttribute("aria-pressed", "true");
+  await expect(ownerPill).toHaveAttribute("aria-pressed", "false");
+  await expect(
+    page.getByRole("progressbar", { name: "Document Vault readiness" }),
+  ).toHaveAttribute("aria-valuenow", "0");
+  await page.getByText("Life in the UK & English", { exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Add Life in the UK evidence" }),
+  ).toBeVisible();
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(
+      (value) => document.documentElement.setAttribute("data-theme", value),
+      theme,
+    );
+    const vaultCard = page.getByRole("region", { name: "Evidence readiness" });
+    const vaultStyle = await vaultCard.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        background: style.backgroundColor,
+        border: style.borderRadius,
+        color: style.color,
+      };
+    });
+    const vaultPillStyle = await otherPill.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        background: style.backgroundImage,
+        border: style.borderRadius,
+        color: style.color,
+      };
+    });
+    await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+    const journeyPill = page.getByRole("button", {
+      name: `Show ${otherName}'s ILR journey`,
+    });
+    await expect(journeyPill).toHaveAttribute("aria-pressed", "true");
+    const ilrCard = page.getByRole("region", {
+      name: "Permission not recorded",
+      exact: true,
+    });
+    expect(
+      await ilrCard.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          background: style.backgroundColor,
+          border: style.borderRadius,
+          color: style.color,
+        };
+      }),
+    ).toEqual(vaultStyle);
+    expect(
+      await journeyPill.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          background: style.backgroundImage,
+          border: style.borderRadius,
+          color: style.color,
+        };
+      }),
+    ).toEqual(vaultPillStyle);
+    await page
+      .getByRole("link", { name: "Vault", exact: true })
+      .first()
+      .click();
+    await expect(otherPill).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      page.getByText("Encrypted storage", { exact: true }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await ownerPill.click();
+  await expect(
+    page.getByRole("progressbar", { name: "Document Vault readiness" }),
+  ).toHaveAttribute("aria-valuenow", "20");
+  await page.reload();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  await ownerPill.click();
+  await expect(ownerPill).toContainText("20%");
+  await expect(otherPill).toContainText("0%");
 });

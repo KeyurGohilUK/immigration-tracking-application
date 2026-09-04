@@ -1,3 +1,12 @@
+import type {
+  AddressHistoryCoverage,
+  AddressHistoryEntry,
+} from "./address-history";
+import {
+  isEnglishRequirementComplete,
+  isLifeInUkComplete,
+  type LifeEnglishRecord,
+} from "./life-english";
 import type { DocumentCategory, DocumentMetadata } from "./document";
 
 export const DOCUMENT_VAULT_SECTION_IDS = [
@@ -379,4 +388,21 @@ export function getDefaultCategoryForSection(
     ({ categories }) => categories.length > 0,
   );
   return requirement?.categories[0] ?? null;
+}
+
+export function calculateProfileDocumentVaultProgress(
+  documents: readonly DocumentMetadata[],
+  addressHistory: readonly AddressHistoryEntry[],
+  addressCoverage: AddressHistoryCoverage,
+  lifeEnglish: LifeEnglishRecord | null,
+): DocumentVaultProgress {
+  return calculateDocumentVaultProgress(documents, {
+    addressHistoryComplete: addressCoverage.complete,
+    addressHistoryEntryCount: addressHistory.length,
+    addressHistoryHasCurrentAddress:
+      addressHistory.length === 0 ||
+      addressHistory.some(({ isCurrent }) => isCurrent),
+    lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
+    englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
+  });
 }
