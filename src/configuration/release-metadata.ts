@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.24.2";
+export const APP_VERSION = "3.24.3";
 
 export const RELEASE_NOTES = [
-  "Family Overview now focuses on household members, with tap-to-edit cards and Add Household Member below the list.",
+  "Roadmap housekeeping now separates active work from the archived completed product roadmap.",
 ] as const;
