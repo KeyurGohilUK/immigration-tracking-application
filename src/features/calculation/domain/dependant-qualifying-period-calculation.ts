@@ -111,7 +111,6 @@ export function calculateSkilledWorkerDependantQualifyingPeriod(
     [
       "dependant-partner-linkage-not-verified",
       "gap-in-recorded-permission",
-      "pre-2018-permission",
     ].includes(issue),
   );
   const incomplete = issues.some((issue) =>
