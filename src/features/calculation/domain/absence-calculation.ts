@@ -112,7 +112,8 @@ function isTransitionalPermission(
   permission: ImmigrationPermission | null,
 ): boolean {
   return Boolean(
-    permission?.grantDate && permission.grantDate < ABSENCE_RULE.effectiveFrom,
+    permission?.grantDate &&
+      permission.grantDate < ABSENCE_RULE.effectiveFrom,
   );
 }
 
