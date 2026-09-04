@@ -3,6 +3,8 @@ import {
   DATABASE_STORES,
   openAppDatabase,
 } from "../../../infrastructure/storage/app-database";
+import { toStorageFailure } from "../../../infrastructure/storage/storage-error";
+import { waitForTransaction } from "../../../infrastructure/storage/storage-transaction";
 import {
   decryptRecord,
   encryptRecord,
@@ -174,24 +176,21 @@ export async function saveDocument(
 ): Promise<void> {
   const record = await createEncryptedDocumentRecord(metadata, bytes, key);
   const database = await openAppDatabase();
-  await new Promise<void>((resolve, reject) => {
+  try {
     const transaction = database.transaction(
       DATABASE_STORES.documents,
       "readwrite",
     );
     transaction.objectStore(DATABASE_STORES.documents).put(record, metadata.id);
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onabort = () => {
-      database.close();
-      reject(new Error("Encrypted document could not be saved."));
-    };
-    transaction.onerror = () => {
-      // IndexedDB aborts the transaction, preventing a partial write.
-    };
-  });
+    await waitForTransaction(transaction, database, "write");
+  } catch (error) {
+    database.close();
+    throw toStorageFailure(
+      error,
+      "write-failed",
+      "Encrypted document could not be saved.",
+    );
+  }
 }
 
 export async function getDocumentFile(
@@ -236,45 +235,39 @@ export async function saveDocumentMetadataBatch(
     })),
   );
   const database = await openAppDatabase();
-  await new Promise<void>((resolve, reject) => {
+  try {
     const transaction = database.transaction(
       DATABASE_STORES.documents,
       "readwrite",
     );
     const store = transaction.objectStore(DATABASE_STORES.documents);
     for (const update of updates) store.put(update.record, update.id);
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onabort = () => {
-      database.close();
-      reject(new Error("Document metadata could not be updated."));
-    };
-    transaction.onerror = () => {
-      // IndexedDB aborts the transaction, preventing partial metadata changes.
-    };
-  });
+    await waitForTransaction(transaction, database, "write");
+  } catch (error) {
+    database.close();
+    throw toStorageFailure(
+      error,
+      "write-failed",
+      "Document metadata could not be updated.",
+    );
+  }
 }
 
 export async function deleteDocument(id: string): Promise<void> {
   const database = await openAppDatabase();
-  await new Promise<void>((resolve, reject) => {
+  try {
     const transaction = database.transaction(
       DATABASE_STORES.documents,
       "readwrite",
     );
     transaction.objectStore(DATABASE_STORES.documents).delete(id);
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onabort = () => {
-      database.close();
-      reject(new Error("Document could not be deleted."));
-    };
-    transaction.onerror = () => {
-      // IndexedDB aborts the transaction, preserving the document.
-    };
-  });
+    await waitForTransaction(transaction, database, "write");
+  } catch (error) {
+    database.close();
+    throw toStorageFailure(
+      error,
+      "write-failed",
+      "Document could not be deleted.",
+    );
+  }
 }

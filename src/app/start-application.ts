@@ -94,6 +94,7 @@ import {
   type VaultRecord,
 } from "../features/security/services/vault-crypto";
 import { getUkCalendarDate } from "../shared/date/uk-calendar-date";
+import { getStorageFailureMessage } from "../infrastructure/storage/storage-error";
 import {
   readDocumentRenameForm,
   readDocumentUploadForm,
@@ -1787,10 +1788,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           else await saveDocumentMetadataBatch([metadata], key);
           uploadDialog?.close();
           await showDocuments(profile);
-        } catch {
+        } catch (storageError) {
           if (error) {
-            error.textContent =
-              "The document could not be encrypted and saved. No partial file was stored.";
+            error.textContent = getStorageFailureMessage(
+              storageError,
+              "The document could not be encrypted and saved. No partial file was stored.",
+            );
             error.hidden = false;
           }
           if (submit) submit.disabled = false;
@@ -2193,10 +2196,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           permissionCache.set(selectedProfileId, nextPermissions);
           dialog?.close();
           renderPermissions(profile, nextPermissions);
-        } catch {
+        } catch (storageError) {
           if (error) {
-            error.textContent =
-              "This encrypted immigration permission could not be saved.";
+            error.textContent = getStorageFailureMessage(
+              storageError,
+              "This encrypted immigration permission could not be saved.",
+            );
             error.hidden = false;
           }
           if (submit) submit.disabled = false;
@@ -2364,9 +2369,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           tripCache.set(selectedProfileId, nextTrips);
           dialog?.close();
           renderTrips(profile, nextTrips);
-        } catch {
+        } catch (storageError) {
           if (error) {
-            error.textContent = "This encrypted trip could not be saved.";
+            error.textContent = getStorageFailureMessage(
+              storageError,
+              "This encrypted trip could not be saved.",
+            );
             error.hidden = false;
           }
           if (submit) submit.disabled = false;
@@ -2449,10 +2457,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyProfilesAvailable = true;
           selectedProfileId = member.id;
           await showIlrJourney(member);
-        } catch {
+        } catch (storageError) {
           if (errorElement) {
-            errorElement.textContent =
-              "This encrypted household member could not be saved.";
+            errorElement.textContent = getStorageFailureMessage(
+              storageError,
+              "This encrypted household member could not be saved.",
+            );
             errorElement.hidden = false;
           }
         }
