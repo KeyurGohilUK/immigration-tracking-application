@@ -327,9 +327,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const latestPermission = [...permissions].sort((left, right) =>
             right.permissionStartDate.localeCompare(left.permissionStartDate),
           )[0];
-          const isDependant =
-            latestPermission?.role === "dependant" ||
-            member.immigrationRole === "dependant";
+          const isDependant = latestPermission
+            ? latestPermission.role === "dependant"
+            : member.immigrationRole === "dependant";
           const absenceInput = {
             permissions,
             trips,
