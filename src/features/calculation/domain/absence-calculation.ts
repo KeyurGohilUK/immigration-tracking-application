@@ -112,8 +112,7 @@ function isTransitionalPermission(
   permission: ImmigrationPermission | null,
 ): boolean {
   return Boolean(
-    permission?.grantDate &&
-      permission.grantDate < ABSENCE_RULE.effectiveFrom,
+    permission?.grantDate && permission.grantDate < ABSENCE_RULE.effectiveFrom,
   );
 }
 
@@ -129,9 +128,7 @@ function collectWholeAbsenceDays(
     const activePermission = permission ?? permissionForDay(day, permissions);
     classified.set(
       day,
-      isTransitionalPermission(activePermission)
-        ? "transitional"
-        : "rolling",
+      isTransitionalPermission(activePermission) ? "transitional" : "rolling",
     );
   };
 
