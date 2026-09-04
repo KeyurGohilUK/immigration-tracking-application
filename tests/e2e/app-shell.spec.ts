@@ -2645,6 +2645,7 @@ test("rejects mismatched PIN confirmation during private-space setup", async ({
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
 
   const chooseDigits = page.locator('[data-pin-digit="pin"]');
