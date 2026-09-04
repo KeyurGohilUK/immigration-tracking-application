@@ -2636,3 +2636,25 @@ test("forgotten PIN reset removes the vault and encrypted profile records", asyn
   await page.reload();
   await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
 });
+
+
+test("rejects mismatched PIN confirmation during private-space setup", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Accept and continue" }).click();
+
+  const chooseDigits = page.locator('[data-pin-digit="pin"]');
+  const confirmDigits = page.locator('[data-pin-digit="confirmPin"]');
+  for (const [index, digit] of [..."4826"].entries())
+    await chooseDigits.nth(index).fill(digit);
+  for (const [index, digit] of [..."4827"].entries())
+    await confirmDigits.nth(index).fill(digit);
+
+  await page.getByRole("button", { name: "Create private space" }).click();
+  await expect(page.getByRole("alert")).toContainText("PINs do not match");
+  await expect(
+    page.getByRole("heading", { name: "Create your four-digit PIN" }),
+  ).toBeVisible();
+});
