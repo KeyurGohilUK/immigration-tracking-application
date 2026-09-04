@@ -267,12 +267,12 @@ function calculateAbsenceForRole(
   const absenceDays = collectWholeAbsenceDays(
     trips,
     qualifyingPermissions,
-    applicationDate ?? asOfDate,
+    asOfDate,
   );
   const rollingWindow = findMaximumRollingWindow(absenceDays.rolling);
   const transitionalWindow = findMaximumApplicationAnchoredWindow(
     absenceDays.transitional,
-    asOfDate,
+    applicationDate ?? asOfDate,
   );
   const maximumWindow = largerWindow(rollingWindow, transitionalWindow);
   const maximumRecordedDays = maximumWindow?.daysOutside ?? 0;
