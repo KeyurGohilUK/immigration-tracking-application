@@ -10,61 +10,6 @@
   padding-bottom: 8.5rem;
 }
 
-.vault-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.15rem;
-}
-
-.vault-heading-copy {
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-}
-
-.vault-heading-copy > div {
-  min-width: 0;
-}
-
-.vault-heading h1 {
-  margin: 0.1rem 0 0;
-  font-family: "Plus Jakarta Sans", Inter, sans-serif;
-  font-size: clamp(1.75rem, 7vw, 2.45rem);
-  letter-spacing: -0.045em;
-  color: var(--colour-text);
-}
-
-.vault-heading p {
-  margin: 0.25rem 0 0;
-}
-
-.vault-heading-icon {
-  display: grid;
-  width: 2.7rem;
-  height: 2.7rem;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid var(--ibiza-border-soft);
-  border-radius: 1rem;
-  color: var(--ibiza-primary);
-  background: var(--ibiza-glass-soft);
-  box-shadow:
-    inset 0 1px 0 var(--ibiza-glass-highlight),
-    0 0.55rem 1.2rem var(--ibiza-glow-pink-soft);
-}
-
-.vault-heading-icon svg {
-  width: 1.45rem;
-  height: 1.45rem;
-  fill: none;
-  stroke: currentcolor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-}
-
 .documents-panel,
 .document-card,
 .vault-section-card,
@@ -473,11 +418,6 @@
   grid-row: auto;
 }
 
-html[data-theme="dark"] .vault-heading h1 {
-  color: #ffb1c5;
-  text-shadow: 0 0 1.25rem rgb(238 9 121 / 10%);
-}
-
 html[data-theme="dark"] .vault-section-card {
   background:
     linear-gradient(145deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 2%)),
@@ -485,14 +425,6 @@ html[data-theme="dark"] .vault-section-card {
 }
 
 @media (max-width: 39.99rem) {
-  .vault-heading {
-    align-items: flex-start;
-  }
-
-  .vault-heading p:not(.eyebrow) {
-    display: none;
-  }
-
   .vault-category-description {
     display: none;
   }
