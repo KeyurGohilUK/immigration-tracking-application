@@ -9,6 +9,11 @@ import { saveAddressHistory } from "../../features/documents/data/address-histor
 import type { AddressHistoryEntry } from "../../features/documents/domain/address-history";
 import { saveLifeEnglishRecord } from "../../features/documents/data/life-english-repository";
 import type { LifeEnglishRecord } from "../../features/documents/domain/life-english";
+import {
+  saveDocument,
+  saveDocumentMetadataBatch,
+} from "../../features/documents/data/document-repository";
+import type { DocumentMetadata } from "../../features/documents/domain/document";
 
 const key = {} as CryptoKey;
 const timestamp = "2026-08-30T10:00:00.000Z";
@@ -119,5 +124,31 @@ describe("encrypted repository save boundaries", () => {
     await expect(
       saveLifeEnglishRecord("member-1", lifeEnglish, key),
     ).rejects.toThrow("Life in the UK and English data is invalid");
+  });
+
+  it("rejects document writes and metadata changes scoped to another profile", async () => {
+    const png = Uint8Array.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+    ]);
+    const document: DocumentMetadata = {
+      version: 1,
+      id: "document-1",
+      profileId: "member-2",
+      displayName: "Other profile document",
+      fileName: "other.png",
+      mimeType: "image/png",
+      size: png.byteLength,
+      category: "additional-document",
+      sortOrder: 0,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+
+    await expect(
+      saveDocument(document, png, key, "member-1"),
+    ).rejects.toThrow("different household profile");
+    await expect(
+      saveDocumentMetadataBatch([document], key, "member-1"),
+    ).rejects.toThrow("different household profile");
   });
 });
