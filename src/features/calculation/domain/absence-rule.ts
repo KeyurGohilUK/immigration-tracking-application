@@ -13,7 +13,7 @@ export const ABSENCE_RULE = {
   maximumDays: 180,
   rollingMonths: 12,
   effectiveFrom: "2018-01-11",
-  verifiedAt: "2026-08-30",
+  verifiedAt: "2026-09-04",
   guidanceLastUpdated: "2026-06-08",
   sources: [
     {
