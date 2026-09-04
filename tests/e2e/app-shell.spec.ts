@@ -2354,6 +2354,30 @@ test("shares household selection and progress styling across ILR and Vault", asy
   });
   await lifeDialog.getByLabel("Status").selectOption("exempt");
   await lifeDialog.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(lifeDialog).not.toBeVisible();
+  await expect(ownerPill).toContainText("0%");
+  await page.getByRole("heading", { name: "Employment", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Add Employer letter", exact: true })
+    .click();
+  const employmentDialog = page.getByRole("dialog", {
+    name: "Add Employer letter",
+  });
+  await employmentDialog.getByLabel("Document file").setInputFiles({
+    name: "owner-letter.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+  await employmentDialog
+    .getByLabel("Document name")
+    .fill("Owner employment evidence");
+  await employmentDialog
+    .getByRole("button", { name: "Encrypt and save document" })
+    .click();
+  await expect(employmentDialog).not.toBeVisible();
   await expect(ownerPill).toContainText("20%");
   await expect(otherPill).toContainText("0%");
   await expect(
@@ -2364,6 +2388,9 @@ test("shares household selection and progress styling across ILR and Vault", asy
   await otherPill.press("Enter");
   await expect(otherPill).toHaveAttribute("aria-pressed", "true");
   await expect(ownerPill).toHaveAttribute("aria-pressed", "false");
+  await expect(
+    page.getByRole("heading", { name: "Owner employment evidence" }),
+  ).toHaveCount(0);
   await expect(
     page.getByRole("progressbar", { name: "Document Vault readiness" }),
   ).toHaveAttribute("aria-valuenow", "0");
