@@ -77,6 +77,16 @@
   gap: 0.5rem;
 }
 
+.header-actions .icon-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .install-button {
   min-height: 2.75rem;
   padding: 0 0.85rem;

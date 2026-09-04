@@ -99,8 +99,8 @@ export function renderAppShell(
         </a>
         ${renderNavigation("desktop-navigation", activeNavigation)}
         <div class="header-actions">
-          <button class="icon-button" type="button" aria-label="Lock app">
-            <span aria-hidden="true">⌑</span>
+          <button class="icon-button" type="button" aria-label="Lock app" title="Lock app">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></svg>
           </button>
         </div>
       </header>
