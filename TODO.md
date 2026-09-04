@@ -88,6 +88,20 @@ Document Vault-specific work is tracked separately in
 - [ ] Complete the legal-content review.
 - [ ] Obtain professional legal review before describing the app as production ready.
 
+## Low-priority future security enhancements
+
+- [ ] Explore optional recovery email registration with email OTP for forgotten-PIN recovery.
+      Keep registration optional and preserve the local-only data model: immigration
+      records and documents must remain on-device.
+- [ ] Design recovery around a separately wrapped data-encryption key so OTP
+      verification can authorise a new PIN without requiring the original PIN.
+      Do not store the raw encryption key remotely.
+- [ ] Evaluate Supabase Auth email OTP (or an equivalent provider) for low-cost
+      recovery-only authentication, including abuse/rate-limit handling, privacy
+      disclosures, and the effect on the current no-online-account scope.
+- [ ] Keep the existing delete-local-data / encrypted-backup recovery path for
+      users who choose not to register a recovery email.
+
 ## Later releases
 
 These require separately verified route configurations or product scope:
