@@ -113,7 +113,9 @@ describe("encrypted backup", () => {
     const password = "a-secure-backup-password";
     const backup = await createEncryptedBackup(data, password);
 
-    await expect(decryptAndValidateBackup(backup, password)).resolves.toMatchObject({
+    await expect(
+      decryptAndValidateBackup(backup, password),
+    ).resolves.toMatchObject({
       data,
     });
   });
