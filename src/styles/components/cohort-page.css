@@ -10,6 +10,10 @@
   padding: 1rem 1rem calc(8.5rem + env(safe-area-inset-bottom));
 }
 
+.cohort-page > .notice {
+  grid-area: auto;
+}
+
 @media (min-width: 48rem) {
   .cohort-page {
     width: min(100%, 48rem);
