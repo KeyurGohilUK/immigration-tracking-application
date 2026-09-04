@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import { RELEASE_NOTES } from "../../src/configuration/release-metadata";
 
 const TEST_PROFILE = {
   name: "Urban Fox Test User",
@@ -159,11 +160,9 @@ test("shows install and update controls in every device header", async ({
   await expect(
     page.getByRole("button", { name: "Check for updates" }),
   ).toBeVisible();
-  await expect(
-    page.getByText(
-      "Permission history now keeps visa names, year ranges, and calculation status aligned in responsive cards.",
-    ),
-  ).toBeVisible();
+  for (const note of RELEASE_NOTES) {
+    await expect(installDialog.getByText(note, { exact: true })).toBeVisible();
+  }
   await expect(
     page.getByText("Added a protected forgotten-PIN reset", { exact: false }),
   ).toHaveCount(0);
@@ -1660,6 +1659,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Family", exact: true }).first().click();
   await expect(
     page.getByRole("button", { name: "Edit Freddy Test Child" }),
   ).toBeVisible();
@@ -1751,6 +1751,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Family", exact: true }).first().click();
   await page
     .getByRole("button", { name: "Manage immigration history" })
     .click();
