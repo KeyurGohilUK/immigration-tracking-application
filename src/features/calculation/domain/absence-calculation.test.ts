@@ -179,8 +179,8 @@ describe("recorded absence check", () => {
     expect(result.status).toBe("within-recorded-limit");
     expect(result.maximumRecordedDays).toBe(120);
     expect(result.maximumWindow).toEqual({
-      startDate: "2016-07-01",
-      endDate: "2017-06-30",
+      startDate: "2017-07-01",
+      endDate: "2018-06-30",
       daysOutside: 120,
     });
     expect(result.issues).toContain("pre-2018-record");
@@ -205,7 +205,11 @@ describe("recorded absence check", () => {
       applicationDate: "2020-06-30",
     });
     expect(result.maximumRecordedDays).toBe(120);
-    expect(result.maximumWindow?.endDate).toBe("2017-06-30");
+    expect(result.maximumWindow).toEqual({
+      startDate: "2017-07-01",
+      endDate: "2018-06-30",
+      daysOutside: 120,
+    });
   });
 
   it("still flags a transitional fixed period when it exceeds 180 days", () => {
