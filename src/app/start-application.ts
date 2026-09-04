@@ -2462,7 +2462,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       if (firstMember) {
         if (!isKnownProfileId(selectedProfileId, familyMembers))
           selectedProfileId = firstMember.id;
-        renderDashboard(firstMember);
+        await showIlrJourney(firstMember);
         return;
       }
 
@@ -2499,7 +2499,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyMembers = [member];
           familyProfilesAvailable = true;
           selectedProfileId = member.id;
-          renderDashboard(member);
+          await showIlrJourney(member);
         } catch {
           if (errorElement) {
             errorElement.textContent =

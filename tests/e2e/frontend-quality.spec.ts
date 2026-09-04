@@ -23,6 +23,10 @@ async function createLocalProfile(page: Page): Promise<void> {
   await page.getByLabel("Immigration role").selectOption("dependant");
   await page.getByRole("button", { name: "Create household member" }).click();
   await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: "Family", exact: true }).first().click();
+  await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
 }
