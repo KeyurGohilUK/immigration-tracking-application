@@ -2555,3 +2555,84 @@ test("shares household selection and progress styling across ILR, Vault, and Tra
   await expect(ownerPill).toContainText("20%");
   await expect(otherPill).toContainText("0%");
 });
+
+
+test("locks from Profile settings and requires the PIN again", async ({ page }) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Protect this device", { exact: true }).click();
+  await page.getByRole("button", { name: "Lock now" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Enter Security PIN" }),
+  ).toBeVisible();
+
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+});
+
+test("enforces a cooldown after five consecutive incorrect PIN attempts", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("button", { name: "Lock app" }).click();
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    await enterPin(page, "Four-digit PIN", "0000");
+  }
+
+  await expect(page.getByRole("alert")).toContainText(
+    "Too many attempts. Try again in 30 seconds.",
+  );
+  await expect(page.getByRole("button", { name: "Enter 0" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Forgot PIN?" })).toBeDisabled();
+});
+
+test("forgotten PIN reset removes the vault and encrypted profile records", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("button", { name: "Lock app" }).click();
+
+  await page.getByRole("button", { name: "Forgot PIN?" }).click();
+  await page.getByLabel("Type DELETE to confirm").fill("DELETE");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete data and reset PIN" }).click();
+
+  const storedValues = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("urbanfox-ilr", 8);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+
+    const read = (storeName: string, key: string) =>
+      new Promise<unknown>((resolve, reject) => {
+        const request = database
+          .transaction(storeName, "readonly")
+          .objectStore(storeName)
+          .get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+
+    const result = {
+      vault: await read("security", "vault"),
+      profiles: await read("profiles", "household-members"),
+    };
+    database.close();
+    return result;
+  });
+
+  expect(storedValues.vault).toBeUndefined();
+  expect(storedValues.profiles).toBeUndefined();
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
+});
