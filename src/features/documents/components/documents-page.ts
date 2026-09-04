@@ -58,7 +58,7 @@ export function renderDocumentsPage(
   renderAppShell(
     root,
     "Documents",
-    `<main id="main-content" class="record-main documents-main document-vault-main">
+    `<main id="main-content" class="cohort-page documents-main document-vault-main">
       <div id="vault-household-selector"></div>
       <div id="vault-summary"></div>
       <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory, documents)}</section>

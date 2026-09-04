@@ -1,0 +1,16 @@
+.cohort-page {
+  position: relative;
+  display: grid;
+  width: min(100%, 31rem);
+  min-height: 0;
+  gap: 1.35rem;
+  margin: 0 auto;
+  padding: 1rem 1rem calc(8.5rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 48rem) {
+  .cohort-page {
+    width: min(100%, 48rem);
+    padding: 2rem 2rem calc(5rem + env(safe-area-inset-bottom));
+  }
+}
