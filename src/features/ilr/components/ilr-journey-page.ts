@@ -226,7 +226,7 @@ export function renderIlrJourneyPage(
   renderAppShell(
     root,
     "ILR",
-    `<main id="main-content" class="ilr-main">
+    `<main id="main-content" class="cohort-page ilr-main">
     <div class="ilr-atmosphere" aria-hidden="true"></div>
     <div id="ilr-household-selector"></div>
     <div id="ilr-summary"></div>

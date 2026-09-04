@@ -37,6 +37,7 @@ const expectedImports = [
   '@import "./styles/pages/household-dashboard.css";',
   '@import "./styles/components/navigation.css";',
   '@import "./styles/pages/household.css";',
+  '@import "./styles/components/cohort-page.css";',
   '@import "./styles/components/household-selector.css";',
   '@import "./styles/components/progress-card.css";',
   '@import "./styles/pages/ilr.css";',

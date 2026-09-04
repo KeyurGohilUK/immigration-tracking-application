@@ -1,6 +1,6 @@
 {
-  "version": "3.23.4",
+  "version": "3.23.5",
   "notes": [
-    "Document Vault now starts with the household selector, matching the ILR page without a separate title banner."
+    "ILR and Document Vault now share consistent page padding, content widths, and spacing between the household selector and progress sections."
   ]
 }

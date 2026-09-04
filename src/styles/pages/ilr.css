@@ -1,12 +1,3 @@
-.ilr-main {
-  position: relative;
-  display: grid;
-  width: min(100%, 31rem);
-  gap: 1.35rem;
-  margin: 0 auto;
-  padding: 1rem 1rem 7.5rem;
-}
-
 .ilr-atmosphere {
   position: fixed;
   z-index: -1;
@@ -230,11 +221,4 @@
 
 .ilr-notice {
   border-radius: 1.2rem;
-}
-
-@media (min-width: 48rem) {
-  .ilr-main {
-    width: min(100%, 48rem);
-    padding: 2rem 2rem 5rem;
-  }
 }

@@ -2333,6 +2333,28 @@ test("restarts the app after downloading an available update", async ({
   await expect(dialog).not.toBeVisible();
 });
 
+async function readCohortSpacing(page: import("@playwright/test").Page) {
+  return page
+    .getByRole("region", { name: "Household cohort", exact: true })
+    .evaluate((cohort) => {
+      const main = cohort.closest("main")!;
+      const card = main
+        .querySelector('[role="progressbar"]')!
+        .closest("section")!;
+      const style = getComputedStyle(main);
+      const mainBox = main.getBoundingClientRect();
+      const cohortBox = cohort.getBoundingClientRect();
+      const cardBox = card.getBoundingClientRect();
+      return {
+        sectionGap: Math.round((cardBox.top - cohortBox.bottom) * 100) / 100,
+        topGap: Math.round((cohortBox.top - mainBox.top) * 100) / 100,
+        padding: style.padding,
+        rowGap: style.rowGap,
+        width: Math.round(mainBox.width * 100) / 100,
+      };
+    });
+}
+
 test("shares household selection and progress styling across ILR and Vault", async ({
   page,
 }) => {
@@ -2417,6 +2439,8 @@ test("shares household selection and progress styling across ILR and Vault", asy
       (value) => document.documentElement.setAttribute("data-theme", value),
       theme,
     );
+    const vaultSpacing = await readCohortSpacing(page);
+    expect(vaultSpacing.sectionGap).toBeGreaterThan(0);
     const vaultCard = page.getByRole("region", { name: "Evidence readiness" });
     const vaultStyle = await vaultCard.evaluate((element) => {
       const style = getComputedStyle(element);
@@ -2439,6 +2463,29 @@ test("shares household selection and progress styling across ILR and Vault", asy
       name: `Show ${otherName}'s ILR journey`,
     });
     await expect(journeyPill).toHaveAttribute("aria-pressed", "true");
+    const ilrSpacing = await readCohortSpacing(page);
+    const layoutDetails =
+      ilrSpacing.sectionGap === vaultSpacing.sectionGap
+        ? ""
+        : await page.getByRole("main").evaluate((main) =>
+            JSON.stringify(
+              [...main.children].map((child) => {
+                const style = getComputedStyle(child);
+                const box = child.getBoundingClientRect();
+                return {
+                  tag: child.tagName,
+                  className: child.className,
+                  top: box.top,
+                  bottom: box.bottom,
+                  position: style.position,
+                  margin: style.margin,
+                  gridRow: style.gridRow,
+                  gridColumn: style.gridColumn,
+                };
+              }),
+            ),
+          );
+    expect(ilrSpacing, layoutDetails).toEqual(vaultSpacing);
     const ilrCard = page.getByRole("region", {
       name: "Permission not recorded",
       exact: true,

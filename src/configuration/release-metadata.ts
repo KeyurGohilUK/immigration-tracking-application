@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.23.4";
+export const APP_VERSION = "3.23.5";
 
 export const RELEASE_NOTES = [
-  "Document Vault now starts with the household selector, matching the ILR page without a separate title banner.",
+  "ILR and Document Vault now share consistent page padding, content widths, and spacing between the household selector and progress sections.",
 ] as const;
