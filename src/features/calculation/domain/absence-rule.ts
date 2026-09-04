@@ -1,8 +1,8 @@
 import type { ImmigrationRoute } from "../../immigration/domain/immigration-permission";
 
 export const ABSENCE_RULE = {
-  id: "skilled-worker-main-applicant-absence-v1",
-  version: 1,
+  id: "skilled-worker-main-applicant-absence-v2",
+  version: 2,
   supportedRoutes: [
     "skilled-worker",
     "health-and-care-worker",
