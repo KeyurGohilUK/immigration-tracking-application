@@ -1,6 +1,6 @@
 {
-  "version": "3.23.6",
+  "version": "3.24.0",
   "notes": [
-    "The app header now has a larger logo, equally sized action buttons, and no padlock storage indicator."
+    "Travel now shares the household selector, absence summary styling, and page spacing, with a clearer trip history and departure-year filters."
   ]
 }

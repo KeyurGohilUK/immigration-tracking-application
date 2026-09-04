@@ -1,256 +1,55 @@
-/* Ibiza Sunset travel timeline */
-.travel-page {
-  width: min(100%, 72rem);
+/* Travel uses the shared cohort layout and progress card. */
+.travel-actions {
+  display: grid;
+  gap: 0.65rem;
 }
 
-.travel-hero {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.travel-hero-copy {
-  max-width: 44rem;
-}
-
-.travel-profile-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.8rem;
-  margin-bottom: 0.75rem;
-  padding: 0.25rem 0.7rem;
-  border: 1px solid rgb(238 9 121 / 24%);
-  border-radius: 999px;
-  color: var(--ibiza-primary);
-  background: rgb(238 9 121 / 10%);
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.68rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
-}
-
-.travel-hero h1 {
+.travel-actions p {
   margin: 0;
-  color: var(--ibiza-text);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: -0.045em;
-}
-
-.travel-hero p {
-  margin-top: 0.8rem;
-  color: var(--ibiza-text-muted);
-  line-height: 1.55;
+  color: var(--colour-text-muted);
+  font-size: 0.76rem;
+  text-align: center;
 }
 
 .travel-add-button {
-  align-self: flex-start;
+  width: 100%;
   min-height: 3rem;
-  gap: 0.45rem;
-  padding: 0 1.2rem;
-  border: 0;
   border-radius: 999px;
-  color: #fff;
-  background: var(--ibiza-gradient);
-  box-shadow: 0 0.55rem 1.6rem rgb(238 9 121 / 20%);
 }
 
-.travel-add-button:hover {
-  box-shadow:
-    0 0.7rem 1.9rem rgb(238 9 121 / 24%),
-    0 0 1.5rem rgb(255 106 0 / 16%);
-}
-
-.travel-profile-picker {
-  margin-bottom: 1rem;
-  padding: 0.65rem 0.8rem;
-  border-radius: 1.2rem;
-}
-
-.travel-profile-picker .person-switcher {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
-
-.travel-bento {
-  display: grid;
-  gap: 1rem;
-}
-
-.travel-stat-stack {
-  display: grid;
-  gap: 1rem;
-}
-
-.travel-limit-card,
-.travel-ilr-card,
-.travel-recorded-card,
-.travel-recent-panel {
-  position: relative;
-  overflow: hidden;
-  border-radius: 2rem;
-}
-
-.travel-limit-card,
-.travel-ilr-card,
-.travel-recorded-card {
-  padding: 1.25rem;
-}
-
-.travel-limit-card {
-  box-shadow:
-    0 0.8rem 2.5rem rgb(238 9 121 / 12%),
-    inset 0 1px 0 rgb(255 255 255 / 42%);
-}
-
-.travel-card-glow {
-  position: absolute;
-  top: -3.5rem;
-  right: -3.5rem;
-  width: 9rem;
-  height: 9rem;
-  border-radius: 50%;
-  background: rgb(255 74 143 / 16%);
-  filter: blur(2rem);
-  pointer-events: none;
-}
-
-.travel-stat-heading {
-  position: relative;
+.travel-year-filters {
   display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 1rem 0 0.25rem;
 }
 
-.travel-stat-heading h2 {
-  margin: 0;
-  color: var(--ibiza-primary);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 1.45rem;
-}
-
-.travel-ilr-card .travel-stat-heading h2 {
-  color: var(--ibiza-secondary);
-}
-
-.travel-stat-icon {
-  display: grid;
-  width: 2.35rem;
-  height: 2.35rem;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--ibiza-primary);
-  background: rgb(238 9 121 / 10%);
-}
-
-.travel-stat-icon-secondary {
-  color: var(--ibiza-secondary);
-  background: rgb(255 106 0 / 10%);
-}
-
-.travel-stat-icon svg {
-  width: 1.2rem;
-  height: 1.2rem;
-  fill: none;
-  stroke: currentcolor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.7;
-}
-
-.travel-limit-value {
-  display: flex;
-  gap: 0.45rem;
-  align-items: flex-end;
-  margin: 1.2rem 0 0.9rem;
-}
-
-.travel-limit-value strong {
-  color: var(--ibiza-text);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 3rem;
-  line-height: 0.9;
-}
-
-.travel-limit-value span {
-  color: var(--ibiza-text-muted);
-  font-size: 0.85rem;
-}
-
-.travel-progress {
-  height: 0.5rem;
-  overflow: hidden;
+.travel-year-filter {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
-  background: rgb(91 63 70 / 14%);
+  color: var(--colour-text);
+  background: var(--colour-surface);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
-.travel-progress span {
-  display: block;
-  width: var(--travel-absence-progress, 0%);
-  height: 100%;
-  border-radius: inherit;
-  background: var(--ibiza-gradient);
-  box-shadow: 0 0 0.8rem rgb(238 9 121 / 30%);
+.travel-year-filter[aria-pressed="true"] {
+  border-color: var(--colour-strong);
+  color: var(--colour-strong);
+  background: var(--colour-surface-strong);
 }
 
-.travel-stat-copy,
-.travel-estimate-label,
-.travel-recorded-card small {
-  color: var(--ibiza-text-muted);
-  font-size: 0.76rem;
-  line-height: 1.5;
+.travel-year-filter:focus-visible {
+  outline: 2px solid var(--colour-strong);
+  outline-offset: 2px;
 }
 
-.travel-stat-copy {
-  margin-top: 0.9rem;
-}
-
-.travel-estimate-label {
-  margin: 1rem 0 0.25rem;
-}
-
-.travel-estimate-date {
-  margin: 0;
-  color: var(--ibiza-primary);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
-}
-
-.travel-estimate-chip {
-  display: inline-flex;
-  margin-top: 0.85rem;
-  padding: 0.35rem 0.65rem;
-  border: 1px solid rgb(238 9 121 / 18%);
-  border-radius: 999px;
-  color: var(--ibiza-primary);
-  background: rgb(238 9 121 / 8%);
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-.travel-recorded-summary {
-  display: flex;
-  gap: 0.45rem;
-  align-items: baseline;
-  margin: 0.45rem 0 0.35rem;
-}
-
-.travel-recorded-summary strong {
-  color: var(--ibiza-text);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 2rem;
-}
-
-.travel-recorded-summary span {
-  color: var(--ibiza-text-muted);
-  font-size: 0.78rem;
+.travel-entry[hidden] {
+  display: none;
 }
 
 .travel-recent-panel {
@@ -289,6 +88,7 @@
 }
 
 .travel-timeline-premium {
+  display: grid;
   gap: 1.15rem;
   margin-top: 1rem;
   padding-left: 0.35rem;
@@ -411,64 +211,7 @@
 }
 
 .travel-notice {
-  margin-top: 1rem;
-}
-
-html[data-theme="dark"] .travel-page {
-  background:
-    radial-gradient(circle at 10% 4%, rgb(238 9 121 / 12%), transparent 24rem),
-    radial-gradient(circle at 92% 15%, rgb(255 106 0 / 9%), transparent 22rem);
-}
-
-html[data-theme="dark"] .travel-profile-picker,
-html[data-theme="dark"] .travel-ilr-card,
-html[data-theme="dark"] .travel-recorded-card,
-html[data-theme="dark"] .travel-recent-panel,
-html[data-theme="dark"] .travel-entry-card {
-  border-color: rgb(255 255 255 / 12%);
-  background: rgb(255 255 255 / 7%);
-}
-
-html[data-theme="dark"] .travel-limit-card {
-  border-color: rgb(255 255 255 / 14%);
-  background: rgb(255 255 255 / 10%);
-  box-shadow:
-    0 0.8rem 2.7rem rgb(238 9 121 / 13%),
-    inset 0 1px 0 rgb(255 255 255 / 8%);
-}
-
-html[data-theme="dark"] .travel-progress {
-  background: rgb(255 255 255 / 10%);
-}
-
-@media (min-width: 48rem) {
-  .travel-hero {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .travel-add-button {
-    flex: 0 0 auto;
-  }
-
-  .travel-bento {
-    grid-template-columns: minmax(15rem, 4fr) minmax(0, 8fr);
-    align-items: start;
-  }
-
-  .travel-recent-panel {
-    padding: 1.25rem;
-  }
-
-  .travel-entry-topline {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-  }
-
-  .travel-entry-duration {
-    text-align: right;
-  }
+  margin: 0;
 }
 
 /* Ibiza Sunset trip editor */
