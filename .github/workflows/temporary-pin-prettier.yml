@@ -1,0 +1,24 @@
+name: Temporary PIN formatter diagnostic
+
+on:
+  push:
+    branches:
+      - test/pin-security-lifecycle
+
+permissions:
+  contents: read
+
+jobs:
+  prettier-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Show Prettier diff
+        run: |
+          npx prettier --write src/features/security/services/session-lock.test.ts tests/e2e/app-shell.spec.ts
+          git diff -- src/features/security/services/session-lock.test.ts tests/e2e/app-shell.spec.ts
