@@ -93,27 +93,23 @@ describe("encrypted repository save boundaries", () => {
         postcode: "BS1 1AA",
       },
       startMonth: "2024-01",
-      endMonth: null,
+      endMonth: "",
       isCurrent: true,
-      evidenceDocumentId: null,
+      notes: "",
       createdAt: timestamp,
       updatedAt: timestamp,
     };
     const lifeEnglish: LifeEnglishRecord = {
       version: 1,
       profileId: "member-2",
-      lifeInUk: {
-        status: "not-started",
-        passDate: null,
-        reference: "",
-        evidenceDocumentId: null,
-      },
-      englishLanguage: {
-        status: "not-started",
-        evidenceType: "",
-        certificateReference: "",
-        evidenceDocumentId: null,
-      },
+      lifeInUkStatus: "not-recorded",
+      lifeInUkPassedDate: "",
+      lifeInUkReference: "",
+      englishStatus: "not-recorded",
+      englishEvidenceType: "",
+      englishReference: "",
+      notes: "",
+      createdAt: timestamp,
       updatedAt: timestamp,
     };
 
