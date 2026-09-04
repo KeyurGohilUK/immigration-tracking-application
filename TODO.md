@@ -31,10 +31,10 @@ Document Vault-specific work is tracked separately in
 
 ## Privacy, resilience, and security
 
-- [ ] Test behaviour when browser storage is unavailable or full.
+- [x] Test behaviour when browser storage is unavailable or full.
 - [ ] Add the chosen contact email to `SECURITY.md` before public release.
 - [ ] Test restoration from every supported older schema version.
-- [ ] Test IndexedDB migrations and interrupted writes.
+- [x] Test IndexedDB migrations and interrupted writes.
 - [ ] Test PIN setup, unlock, incorrect attempts, auto-lock, manual lock, and
       forgotten-PIN data reset.
 - [ ] Test family-member isolation so records and calculations cannot be mixed.
