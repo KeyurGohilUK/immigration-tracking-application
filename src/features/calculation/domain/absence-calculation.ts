@@ -40,6 +40,7 @@ interface AbsenceCalculationInput {
   permissions: ImmigrationPermission[];
   trips: Trip[];
   asOfDate: string;
+  applicationDate?: string;
 }
 
 interface ClassifiedAbsenceDays {
@@ -237,10 +238,11 @@ function largerWindow(
 }
 
 function calculateAbsenceForRole(
-  { permissions, trips, asOfDate }: AbsenceCalculationInput,
+  { permissions, trips, asOfDate, applicationDate }: AbsenceCalculationInput,
   supportedRole: "main-applicant" | "dependant",
 ): AbsenceCheckResult {
   parseDate(asOfDate);
+  if (applicationDate) parseDate(applicationDate);
   const qualifyingPermissions = permissions
     .filter(
       ({ route, role }) =>
@@ -265,7 +267,7 @@ function calculateAbsenceForRole(
   const absenceDays = collectWholeAbsenceDays(
     trips,
     qualifyingPermissions,
-    asOfDate,
+    applicationDate ?? asOfDate,
   );
   const rollingWindow = findMaximumRollingWindow(absenceDays.rolling);
   const transitionalWindow = findMaximumApplicationAnchoredWindow(
