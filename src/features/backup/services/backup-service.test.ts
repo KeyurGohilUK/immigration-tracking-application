@@ -81,6 +81,43 @@ describe("encrypted backup", () => {
     );
   });
 
+  it("round-trips multiple household members without mixing profiles", async () => {
+    const data: BackupData = {
+      ...backupData,
+      members: [
+        ...backupData.members,
+        {
+          version: 1,
+          id: "member-2",
+          fullName: "Second Encrypted Person",
+          dateOfBirth: "1992-02-02",
+          immigrationRole: "dependant",
+          createdAt: "2026-08-30T10:00:00.000Z",
+          updatedAt: "2026-08-30T10:00:00.000Z",
+        },
+      ],
+      permissions: [
+        ...backupData.permissions,
+        { profileId: "member-2", records: [] },
+      ],
+      trips: [...backupData.trips, { profileId: "member-2", records: [] }],
+      addressHistory: [
+        ...backupData.addressHistory,
+        { profileId: "member-2", records: [] },
+      ],
+      lifeEnglish: [
+        ...backupData.lifeEnglish,
+        { profileId: "member-2", records: [] },
+      ],
+    };
+    const password = "a-secure-backup-password";
+    const backup = await createEncryptedBackup(data, password);
+
+    await expect(decryptAndValidateBackup(backup, password)).resolves.toMatchObject({
+      data,
+    });
+  });
+
   it("rejects an incorrect backup password", async () => {
     const backup = await createEncryptedBackup(
       backupData,
@@ -90,6 +127,27 @@ describe("encrypted backup", () => {
     await expect(
       decryptAndValidateBackup(backup, "the-wrong-backup-password"),
     ).rejects.toThrow();
+  });
+
+  it("rejects tampered encrypted payloads", async () => {
+    const password = "a-secure-backup-password";
+    const backup = await createEncryptedBackup(backupData, password);
+    const replacement = backup.ciphertext[0] === "0" ? "1" : "0";
+    const tampered = {
+      ...backup,
+      ciphertext: replacement + backup.ciphertext.slice(1),
+    };
+
+    await expect(decryptAndValidateBackup(tampered, password)).rejects.toThrow();
+  });
+
+  it("rejects readable metadata that does not match the encrypted payload", async () => {
+    const password = "a-secure-backup-password";
+    const backup = await createEncryptedBackup(backupData, password);
+
+    await expect(
+      decryptAndValidateBackup({ ...backup, appVersion: "9.9.9" }, password),
+    ).rejects.toThrow("metadata does not match");
   });
 
   it("rejects unsupported wrappers before decryption", async () => {
@@ -104,6 +162,17 @@ describe("encrypted backup", () => {
         "a-secure-backup-password",
       ),
     ).rejects.toThrow("format is not supported");
+  });
+
+  it("rejects unsupported or malicious wrapper JSON", () => {
+    expect(() =>
+      parseEncryptedBackupFile(
+        JSON.stringify({
+          format: "urbanfox-ilr-encrypted-backup",
+          version: 999,
+        }),
+      ),
+    ).toThrow("format is not supported");
   });
 
   it("rejects malformed backup JSON", () => {
