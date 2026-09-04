@@ -393,9 +393,8 @@ test("guides Address History from the current address backwards", async ({
   await page.goto("/");
   await createLocalProfile(page);
 
-  await page
-    .getByRole("button", { name: "Manage immigration history" })
-    .click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await page.getByRole("button", { name: "+ Add past visa" }).click();
   await page.getByRole("button", { name: "Add permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
@@ -1420,14 +1419,6 @@ test("uses a three-state sliding appearance toggle and persists preferences", as
     .toBe("dark");
 
   await page.getByRole("link", { name: "Family", exact: true }).click();
-  await expect(page.locator(".household-status-label h2")).toHaveCSS(
-    "color",
-    "rgb(255, 177, 197)",
-  );
-  await expect(page.locator(".household-status-icon")).toHaveCSS(
-    "color",
-    "rgb(255, 177, 197)",
-  );
   await page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }).click();
   await expect(page.locator(".member-profile-dialog")).toHaveCSS(
     "background-color",
@@ -1600,7 +1591,12 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Selected profile check" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.getByText("Official-rule residence tracker")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText("Selected tracking profile")).toHaveCount(0);
+  await expect(page.getByText("Edit", { exact: true })).toHaveCount(0);
   await expect(page.locator(".dashboard-person-progress")).toHaveCount(0);
   await page.getByRole("button", { name: "Add Household Member" }).click();
 
@@ -1632,6 +1628,14 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
   await expect(page.getByText("2 of 2", { exact: true })).toBeVisible();
+  const membersRegion = page.getByRole("region", { name: "Active members" });
+  const membersBox = await membersRegion.boundingBox();
+  const addBox = await page
+    .getByRole("button", { name: "Add Household Member" })
+    .boundingBox();
+  expect(membersBox).not.toBeNull();
+  expect(addBox).not.toBeNull();
+  expect(addBox!.y).toBeGreaterThanOrEqual(membersBox!.y + membersBox!.height);
   const editFamilyMember = page.getByRole("button", {
     name: "Edit Freddy Test Dependant",
   });
@@ -1700,9 +1704,8 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page
-    .getByRole("button", { name: "Manage immigration history" })
-    .click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await page.getByRole("button", { name: "+ Add past visa" }).click();
   await expect(
     page.getByRole("heading", { name: "Immigration history" }),
   ).toBeVisible();
@@ -1775,9 +1778,8 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page.getByRole("link", { name: "Family", exact: true }).first().click();
-  await page
-    .getByRole("button", { name: "Manage immigration history" })
-    .click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await page.getByRole("button", { name: "+ Add past visa" }).click();
   await expect(page.locator(".permission-summary-date")).toHaveText(
     "2027-12-31",
   );
@@ -1795,9 +1797,8 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
   await expect(
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Manage immigration history" })
-    .click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await page.getByRole("button", { name: "+ Add past visa" }).click();
   await page.getByRole("button", { name: "Add permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("dependant");
@@ -1810,20 +1811,12 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
     page.getByText("Dependant calculation supported", { exact: true }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Family" }).first().click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await expect(page.getByText("17 Nov 2028", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Recorded estimate: 2028-11-17" }),
+    page.getByText("Dependant permission", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("2023-12-15", { exact: true })).toBeVisible();
-  await expect(page.getByText("2028-12-15", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText(/same partner; UrbanFox does not store or verify/i),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", {
-      name: "31 days at most in one rolling year",
-    }),
-  ).toBeVisible();
+  await expect(page.getByText("31 / 180 days", { exact: true })).toBeVisible();
 });
 
 test("tracks encrypted trips, open travel, and overlap warnings", async ({
@@ -1956,18 +1949,13 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toHaveCount(0);
 });
 
-test("shows a sourced recorded-absence warning without claiming eligibility", async ({
+test("shows recorded-absence usage on ILR and Travel without claiming eligibility", async ({
   page,
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await expect(
-    page.getByRole("heading", { name: "Add immigration permission history" }),
-  ).toBeVisible();
-
-  await page
-    .getByRole("button", { name: "Manage immigration history" })
-    .click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await page.getByRole("button", { name: "+ Add past visa" }).click();
   await page.getByRole("button", { name: "Add permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
@@ -1976,39 +1964,26 @@ test("shows a sourced recorded-absence warning without claiming eligibility", as
   await page.getByLabel("Permission expiry date").fill("2028-01-01");
   await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
   await page.getByRole("button", { name: "Save permission" }).click();
-  await page.getByRole("link", { name: "Family", exact: true }).click();
-  await expect(
-    page.getByRole("heading", {
-      name: "Earliest estimated application: 2026-12-04",
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "No complete absence days recorded" }),
-  ).toBeVisible();
-
-  await page.getByRole("button", { name: "Manage trips" }).click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await expect(page.getByText("4 Dec 2026", { exact: true })).toBeVisible();
+  await expect(page.getByText("0 / 180 days", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Travel", exact: true }).click();
   await page.getByRole("button", { name: "Add trip" }).click();
   await page.getByLabel("UK departure date").fill("2024-01-01");
   await page.getByLabel(/UK return date/).fill("2024-07-01");
   await page.getByLabel("Destination").fill("Test destination");
   await page.getByRole("button", { name: "Save trip" }).click();
-  await page.getByRole("link", { name: "Family", exact: true }).click();
-
-  await expect(page.getByText("Potential limit issue")).toBeVisible();
   await expect(
-    page.getByRole("heading", {
-      name: "181 recorded days in one rolling year",
-    }),
+    page.getByText("Recorded history may exceed the rolling 180-day limit."),
   ).toBeVisible();
   await expect(
-    page.getByText(/does not determine ILR eligibility/i),
-  ).toBeVisible();
-  await page.getByText("Method and official sources").click();
+    page.getByRole("progressbar", { name: "Recorded rolling absence usage" }),
+  ).toHaveAttribute("aria-valuetext", "181 / 180 days used");
   await expect(
-    page.getByRole("link", {
-      name: "Immigration Rules Appendix Continuous Residence",
-    }),
+    page.getByRole("heading", { name: "Tracking only—not legal advice" }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await expect(page.getByText("181 / 180 days", { exact: true })).toBeVisible();
 });
 
 test("keeps fixed chrome and compacts the mobile menu while scrolling", async ({

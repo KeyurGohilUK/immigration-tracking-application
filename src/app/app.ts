@@ -133,11 +133,7 @@ export function renderAppShell(
   window.scrollTo({ top: 0, left: 0 });
 }
 
-export function renderApp(
-  root: HTMLElement,
-  members: HouseholdMember[],
-  selectedProfileId: string,
-): void {
+export function renderApp(root: HTMLElement, members: HouseholdMember[]): void {
   const mainApplicants = members.filter(
     ({ immigrationRole }) => immigrationRole === "main-applicant",
   ).length;
@@ -160,48 +156,15 @@ export function renderApp(
         </dl>
       </section>
 
-      <button id="manage-family" class="primary-button dashboard-add-member" type="button">
-        <span class="dashboard-add-member-icon" aria-hidden="true">＋</span>
-        <span>Add Household Member</span>
-      </button>
-
-      <section class="household-status-card glass-panel" aria-labelledby="household-status-title">
-        <div class="household-status-glow" aria-hidden="true"></div>
-        <div>
-          <div class="household-status-label">
-            <span class="household-status-icon" aria-hidden="true">⌂</span>
-            <h2 id="household-status-title">Selected profile check</h2>
-          </div>
-          <div class="household-status-main">
-            <strong id="household-status-value">Checking…</strong>
-            <span class="household-status-chip"><span id="household-status-copy">Reviewing recorded history</span></span>
-          </div>
-        </div>
-        <div class="household-total-absence">
-          <span>Maximum recorded absence</span>
-          <strong id="household-total-absence">—</strong>
-          <small>complete days in one rolling year</small>
-        </div>
-      </section>
-
       <section class="family-member-stack" aria-labelledby="family-members-title">
         <div class="family-member-heading"><div><p class="eyebrow">Household cohort</p><h2 id="family-members-title">Active members</h2></div><span>${members.length} ${members.length === 1 ? "profile" : "profiles"}</span></div>
         <div id="dashboard-family-list" class="dashboard-family-list"></div>
       </section>
 
-      <section id="absence-summary" class="setup-card absence-summary family-dashboard-absence" aria-labelledby="absence-summary-title" aria-live="polite">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Selected member</p>
-            <h2 id="absence-summary-title">Reviewing recorded history…</h2>
-          </div>
-        </div>
-        <p>This check stays on your device and does not determine ILR eligibility.</p>
-        <div class="dashboard-actions">
-          <button id="manage-permissions" class="secondary-button" type="button">Immigration history</button>
-          <button id="manage-trips" class="primary-button" type="button">Manage trips</button>
-        </div>
-      </section>
+      <button id="manage-family" class="primary-button dashboard-add-member" type="button">
+        <span class="dashboard-add-member-icon" aria-hidden="true">＋</span>
+        <span>Add Household Member</span>
+      </button>
 
       <aside class="notice dashboard-notice" aria-labelledby="notice-title">
         <span class="notice-icon" aria-hidden="true">i</span>
@@ -223,12 +186,7 @@ export function renderApp(
           ? "Dependant"
           : "Immigration role not set";
     familyList?.append(
-      createDashboardProfileCard(
-        member.fullName,
-        role,
-        member.id,
-        selectedProfileId === member.id,
-      ),
+      createDashboardProfileCard(member.fullName, role, member.id),
     );
   }
 }
@@ -237,22 +195,17 @@ function createDashboardProfileCard(
   name: string,
   role: string,
   profileId: string,
-  selected: boolean,
 ): HTMLElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "dashboard-person-card family-overview-member";
-  if (selected) button.classList.add("is-selected");
   button.dataset.editDashboardMember = profileId;
   button.setAttribute("aria-label", `Edit ${name}`);
   button.innerHTML = `
     <span class="dashboard-person-avatar" aria-hidden="true"></span>
     <span class="dashboard-person-copy">
       <span class="dashboard-person-heading"><strong></strong><span class="dashboard-person-badge"></span></span>
-      <small>${selected ? "Selected tracking profile" : "Household profile"}</small>
-    </span>
-    <span class="dashboard-person-state">
-      <span class="dashboard-person-limit-value">Edit</span><span aria-hidden="true">›</span>
+      <small>Household profile</small>
     </span>
   `;
   const avatar = button.querySelector<HTMLElement>(".dashboard-person-avatar");

@@ -97,45 +97,7 @@ p {
   background: var(--colour-canvas);
 }
 
-.absence-summary {
-  display: grid;
-  align-content: start;
-  gap: 0.65rem;
-}
-
-.dashboard-main .absence-summary {
-  background: var(--glass-surface);
-  box-shadow: var(--glass-shadow);
-  -webkit-backdrop-filter: blur(1.1rem) saturate(135%);
-  backdrop-filter: blur(1.1rem) saturate(135%);
-}
-
-.absence-summary h2 {
-  margin-bottom: 0;
-}
-
-.absence-description {
-  font-size: 0.82rem;
-}
-
-.calculation-issues {
-  display: grid;
-  gap: 0.35rem;
-  margin: 0;
-  padding-left: 1.1rem;
-  color: var(--colour-text-muted);
-  font-size: 0.72rem;
-}
-
-.period-metrics {
-  grid-template-columns: 1fr;
-}
-
 @media (min-width: 40rem) {
-  .period-metrics {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .family-form-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -151,81 +113,6 @@ p {
   .more-action-group {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
-
-.calculation-subsection {
-  display: grid;
-  gap: 0.55rem;
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--colour-border);
-}
-
-.calculation-subsection h3 {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.calculation-boundary {
-  padding-left: 0.55rem;
-  border-left: 3px solid var(--colour-strong);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.absence-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin: 0;
-}
-
-.absence-metrics div {
-  min-width: 0;
-  padding: 0.55rem;
-  border-radius: 0.55rem;
-  background: var(--colour-surface);
-}
-
-.absence-metrics dt {
-  color: var(--colour-text-muted);
-  font-size: 0.62rem;
-  font-weight: 750;
-  text-transform: uppercase;
-}
-
-.absence-metrics dd {
-  margin: 0.2rem 0 0;
-  overflow-wrap: anywhere;
-  font-size: 0.72rem;
-  font-weight: 750;
-}
-
-.calculation-sources {
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--colour-border);
-  color: var(--colour-text-muted);
-  font-size: 0.72rem;
-}
-
-.calculation-sources[open] {
-  max-height: 9rem;
-  overflow-y: auto;
-}
-
-.calculation-sources summary {
-  cursor: pointer;
-  color: var(--colour-text);
-  font-weight: 750;
-}
-
-.calculation-sources p,
-.calculation-sources ul {
-  margin: 0.5rem 0;
-  font-size: 0.72rem;
-}
-
-.calculation-sources a {
-  color: var(--colour-text);
 }
 
 .dashboard-actions {

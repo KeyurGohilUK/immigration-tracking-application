@@ -29,8 +29,6 @@
 }
 
 .family-summary-card,
-.household-status-card,
-.family-dashboard-absence,
 .family-dashboard .dashboard-notice {
   border-radius: 1.5rem;
 }
@@ -83,8 +81,7 @@
   background: var(--glass-surface);
 }
 
-.family-summary-metrics dt,
-.household-total-absence > span {
+.family-summary-metrics dt {
   color: var(--ibiza-text-muted);
   font-size: 0.68rem;
   font-weight: 750;
@@ -134,112 +131,6 @@
   line-height: 1;
 }
 
-.household-status-card {
-  position: relative;
-  display: grid;
-  gap: 1.15rem;
-  overflow: hidden;
-  padding: 1.15rem;
-}
-
-.household-status-glow {
-  position: absolute;
-  top: -5rem;
-  right: -4rem;
-  width: 12rem;
-  height: 12rem;
-  border-radius: 999px;
-  background: rgb(238 9 121 / 18%);
-  filter: blur(45px);
-  pointer-events: none;
-}
-
-.household-status-label,
-.household-status-main,
-.household-total-absence {
-  position: relative;
-}
-
-.household-status-label {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-}
-
-.household-status-label h2 {
-  margin: 0;
-  color: #a14000;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.72rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.household-status-icon {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border: 1px solid rgb(255 106 0 / 30%);
-  border-radius: 999px;
-  color: #a14000;
-  background: rgb(255 106 0 / 12%);
-}
-
-.household-status-main {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.85rem;
-}
-
-.household-status-main > strong {
-  color: var(--ibiza-text);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-}
-
-.household-status-chip {
-  display: inline-flex;
-  padding: 0.42rem 0.7rem;
-  border: 1px solid rgb(182 0 90 / 18%);
-  border-radius: 999px;
-  color: var(--ibiza-primary);
-  background: rgb(238 9 121 / 9%);
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-.household-total-absence {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.15rem 0.55rem;
-  align-items: end;
-  padding-top: 1rem;
-  border-top: 1px solid var(--glass-border);
-}
-
-.household-total-absence > span {
-  grid-column: 1 / -1;
-}
-
-.household-total-absence strong {
-  color: var(--ibiza-text);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 2rem;
-}
-
-.household-total-absence small {
-  padding-bottom: 0.3rem;
-  color: var(--ibiza-text-muted);
-  line-height: 1.35;
-}
-
 .family-member-stack,
 .dashboard-family-list {
   display: grid;
@@ -278,7 +169,7 @@
 
 .family-overview-member {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0.85rem;
   align-items: center;
   width: 100%;
@@ -303,13 +194,6 @@
   border-color: rgb(238 9 121 / 28%);
 }
 
-.family-overview-member.is-selected {
-  border-color: rgb(238 9 121 / 44%);
-  box-shadow:
-    0 1rem 2.8rem rgb(182 0 90 / 12%),
-    inset 0 0 0 1px rgb(238 9 121 / 12%);
-}
-
 .family-overview-member .dashboard-person-avatar {
   display: grid;
   width: 3rem;
@@ -331,8 +215,7 @@
   align-items: center;
 }
 
-.family-overview-member .dashboard-person-copy,
-.family-overview-member .dashboard-person-state {
+.family-overview-member .dashboard-person-copy {
   min-width: 0;
 }
 
@@ -362,19 +245,6 @@
   white-space: nowrap;
 }
 
-.family-overview-member .dashboard-person-state {
-  display: flex;
-  gap: 0.35rem;
-  align-items: center;
-  color: var(--ibiza-primary);
-  font-size: 1.25rem;
-}
-
-.dashboard-person-limit-value {
-  font-size: 0.72rem;
-  font-weight: 750;
-}
-
 .family-dashboard .primary-button {
   color: #ffffff;
   background: var(--ibiza-gradient);
@@ -390,16 +260,5 @@
 @media (min-width: 40rem) {
   .family-summary-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .household-status-card {
-    grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.45fr);
-    align-items: end;
-  }
-
-  .household-total-absence {
-    padding: 0 0 0 1.25rem;
-    border-top: 0;
-    border-left: 1px solid var(--glass-border);
   }
 }

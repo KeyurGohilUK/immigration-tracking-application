@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.24.1";
+export const APP_VERSION = "3.24.2";
 
 export const RELEASE_NOTES = [
-  "Family Overview now uses shared page spacing, factual household metrics, and clearer member and selected-profile status cards.",
+  "Family Overview now focuses on household members, with tap-to-edit cards and Add Household Member below the list.",
 ] as const;

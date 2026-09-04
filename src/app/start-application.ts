@@ -24,10 +24,6 @@ import {
   summariseBackup,
 } from "../features/backup/services/restore-service";
 import {
-  renderAbsenceSummary,
-  renderAbsenceSummaryUnavailable,
-} from "../features/calculation/components/absence-summary";
-import {
   calculateRecordedAbsenceCheck,
   calculateRecordedDependantAbsenceCheck,
 } from "../features/calculation/domain/absence-calculation";
@@ -295,11 +291,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const renderDashboard = (profile: HouseholdMember): void => {
-      renderApp(root, familyMembers, selectedProfileId);
+      renderApp(root, familyMembers);
       wireAuthenticatedShell(profile, "Home");
-      wireDashboardActions(profile);
-      const profileId = selectedProfileId;
-      void updateDashboardCalculation(profile, profileId);
+      wireDashboardActions();
     };
 
     const showIlrJourney = async (profile: HouseholdMember): Promise<void> => {
@@ -1963,18 +1957,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       }
     };
 
-    const wireDashboardActions = (profile: HouseholdMember): void => {
+    const wireDashboardActions = (): void => {
       const dialog = root.querySelector<HTMLDialogElement>("#family-dialog");
       const form = root.querySelector<HTMLFormElement>("#family-form");
       const addMember = root.querySelector<HTMLButtonElement>("#manage-family");
       if (addMember) addMember.disabled = !familyProfilesAvailable;
 
-      root
-        .querySelector<HTMLButtonElement>("#manage-permissions")
-        ?.addEventListener("click", () => void showPermissions(profile));
-      root
-        .querySelector<HTMLButtonElement>("#manage-trips")
-        ?.addEventListener("click", () => void showTrips(profile));
       addMember?.addEventListener("click", () => showHouseholdMemberForm(root));
       root
         .querySelector<HTMLButtonElement>(".dialog-close")
@@ -1982,20 +1970,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       dialog?.addEventListener("click", (event) => {
         if (event.target === dialog) dialog.close();
       });
-
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-select-dashboard-profile]",
-      )) {
-        button.addEventListener("click", () => {
-          const profileId = button.dataset.selectDashboardProfile;
-          if (!profileId || !isKnownProfileId(profileId, familyMembers)) return;
-          selectedProfileId = profileId;
-          const selectedMember = familyMembers.find(
-            ({ id }) => id === profileId,
-          );
-          if (selectedMember) renderDashboard(selectedMember);
-        });
-      }
 
       for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-edit-dashboard-member]",
@@ -2415,84 +2389,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             "This profile’s encrypted travel records could not be opened.";
           error.hidden = false;
         }
-      }
-    };
-
-    const updateDashboardCalculation = async (
-      profile: HouseholdMember,
-      profileId: string,
-    ): Promise<void> => {
-      try {
-        const cachedPermissions = permissionCache.get(profileId);
-        const cachedTrips = tripCache.get(profileId);
-        const [permissions, trips] = await Promise.all([
-          cachedPermissions ?? getImmigrationPermissions(profileId, key),
-          cachedTrips ?? getTrips(profileId, key),
-        ]);
-        permissionCache.set(profileId, permissions);
-        tripCache.set(profileId, trips);
-        if (
-          selectedProfileId !== profileId ||
-          !root.querySelector("#absence-summary")
-        )
-          return;
-        const latestPermission = [...permissions].sort((left, right) =>
-          right.permissionStartDate.localeCompare(left.permissionStartDate),
-        )[0];
-        const isDependant = latestPermission?.role === "dependant";
-        const calculationInput = {
-          permissions,
-          trips,
-          asOfDate: getUkCalendarDate(),
-        };
-        const result = isDependant
-          ? calculateRecordedDependantAbsenceCheck(calculationInput)
-          : calculateRecordedAbsenceCheck(calculationInput);
-        const period = isDependant
-          ? calculateSkilledWorkerDependantQualifyingPeriod(
-              permissions,
-              getUkCalendarDate(),
-            )
-          : calculateSkilledWorkerQualifyingPeriod({
-              permissions,
-              asOfDate: getUkCalendarDate(),
-            });
-        renderAbsenceSummary(root, result, period);
-        const householdStatus = root.querySelector<HTMLElement>(
-          "#household-status-value",
-        );
-        const householdStatusCopy = root.querySelector<HTMLElement>(
-          "#household-status-copy",
-        );
-        const householdAbsence = root.querySelector<HTMLElement>(
-          "#household-total-absence",
-        );
-        if (householdAbsence)
-          householdAbsence.textContent = String(result.maximumRecordedDays);
-        if (householdStatus && householdStatusCopy) {
-          if (result.status === "within-recorded-limit") {
-            householdStatus.textContent = "On Track";
-            householdStatusCopy.textContent = "Recorded Absences Within Limit";
-          } else if (result.status === "potentially-over-limit") {
-            householdStatus.textContent = "Review";
-            householdStatusCopy.textContent = "Potential Absence Limit Issue";
-          } else if (result.status === "manual-review") {
-            householdStatus.textContent = "Review";
-            householdStatusCopy.textContent = "Manual Review Needed";
-          } else {
-            householdStatus.textContent = "Setup";
-            householdStatusCopy.textContent = "More Information Needed";
-          }
-        }
-        wireDashboardActions(profile);
-      } catch {
-        if (
-          selectedProfileId !== profileId ||
-          !root.querySelector("#absence-summary")
-        )
-          return;
-        renderAbsenceSummaryUnavailable(root);
-        wireDashboardActions(profile);
       }
     };
 
