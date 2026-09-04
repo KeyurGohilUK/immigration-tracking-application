@@ -43,14 +43,14 @@ Document Vault-specific work is tracked separately in
 
 ## Calculation correctness
 
-- [ ] Handle the pre-11-January-2018 transitional absence calculation separately.
-- [ ] Unit test every calculation rule and route configuration.
-- [ ] Test same-day travel, one-day travel, open trips, and overlapping trips.
-- [ ] Test leap years, month ends, year ends, and daylight-saving transitions.
-- [ ] Test visa gaps, route changes, and first-entry absence counting.
-- [ ] Test missing and contradictory information.
-- [ ] Complete a manual calculation review against current official GOV.UK rules.
-- [ ] Record the rules verification date in the release.
+- [x] Handle the pre-11-January-2018 transitional absence calculation separately.
+- [x] Unit test every calculation rule and route configuration.
+- [x] Test same-day travel, one-day travel, open trips, and overlapping trips.
+- [x] Test leap years, month ends, year ends, and daylight-saving transitions.
+- [x] Test visa gaps, route changes, and first-entry absence counting.
+- [x] Test missing and contradictory information.
+- [x] Complete a manual calculation review against current official GOV.UK rules.
+- [x] Record the rules verification date in the release.
 
 ## UX and accessibility
 
