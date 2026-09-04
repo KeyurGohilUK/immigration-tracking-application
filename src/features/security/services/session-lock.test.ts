@@ -1,8 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  INACTIVITY_TIMEOUT_MS,
-  startSessionLock,
-} from "./session-lock";
+import { INACTIVITY_TIMEOUT_MS, startSessionLock } from "./session-lock";
 
 describe("session lock", () => {
   beforeEach(() => {
