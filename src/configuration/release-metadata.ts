@@ -1,7 +1,7 @@
-export const APP_VERSION = "3.25.4";
+export const APP_VERSION = "3.25.5";
 
 export const RELEASE_NOTES = [
-  "Family-member isolation is now explicitly regression-tested across permissions, trips, calculations, address history, Life in the UK/English data, and documents.",
-  "Document read, write, rename, and delete actions can now be scoped to the selected household profile and reject cross-profile access.",
-  "Browser coverage verifies that switching family members does not expose another profile's travel or ILR state.",
+  "Encrypted backup tests now cover multi-member round trips, wrong passwords, tampered ciphertext, metadata tampering, unsupported wrappers, and malformed JSON.",
+  "Full restore now clears stale local documents even when an older backup contains no document collection, preventing mixed pre- and post-backup evidence.",
+  "Browser restore coverage now proves records and documents created after a backup are removed when that backup replaces local data.",
 ] as const;
