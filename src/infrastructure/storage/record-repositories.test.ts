@@ -5,6 +5,10 @@ import { saveImmigrationPermissions } from "../../features/immigration/data/immi
 import type { ImmigrationPermission } from "../../features/immigration/domain/immigration-permission";
 import { saveTrips } from "../../features/travel/data/trip-repository";
 import type { Trip } from "../../features/travel/domain/trip";
+import { saveAddressHistory } from "../../features/documents/data/address-history-repository";
+import type { AddressHistoryEntry } from "../../features/documents/domain/address-history";
+import { saveLifeEnglishRecord } from "../../features/documents/data/life-english-repository";
+import type { LifeEnglishRecord } from "../../features/documents/domain/life-english";
 
 const key = {} as CryptoKey;
 const timestamp = "2026-08-30T10:00:00.000Z";
@@ -72,5 +76,52 @@ describe("encrypted repository save boundaries", () => {
         key,
       ),
     ).rejects.toThrow("Trips are invalid");
+  });
+
+  it("rejects address and Life/English records that belong to another profile", async () => {
+    const address: AddressHistoryEntry = {
+      version: 1,
+      id: "address-1",
+      profileId: "member-2",
+      address: {
+        flatBuilding: "",
+        houseNumberName: "10",
+        street: "Isolation Street",
+        locality: "",
+        townCity: "Bristol",
+        county: "",
+        postcode: "BS1 1AA",
+      },
+      startMonth: "2024-01",
+      endMonth: null,
+      isCurrent: true,
+      evidenceDocumentId: null,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+    const lifeEnglish: LifeEnglishRecord = {
+      version: 1,
+      profileId: "member-2",
+      lifeInUk: {
+        status: "not-started",
+        passDate: null,
+        reference: "",
+        evidenceDocumentId: null,
+      },
+      englishLanguage: {
+        status: "not-started",
+        evidenceType: "",
+        certificateReference: "",
+        evidenceDocumentId: null,
+      },
+      updatedAt: timestamp,
+    };
+
+    await expect(saveAddressHistory("member-1", [address], key)).rejects.toThrow(
+      "Address history is invalid",
+    );
+    await expect(
+      saveLifeEnglishRecord("member-1", lifeEnglish, key),
+    ).rejects.toThrow("Life in the UK and English data is invalid");
   });
 });
