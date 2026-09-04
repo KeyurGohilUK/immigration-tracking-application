@@ -653,7 +653,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ? window.open("about:blank", "_blank", "noopener")
         : null;
       try {
-        const document = await getDocumentFile(documentId, key, selectedProfileId);
+        const document = await getDocumentFile(
+          documentId,
+          key,
+          selectedProfileId,
+        );
         const blob = new Blob([document.bytes], {
           type: document.metadata.mimeType,
         });
@@ -832,7 +836,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             downloadAddressHistoryIndex(indexBytes, profileName);
             for (const item of plan.evidenceFiles) {
-              const file = await getDocumentFile(item.documentId, key, selectedProfileId);
+              const file = await getDocumentFile(
+                item.documentId,
+                key,
+                selectedProfileId,
+              );
               downloadAddressEvidenceFile(file, item.exportedFileName);
             }
             button.textContent =
@@ -1784,8 +1792,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
         if (submit) submit.disabled = true;
         try {
-          if (bytes) await saveDocument(metadata, bytes, key, selectedProfileId);
-          else await saveDocumentMetadataBatch([metadata], key, selectedProfileId);
+          if (bytes)
+            await saveDocument(metadata, bytes, key, selectedProfileId);
+          else
+            await saveDocumentMetadataBatch([metadata], key, selectedProfileId);
           uploadDialog?.close();
           await showDocuments(profile);
         } catch (storageError) {
