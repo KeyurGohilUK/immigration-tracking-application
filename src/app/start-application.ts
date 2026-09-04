@@ -653,7 +653,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         ? window.open("about:blank", "_blank", "noopener")
         : null;
       try {
-        const document = await getDocumentFile(documentId, key);
+        const document = await getDocumentFile(documentId, key, selectedProfileId);
         const blob = new Blob([document.bytes], {
           type: document.metadata.mimeType,
         });
@@ -832,7 +832,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             downloadAddressHistoryIndex(indexBytes, profileName);
             for (const item of plan.evidenceFiles) {
-              const file = await getDocumentFile(item.documentId, key);
+              const file = await getDocumentFile(item.documentId, key, selectedProfileId);
               downloadAddressEvidenceFile(file, item.exportedFileName);
             }
             button.textContent =
@@ -1320,7 +1320,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         try {
           await Promise.all(
             preparedEvidence.map(({ metadata, bytes }) =>
-              saveDocument(metadata, bytes, key),
+              saveDocument(metadata, bytes, key, selectedProfileId),
             ),
           );
           await saveLifeEnglishRecord(selectedProfileId, nextRecord, key);
@@ -1784,8 +1784,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
         if (submit) submit.disabled = true;
         try {
-          if (bytes) await saveDocument(metadata, bytes, key);
-          else await saveDocumentMetadataBatch([metadata], key);
+          if (bytes) await saveDocument(metadata, bytes, key, selectedProfileId);
+          else await saveDocumentMetadataBatch([metadata], key, selectedProfileId);
           uploadDialog?.close();
           await showDocuments(profile);
         } catch (storageError) {
@@ -1841,6 +1841,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           await saveDocumentMetadataBatch(
             [{ ...current, displayName, updatedAt: new Date().toISOString() }],
             key,
+            selectedProfileId,
           );
           renameDialog?.close();
           await showDocuments(profile);
@@ -1902,7 +1903,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           )
             return;
           try {
-            await deleteDocument(document.id);
+            await deleteDocument(document.id, key, selectedProfileId);
             await showDocuments(profile);
           } catch {
             showDocumentPageError(
