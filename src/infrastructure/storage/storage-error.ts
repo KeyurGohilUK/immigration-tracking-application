@@ -40,7 +40,10 @@ export function toStorageFailure(
   return new StorageFailure(fallbackCode, fallbackMessage, { cause: error });
 }
 
-export function getStorageFailureMessage(error: unknown): string {
+export function getStorageFailureMessage(
+  error: unknown,
+  fallbackMessage = "Private storage could not be accessed.",
+): string {
   if (error instanceof StorageFailure) {
     switch (error.code) {
       case "quota-exceeded":
@@ -55,5 +58,5 @@ export function getStorageFailureMessage(error: unknown): string {
         return "Encrypted local data could not be saved. Existing data was left unchanged.";
     }
   }
-  return "Private storage could not be accessed.";
+  return fallbackMessage;
 }
