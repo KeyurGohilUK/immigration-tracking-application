@@ -1,5 +1,7 @@
 import { bytesToHex, hexToBytes } from "../../shared/encoding/hex";
 import { openAppDatabase, type AppDatabaseStore } from "./app-database";
+import { toStorageFailure } from "./storage-error";
+import { waitForTransaction } from "./storage-transaction";
 
 export interface EncryptedRecord {
   version: 1;
@@ -46,18 +48,18 @@ export async function saveEncryptedRecord(
 ): Promise<void> {
   const record = await encryptRecord(value, key);
   const database = await openAppDatabase();
-  await new Promise<void>((resolve, reject) => {
+  try {
     const transaction = database.transaction(storeName, "readwrite");
     transaction.objectStore(storeName).put(record, recordKey);
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onerror = () => {
-      database.close();
-      reject(new Error("Encrypted local data could not be saved."));
-    };
-  });
+    await waitForTransaction(transaction, database, "write");
+  } catch (error) {
+    database.close();
+    throw toStorageFailure(
+      error,
+      "write-failed",
+      "Encrypted local data could not be saved.",
+    );
+  }
 }
 
 export async function decryptRecord(
@@ -80,17 +82,31 @@ export async function getEncryptedRecord(
   key: CryptoKey,
 ): Promise<unknown | null> {
   const database = await openAppDatabase();
-  const record = await new Promise<EncryptedRecord | null>(
-    (resolve, reject) => {
-      const transaction = database.transaction(storeName, "readonly");
-      const request = transaction.objectStore(storeName).get(recordKey);
+  let record: EncryptedRecord | null = null;
+  try {
+    const transaction = database.transaction(storeName, "readonly");
+    const request = transaction.objectStore(storeName).get(recordKey);
+    record = await new Promise<EncryptedRecord | null>((resolve, reject) => {
       request.onsuccess = () =>
         resolve((request.result as EncryptedRecord | undefined) ?? null);
       request.onerror = () =>
-        reject(new Error("Encrypted local data could not be read."));
-      transaction.oncomplete = () => database.close();
-    },
-  );
+        reject(
+          toStorageFailure(
+            request.error,
+            "read-failed",
+            "Encrypted local data could not be read.",
+          ),
+        );
+    });
+    await waitForTransaction(transaction, database, "read");
+  } catch (error) {
+    database.close();
+    throw toStorageFailure(
+      error,
+      "read-failed",
+      "Encrypted local data could not be read.",
+    );
+  }
   if (!record) return null;
   return decryptRecord(record, key);
 }
