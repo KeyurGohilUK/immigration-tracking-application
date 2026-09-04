@@ -772,14 +772,24 @@ test("stores and manages encrypted documents for a profile", async ({
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Vault" }).first().click();
   await expect(
-    page.getByRole("heading", { name: "Document Vault", exact: true }),
+    page.getByRole("heading", {
+      name: "Evidence readiness",
+      exact: true,
+      level: 1,
+    }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Add document" })).toHaveCount(
     0,
   );
-  const vaultHeaderIcon = page.locator(".vault-heading-icon");
-  await expect(vaultHeaderIcon.locator("svg")).toHaveCount(1);
-  await expect(vaultHeaderIcon.locator("path")).toHaveCount(2);
+  await expect(
+    page.getByRole("heading", { name: "Document Vault", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("Encrypted on this device", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("main").getByRole("region").first(),
+  ).toHaveAccessibleName("Household cohort");
   await expect(page.getByText("No documents added yet")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Identity & Immigration" }),
@@ -2255,7 +2265,11 @@ test("keeps an authenticated session open across temporary system UI", async ({
   });
 
   await expect(
-    page.getByRole("heading", { name: "Document Vault", exact: true }),
+    page.getByRole("heading", {
+      name: "Evidence readiness",
+      exact: true,
+      level: 1,
+    }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: /Enter PIN/i })).toHaveCount(
     0,

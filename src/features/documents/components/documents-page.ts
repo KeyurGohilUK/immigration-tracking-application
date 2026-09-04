@@ -59,7 +59,6 @@ export function renderDocumentsPage(
     root,
     "Documents",
     `<main id="main-content" class="record-main documents-main document-vault-main">
-      <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 6.5h6l2 2h9v10.5h-17Z"/><path d="M7.5 12h9M7.5 15.5h6"/></svg></span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div></section>
       <div id="vault-household-selector"></div>
       <div id="vault-summary"></div>
       <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory, documents)}</section>
@@ -123,7 +122,7 @@ export function renderDocumentsPage(
   root.querySelector("#vault-summary")?.replaceWith(
     createProgressCard({
       id: "vault-readiness",
-      headingLevel: 2,
+      headingLevel: 1,
       kicker: "Selected profile",
       title: "Evidence readiness",
       subtitle: `${vaultProgress.completedRequired} of ${vaultProgress.totalRequired} core items complete`,
