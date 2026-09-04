@@ -1592,6 +1592,12 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
+  await expect(page.getByText("Household profiles")).toBeVisible();
+  await expect(page.getByText("Immigration roles set")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Selected profile check" }),
+  ).toBeVisible();
+  await expect(page.locator(".dashboard-person-progress")).toHaveCount(0);
   await page.getByRole("button", { name: "Add Household Member" }).click();
 
   await expect(
@@ -1621,6 +1627,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
+  await expect(page.getByText("2 of 2", { exact: true })).toBeVisible();
   const editFamilyMember = page.getByRole("button", {
     name: "Edit Freddy Test Dependant",
   });
