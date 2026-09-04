@@ -1,21 +1,37 @@
 export const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000;
 
-export function startSessionLock(onLock: () => void): () => void {
-  let timeout = window.setTimeout(onLock, INACTIVITY_TIMEOUT_MS);
+export interface SessionLockEnvironment {
+  setTimeout: (handler: () => void, timeout: number) => number;
+  clearTimeout: (timeout: number) => void;
+  addEventListener: (
+    eventName: "pointerdown" | "keydown",
+    handler: () => void,
+  ) => void;
+  removeEventListener: (
+    eventName: "pointerdown" | "keydown",
+    handler: () => void,
+  ) => void;
+}
+
+export function startSessionLock(
+  onLock: () => void,
+  environment: SessionLockEnvironment = window,
+): () => void {
+  let timeout = environment.setTimeout(onLock, INACTIVITY_TIMEOUT_MS);
 
   const resetTimeout = (): void => {
-    window.clearTimeout(timeout);
-    timeout = window.setTimeout(onLock, INACTIVITY_TIMEOUT_MS);
+    environment.clearTimeout(timeout);
+    timeout = environment.setTimeout(onLock, INACTIVITY_TIMEOUT_MS);
   };
 
   for (const eventName of ["pointerdown", "keydown"] as const) {
-    window.addEventListener(eventName, resetTimeout);
+    environment.addEventListener(eventName, resetTimeout);
   }
 
   return () => {
-    window.clearTimeout(timeout);
+    environment.clearTimeout(timeout);
     for (const eventName of ["pointerdown", "keydown"] as const) {
-      window.removeEventListener(eventName, resetTimeout);
+      environment.removeEventListener(eventName, resetTimeout);
     }
   };
 }
