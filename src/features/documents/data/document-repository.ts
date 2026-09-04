@@ -152,6 +152,14 @@ async function getEncryptedDocument(
   });
 }
 
+function assertDocumentProfile(
+  metadata: DocumentMetadata,
+  expectedProfileId?: string,
+): void {
+  if (expectedProfileId !== undefined && metadata.profileId !== expectedProfileId)
+    throw new Error("Document belongs to a different household profile.");
+}
+
 async function decryptMetadata(
   record: EncryptedDocumentRecord,
   key: CryptoKey,
@@ -173,7 +181,9 @@ export async function saveDocument(
   metadata: DocumentMetadata,
   bytes: Uint8Array<ArrayBuffer>,
   key: CryptoKey,
+  expectedProfileId?: string,
 ): Promise<void> {
+  assertDocumentProfile(metadata, expectedProfileId);
   const record = await createEncryptedDocumentRecord(metadata, bytes, key);
   const database = await openAppDatabase();
   try {
@@ -196,6 +206,7 @@ export async function saveDocument(
 export async function getDocumentFile(
   id: string,
   key: CryptoKey,
+  expectedProfileId?: string,
 ): Promise<DecryptedDocumentFile> {
   const record = await getEncryptedDocument(id);
   const [metadata, bytes] = await Promise.all([
@@ -206,12 +217,14 @@ export async function getDocumentFile(
     throw new Error("Decrypted document size does not match its metadata.");
   const signatureError = validateDocumentSignature(metadata.mimeType, bytes);
   if (signatureError) throw new Error(signatureError);
+  assertDocumentProfile(metadata, expectedProfileId);
   return { metadata, bytes };
 }
 
 export async function saveDocumentMetadataBatch(
   documents: DocumentMetadata[],
   key: CryptoKey,
+  expectedProfileId?: string,
 ): Promise<void> {
   if (
     documents.length < 1 ||
@@ -219,6 +232,8 @@ export async function saveDocumentMetadataBatch(
     new Set(documents.map(({ id }) => id)).size !== documents.length
   )
     throw new Error("Document metadata changes are invalid.");
+  for (const document of documents)
+    assertDocumentProfile(document, expectedProfileId);
   const existing = await Promise.all(
     documents.map(async (metadata) => ({
       metadata,
@@ -253,7 +268,13 @@ export async function saveDocumentMetadataBatch(
   }
 }
 
-export async function deleteDocument(id: string): Promise<void> {
+export async function deleteDocument(
+  id: string,
+  key: CryptoKey,
+  expectedProfileId?: string,
+): Promise<void> {
+  const existing = await getDocumentFile(id, key, expectedProfileId);
+  assertDocumentProfile(existing.metadata, expectedProfileId);
   const database = await openAppDatabase();
   try {
     const transaction = database.transaction(
