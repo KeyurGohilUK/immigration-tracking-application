@@ -156,7 +156,10 @@ function assertDocumentProfile(
   metadata: DocumentMetadata,
   expectedProfileId?: string,
 ): void {
-  if (expectedProfileId !== undefined && metadata.profileId !== expectedProfileId)
+  if (
+    expectedProfileId !== undefined &&
+    metadata.profileId !== expectedProfileId
+  )
     throw new Error("Document belongs to a different household profile.");
 }
 
