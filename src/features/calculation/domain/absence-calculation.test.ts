@@ -186,6 +186,28 @@ describe("recorded absence check", () => {
     expect(result.issues).toContain("pre-2018-record");
   });
 
+  it("anchors transitional periods to the prospective application date rather than today", () => {
+    const result = calculateRecordedAbsenceCheck({
+      permissions: [
+        {
+          ...permission,
+          grantDate: "2015-07-01",
+          permissionStartDate: "2015-07-01",
+          permissionExpiryDate: "2018-07-28",
+          actualUkArrivalDate: "",
+        },
+      ],
+      trips: [
+        trip("trip-1", "2017-03-01", "2017-06-30"),
+        trip("trip-2", "2017-07-01", "2017-10-30"),
+      ],
+      asOfDate: "2019-12-31",
+      applicationDate: "2020-06-30",
+    });
+    expect(result.maximumRecordedDays).toBe(120);
+    expect(result.maximumWindow?.endDate).toBe("2017-06-30");
+  });
+
   it("still flags a transitional fixed period when it exceeds 180 days", () => {
     const result = calculateRecordedAbsenceCheck({
       permissions: [
