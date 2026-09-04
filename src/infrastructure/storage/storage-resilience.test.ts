@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { openAppDatabase } from "./app-database";
+import {
+  applyDatabaseUpgrade,
+  DATABASE_STORES,
+  openAppDatabase,
+} from "./app-database";
 import {
   getStorageFailureMessage,
   StorageFailure,
@@ -19,6 +23,63 @@ describe("storage resilience", () => {
       name: "StorageFailure",
       code: "unavailable",
     });
+  });
+
+  it("creates missing stores and clears legacy sensitive stores during migration", () => {
+    const cleared: string[] = [];
+    const existing = new Set<string>([DATABASE_STORES.security]);
+    const database = {
+      objectStoreNames: {
+        contains: (name: string) => existing.has(name),
+      },
+      createObjectStore: vi.fn((name: string) => {
+        existing.add(name);
+        return {} as IDBObjectStore;
+      }),
+    } as unknown as IDBDatabase;
+    const transaction = {
+      objectStore: (name: string) =>
+        ({
+          clear: () => {
+            cleared.push(name);
+          },
+        }) as unknown as IDBObjectStore,
+    } as unknown as IDBTransaction;
+
+    applyDatabaseUpgrade(database, transaction, 5);
+
+    for (const store of Object.values(DATABASE_STORES))
+      expect(existing.has(store)).toBe(true);
+    expect(cleared).toEqual([
+      DATABASE_STORES.profiles,
+      DATABASE_STORES.permissions,
+      DATABASE_STORES.trips,
+      DATABASE_STORES.documents,
+    ]);
+  });
+
+  it("does not clear current-version records during a later additive migration", () => {
+    const cleared: string[] = [];
+    const existing = new Set<string>(Object.values(DATABASE_STORES));
+    const database = {
+      objectStoreNames: {
+        contains: (name: string) => existing.has(name),
+      },
+      createObjectStore: vi.fn(),
+    } as unknown as IDBDatabase;
+    const transaction = {
+      objectStore: (name: string) =>
+        ({
+          clear: () => {
+            cleared.push(name);
+          },
+        }) as unknown as IDBObjectStore,
+    } as unknown as IDBTransaction;
+
+    applyDatabaseUpgrade(database, transaction, 7);
+
+    expect(cleared).toEqual([]);
+    expect(database.createObjectStore).not.toHaveBeenCalled();
   });
 
   it("maps browser quota errors to a clear storage-full failure", () => {
