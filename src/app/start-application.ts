@@ -179,7 +179,10 @@ import {
   validateLifeEnglishInput,
   type LifeEnglishRecord,
 } from "../features/documents/domain/life-english";
-import { getDefaultCategoryForSection } from "../features/documents/domain/document-vault";
+import {
+  calculateProfileDocumentVaultProgress,
+  getDefaultCategoryForSection,
+} from "../features/documents/domain/document-vault";
 import {
   renderIlrJourneyPage,
   type IlrJourneyMember,
@@ -261,23 +264,31 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           });
         }
       }
+      const selectProfile = (profileId: string): void => {
+        if (
+          !isKnownProfileId(profileId, familyMembers) ||
+          profileId === selectedProfileId
+        )
+          return;
+        selectedProfileId = profileId;
+        const selectedMember = familyMembers.find(({ id }) => id === profileId);
+        if (!selectedMember) return;
+        if (currentView === "Permissions") void showPermissions(selectedMember);
+        else if (currentView === "Trips") void showTrips(selectedMember);
+        else if (currentView === "ILR") void showIlrJourney(selectedMember);
+        else if (currentView === "Documents")
+          void showDocuments(selectedMember);
+        else renderDashboard(selectedMember);
+      };
       root
         .querySelector<HTMLSelectElement>("#active-person")
         ?.addEventListener("change", (event) => {
-          const profileId = (event.currentTarget as HTMLSelectElement).value;
-          if (!isKnownProfileId(profileId, familyMembers)) return;
-          selectedProfileId = profileId;
-          const selectedMember = familyMembers.find(
-            ({ id }) => id === profileId,
-          );
-          if (!selectedMember) return;
-          if (currentView === "Permissions")
-            void showPermissions(selectedMember);
-          else if (currentView === "Trips") void showTrips(selectedMember);
-          else if (currentView === "ILR") void showIlrJourney(selectedMember);
-          else if (currentView === "Documents")
-            void showDocuments(selectedMember);
-          else renderDashboard(selectedMember);
+          selectProfile((event.currentTarget as HTMLSelectElement).value);
+        });
+      root
+        .querySelector(".household-selector")
+        ?.addEventListener("profile-select", (event) => {
+          selectProfile((event as CustomEvent<string>).detail);
         });
       stopSessionLock?.();
       stopSessionLock = startSessionLock(lock);
@@ -352,18 +363,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       );
       renderIlrJourneyPage(root, journeys, selectedProfileId, asOfDate);
       wireAuthenticatedShell(profile, "ILR");
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-ilr-profile]",
-      )) {
-        button.addEventListener("click", () => {
-          const profileId = button.dataset.ilrProfile;
-          if (!profileId || !isKnownProfileId(profileId, familyMembers)) return;
-          const member = familyMembers.find(({ id }) => id === profileId);
-          if (!member) return;
-          selectedProfileId = profileId;
-          void showIlrJourney(member);
-        });
-      }
       root
         .querySelector<HTMLButtonElement>("#ilr-manage-permissions")
         ?.addEventListener("click", () => void showPermissions(profile));
@@ -699,6 +698,37 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         requiredAddressMonths,
         asOfMonth,
       );
+      const profileReadiness = new Map(
+        familyMembers.map((member) => {
+          const entries =
+            member.id === selectedProfileId
+              ? addressHistory
+              : (addressHistoryCache.get(member.id) ?? []);
+          const requirement = getAddressHistoryRequirement(
+            permissionCache.get(member.id) ?? [],
+          );
+          const coverage =
+            member.id === selectedProfileId
+              ? addressCoverage
+              : calculateAddressHistoryCoverage(
+                  entries,
+                  requirement.requiredMonths,
+                  requirement.startMonth,
+                  asOfMonth,
+                );
+          const record =
+            member.id === selectedProfileId
+              ? lifeEnglish
+              : (lifeEnglishCache.get(member.id) ?? null);
+          const progress = calculateProfileDocumentVaultProgress(
+            documents.filter(({ profileId }) => profileId === member.id),
+            entries,
+            coverage,
+            record,
+          );
+          return [member.id, progress.readinessPercent] as const;
+        }),
+      );
       renderDocumentsPage(
         root,
         familyMembers,
@@ -709,6 +739,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         requiredAddressStartMonth,
         addressMonthsRemaining,
         lifeEnglish,
+        profileReadiness,
       );
       wireAuthenticatedShell(profile, "Documents");
       const uploadDialog =
@@ -1883,23 +1914,38 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     };
 
     const showDocuments = async (profile: HouseholdMember): Promise<void> => {
+      const profileId = profile.id;
       try {
-        const cachedPermissions = permissionCache.get(selectedProfileId);
-        const cachedAddressHistory = addressHistoryCache.get(selectedProfileId);
-        const hasCachedLifeEnglish = lifeEnglishCache.has(selectedProfileId);
-        const [documents, permissions, addressHistory, lifeEnglish] =
-          await Promise.all([
-            getAllDocumentMetadata(key),
-            cachedPermissions ??
-              getImmigrationPermissions(selectedProfileId, key),
-            cachedAddressHistory ?? getAddressHistory(selectedProfileId, key),
-            hasCachedLifeEnglish
-              ? Promise.resolve(lifeEnglishCache.get(selectedProfileId) ?? null)
-              : getLifeEnglishRecord(selectedProfileId, key),
-          ]);
-        permissionCache.set(selectedProfileId, permissions);
-        addressHistoryCache.set(selectedProfileId, addressHistory);
-        lifeEnglishCache.set(selectedProfileId, lifeEnglish);
+        const [documents, profiles] = await Promise.all([
+          getAllDocumentMetadata(key),
+          Promise.all(
+            familyMembers.map(async (member) => {
+              const [permissions, addressHistory, lifeEnglish] =
+                await Promise.all([
+                  permissionCache.get(member.id) ??
+                    getImmigrationPermissions(member.id, key),
+                  addressHistoryCache.get(member.id) ??
+                    getAddressHistory(member.id, key),
+                  lifeEnglishCache.has(member.id)
+                    ? (lifeEnglishCache.get(member.id) ?? null)
+                    : getLifeEnglishRecord(member.id, key),
+                ]);
+              permissionCache.set(member.id, permissions);
+              addressHistoryCache.set(member.id, addressHistory);
+              lifeEnglishCache.set(member.id, lifeEnglish);
+              return {
+                id: member.id,
+                permissions,
+                addressHistory,
+                lifeEnglish,
+              };
+            }),
+          ),
+        ]);
+        if (selectedProfileId !== profileId) return;
+        const selected = profiles.find(({ id }) => id === profileId);
+        if (!selected) throw new Error("A household member is required.");
+        const { permissions, addressHistory, lifeEnglish } = selected;
         const addressRequirement = getAddressHistoryRequirement(permissions);
         renderDocuments(
           profile,

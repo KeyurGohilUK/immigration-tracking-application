@@ -1,20 +1,17 @@
+import { createHouseholdSelector } from "../../../shared/components/household-selector";
+import { createProgressCard } from "../../../shared/components/progress-card";
 import { renderAppShell } from "../../../app/app";
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
-import {
-  populatePersonSwitcher,
-  renderPersonSwitcherMarkup,
-} from "../../household/components/person-switcher";
 import type { HouseholdMember } from "../../household/domain/household-member";
 import {
   DOCUMENT_CATEGORY_LABELS,
   formatDocumentBytes,
   MAXIMUM_DOCUMENT_BYTES,
-  MAXIMUM_TOTAL_DOCUMENT_BYTES,
   type DocumentCategory,
   type DocumentMetadata,
 } from "../domain/document";
 import {
-  calculateDocumentVaultProgress,
+  calculateProfileDocumentVaultProgress,
   DOCUMENT_VAULT_STATUS_LABELS,
   type DocumentVaultSectionProgress,
 } from "../domain/document-vault";
@@ -27,11 +24,7 @@ import {
   renderReadOnlyAddressList,
 } from "./address-history-dialog";
 import { renderLifeEnglishDialogs } from "./life-english-dialog";
-import {
-  isEnglishRequirementComplete,
-  isLifeInUkComplete,
-  type LifeEnglishRecord,
-} from "../domain/life-english";
+import { type LifeEnglishRecord } from "../domain/life-english";
 
 export function renderDocumentsPage(
   root: HTMLElement,
@@ -43,6 +36,7 @@ export function renderDocumentsPage(
   requiredAddressStartMonth: string | null,
   addressMonthsRemaining: number | null,
   lifeEnglish: LifeEnglishRecord | null,
+  profileReadiness: ReadonlyMap<string, number>,
 ): void {
   const documents = allDocuments
     .filter(({ profileId }) => profileId === selectedProfileId)
@@ -55,26 +49,19 @@ export function renderDocumentsPage(
     (total, document) => total + document.size,
     0,
   );
-  const storagePercent = Math.min(
-    100,
-    (totalBytes / MAXIMUM_TOTAL_DOCUMENT_BYTES) * 100,
+  const vaultProgress = calculateProfileDocumentVaultProgress(
+    documents,
+    addressHistory,
+    addressCoverage,
+    lifeEnglish,
   );
-  const vaultProgress = calculateDocumentVaultProgress(documents, {
-    addressHistoryComplete: addressCoverage.complete,
-    addressHistoryEntryCount: addressHistory.length,
-    addressHistoryHasCurrentAddress:
-      addressHistory.length === 0 ||
-      addressHistory.some(({ isCurrent }) => isCurrent),
-    lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
-    englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
-  });
   renderAppShell(
     root,
     "Documents",
     `<main id="main-content" class="record-main documents-main document-vault-main">
       <section class="record-heading documents-heading vault-heading" aria-labelledby="documents-title"><div class="vault-heading-copy"><span class="vault-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 6.5h6l2 2h9v10.5h-17Z"/><path d="M7.5 12h9M7.5 15.5h6"/></svg></span><div><p class="eyebrow">Encrypted on this device</p><h1 id="documents-title">Document Vault</h1><p>Keep every applicant’s ILR evidence organised in one private place.</p></div></div></section>
-      <section class="documents-profile-picker vault-profile-picker" aria-label="Choose a profile for documents">${renderVaultMemberStrip(members, selectedProfileId)}<div class="documents-profile-select">${renderPersonSwitcherMarkup()}</div></section>
-      <section class="document-summary-grid vault-summary-grid" aria-label="Local document summary"><article class="document-summary-card vault-readiness-card"><p class="eyebrow">Selected profile</p><div class="vault-readiness-line"><p class="document-summary-value"><span id="vault-readiness-percent">${vaultProgress.readinessPercent}%</span><small>ready</small></p><span class="vault-ready-label">${vaultProgress.completedRequired} of ${vaultProgress.totalRequired} core items</span></div><div class="vault-readiness-track" role="progressbar" aria-label="Document Vault readiness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${vaultProgress.readinessPercent}"><span style="--vault-readiness-progress: ${vaultProgress.readinessPercent}%"></span></div><p>${vaultProgress.completedSections} of ${vaultProgress.sections.length} sections complete. Conditional and later items do not reduce readiness.</p></article><article class="document-summary-card vault-storage-card"><p class="eyebrow">Encrypted storage</p><p class="document-summary-date">${formatDocumentBytes(totalBytes)} <small>of 50 MB</small></p><div class="document-storage-track" role="progressbar" aria-label="Document storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(storagePercent)}"><span style="--document-storage-progress: ${storagePercent}%"></span></div><p>Across every household profile on this device</p></article></section>
+      <div id="vault-household-selector"></div>
+      <div id="vault-summary"></div>
       <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory, documents)}</section>
 <section class="vault-download-panel"><button id="download-document-bundle" class="vault-download-button" type="button" ${documents.length === 0 && addressHistory.length === 0 ? "disabled" : ""}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3.5 6.5h6l2 2h9v10.5h-17Z"/><rect x="10" y="12.5" width="7" height="5.5" rx="1"/><path d="M11.5 12.5v-1a2 2 0 0 1 4 0v1"/></svg><span data-vault-download-label>DOWNLOAD ZIP BUNDLE</span></button></section>
 <aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups include documents</h2><p>Encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
@@ -120,8 +107,51 @@ export function renderDocumentsPage(
       closeLabel: "Close rename form",
     })}`,
   );
-  populatePersonSwitcher(root, members, selectedProfileId);
-  wireVaultMemberStrip(root);
+  root.querySelector("#vault-household-selector")?.replaceWith(
+    createHouseholdSelector(
+      members.map((member) => ({
+        ...member,
+        progressPercent: profileReadiness.get(member.id),
+      })),
+      selectedProfileId,
+      "documents",
+    ),
+  );
+  const requiresReview = vaultProgress.sections.some(
+    ({ status }) => status === "needs-attention",
+  );
+  root.querySelector("#vault-summary")?.replaceWith(
+    createProgressCard({
+      id: "vault-readiness",
+      headingLevel: 2,
+      kicker: "Selected profile",
+      title: "Evidence readiness",
+      subtitle: `${vaultProgress.completedRequired} of ${vaultProgress.totalRequired} core items complete`,
+      status: requiresReview
+        ? "Review needed"
+        : vaultProgress.readinessPercent === 100
+          ? "Core items complete"
+          : vaultProgress.readinessPercent > 0
+            ? "In progress"
+            : "To do",
+      requiresReview: requiresReview || vaultProgress.readinessPercent < 100,
+      progressLabel: "Document completion",
+      progressAccessibleName: "Document Vault readiness",
+      progressPercent: vaultProgress.readinessPercent,
+      metrics: [
+        {
+          label: "Sections complete",
+          value: `${vaultProgress.completedSections} of ${vaultProgress.sections.length}`,
+          description: "Conditional and later items do not reduce readiness.",
+        },
+        {
+          label: "Encrypted storage",
+          value: `${formatDocumentBytes(totalBytes)} of 50 MB`,
+          description: "Across every household profile on this device",
+        },
+      ],
+    }),
+  );
   const list = root.querySelector<HTMLElement>("#document-list");
   if (!list) throw new Error("Documents could not be rendered.");
   if (documents.length === 0) {
@@ -215,44 +245,6 @@ function renderVaultStatusIcon(
   if (status === "partial") return "◐";
   if (status === "required-later") return "↗";
   return "○";
-}
-function renderVaultMemberStrip(
-  members: HouseholdMember[],
-  selectedProfileId: string,
-): string {
-  return `<div class="vault-profile-rail" role="list">${members
-    .map((member) => {
-      const selected = member.id === selectedProfileId;
-      const initial = member.fullName.trim().charAt(0).toUpperCase() || "?";
-      const firstName =
-        member.fullName.trim().split(/\s+/)[0] || member.fullName;
-      return `<button class="vault-profile-chip${selected ? " is-selected" : ""}" type="button" data-vault-profile="${member.id}" ${selected ? 'aria-current="true"' : ""}><span class="vault-profile-avatar" aria-hidden="true">${initial}</span><span>${escapeVaultLabel(firstName)}</span></button>`;
-    })
-    .join("")}</div>`;
-}
-
-function wireVaultMemberStrip(root: HTMLElement): void {
-  const select = root.querySelector<HTMLSelectElement>("#active-person");
-  if (!select) return;
-  for (const button of root.querySelectorAll<HTMLButtonElement>(
-    "[data-vault-profile]",
-  )) {
-    button.addEventListener("click", () => {
-      const profileId = button.dataset.vaultProfile;
-      if (!profileId || profileId === select.value) return;
-      select.value = profileId;
-      select.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-  }
-}
-
-function escapeVaultLabel(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
 function createDocumentCard(
   document: DocumentMetadata,

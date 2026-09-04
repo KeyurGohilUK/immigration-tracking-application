@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.23.2";
+export const APP_VERSION = "3.23.3";
 
 export const RELEASE_NOTES = [
-  "The main ILR hero page now opens by default after unlocking or completing household setup.",
+  "Document Vault now shares household profile pills and progress cards with the ILR page for a consistent look in both themes.",
 ] as const;

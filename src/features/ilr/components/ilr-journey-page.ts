@@ -1,3 +1,5 @@
+import { createHouseholdSelector } from "../../../shared/components/household-selector";
+import { createProgressCard } from "../../../shared/components/progress-card";
 import { renderAppShell } from "../../../app/app";
 import type { AbsenceCheckResult } from "../../calculation/domain/absence-calculation";
 import type { QualifyingPeriodResult } from "../../calculation/domain/qualifying-period-calculation";
@@ -65,40 +67,6 @@ function daysUntil(value: string | null, asOfDate: string): number | null {
   );
 }
 
-function memberInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("");
-}
-
-function createMemberPill(
-  journey: IlrJourneyMember,
-  selectedProfileId: string,
-  asOfDate: string,
-): HTMLButtonElement {
-  const button = document.createElement("button");
-  const selected = journey.member.id === selectedProfileId;
-  button.type = "button";
-  button.className = `ilr-person-pill${selected ? " is-selected" : ""}`;
-  button.dataset.ilrProfile = journey.member.id;
-  button.setAttribute("aria-pressed", String(selected));
-  button.setAttribute(
-    "aria-label",
-    `Show ${journey.member.fullName}'s ILR journey`,
-  );
-  button.innerHTML = `<span class="ilr-person-initials" aria-hidden="true"></span><span class="ilr-person-name"></span><strong></strong>`;
-  const initials = button.querySelector<HTMLElement>(".ilr-person-initials");
-  const name = button.querySelector<HTMLElement>(".ilr-person-name");
-  const progress = button.querySelector<HTMLElement>("strong");
-  if (initials) initials.textContent = memberInitials(journey.member.fullName);
-  if (name) name.textContent = journey.member.fullName;
-  if (progress)
-    progress.textContent = `${Math.round(progressForPeriod(journey.period, asOfDate))}%`;
-  return button;
-}
-
 function createPermissionHistory(
   permissions: ImmigrationPermission[],
   period: QualifyingPeriodResult,
@@ -157,56 +125,51 @@ function renderSelectedJourney(
   journey: IlrJourneyMember,
   asOfDate: string,
 ): void {
-  const { member, period, absence, permissions, lifeEnglish } = journey;
+  const { period, absence, permissions, lifeEnglish } = journey;
   const latestPermission = [...permissions].sort((left, right) =>
     right.permissionStartDate.localeCompare(left.permissionStartDate),
   )[0];
   const progress = progressForPeriod(period, asOfDate);
   const countdown = daysUntil(period.earliestApplicationDate, asOfDate);
-  const values: Array<[string, string]> = [
-    ["#ilr-active-name", member.fullName],
-    [
-      "#ilr-active-route",
-      latestPermission
+  root.querySelector("#ilr-summary")?.replaceWith(
+    createProgressCard({
+      id: "ilr-active-route",
+      headingLevel: 1,
+      kicker: "Active visa permission",
+      title: latestPermission
         ? getPermissionRouteLabel(latestPermission)
         : "Permission not recorded",
-    ],
-    [
-      "#ilr-active-role",
-      latestPermission
+      subtitle: latestPermission
         ? latestPermission.role === "dependant"
           ? "Dependant permission"
           : "Main applicant permission"
         : "Add permission history to calculate this journey",
-    ],
-    ["#ilr-active-status", periodStatusLabel(period.status)],
-    ["#ilr-progress-value", `${Math.round(progress)}% complete`],
-    ["#ilr-application-date", formatDate(period.earliestApplicationDate)],
-    [
-      "#ilr-countdown",
-      countdown === null
-        ? "Not available"
-        : countdown === 0
-          ? "Window open"
-          : `${countdown.toLocaleString("en-GB")} days`,
-    ],
-  ];
-  for (const [selector, value] of values) {
-    const element = root.querySelector<HTMLElement>(selector);
-    if (element) element.textContent = value;
-  }
-  root
-    .querySelector<HTMLElement>("#ilr-progress-bar")
-    ?.style.setProperty("--ilr-progress", `${progress}%`);
-  root
-    .querySelector<HTMLElement>("#ilr-progress-bar")
-    ?.setAttribute("aria-valuenow", String(Math.round(progress)));
-  root
-    .querySelector<HTMLElement>(".ilr-status-chip")
-    ?.classList.toggle(
-      "requires-review",
-      ["incomplete", "manual-review", "unsupported"].includes(period.status),
-    );
+      status: periodStatusLabel(period.status),
+      requiresReview: ["incomplete", "manual-review", "unsupported"].includes(
+        period.status,
+      ),
+      progressLabel: "Qualifying-period progress",
+      progressAccessibleName: "Estimated qualifying-period progress",
+      progressPercent: progress,
+      metrics: [
+        {
+          label: "Estimated application window",
+          value: formatDate(period.earliestApplicationDate),
+          description: "Up to 28 days before the qualifying period",
+        },
+        {
+          label: "Countdown",
+          value:
+            countdown === null
+              ? "Not available"
+              : countdown === 0
+                ? "Window open"
+                : `${countdown.toLocaleString("en-GB")} days`,
+          description: "Based on today’s recorded data",
+        },
+      ],
+    }),
+  );
   const milestones = root.querySelector<HTMLElement>("#ilr-milestones");
   if (milestones) {
     setMilestone(
@@ -265,18 +228,23 @@ export function renderIlrJourneyPage(
     "ILR",
     `<main id="main-content" class="ilr-main">
     <div class="ilr-atmosphere" aria-hidden="true"></div>
-    <section class="ilr-cohort" aria-labelledby="ilr-cohort-title"><div class="ilr-section-label"><span id="ilr-cohort-title">Household cohort</span><strong id="ilr-active-name"></strong></div><div id="ilr-person-switcher" class="ilr-person-switcher" role="group" aria-label="Choose household member"></div></section>
-    <section class="ilr-active-card glass-panel-floating" aria-labelledby="ilr-active-route"><div class="ilr-gradient-edge" aria-hidden="true"></div><div class="ilr-active-heading"><div><span class="ilr-kicker">Active visa permission</span><h1 id="ilr-active-route"></h1><p id="ilr-active-role"></p></div><span class="ilr-status-chip"><i aria-hidden="true"></i><span id="ilr-active-status"></span></span></div><div class="ilr-progress-summary"><div><span>Qualifying-period progress</span><strong id="ilr-progress-value"></strong></div><div id="ilr-progress-bar" class="ilr-progress-track" role="progressbar" aria-label="Estimated qualifying-period progress"><span></span></div></div><div class="ilr-date-grid"><div><span>Estimated application window</span><strong id="ilr-application-date"></strong><small>Up to 28 days before the qualifying period</small></div><div><span>Countdown</span><strong id="ilr-countdown"></strong><small>Based on today’s recorded data</small></div></div></section>
+    <div id="ilr-household-selector"></div>
+    <div id="ilr-summary"></div>
     <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div></div></section>
       <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-manage-permissions" class="ilr-text-action" type="button">+ Add past visa</button></div><div id="ilr-permission-history"></div></section>
     <aside class="notice ilr-notice" aria-labelledby="ilr-notice-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="ilr-notice-title">Estimate only—not an eligibility decision</h2><p>UrbanFox uses information recorded on this device. Always verify current GOV.UK rules and supporting evidence before applying.</p></div></aside>
   </main>`,
   );
-  const switcher = root.querySelector<HTMLElement>("#ilr-person-switcher");
-  if (!switcher || !selectedJourney) return;
-  for (const journey of journeys)
-    switcher.append(
-      createMemberPill(journey, selectedJourney.member.id, asOfDate),
-    );
+  if (!selectedJourney) return;
+  root.querySelector("#ilr-household-selector")?.replaceWith(
+    createHouseholdSelector(
+      journeys.map(({ member, period }) => ({
+        ...member,
+        progressPercent: progressForPeriod(period, asOfDate),
+      })),
+      selectedJourney.member.id,
+      "ILR journey",
+    ),
+  );
   renderSelectedJourney(root, selectedJourney, asOfDate);
 }

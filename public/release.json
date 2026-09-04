@@ -1,6 +1,6 @@
 {
-  "version": "3.23.2",
+  "version": "3.23.3",
   "notes": [
-    "The main ILR hero page now opens by default after unlocking or completing household setup."
+    "Document Vault now shares household profile pills and progress cards with the ILR page for a consistent look in both themes."
   ]
 }
