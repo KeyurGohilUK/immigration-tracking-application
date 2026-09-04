@@ -3,6 +3,8 @@ import { ABSENCE_RULE, isAbsenceRuleRoute } from "./absence-rule";
 
 describe("Skilled Worker absence rule configuration", () => {
   it("uses the verified 180-day transitional boundary", () => {
+    expect(ABSENCE_RULE.id).toBe("skilled-worker-main-applicant-absence-v2");
+    expect(ABSENCE_RULE.version).toBe(2);
     expect(ABSENCE_RULE.maximumDays).toBe(180);
     expect(ABSENCE_RULE.rollingMonths).toBe(12);
     expect(ABSENCE_RULE.effectiveFrom).toBe("2018-01-11");
