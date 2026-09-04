@@ -109,6 +109,28 @@ describe("Skilled Worker qualifying period", () => {
     expect(result.qualifyingStartDate).toBe("2023-02-01");
   });
 
+  it("supports qualifying route changes without breaking the recorded period", () => {
+    const result = calculateSkilledWorkerQualifyingPeriod({
+      permissions: [
+        permission("tier-1", "2021-01-01", "2022-12-31", {
+          route: "tier-1",
+        }),
+        permission("global", "2023-01-01", "2024-12-31", {
+          route: "global-talent",
+        }),
+        permission("current", "2025-01-01", "2028-01-01"),
+      ],
+      asOfDate: "2026-09-04",
+    });
+    expect(result.qualifyingStartDate).toBe("2021-01-01");
+    expect(result.relevantPermissionIds).toEqual([
+      "tier-1",
+      "global",
+      "current",
+    ]);
+    expect(result.issues).not.toContain("gap-in-recorded-permission");
+  });
+
   it("uses an entry-clearance grant as the start and handles leap-day anniversaries", () => {
     const entry = calculateSkilledWorkerQualifyingPeriod({
       permissions: [
@@ -172,6 +194,7 @@ describe("Skilled Worker qualifying period", () => {
 
     expect(missing.status).toBe("incomplete");
     expect(expired.issues).toContain("permission-expired");
-    expect(transitional.status).toBe("manual-review");
+    expect(transitional.status).toBe("not-yet-complete");
+    expect(transitional.issues).toContain("pre-2018-permission");
   });
 });
