@@ -1,6 +1,6 @@
 {
-  "version": "3.23.1",
+  "version": "3.23.2",
   "notes": [
-    "Permission history now keeps visa names, year ranges, and calculation status aligned in responsive cards."
+    "The main ILR hero page now opens by default after unlocking or completing household setup."
   ]
 }

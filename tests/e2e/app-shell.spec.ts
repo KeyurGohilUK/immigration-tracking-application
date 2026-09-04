@@ -20,6 +20,10 @@ async function createLocalProfile(
   await page.getByLabel("Immigration role").selectOption("dependant");
   await page.getByRole("button", { name: "Create household member" }).click();
   await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: "Family", exact: true }).first().click();
+  await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
   await expect(
@@ -356,8 +360,8 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
 
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
-    page.getByRole("heading", { name: "Family Overview" }),
-  ).toBeVisible();
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
 
   await page.reload();
   await expect(
@@ -377,6 +381,11 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await numberOne.evaluate((button) => button.classList.add("is-popping"));
   await expect(numberOne).toHaveCSS("animation-name", "security-key-pop");
   await expect(page.locator("[data-pin-indicator]")).toHaveCount(4);
+  await page.getByRole("button", { name: "Delete last PIN digit" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
 });
 
 test("guides Address History from the current address backwards", async ({
