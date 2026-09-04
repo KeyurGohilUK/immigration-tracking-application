@@ -15,6 +15,7 @@ interface ProgressCardOptions {
   progressLabel: string;
   progressAccessibleName: string;
   progressPercent: number;
+  progressValueText?: string;
   metrics: readonly ProgressMetric[];
 }
 
@@ -35,10 +36,12 @@ export function createProgressCard(options: ProgressCardOptions): HTMLElement {
   card.querySelector(".progress-card-summary > div > span")!.textContent =
     options.progressLabel;
   card.querySelector(".progress-card-summary strong")!.textContent =
-    `${Math.round(percent)}% complete`;
+    options.progressValueText ?? `${Math.round(percent)}% complete`;
   const track = card.querySelector<HTMLElement>(".progress-card-track")!;
   track.setAttribute("aria-label", options.progressAccessibleName);
   track.setAttribute("aria-valuenow", String(Math.round(percent)));
+  if (options.progressValueText)
+    track.setAttribute("aria-valuetext", options.progressValueText);
   track.style.setProperty("--progress-percent", `${percent}%`);
   const metrics = card.querySelector(".progress-card-metrics")!;
   for (const metric of options.metrics) {

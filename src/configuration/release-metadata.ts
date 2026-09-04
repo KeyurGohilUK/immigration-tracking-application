@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.23.6";
+export const APP_VERSION = "3.24.0";
 
 export const RELEASE_NOTES = [
-  "The app header now has a larger logo, equally sized action buttons, and no padlock storage indicator.",
+  "Travel now shares the household selector, absence summary styling, and page spacing, with a clearer trip history and departure-year filters.",
 ] as const;

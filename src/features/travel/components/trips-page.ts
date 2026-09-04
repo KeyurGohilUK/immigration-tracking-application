@@ -1,10 +1,8 @@
 import { renderAppShell } from "../../../app/app";
 import { calculateCompleteAbsenceDays } from "../../../shared/date/absence-days";
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
-import {
-  populatePersonSwitcher,
-  renderPersonSwitcherMarkup,
-} from "../../household/components/person-switcher";
+import { createHouseholdSelector } from "../../../shared/components/household-selector";
+import { createProgressCard } from "../../../shared/components/progress-card";
 import type { HouseholdMember } from "../../household/domain/household-member";
 import type { Trip, TripInput } from "../domain/trip";
 
@@ -39,7 +37,6 @@ export function renderTripsPage(
         : 0),
     0,
   );
-  const selectedMember = members.find(({ id }) => id === selectedProfileId);
   const rollingDays = overview?.maximumRecordedDays ?? null;
   const progress =
     rollingDays === null
@@ -59,75 +56,17 @@ export function renderTripsPage(
   renderAppShell(
     root,
     "Trips",
-    `<main id="main-content" class="record-main travel-main travel-page">
-      <section class="travel-hero" aria-labelledby="trips-title">
-        <div class="travel-hero-copy">
-          <span id="travel-profile-pill" class="travel-profile-pill"></span>
-          <h1 id="trips-title">Travel Timeline</h1>
-          <p>Track recorded absences against the rolling 180-day limit and keep every trip organised for the selected household member.</p>
-        </div>
-        <button id="add-trip" class="primary-button travel-add-button" type="button">
-          <span aria-hidden="true">＋</span>
-          <span>Add Trip</span>
-        </button>
-      </section>
-
-      <section class="travel-profile-picker glass-panel" aria-label="Choose a household profile">
-        ${renderPersonSwitcherMarkup()}
-      </section>
-
-      <section class="travel-bento" aria-label="Travel overview">
-        <div class="travel-stat-stack">
-          <article class="travel-limit-card glass-panel-floating">
-            <div class="travel-card-glow" aria-hidden="true"></div>
-            <div class="travel-stat-heading">
-              <h2>Absence Limit</h2>
-              <span class="travel-stat-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9Z"/><path d="M15 3.5A8.5 8.5 0 0 1 20.5 9H15Z"/></svg>
-              </span>
-            </div>
-            <p class="travel-limit-value">
-              <strong>${rollingDays ?? "—"}</strong>
-              <span>/ ${ROLLING_ABSENCE_LIMIT} days</span>
-            </p>
-            <div class="travel-progress" aria-label="Recorded rolling absence usage">
-              <span style="--travel-absence-progress: ${progress.toFixed(1)}%"></span>
-            </div>
-            <p class="travel-stat-copy">${getAbsenceStatusCopy(overview?.absenceStatus ?? null)}</p>
-          </article>
-
-          <article class="travel-ilr-card glass-panel">
-            <div class="travel-stat-heading">
-              <h2>ILR Estimate</h2>
-              <span class="travel-stat-icon travel-stat-icon-secondary" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14l2 2 5-5"/></svg>
-              </span>
-            </div>
-            <p class="travel-estimate-label">Earliest estimated application</p>
-            <p class="travel-estimate-date">${eligibilityDate}</p>
-            <p class="travel-estimate-chip">${formatRemainingDays(daysRemaining)}</p>
-          </article>
-
-          <article class="travel-recorded-card glass-panel">
-            <p class="eyebrow">Recorded travel</p>
-            <div class="travel-recorded-summary">
-              <strong>${recordedDays}</strong>
-              <span>complete days</span>
-            </div>
-            <small>${trips.length} ${trips.length === 1 ? "trip" : "trips"} stored locally and encrypted</small>
-          </article>
-        </div>
-
-        <section class="travel-recent-panel glass-panel" aria-labelledby="trip-list-title">
-          <div class="travel-recent-heading">
-            <div>
-              <p class="eyebrow">Chronological record</p>
-              <h2 id="trip-list-title">Recent Travel</h2>
-            </div>
-            <span id="trip-count" class="travel-count-pill"></span>
-          </div>
-          <div id="trip-list" class="travel-timeline travel-timeline-premium"></div>
-        </section>
+    `<main id="main-content" class="cohort-page travel-page">
+      <div id="travel-household"></div>
+      <div id="travel-summary"></div>
+      <div class="travel-actions">
+        <button id="add-trip" class="primary-button travel-add-button" type="button"><span aria-hidden="true">＋</span><span>Add Trip</span></button>
+        <p>Keep each journey with the household member who travelled.</p>
+      </div>
+      <section class="travel-recent-panel glass-panel" aria-labelledby="trip-list-title">
+        <div class="travel-recent-heading"><div><p class="eyebrow">Chronological record</p><h2 id="trip-list-title">Trip history</h2></div><span id="trip-count" class="travel-count-pill"></span></div>
+        <div id="trip-year-filters" class="travel-year-filters" role="group" aria-label="Filter trips by departure year"></div>
+        <div id="trip-list" class="travel-timeline travel-timeline-premium"></div>
       </section>
 
       <aside class="notice compact-notice travel-notice" aria-labelledby="trip-warning-title">
@@ -168,11 +107,42 @@ export function renderTripsPage(
     })}`,
   );
 
-  const profilePill = root.querySelector<HTMLElement>("#travel-profile-pill");
-  if (profilePill)
-    profilePill.textContent = selectedMember?.fullName ?? "Selected profile";
-
-  populatePersonSwitcher(root, members, selectedProfileId);
+  root
+    .querySelector("#travel-household")!
+    .replaceWith(createHouseholdSelector(members, selectedProfileId, "travel"));
+  root.querySelector("#travel-summary")!.replaceWith(
+    createProgressCard({
+      id: "travel-summary",
+      headingLevel: 1,
+      kicker: "Rolling 12-month absence check",
+      title: "Travel & Absences",
+      subtitle: getAbsenceStatusCopy(overview?.absenceStatus ?? null),
+      status:
+        overview?.absenceStatus === "within-recorded-limit"
+          ? "Within recorded limit"
+          : "Review needed",
+      requiresReview: overview?.absenceStatus !== "within-recorded-limit",
+      progressLabel: "Recorded absence usage",
+      progressAccessibleName: "Recorded rolling absence usage",
+      progressPercent: progress,
+      progressValueText:
+        rollingDays === null
+          ? "Not available yet"
+          : `${rollingDays} / ${ROLLING_ABSENCE_LIMIT} days used`,
+      metrics: [
+        {
+          label: "Recorded travel",
+          value: `${recordedDays} complete days`,
+          description: `${trips.length} ${trips.length === 1 ? "trip" : "trips"} recorded. Open trips are not included in this total.`,
+        },
+        {
+          label: "Earliest estimated application",
+          value: eligibilityDate,
+          description: formatRemainingDays(daysRemaining),
+        },
+      ],
+    }),
+  );
   const list = root.querySelector<HTMLElement>("#trip-list");
   const count = root.querySelector<HTMLElement>("#trip-count");
   if (!list || !count) throw new Error("Trips page could not be rendered.");
@@ -185,10 +155,31 @@ export function renderTripsPage(
     list.append(empty);
     return;
   }
-  for (const trip of [...trips].sort((left, right) =>
+  const ordered = [...trips].sort((left, right) =>
     right.departureDate.localeCompare(left.departureDate),
-  )) {
-    list.append(createTripCard(trip));
+  );
+  const cards = ordered.map((trip) => ({
+    year: trip.departureDate.slice(0, 4),
+    card: createTripCard(trip),
+  }));
+  list.append(...cards.map(({ card }) => card));
+  const filters = root.querySelector("#trip-year-filters")!;
+  const years = [...new Set(cards.map(({ year }) => year))];
+  for (const year of ["All years", ...years]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "travel-year-filter";
+    button.textContent = year;
+    button.setAttribute("aria-pressed", String(year === "All years"));
+    button.addEventListener("click", () => {
+      for (const filter of filters.querySelectorAll("button"))
+        filter.setAttribute("aria-pressed", String(filter === button));
+      for (const item of cards)
+        item.card.hidden = year !== "All years" && item.year !== year;
+      const visible = cards.filter(({ card }) => !card.hidden).length;
+      count.textContent = `${visible} ${visible === 1 ? "trip" : "trips"}`;
+    });
+    filters.append(button);
   }
 }
 
@@ -207,7 +198,7 @@ function createTripCard(trip: Trip): HTMLElement {
             <h3></h3>
             <div class="trip-badges"></div>
           </div>
-          <p class="travel-entry-location">Trip outside the UK</p>
+          <p class="travel-entry-location">Complete days outside the UK</p>
         </div>
         <div class="travel-entry-duration">
           <strong></strong>

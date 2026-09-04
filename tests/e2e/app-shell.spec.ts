@@ -1820,15 +1820,18 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
+  const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
   await page.getByRole("link", { name: "Travel", exact: true }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Travel Timeline" }),
+    page.getByRole("heading", { name: "Travel & Absences" }),
   ).toBeVisible();
-  await expect(page.getByText("Absence Limit")).toBeVisible();
+  await expect(
+    page.getByRole("progressbar", { name: "Recorded rolling absence usage" }),
+  ).toBeVisible();
   await expect(page.getByText("Recorded travel")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Recent Travel", exact: true }),
+    page.getByRole("heading", { name: "Trip history", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("No trips recorded")).toBeVisible();
   await page.getByRole("button", { name: "Add trip" }).click();
@@ -1877,7 +1880,6 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
   await expect(page.getByText("Manual review", { exact: true })).toBeVisible();
   await expect(page.getByText("8 Days", { exact: true })).toBeVisible();
-  const tripProfileId = await page.getByLabel("Tracking profile").inputValue();
   const storedTrip = await page.evaluate(async (profileId) => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 8);
@@ -1917,6 +1919,18 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await page.getByRole("button", { name: "Save trip" }).click();
   await expect(page.getByText("Open trip", { exact: true })).toBeVisible();
   await expect(page.getByText(/Still away/)).toBeVisible();
+
+  await page.getByRole("button", { name: "2024", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Canada", level: 3 }),
+  ).toBeHidden();
+  await expect(
+    page.getByRole("heading", { name: "India", level: 3 }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "All years", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Canada", level: 3 }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
@@ -2510,6 +2524,28 @@ test("shares household selection and progress styling across ILR and Vault", asy
         };
       }),
     ).toEqual(vaultPillStyle);
+    await page
+      .getByRole("link", { name: "Travel", exact: true })
+      .first()
+      .click();
+    const travelPill = page.getByRole("button", {
+      name: `Show ${otherName}'s travel`,
+    });
+    await expect(travelPill).toHaveAttribute("aria-pressed", "true");
+    expect(await readCohortSpacing(page)).toEqual(vaultSpacing);
+    await expect(
+      page.getByRole("progressbar", { name: "Recorded rolling absence usage" }),
+    ).toHaveAttribute("aria-valuetext", "Not available yet");
+    await page
+      .getByRole("button", { name: `Show ${TEST_PROFILE.name}'s travel` })
+      .click();
+    await expect(
+      page.getByRole("button", {
+        name: `Show ${TEST_PROFILE.name}'s travel`,
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await travelPill.click();
+    await expect(travelPill).toHaveAttribute("aria-pressed", "true");
     await page
       .getByRole("link", { name: "Vault", exact: true })
       .first()

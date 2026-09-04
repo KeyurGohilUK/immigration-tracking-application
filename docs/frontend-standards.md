@@ -48,8 +48,8 @@ Do not recreate catch-all files such as `foundation.css` or `application.css`. W
 - Prefer low-specificity class selectors. Do not use IDs for styling.
 - Do not add `!important`. The only allowed uses are the four declarations in the central reduced-motion accessibility override.
 - Avoid duplicate feature-specific copies of common controls, cards, dialogs, navigation, or buttons.
-- ILR and Document Vault use the shared `.cohort-page` layout (`styles/components/cohort-page.css`) for page width, responsive padding, and section gaps. Keep these values out of the individual page stylesheets.
-- ILR and Document Vault share `shared/components/household-selector.ts` and `progress-card.ts`, with styles under `styles/components/`. Pages supply their own progress calculations and labels; shared components only render them. Profile pills emit `profile-select`, handled by the authenticated app shell.
+- ILR, Document Vault, and Travel use the shared `.cohort-page` layout (`styles/components/cohort-page.css`) for page width, responsive padding, and section gaps. Keep these values out of the individual page stylesheets.
+- ILR, Document Vault, and Travel share `shared/components/household-selector.ts` and `progress-card.ts`, with styles under `styles/components/`. Pages supply their own progress calculations and labels; shared components only render them. Profile pills emit `profile-select`, handled by the authenticated app shell.
 - Keep responsive rules with the component they modify.
 - Keep each CSS module below 1,200 lines. Split by page or shared component before a module becomes another catch-all stylesheet.
 - Preserve reduced-motion behaviour for animated interactions.
