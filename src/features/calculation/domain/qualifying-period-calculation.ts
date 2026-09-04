@@ -158,10 +158,7 @@ export function calculateSkilledWorkerQualifyingPeriod({
     issues.push("permission-expires-before-estimated-date");
 
   let status: QualifyingPeriodStatus;
-  if (
-    issues.includes("gap-in-recorded-permission") ||
-    issues.includes("pre-2018-permission")
-  )
+  if (issues.includes("gap-in-recorded-permission"))
     status = "manual-review";
   else if (
     issues.includes("missing-grant-date") ||
