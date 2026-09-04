@@ -29,7 +29,7 @@ async function createLocalProfile(
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Track your household's progress towards Indefinite Leave to Remain.",
+      "Manage household profiles and review each person’s recorded ILR information.",
     ),
   ).toBeVisible();
   await expect(
