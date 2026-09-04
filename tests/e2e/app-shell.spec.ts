@@ -1592,8 +1592,12 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   await expect(
     page.getByRole("heading", { name: "Family Overview" }),
   ).toBeVisible();
-  await expect(page.getByText("Household profiles")).toBeVisible();
-  await expect(page.getByText("Immigration roles set")).toBeVisible();
+  await expect(
+    page.getByText("Household profiles", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Immigration roles set", { exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Selected profile check" }),
   ).toBeVisible();
@@ -2219,7 +2223,9 @@ test("glides the active mobile navigation capsule between sections", async ({
     .toBe("200%");
 });
 
-test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
+test("uses a centered website layout on desktop", async ({
+  page,
+}, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   await page.goto("/");
   await createLocalProfile(page);
@@ -2231,7 +2237,7 @@ test("uses a wide website layout on desktop", async ({ page }, testInfo) => {
 
   expect(mainBox).not.toBeNull();
   expect(navigationBox).not.toBeNull();
-  expect(mainBox?.width).toBeGreaterThan(900);
+  expect(mainBox?.width).toBe(768);
   expect(navigationBox?.y).toBeLessThan(mainBox?.y ?? 0);
   expect(navigationBox?.height).toBeLessThanOrEqual(64);
   await expect(page.locator(".top-bar")).toHaveCSS("position", "sticky");
