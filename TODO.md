@@ -33,7 +33,7 @@ Document Vault-specific work is tracked separately in
 
 - [x] Test behaviour when browser storage is unavailable or full.
 - [ ] Add the chosen contact email to `SECURITY.md` before public release.
-- [ ] Test restoration from every supported older schema version.
+- [x] Test restoration from every supported older schema version.
 - [x] Test IndexedDB migrations and interrupted writes.
 - [x] Test PIN setup, unlock, incorrect attempts, auto-lock, manual lock, and
       forgotten-PIN data reset.
