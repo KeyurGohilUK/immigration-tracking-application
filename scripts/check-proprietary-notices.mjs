@@ -30,7 +30,9 @@ for (const item of required) {
   const contents = readFileSync(item.path, "utf8");
   for (const fragment of item.fragments)
     if (!contents.includes(fragment))
-      errors.push(`${item.path}: missing required notice fragment: ${fragment}`);
+      errors.push(
+        `${item.path}: missing required notice fragment: ${fragment}`,
+      );
 }
 
 if (errors.length > 0) {
