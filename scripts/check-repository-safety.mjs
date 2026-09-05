@@ -60,7 +60,7 @@ for (const path of tracked) {
     path.startsWith("tests/") ||
     path.includes(".test.") ||
     path.includes(".spec.");
-  if (!testOnly)
+  if (!testOnly && path !== "scripts/check-repository-safety.mjs")
     for (const marker of syntheticMarkers)
       if (contents.includes(marker))
         errors.push(`${path}: synthetic test record escaped test-only files`);
