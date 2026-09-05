@@ -23,6 +23,7 @@ import {
   type EncryptedBackupFile,
   validateBackupPassword,
 } from "../domain/backup";
+import { migrateBackupPayload } from "./backup-migration";
 
 async function deriveBackupKey(
   password: string,
@@ -162,15 +163,23 @@ export async function decryptAndValidateBackup(
     hexToBytes(backup.ciphertext),
   );
   const value: unknown = JSON.parse(new TextDecoder().decode(decrypted));
-  if (!isBackupPayload(value))
+  if (!value || typeof value !== "object")
     throw new Error("The decrypted backup data is invalid.");
+  const source = value as {
+    appVersion?: unknown;
+    dataSchemaVersion?: unknown;
+    exportedAt?: unknown;
+  };
   if (
-    value.appVersion !== backup.appVersion ||
-    value.dataSchemaVersion !== backup.dataSchemaVersion ||
-    value.exportedAt !== backup.exportedAt
+    source.appVersion !== backup.appVersion ||
+    source.dataSchemaVersion !== backup.dataSchemaVersion ||
+    source.exportedAt !== backup.exportedAt
   )
     throw new Error("The backup metadata does not match its encrypted data.");
-  return value;
+  const migrated = migrateBackupPayload(value, backup.dataSchemaVersion);
+  if (!migrated || !isBackupPayload(migrated))
+    throw new Error("The decrypted backup data is invalid.");
+  return migrated;
 }
 
 export function parseEncryptedBackupFile(

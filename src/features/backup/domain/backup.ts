@@ -1,4 +1,5 @@
 import { DATA_SCHEMA_VERSION } from "../../../configuration/app-metadata";
+import { MINIMUM_SUPPORTED_BACKUP_SCHEMA_VERSION } from "../services/backup-migration";
 import {
   isHouseholdMemberCollection,
   type HouseholdMember,
@@ -132,7 +133,9 @@ export function isEncryptedBackupFile(
     backup.version === BACKUP_VERSION &&
     typeof backup.appVersion === "string" &&
     /^\d+\.\d+\.\d+$/.test(backup.appVersion) &&
-    backup.dataSchemaVersion === DATA_SCHEMA_VERSION &&
+    typeof backup.dataSchemaVersion === "number" &&
+    backup.dataSchemaVersion >= MINIMUM_SUPPORTED_BACKUP_SCHEMA_VERSION &&
+    backup.dataSchemaVersion <= DATA_SCHEMA_VERSION &&
     isIsoTimestamp(backup.exportedAt) &&
     !!encryption &&
     encryption.algorithm === "AES-GCM-256" &&

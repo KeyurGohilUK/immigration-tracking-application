@@ -1,7 +1,7 @@
-export const APP_VERSION = "3.25.6";
+export const APP_VERSION = "3.25.7";
 
 export const RELEASE_NOTES = [
-  "A permanent network-privacy regression guard now checks that household, immigration, travel, address, Life in the UK, document, and backup secrets never appear in outgoing requests.",
-  "The privacy detector inspects request URLs, decoded query values, headers, and request bodies for deliberately seeded sensitive canary values.",
-  "Browser coverage also verifies normal app traffic remains same-origin while update checks continue to work without transmitting local records.",
+  "Encrypted backup restore now supports every backup schema actually shipped by UrbanFox, from data schema 4 through schema 7.",
+  "Schema 4 owner/family backups are migrated into the current household-member model, while later schemas receive safe empty collections for features that did not yet exist.",
+  "Pre-backup schemas and future unsupported schema versions remain explicitly rejected instead of being guessed or partially restored.",
 ] as const;
