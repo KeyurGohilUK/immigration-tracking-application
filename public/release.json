@@ -1,8 +1,8 @@
 {
-  "version": "3.25.7",
+  "version": "3.25.8",
   "notes": [
-    "Encrypted backup restore now supports every backup schema actually shipped by UrbanFox, from data schema 4 through schema 7.",
-    "Schema 4 owner/family backups are migrated into the current household-member model, while later schemas receive safe empty collections for features that did not yet exist.",
-    "Pre-backup schemas and future unsupported schema versions remain explicitly rejected instead of being guessed or partially restored."
+    "PWA regression coverage now proves UrbanFox can reload, unlock, and navigate core tracker screens while fully offline after its first controlled load.",
+    "Service-worker update coverage now verifies a replacement worker activates, removes stale UrbanFox caches, and leaves encrypted IndexedDB records unchanged.",
+    "Offline update checks now remain non-blocking and recover automatically when connectivity returns."
   ]
 }
