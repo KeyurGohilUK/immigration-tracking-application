@@ -42,16 +42,8 @@ async function waitForControlledServiceWorker(
 ): Promise<void> {
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
-    if (!navigator.serviceWorker.controller)
-      await new Promise<void>((resolve) => {
-        navigator.serviceWorker.addEventListener(
-          "controllerchange",
-          () => resolve(),
-          { once: true },
-        );
-        window.location.reload();
-      });
   });
+  await page.reload();
   await page.waitForLoadState("domcontentloaded");
   await expect
     .poll(() =>
@@ -67,6 +59,10 @@ test("launches and navigates with encrypted local data while offline", async ({
   await page.goto("/");
   await createLocalProfile(page);
   await waitForControlledServiceWorker(page);
+  await expect(
+    page.getByRole("heading", { name: "Enter Security PIN" }),
+  ).toBeVisible();
+  await enterUnlockPin(page, PROFILE.pin);
 
   await context.setOffline(true);
   await page.reload();
