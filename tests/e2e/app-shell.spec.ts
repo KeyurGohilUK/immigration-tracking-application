@@ -419,9 +419,8 @@ test("guides Address History from the current address backwards", async ({
     .poll(() =>
       dialog.evaluate(
         (element) =>
-          document.activeElement?.classList.contains(
-            "liquid-dialog-initial-focus",
-          ) === true && element.contains(document.activeElement),
+          document.activeElement?.classList.contains("liquid-dialog-close") ===
+            true && element.contains(document.activeElement),
       ),
     )
     .toBe(true);
