@@ -57,7 +57,7 @@ test("serves the production PWA correctly from the GitHub Pages repository path"
   expect(deployment.base).toBe("/immigration-tracking-application/");
   expect(deployment.localResources.length).toBeGreaterThan(0);
   for (const path of deployment.localResources)
-    expect(path).toStartWith("/immigration-tracking-application/");
+    expect(path.startsWith("/immigration-tracking-application/")).toBe(true);
   expect(deployment.manifestPath).toBe(
     "/immigration-tracking-application/manifest.webmanifest",
   );
