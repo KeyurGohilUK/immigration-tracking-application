@@ -1,4 +1,4 @@
-name: Temporary finish PWA preflight
+name: Temporary finish PWA formatter
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  preflight:
+  prettier-diff:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,6 +18,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run check
-      - run: npx playwright install chromium
-      - run: npm run test:pages
+      - run: |
+          npx prettier --write playwright.pages.config.ts scripts/check-proprietary-notices.mjs scripts/check-repository-safety.mjs tests/pages/github-pages.spec.ts
+          git diff -- playwright.pages.config.ts scripts/check-proprietary-notices.mjs scripts/check-repository-safety.mjs tests/pages/github-pages.spec.ts
