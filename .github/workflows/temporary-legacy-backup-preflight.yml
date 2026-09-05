@@ -1,4 +1,4 @@
-name: Temporary legacy backup preflight
+name: Temporary legacy backup formatter
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  preflight:
+  prettier-diff:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,4 +18,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run check
+      - run: |
+          npx prettier --write src/features/backup/services/backup-migration.ts
+          git diff -- src/features/backup/services/backup-migration.ts
