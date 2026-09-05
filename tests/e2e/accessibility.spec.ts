@@ -145,7 +145,8 @@ function luminance(hex: string): number {
   const linear = channels.map((value) =>
     value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4,
   );
-  return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+  const [red = 0, green = 0, blue = 0] = linear;
+  return red * 0.2126 + green * 0.7152 + blue * 0.0722;
 }
 
 function contrastRatio(left: string, right: string): number {
