@@ -55,16 +55,13 @@ function migratePermissions(
   value: unknown,
   profileIds: readonly string[],
 ): ProfileRecords<ImmigrationPermission>[] | null {
-  if (!isProfileRecords(value) || value.length !== profileIds.length) return null;
+  if (!isProfileRecords(value) || value.length !== profileIds.length)
+    return null;
   const expected = new Set(profileIds);
   const found = new Set<string>();
   const result: ProfileRecords<ImmigrationPermission>[] = [];
   for (const item of value) {
-    if (
-      !expected.has(item.profileId) ||
-      found.has(item.profileId)
-    )
-      return null;
+    if (!expected.has(item.profileId) || found.has(item.profileId)) return null;
     const records = migrateImmigrationPermissionCollection(
       item.records,
       item.profileId,
@@ -148,7 +145,8 @@ function migrateDocuments(
   profileIds: readonly string[],
 ): BackupDocument[] | undefined | null {
   if (value === undefined) return undefined;
-  if (!Array.isArray(value) || value.length > profileIds.length * 25) return null;
+  if (!Array.isArray(value) || value.length > profileIds.length * 25)
+    return null;
   const profileIdSet = new Set(profileIds);
   const ids = new Set<string>();
   let totalBytes = 0;
@@ -237,7 +235,8 @@ function migrateSchema4Members(
       id: member.id,
       fullName: member.fullName.trim(),
       dateOfBirth: member.dateOfBirth,
-      immigrationRole: member.immigrationRole as HouseholdMember["immigrationRole"],
+      immigrationRole:
+        member.immigrationRole as HouseholdMember["immigrationRole"],
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,
     });
