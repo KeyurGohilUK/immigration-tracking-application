@@ -99,3 +99,8 @@ to **GitHub Actions**.
 Every push to `main` builds and deploys the current production app. A deployment
 can also be rerun manually from the **Deploy GitHub Pages** workflow. Generated
 `dist` files are uploaded as a deployment artifact and are not committed.
+
+Pull-request CI also serves the built app under the repository subdirectory path,
+checks the manifest/release/service-worker scope, and performs an offline reload
+against production output. Deployment security controls and GitHub Pages header
+limitations are documented in [GitHub Pages security controls](docs/github-pages-security.md).
