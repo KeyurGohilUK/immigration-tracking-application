@@ -75,7 +75,7 @@ Document Vault-specific work is tracked separately in
 
 ## PWA, browser, and deployment resilience
 
-- [ ] Test offline launch and service-worker updates.
+- [x] Test offline launch and service-worker updates.
 - [ ] Test production output under the GitHub Pages subdirectory path.
 - [ ] Add a restrictive Content Security Policy where GitHub Pages permits it.
 - [ ] Add secure browser headers or document GitHub Pages limitations.
