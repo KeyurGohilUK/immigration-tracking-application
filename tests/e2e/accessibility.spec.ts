@@ -41,13 +41,19 @@ async function auditPage(page: Page): Promise<void> {
     const ids = [...document.querySelectorAll<HTMLElement>("[id]")]
       .map(({ id }) => id)
       .filter(Boolean);
-    const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+    const duplicates = [
+      ...new Set(ids.filter((id, index) => ids.indexOf(id) !== index)),
+    ];
     if (duplicates.length > 0)
       failures.push(`Duplicate IDs: ${duplicates.join(", ")}`);
 
-    const visibleMains = [...document.querySelectorAll("main")].filter(isVisible);
+    const visibleMains = [...document.querySelectorAll("main")].filter(
+      isVisible,
+    );
     if (visibleMains.length !== 1)
-      failures.push(`Expected one visible main landmark; found ${visibleMains.length}`);
+      failures.push(
+        `Expected one visible main landmark; found ${visibleMains.length}`,
+      );
 
     for (const image of document.querySelectorAll<HTMLImageElement>("img")) {
       if (isVisible(image) && !image.hasAttribute("alt"))
@@ -93,16 +99,22 @@ async function auditPage(page: Page): Promise<void> {
         );
     }
 
-    for (const dialog of document.querySelectorAll<HTMLDialogElement>("dialog[open]")) {
+    for (const dialog of document.querySelectorAll<HTMLDialogElement>(
+      "dialog[open]",
+    )) {
       if (!isVisible(dialog)) continue;
       const labelId = dialog.getAttribute("aria-labelledby");
       if (!labelId || !document.getElementById(labelId))
-        failures.push(`Open dialog #${dialog.id} is missing a valid aria-labelledby target`);
+        failures.push(
+          `Open dialog #${dialog.id} is missing a valid aria-labelledby target`,
+        );
       if (!dialog.contains(document.activeElement))
         failures.push(`Keyboard focus is outside open dialog #${dialog.id}`);
     }
 
-    for (const element of document.querySelectorAll<HTMLElement>('[aria-hidden="true"]')) {
+    for (const element of document.querySelectorAll<HTMLElement>(
+      '[aria-hidden="true"]',
+    )) {
       if (
         element === document.activeElement ||
         element.contains(document.activeElement)
@@ -110,7 +122,9 @@ async function auditPage(page: Page): Promise<void> {
         failures.push("Keyboard focus is inside aria-hidden content");
     }
 
-    for (const element of document.querySelectorAll<HTMLElement>("[tabindex]")) {
+    for (const element of document.querySelectorAll<HTMLElement>(
+      "[tabindex]",
+    )) {
       const value = Number(element.getAttribute("tabindex"));
       if (value > 0) failures.push(`Positive tabindex found: ${value}`);
     }
@@ -129,9 +143,7 @@ function luminance(hex: string): number {
   if (!channels || channels.length !== 3)
     throw new Error(`Unsupported colour value: ${hex}`);
   const linear = channels.map((value) =>
-    value <= 0.04045
-      ? value / 12.92
-      : ((value + 0.055) / 1.055) ** 2.4,
+    value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4,
   );
   return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
 }
@@ -190,7 +202,9 @@ test("keeps dialogs labelled and keyboard focus on accessible content", async ({
     )
     .toBe(true);
 
-  const close = dialog.getByRole("button", { name: "Close install and updates" });
+  const close = dialog.getByRole("button", {
+    name: "Close install and updates",
+  });
   await expect(close).toBeFocused();
 
   await page.keyboard.press("Escape");
@@ -215,10 +229,18 @@ test("meets WCAG AA contrast for supported light-theme semantic tokens", async (
     };
   });
 
-  expect(contrastRatio(colours.text, colours.surface)).toBeGreaterThanOrEqual(4.5);
-  expect(contrastRatio(colours.muted, colours.surface)).toBeGreaterThanOrEqual(4.5);
-  expect(contrastRatio(colours.primary, colours.surface)).toBeGreaterThanOrEqual(4.5);
-  expect(contrastRatio(colours.danger, colours.surface)).toBeGreaterThanOrEqual(4.5);
+  expect(contrastRatio(colours.text, colours.surface)).toBeGreaterThanOrEqual(
+    4.5,
+  );
+  expect(contrastRatio(colours.muted, colours.surface)).toBeGreaterThanOrEqual(
+    4.5,
+  );
+  expect(
+    contrastRatio(colours.primary, colours.surface),
+  ).toBeGreaterThanOrEqual(4.5);
+  expect(contrastRatio(colours.danger, colours.surface)).toBeGreaterThanOrEqual(
+    4.5,
+  );
 });
 
 test("communicates document readiness states with text and structure, not colour alone", async ({
