@@ -1,7 +1,7 @@
-export const APP_VERSION = "3.25.8";
+export const APP_VERSION = "3.25.9";
 
 export const RELEASE_NOTES = [
-  "PWA regression coverage now proves UrbanFox can reload, unlock, and navigate core tracker screens while fully offline after its first controlled load.",
-  "Service-worker update coverage now verifies a replacement worker activates, removes stale UrbanFox caches, and leaves encrypted IndexedDB records unchanged.",
-  "Offline update checks now remain non-blocking and recover automatically when connectivity returns.",
+  "Production PWA CI now serves the built app from the GitHub Pages repository subdirectory and verifies relative assets, manifest paths, release checks, service-worker scope, and a real offline reload; the worker now pre-caches Vite's hashed production assets for first offline launch.",
+  "A restrictive meta-delivered Content Security Policy now limits scripts and network connections to UrbanFox while allowing only the existing Google Fonts stylesheet/font origins and local document-preview images.",
+  "Repository safety and proprietary-notice checks now guard against committed secrets, private-key containers, generated backups, misplaced synthetic records, and missing licence/copyright notices.",
 ] as const;

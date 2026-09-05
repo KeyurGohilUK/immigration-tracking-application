@@ -14,8 +14,11 @@
     "check:release": "node scripts/check-release-version.mjs",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run format:check && npm run lint && npm run lint:frontend && npm run typecheck && npm run check:release && npm run test:unit && npm run build",
-    "lint:frontend": "node scripts/check-frontend-standards.mjs"
+    "check": "npm run format:check && npm run lint && npm run lint:frontend && npm run typecheck && npm run check:release && npm run check:repository-safety && npm run check:proprietary-notices && npm run test:unit && npm run build",
+    "lint:frontend": "node scripts/check-frontend-standards.mjs",
+    "check:repository-safety": "node scripts/check-repository-safety.mjs",
+    "check:proprietary-notices": "node scripts/check-proprietary-notices.mjs",
+    "test:pages": "playwright test -c playwright.pages.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
