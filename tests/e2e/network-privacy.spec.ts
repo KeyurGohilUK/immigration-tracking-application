@@ -115,9 +115,7 @@ test("never sends local immigration data in network requests", async ({
     .fill(PRIVATE.lifeReference);
   await lifeDialog.getByRole("button", { name: "Save" }).click();
 
-  const employmentSection = page.locator(
-    '[data-vault-section="employment"]',
-  );
+  const employmentSection = page.locator('[data-vault-section="employment"]');
   await employmentSection.locator("summary").click();
   await employmentSection
     .getByRole("button", { name: "Add Employer letter", exact: true })
@@ -137,9 +135,7 @@ test("never sends local immigration data in network requests", async ({
     mimeType: "image/png",
     buffer: png,
   });
-  await documentDialog
-    .getByLabel("Document name")
-    .fill(PRIVATE.documentName);
+  await documentDialog.getByLabel("Document name").fill(PRIVATE.documentName);
   await documentDialog
     .getByRole("button", { name: "Encrypt and save document" })
     .click();
@@ -150,9 +146,7 @@ test("never sends local immigration data in network requests", async ({
   await page
     .getByLabel("Backup password", { exact: true })
     .fill(PRIVATE.backupPassword);
-  await page
-    .getByLabel("Confirm backup password")
-    .fill(PRIVATE.backupPassword);
+  await page.getByLabel("Confirm backup password").fill(PRIVATE.backupPassword);
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download encrypted backup" }).click();
   await download;
