@@ -203,9 +203,7 @@ test("keeps dialogs labelled and keyboard focus on accessible content", async ({
     )
     .toBe(true);
 
-  const close = dialog.getByRole("button", {
-    name: "Close install and updates",
-  });
+  const close = dialog.getByRole("button", { name: "Close" });
   await expect(close).toBeFocused();
 
   await page.keyboard.press("Escape");
