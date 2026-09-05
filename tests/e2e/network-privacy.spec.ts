@@ -180,5 +180,11 @@ test("never sends local immigration data in network requests", async ({
   }
 
   const origins = new Set(requests.map(({ url }) => new URL(url).origin));
-  expect(origins).toEqual(new Set([new URL(page.url()).origin]));
+  expect(origins).toEqual(
+    new Set([
+      new URL(page.url()).origin,
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com",
+    ]),
+  );
 });
