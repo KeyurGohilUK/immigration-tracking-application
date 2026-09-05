@@ -30,10 +30,10 @@ jobs:
       - name: Run quality checks
         run: npm run check
 
-  playwright:
+  playwright-mobile:
     name: Playwright mobile tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -46,14 +46,64 @@ jobs:
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run Playwright tests
-        run: npm run test:e2e
-      - name: Test GitHub Pages production subpath
-        run: npm run test:pages
-      - name: Upload Playwright report on failure
+      - name: Run mobile Playwright tests
+        run: npm run test:e2e -- --project=mobile-chromium
+      - name: Upload mobile Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-mobile-report
+          path: playwright-report/
+          retention-days: 7
+
+  playwright-desktop:
+    name: Playwright desktop tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run desktop Playwright tests
+        run: npm run test:e2e -- --project=desktop-chromium
+      - name: Upload desktop Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-desktop-report
+          path: playwright-report/
+          retention-days: 7
+
+  playwright-pages:
+    name: GitHub Pages production PWA tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Test GitHub Pages production subpath
+        run: npm run test:pages
+      - name: Upload Pages Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-pages-report
           path: playwright-report/
           retention-days: 7
