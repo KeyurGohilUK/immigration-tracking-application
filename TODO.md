@@ -39,7 +39,7 @@ Document Vault-specific work is tracked separately in
       forgotten-PIN data reset.
 - [x] Test family-member isolation so records and calculations cannot be mixed.
 - [x] Test backup round trips and malicious or corrupted import files.
-- [ ] Verify that no personal data is sent in network requests.
+- [x] Verify that no personal data is sent in network requests.
 
 ## Calculation correctness
 
