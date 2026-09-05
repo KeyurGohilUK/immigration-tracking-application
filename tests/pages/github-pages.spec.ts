@@ -16,11 +16,12 @@ test("serves the production PWA correctly from the GitHub Pages repository path"
     const resources = [
       ...document.querySelectorAll<HTMLScriptElement>("script[src]"),
       ...document.querySelectorAll<HTMLLinkElement>("link[href]"),
-    ].map((element) =>
-      new URL(
-        element instanceof HTMLScriptElement ? element.src : element.href,
-        window.location.href,
-      ),
+    ].map(
+      (element) =>
+        new URL(
+          element instanceof HTMLScriptElement ? element.src : element.href,
+          window.location.href,
+        ),
     );
     const localResources = resources
       .filter(({ origin }) => origin === window.location.origin)
@@ -30,7 +31,9 @@ test("serves the production PWA correctly from the GitHub Pages repository path"
       'link[rel="manifest"]',
     );
     const manifestUrl = new URL(manifestLink?.href ?? "", window.location.href);
-    const manifest = await fetch(manifestUrl).then((response) => response.json());
+    const manifest = await fetch(manifestUrl).then((response) =>
+      response.json(),
+    );
 
     const releaseUrl = new URL("./release.json", window.location.href);
     const releaseStatus = await fetch(releaseUrl, { cache: "no-store" }).then(
@@ -44,9 +47,7 @@ test("serves the production PWA correctly from the GitHub Pages repository path"
       localResources,
       manifestPath: manifestUrl.pathname,
       manifestStartUrl: manifest.start_url,
-      manifestIcons: manifest.icons.map(
-        (icon: { src: string }) => icon.src,
-      ),
+      manifestIcons: manifest.icons.map((icon: { src: string }) => icon.src),
       releaseStatus,
       serviceWorkerScope: new URL(registration.scope).pathname,
       controlled: Boolean(navigator.serviceWorker.controller),
