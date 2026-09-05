@@ -77,7 +77,8 @@ function migrateTrips(
   value: unknown,
   profileIds: readonly string[],
 ): ProfileRecords<Trip>[] | null {
-  if (!isProfileRecords(value) || value.length !== profileIds.length) return null;
+  if (!isProfileRecords(value) || value.length !== profileIds.length)
+    return null;
   const expected = new Set(profileIds);
   const found = new Set<string>();
   const result: ProfileRecords<Trip>[] = [];
@@ -100,7 +101,8 @@ function migrateAddressHistory(
 ): ProfileRecords<AddressHistoryEntry>[] | null {
   if (value === undefined)
     return profileIds.map((profileId) => ({ profileId, records: [] }));
-  if (!isProfileRecords(value) || value.length !== profileIds.length) return null;
+  if (!isProfileRecords(value) || value.length !== profileIds.length)
+    return null;
   const expected = new Set(profileIds);
   const found = new Set<string>();
   const result: ProfileRecords<AddressHistoryEntry>[] = [];
@@ -123,7 +125,8 @@ function migrateLifeEnglish(
 ): ProfileRecords<LifeEnglishRecord>[] | null {
   if (value === undefined)
     return profileIds.map((profileId) => ({ profileId, records: [] }));
-  if (!isProfileRecords(value) || value.length !== profileIds.length) return null;
+  if (!isProfileRecords(value) || value.length !== profileIds.length)
+    return null;
   const expected = new Set(profileIds);
   const found = new Set<string>();
   const result: ProfileRecords<LifeEnglishRecord>[] = [];
