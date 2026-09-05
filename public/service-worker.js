@@ -11,10 +11,21 @@ const APP_SHELL = [
   "./apple-touch-icon.png",
 ];
 
+async function cacheApplicationShell() {
+  const cache = await caches.open(CACHE_NAME);
+  await cache.addAll(APP_SHELL);
+
+  const response = await fetch("./index.html", { cache: "no-store" });
+  if (!response.ok) throw new Error("The application shell could not be cached.");
+  const html = await response.text();
+  const assetPaths = [
+    ...html.matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g),
+  ].map((match) => match[1]);
+  await cache.addAll([...new Set(assetPaths)]);
+}
+
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)),
-  );
+  event.waitUntil(cacheApplicationShell());
   self.skipWaiting();
 });
 
