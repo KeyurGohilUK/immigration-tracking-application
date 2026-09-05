@@ -1,7 +1,7 @@
 {
   "version": "3.25.9",
   "notes": [
-    "Production PWA CI now serves the built app from the GitHub Pages repository subdirectory and verifies relative assets, manifest paths, release checks, service-worker scope, and offline reload.",
+    "Production PWA CI now serves the built app from the GitHub Pages repository subdirectory and verifies relative assets, manifest paths, release checks, service-worker scope, and a real offline reload; the worker now pre-caches Vite's hashed production assets for first offline launch.",
     "A restrictive meta-delivered Content Security Policy now limits scripts and network connections to UrbanFox while allowing only the existing Google Fonts stylesheet/font origins and local document-preview images.",
     "Repository safety and proprietary-notice checks now guard against committed secrets, private-key containers, generated backups, misplaced synthetic records, and missing licence/copyright notices."
   ]
