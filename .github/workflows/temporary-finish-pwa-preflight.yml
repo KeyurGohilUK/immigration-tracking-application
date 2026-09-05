@@ -1,4 +1,4 @@
-name: Temporary finish PWA formatter
+name: Temporary finish PWA preflight
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  prettier-diff:
+  preflight:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,6 +18,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: |
-          npx prettier --write public/service-worker.js
-          git diff -- public/service-worker.js
+      - run: npm run check
+      - run: npx playwright install chromium
+      - run: npm run test:pages
