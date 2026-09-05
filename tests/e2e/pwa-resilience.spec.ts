@@ -54,7 +54,9 @@ async function waitForControlledServiceWorker(
   });
   await page.waitForLoadState("domcontentloaded");
   await expect
-    .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
+    .poll(() =>
+      page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+    )
     .toBe(true);
 }
 
@@ -106,12 +108,14 @@ test("activates a service-worker update, removes stale caches, and preserves Ind
   await waitForControlledServiceWorker(page);
 
   const before = await page.evaluate(async () => {
-    await caches.open("urbanfox-shell-stale-test").then((cache) =>
-      cache.put(
-        new Request("./stale-test"),
-        new Response("stale", { status: 200 }),
-      ),
-    );
+    await caches
+      .open("urbanfox-shell-stale-test")
+      .then((cache) =>
+        cache.put(
+          new Request("./stale-test"),
+          new Response("stale", { status: 200 }),
+        ),
+      );
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
@@ -163,7 +167,10 @@ test("activates a service-worker update, removes stale caches, and preserves Ind
 
   await expect
     .poll(() =>
-      page.evaluate(async () => !(await caches.keys()).includes("urbanfox-shell-stale-test")),
+      page.evaluate(
+        async () =>
+          !(await caches.keys()).includes("urbanfox-shell-stale-test"),
+      ),
     )
     .toBe(true);
 
