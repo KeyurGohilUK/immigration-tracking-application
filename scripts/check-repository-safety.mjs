@@ -34,10 +34,7 @@ const syntheticMarkers = [
 
 for (const path of tracked) {
   const name = basename(path);
-  if (
-    (name === ".env" || name.startsWith(".env.")) &&
-    name !== ".env.example"
-  )
+  if ((name === ".env" || name.startsWith(".env.")) && name !== ".env.example")
     errors.push(`${path}: committed environment file`);
 
   if ([".key", ".p12", ".pfx"].includes(extname(path).toLowerCase()))
