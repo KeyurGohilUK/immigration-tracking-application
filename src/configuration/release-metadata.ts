@@ -1,7 +1,7 @@
-export const APP_VERSION = "3.25.9";
+export const APP_VERSION = "3.25.10";
 
 export const RELEASE_NOTES = [
-  "Production PWA CI now serves the built app from the GitHub Pages repository subdirectory and verifies relative assets, manifest paths, release checks, service-worker scope, and a real offline reload; the worker now pre-caches Vite's hashed production assets for first offline launch.",
-  "A restrictive meta-delivered Content Security Policy now limits scripts and network connections to UrbanFox while allowing only the existing Google Fonts stylesheet/font origins and local document-preview images.",
-  "Repository safety and proprietary-notice checks now guard against committed secrets, private-key containers, generated backups, misplaced synthetic records, and missing licence/copyright notices.",
+  "Automated accessibility regression coverage now checks key public and authenticated views for landmarks, duplicate IDs, accessible names and labels, dialog semantics, focus safety, and invalid positive tabindex values.",
+  "Shared Liquid Glass dialogs now place initial keyboard focus on their visible labelled close control instead of an aria-hidden focus sentinel.",
+  "Light-theme semantic colours are now guarded by WCAG AA contrast tests, and Document Vault readiness states are verified to expose explicit text labels rather than relying on colour alone.",
 ] as const;
