@@ -16,7 +16,8 @@ async function cacheApplicationShell() {
   await cache.addAll(APP_SHELL);
 
   const response = await fetch("./index.html", { cache: "no-store" });
-  if (!response.ok) throw new Error("The application shell could not be cached.");
+  if (!response.ok)
+    throw new Error("The application shell could not be cached.");
   const html = await response.text();
   const assetPaths = [
     ...html.matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g),
