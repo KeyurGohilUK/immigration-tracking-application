@@ -17,8 +17,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      "npm run build && node scripts/serve-pages-subpath.mjs",
+    command: "npm run build && node scripts/serve-pages-subpath.mjs",
     url: "http://127.0.0.1:4174/immigration-tracking-application/",
     reuseExistingServer: false,
   },
