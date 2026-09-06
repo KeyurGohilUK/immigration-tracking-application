@@ -394,8 +394,7 @@ test("guides Address History from the current address backwards", async ({
   await createLocalProfile(page);
 
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByRole("button", { name: "+ Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2021-09-01");
@@ -1738,12 +1737,6 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await createLocalProfile(page);
   await page.getByRole("link", { name: "ILR", exact: true }).click();
   await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Immigration history" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Permission timeline" }),
-  ).toBeVisible();
   await expect(page.locator("#permission-count")).toHaveText("0");
   await expect(page.locator(".permission-summary-date")).toHaveText(
     "Not recorded",
@@ -1830,8 +1823,7 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByRole("button", { name: "+ Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("dependant");
   await page.getByLabel(/Visa grant date/).fill("2023-12-15");
@@ -1987,8 +1979,7 @@ test("shows recorded-absence usage on ILR and Travel without claiming eligibilit
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByRole("button", { name: "+ Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2022-01-01");
