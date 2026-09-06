@@ -89,7 +89,10 @@ function createPermissionHistory(
     item.type = "button";
     item.className = `ilr-permission-row${index === 0 ? " is-current" : ""}`;
     item.dataset.editPermission = permission.id;
-    item.setAttribute("aria-label", `Edit ${getPermissionRouteLabel(permission)} permission`);
+    item.setAttribute(
+      "aria-label",
+      `Edit ${getPermissionRouteLabel(permission)} permission`,
+    );
     item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><span class="ilr-permission-copy"><strong></strong><span class="ilr-permission-dates"></span></span><small></small>`;
     const title = item.querySelector<HTMLElement>("strong");
     const dates = item.querySelector<HTMLElement>(".ilr-permission-dates");
