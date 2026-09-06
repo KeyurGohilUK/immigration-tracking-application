@@ -29,8 +29,7 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
   await page
     .getByRole("button", { name: "Show Isolation Owner's ILR journey" })
     .click();
-  await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await page.getByRole("button", { name: "Add permission" }).click();
+  await page.getByRole("button", { name: "+ Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2022-01-01");
