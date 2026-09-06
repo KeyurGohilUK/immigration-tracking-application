@@ -1780,12 +1780,18 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   expect(storedPermission).not.toContain("skilled-worker");
   expect(storedPermission).toContain("ciphertext");
 
-  await page.getByRole("button", { name: "Edit Skilled Worker permission" }).click();
+  await page
+    .getByRole("button", {
+      name: "Edit Skilled Worker permission",
+    })
+    .click();
   await page.getByLabel(/Visa grant date/).clear();
   await page.getByLabel("Permission expiry date").fill("2027-12-31");
   await page.getByRole("button", { name: "Save permission" }).click();
   await expect(
-    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
+    page.getByRole("button", {
+      name: "Edit Skilled Worker permission",
+    }),
   ).toBeVisible();
   await expect(page.getByText("2024 – 2027", { exact: true })).toBeVisible();
 
@@ -1794,7 +1800,9 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.getByRole("link", { name: "Family", exact: true }).first().click();
   await page.getByRole("link", { name: "ILR", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
+    page.getByRole("button", {
+      name: "Edit Skilled Worker permission",
+    }),
   ).toBeVisible();
 
   await page
@@ -1827,7 +1835,9 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
   await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
   await page.getByRole("button", { name: "Save permission" }).click();
   await expect(
-    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
+    page.getByRole("button", {
+      name: "Edit Skilled Worker permission",
+    }),
   ).toBeVisible();
 
   await page.getByRole("link", { name: "ILR", exact: true }).click();
