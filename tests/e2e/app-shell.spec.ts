@@ -1752,7 +1752,9 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.getByRole("button", { name: "Save permission" }).click();
 
   await expect(
-    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
+    page.getByRole("button", {
+      name: "Edit Skilled Worker permission",
+    }),
   ).toBeVisible();
   await expect(
     page.getByText("Qualifying (5-year)", { exact: true }),
@@ -1760,24 +1762,21 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByRole("heading", { name: "Skilled Worker", level: 1 }),
   ).toBeVisible();
-  const permissionProfileId = await page
-    .getByLabel("Tracking profile")
-    .inputValue();
-  const storedPermission = await page.evaluate(async (profileId) => {
+  const storedPermission = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("urbanfox-ilr", 8);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
     return new Promise<string>((resolve, reject) => {
-      const request = database
+      const store = database
         .transaction("permissions", "readonly")
-        .objectStore("permissions")
-        .get(profileId);
+        .objectStore("permissions");
+      const request = store.getAll();
       request.onsuccess = () => resolve(JSON.stringify(request.result));
       request.onerror = () => reject(request.error);
     });
-  }, permissionProfileId);
+  });
   expect(storedPermission).not.toContain("skilled-worker");
   expect(storedPermission).toContain("ciphertext");
 
@@ -1799,7 +1798,9 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   ).toBeVisible();
 
   await page
-    .getByRole("button", { name: "Edit Skilled Worker permission" })
+    .getByRole("button", {
+      name: "Edit Skilled Worker permission",
+    })
     .click();
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete permission" }).click();
