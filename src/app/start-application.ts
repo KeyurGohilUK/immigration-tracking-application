@@ -43,10 +43,9 @@ import {
 } from "../features/travel/domain/trip";
 import {
   readImmigrationPermissionInput,
-  renderImmigrationHistoryPage,
   showImmigrationPermissionForm,
   updateOtherRouteField,
-} from "../features/immigration/components/immigration-history-page";
+} from "../features/immigration/components/immigration-permission-dialog";
 import {
   getImmigrationPermissions,
   saveImmigrationPermissions,
@@ -214,8 +213,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const wireAuthenticatedShell = (
       profile: HouseholdMember,
-      currentView:
-        "Home" | "Permissions" | "Trips" | "ILR" | "Documents" | "More",
+      currentView: "Home" | "Trips" | "ILR" | "Documents" | "More",
     ): void => {
       root
         .querySelector<HTMLButtonElement>('button[aria-label="Lock app"]')
@@ -270,8 +268,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         selectedProfileId = profileId;
         const selectedMember = familyMembers.find(({ id }) => id === profileId);
         if (!selectedMember) return;
-        if (currentView === "Permissions") void showPermissions(selectedMember);
-        else if (currentView === "Trips") void showTrips(selectedMember);
+        if (currentView === "Trips") void showTrips(selectedMember);
         else if (currentView === "ILR") void showIlrJourney(selectedMember);
         else if (currentView === "Documents")
           void showDocuments(selectedMember);
@@ -360,9 +357,129 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       );
       renderIlrJourneyPage(root, journeys, selectedProfileId, asOfDate);
       wireAuthenticatedShell(profile, "ILR");
+
+      const selectedPermissions =
+        journeys.find(({ member }) => member.id === selectedProfileId)
+          ?.permissions ?? [];
+      const dialog =
+        root.querySelector<HTMLDialogElement>("#permission-dialog");
+      const form = root.querySelector<HTMLFormElement>("#permission-form");
+
       root
-        .querySelector<HTMLButtonElement>("#ilr-manage-permissions")
-        ?.addEventListener("click", () => void showPermissions(profile));
+        .querySelector<HTMLButtonElement>("#ilr-add-permission")
+        ?.addEventListener("click", () => showImmigrationPermissionForm(root));
+      dialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => dialog.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+      form
+        ?.querySelector<HTMLSelectElement>("#permission-route")
+        ?.addEventListener("change", () => updateOtherRouteField(form));
+
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-permission]",
+      )) {
+        button.addEventListener("click", () => {
+          const permission = selectedPermissions.find(
+            ({ id }) => id === button.dataset.editPermission,
+          );
+          if (permission) showImmigrationPermissionForm(root, permission);
+        });
+      }
+
+      form
+        ?.querySelector<HTMLButtonElement>("#delete-permission")
+        ?.addEventListener("click", async (event) => {
+          const button = event.currentTarget as HTMLButtonElement;
+          const permission = selectedPermissions.find(
+            ({ id }) => id === button.dataset.permissionId,
+          );
+          if (
+            !permission ||
+            !window.confirm(
+              `Delete the ${getPermissionRouteLabel(permission)} permission? This cannot be undone.`,
+            )
+          )
+            return;
+          const nextPermissions = selectedPermissions.filter(
+            ({ id }) => id !== permission.id,
+          );
+          try {
+            await saveImmigrationPermissions(
+              selectedProfileId,
+              nextPermissions,
+              key,
+            );
+            permissionCache.set(selectedProfileId, nextPermissions);
+            dialog?.close();
+            await showIlrJourney(profile);
+          } catch {
+            const error = root.querySelector<HTMLElement>(
+              "#permission-page-error",
+            );
+            if (error) {
+              error.textContent =
+                "The permission could not be deleted. Your existing data is unchanged.";
+              error.hidden = false;
+            }
+          }
+        });
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { permissionId, input } = readImmigrationPermissionInput(form);
+        const validationError = validateImmigrationPermissionInput(input);
+        const error = form.querySelector<HTMLElement>("#permission-form-error");
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const existing = selectedPermissions.find(
+          ({ id }) => id === permissionId,
+        );
+        const timestamp = new Date().toISOString();
+        const permission: ImmigrationPermission = {
+          version: 2,
+          id: existing?.id ?? crypto.randomUUID(),
+          profileId: selectedProfileId,
+          ...input,
+          createdAt: existing?.createdAt ?? timestamp,
+          updatedAt: timestamp,
+        };
+        const nextPermissions = existing
+          ? selectedPermissions.map((current) =>
+              current.id === existing.id ? permission : current,
+            )
+          : [...selectedPermissions, permission];
+        const submit = form.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveImmigrationPermissions(
+            selectedProfileId,
+            nextPermissions,
+            key,
+          );
+          permissionCache.set(selectedProfileId, nextPermissions);
+          dialog?.close();
+          await showIlrJourney(profile);
+        } catch (storageError) {
+          if (error) {
+            error.textContent = getStorageFailureMessage(
+              storageError,
+              "This encrypted immigration permission could not be saved.",
+            );
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
     };
 
     const renderMore = (profile: HouseholdMember): void => {
@@ -2086,164 +2203,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (submit) submit.disabled = false;
         }
       });
-    };
-
-    const renderPermissions = (
-      profile: HouseholdMember,
-      permissions: ImmigrationPermission[],
-    ): void => {
-      renderImmigrationHistoryPage(
-        root,
-        familyMembers,
-        selectedProfileId,
-        permissions,
-      );
-      wireAuthenticatedShell(profile, "Permissions");
-      const dialog =
-        root.querySelector<HTMLDialogElement>("#permission-dialog");
-      const form = root.querySelector<HTMLFormElement>("#permission-form");
-      root
-        .querySelector<HTMLButtonElement>("#back-to-dashboard")
-        ?.addEventListener("click", () => renderDashboard(profile));
-      root
-        .querySelector<HTMLButtonElement>("#add-permission")
-        ?.addEventListener("click", () => showImmigrationPermissionForm(root));
-      root
-        .querySelector<HTMLButtonElement>(".dialog-close")
-        ?.addEventListener("click", () => dialog?.close());
-      dialog?.addEventListener("click", (event) => {
-        if (event.target === dialog) dialog.close();
-      });
-      form
-        ?.querySelector<HTMLSelectElement>("#permission-route")
-        ?.addEventListener("change", () => updateOtherRouteField(form));
-
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-edit-permission]",
-      )) {
-        button.addEventListener("click", () => {
-          const permission = permissions.find(
-            ({ id }) => id === button.dataset.editPermission,
-          );
-          if (permission) showImmigrationPermissionForm(root, permission);
-        });
-      }
-
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-delete-permission]",
-      )) {
-        button.addEventListener("click", async () => {
-          const permission = permissions.find(
-            ({ id }) => id === button.dataset.deletePermission,
-          );
-          if (
-            !permission ||
-            !window.confirm(
-              `Delete the ${getPermissionRouteLabel(permission)} permission? This cannot be undone.`,
-            )
-          )
-            return;
-          const nextPermissions = permissions.filter(
-            ({ id }) => id !== permission.id,
-          );
-          try {
-            await saveImmigrationPermissions(
-              selectedProfileId,
-              nextPermissions,
-              key,
-            );
-            permissionCache.set(selectedProfileId, nextPermissions);
-            renderPermissions(profile, nextPermissions);
-          } catch {
-            const error = root.querySelector<HTMLElement>(
-              "#permission-page-error",
-            );
-            if (error) {
-              error.textContent =
-                "The permission could not be deleted. Your existing data is unchanged.";
-              error.hidden = false;
-            }
-          }
-        });
-      }
-
-      form?.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const { permissionId, input } = readImmigrationPermissionInput(form);
-        const validationError = validateImmigrationPermissionInput(input);
-        const error = form.querySelector<HTMLElement>("#permission-form-error");
-        if (validationError) {
-          if (error) {
-            error.textContent = validationError;
-            error.hidden = false;
-          }
-          return;
-        }
-        const existing = permissions.find(({ id }) => id === permissionId);
-        const timestamp = new Date().toISOString();
-        const permission: ImmigrationPermission = {
-          version: 2,
-          id: existing?.id ?? crypto.randomUUID(),
-          profileId: selectedProfileId,
-          ...input,
-          createdAt: existing?.createdAt ?? timestamp,
-          updatedAt: timestamp,
-        };
-        const nextPermissions = existing
-          ? permissions.map((current) =>
-              current.id === existing.id ? permission : current,
-            )
-          : [...permissions, permission];
-        const submit = form.querySelector<HTMLButtonElement>(
-          'button[type="submit"]',
-        );
-        if (submit) submit.disabled = true;
-        try {
-          await saveImmigrationPermissions(
-            selectedProfileId,
-            nextPermissions,
-            key,
-          );
-          permissionCache.set(selectedProfileId, nextPermissions);
-          dialog?.close();
-          renderPermissions(profile, nextPermissions);
-        } catch (storageError) {
-          if (error) {
-            error.textContent = getStorageFailureMessage(
-              storageError,
-              "This encrypted immigration permission could not be saved.",
-            );
-            error.hidden = false;
-          }
-          if (submit) submit.disabled = false;
-        }
-      });
-    };
-
-    const showPermissions = async (profile: HouseholdMember): Promise<void> => {
-      const cached = permissionCache.get(selectedProfileId);
-      if (cached) {
-        renderPermissions(profile, cached);
-        return;
-      }
-      try {
-        const permissions = await getImmigrationPermissions(
-          selectedProfileId,
-          key,
-        );
-        permissionCache.set(selectedProfileId, permissions);
-        renderPermissions(profile, permissions);
-      } catch {
-        renderPermissions(profile, []);
-        const add = root.querySelector<HTMLButtonElement>("#add-permission");
-        if (add) add.disabled = true;
-        const error = root.querySelector<HTMLElement>("#permission-page-error");
-        if (error) {
-          error.textContent =
-            "This profile’s encrypted immigration permissions could not be opened.";
-          error.hidden = false;
-        }
-      }
     };
 
     const buildTravelOverview = (
