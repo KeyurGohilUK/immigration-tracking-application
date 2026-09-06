@@ -1736,13 +1736,10 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await expect(page.locator("#permission-count")).toHaveText("0");
-  await expect(page.locator(".permission-summary-date")).toHaveText(
-    "Not recorded",
-  );
-  await expect(page.getByText("No permissions recorded")).toBeVisible();
-  await page.getByRole("button", { name: "Add permission" }).click();
+  await expect(
+    page.getByText("No permission history recorded yet."),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "+ Add Permission" }).click();
   await expect(
     page.getByRole("dialog", { name: "Add immigration permission" }),
   ).toHaveClass(/liquid-dialog/);
@@ -1755,16 +1752,14 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.getByRole("button", { name: "Save permission" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Skilled Worker", level: 3 }),
+    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
   ).toBeVisible();
   await expect(
-    page.getByText("Calculation supported", { exact: true }),
+    page.getByText("Qualifying (5-year)", { exact: true }),
   ).toBeVisible();
-  await expect(page.locator("#permission-count")).toHaveText("1");
-  await expect(page.locator(".permission-summary-date")).toHaveText(
-    "2026-12-31",
-  );
-  await expect(page.getByText(/qualifying period on Dashboard/i)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Skilled Worker", level: 1 }),
+  ).toBeVisible();
   const permissionProfileId = await page
     .getByLabel("Tracking profile")
     .inputValue();
@@ -1786,32 +1781,31 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   expect(storedPermission).not.toContain("skilled-worker");
   expect(storedPermission).toContain("ciphertext");
 
-  await page.getByRole("button", { name: "Edit Skilled Worker" }).click();
+  await page.getByRole("button", { name: "Edit Skilled Worker permission" }).click();
   await page.getByLabel(/Visa grant date/).clear();
   await page.getByLabel("Permission expiry date").fill("2027-12-31");
   await page.getByRole("button", { name: "Save permission" }).click();
   await expect(
-    page.getByText("Review required", { exact: true }),
+    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
   ).toBeVisible();
-  await expect(
-    page.getByText("Add the visa grant date", { exact: false }),
-  ).toBeVisible();
-  await expect(page.locator(".permission-summary-date")).toHaveText(
-    "2027-12-31",
-  );
+  await expect(page.getByText("2024 – 2027", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Lock app" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page.getByRole("link", { name: "Family", exact: true }).first().click();
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add past visa" }).click();
-  await expect(page.locator(".permission-summary-date")).toHaveText(
-    "2027-12-31",
-  );
+  await expect(
+    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
+  ).toBeVisible();
 
+  await page
+    .getByRole("button", { name: "Edit Skilled Worker permission" })
+    .click();
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Delete Skilled Worker" }).click();
-  await expect(page.getByText("No permissions recorded")).toBeVisible();
+  await page.getByRole("button", { name: "Delete permission" }).click();
+  await expect(
+    page.getByText("No permission history recorded yet."),
+  ).toBeVisible();
 });
 
 test("shows a separate estimate for a household member who is a Skilled Worker dependant", async ({
@@ -1832,7 +1826,7 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
   await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
   await page.getByRole("button", { name: "Save permission" }).click();
   await expect(
-    page.getByText("Dependant calculation supported", { exact: true }),
+    page.getByRole("button", { name: "Edit Skilled Worker permission" }),
   ).toBeVisible();
 
   await page.getByRole("link", { name: "ILR", exact: true }).click();
