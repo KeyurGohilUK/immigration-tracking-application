@@ -68,10 +68,10 @@ Document Vault-specific work is tracked separately in
       than Freddy monochrome if this remains a product requirement.
 - [ ] Use Freddy’s natural fox palette only inside Freddy artwork if this remains
       a product requirement.
-- [ ] Verify WCAG contrast for the supported light theme.
-- [ ] Communicate success, warning, error, and review states with labels, icons,
+- [x] Verify WCAG contrast for the supported light theme.
+- [x] Communicate success, warning, error, and review states with labels, icons,
       borders, and structure rather than relying on colour alone.
-- [ ] Run automated accessibility checks.
+- [x] Run automated accessibility checks.
 
 ## PWA, browser, and deployment resilience
 
