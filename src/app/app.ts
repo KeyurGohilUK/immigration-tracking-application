@@ -30,20 +30,12 @@ const navigationItems = [
   },
 ] as const;
 
-export type NavigationId =
-  (typeof navigationItems)[number]["id"] | "Permissions";
+export type NavigationId = (typeof navigationItems)[number]["id"];
 
 let previousMobileNavigationIndex = 0;
 
-function resolvePrimaryNavigationId(
-  activeNavigation: NavigationId,
-): (typeof navigationItems)[number]["id"] {
-  if (activeNavigation === "Permissions") return "Home";
-  return activeNavigation;
-}
-
 function getPrimaryNavigationIndex(activeNavigation: NavigationId): number {
-  const resolvedNavigation = resolvePrimaryNavigationId(activeNavigation);
+  const resolvedNavigation = activeNavigation;
   const index = navigationItems.findIndex(
     ({ id }) => id === resolvedNavigation,
   );
@@ -54,7 +46,7 @@ function renderNavigation(
   className: string,
   activeNavigation: NavigationId,
 ): string {
-  const resolvedNavigation = resolvePrimaryNavigationId(activeNavigation);
+  const resolvedNavigation = activeNavigation;
   const isMobile = className.includes("mobile-navigation");
   const indicator = isMobile
     ? '<span class="mobile-navigation-indicator" aria-hidden="true"></span>'
