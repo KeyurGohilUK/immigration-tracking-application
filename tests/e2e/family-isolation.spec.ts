@@ -20,6 +20,12 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
 
   await page.getByRole("link", { name: "Family", exact: true }).first().click();
   await page.getByRole("button", { name: "Add Household Member" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Add household member", level: 2 }),
+  ).toBeFocused();
+  await expect(
+    page.getByRole("button", { name: "Close family form" }),
+  ).not.toBeFocused();
   await page.getByLabel("Full name").fill("Isolation Dependant");
   await page.getByLabel("Date of birth").fill("1995-01-01");
   await page.getByLabel("Immigration role").selectOption("dependant");
@@ -30,6 +36,12 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
     .getByRole("button", { name: "Show Isolation Owner's ILR journey" })
     .click();
   await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Add immigration permission", level: 2 }),
+  ).toBeFocused();
+  await expect(
+    page.getByRole("button", { name: "Close permission form" }),
+  ).not.toBeFocused();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2022-01-01");
@@ -43,6 +55,9 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
     .getByRole("button", { name: "Show Isolation Owner's travel" })
     .click();
   await page.getByRole("button", { name: "Add trip" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Add trip", level: 2 }),
+  ).toBeFocused();
   await page.getByLabel("UK departure date").fill("2024-02-01");
   await page.getByLabel(/UK return date/).fill("2024-02-10");
   await page.getByLabel("Destination").fill("Owner-only trip");

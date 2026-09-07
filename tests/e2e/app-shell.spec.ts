@@ -414,15 +414,12 @@ test("guides Address History from the current address backwards", async ({
   let dialog = page.getByRole("dialog", { name: "Address History" });
   const currentAddressHost = dialog.locator("[data-address-new-current-host]");
   await expect(dialog).toBeVisible();
-  await expect
-    .poll(() =>
-      dialog.evaluate(
-        (element) =>
-          document.activeElement?.classList.contains("liquid-dialog-close") ===
-            true && element.contains(document.activeElement),
-      ),
-    )
-    .toBe(true);
+  await expect(
+    dialog.getByRole("heading", { name: "Address History", level: 2 }),
+  ).toBeFocused();
+  await expect(
+    dialog.getByRole("button", { name: "Close address history" }),
+  ).not.toBeFocused();
   await expect(dialog.getByText("No addresses recorded yet")).toHaveCount(0);
   await expect(dialog.getByText(/Work backwards.*Sept 2021/)).toBeVisible();
   await expect(dialog.getByLabel("Start month")).toHaveValue("");

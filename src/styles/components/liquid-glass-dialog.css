@@ -151,6 +151,10 @@
   line-height: 1.5;
 }
 
+.liquid-dialog-header h2:focus {
+  outline: 0;
+}
+
 .liquid-dialog-body,
 .liquid-dialog-actions {
   display: grid;

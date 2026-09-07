@@ -25,9 +25,12 @@ describe("renderLiquidGlassDialog", () => {
     expect(markup).toContain('class="liquid-dialog-actions"');
     expect(markup).not.toContain("liquid-dialog-initial-focus");
     expect(markup).toContain(
-      'class="dialog-close liquid-dialog-close" type="button" aria-label="Close example" autofocus',
+      'class="dialog-close liquid-dialog-close" type="button" aria-label="Close example"',
     );
-    expect(markup).toContain('<h2 id="example-title">Example</h2>');
+    expect(markup).not.toMatch(/liquid-dialog-close[^>]*autofocus/);
+    expect(markup).toContain(
+      '<h2 id="example-title" tabindex="-1" autofocus>Example</h2>',
+    );
     expect(markup).toContain('id="example-input"');
   });
 });
