@@ -166,11 +166,11 @@
   align-items: center;
 }
 
-.travel-entry-title-row h3 {
-  margin: 0;
+.travel-entry-title {
   color: var(--ibiza-text);
   font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 1rem;
+  font-weight: 700;
 }
 
 .travel-entry-location {
