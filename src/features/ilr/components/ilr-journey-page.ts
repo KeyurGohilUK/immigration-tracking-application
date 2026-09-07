@@ -93,7 +93,7 @@ function createPermissionHistory(
       "aria-label",
       `Edit ${getPermissionRouteLabel(permission)} permission`,
     );
-    item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><span class="ilr-permission-copy"><strong></strong><span class="ilr-permission-dates"></span></span><small></small>`;
+    item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><span class="ilr-permission-copy"><strong></strong><span class="ilr-permission-dates"></span></span><small></small><span class="editable-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg></span>`;
     const title = item.querySelector<HTMLElement>("strong");
     const dates = item.querySelector<HTMLElement>(".ilr-permission-dates");
     const role = item.querySelector<HTMLElement>("small");
