@@ -1960,7 +1960,16 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   );
   await page.getByRole("button", { name: "Close trip form" }).click();
 
+  await expect(
+    page.getByRole("button", { name: "Delete trip to India" }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: "Edit trip to India" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Edit trip" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Delete trip", exact: true }),
+  ).toBeVisible();
   await page.getByLabel(/UK return date/).fill("2024-02-12");
   await page.getByRole("button", { name: "Save trip" }).click();
   await expect(page.getByText(/12 Feb 2024/)).toBeVisible();
@@ -1991,8 +2000,12 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
     page.getByRole("heading", { name: "Canada", level: 3 }),
   ).toBeVisible();
 
+  await page.getByRole("button", { name: "Edit trip to Canada" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Edit trip" }),
+  ).toBeVisible();
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Delete trip to Canada" }).click();
+  await page.getByRole("button", { name: "Delete trip", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Canada", level: 3 }),
   ).toHaveCount(0);
