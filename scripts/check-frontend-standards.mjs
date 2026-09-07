@@ -27,6 +27,7 @@ const expectedImports = [
   '@import "./styles/pages/security.css";',
   '@import "./styles/components/install-manager.css";',
   '@import "./styles/components/app-shell.css";',
+  '@import "./styles/components/editable-card-affordance.css";',
   '@import "./styles/pages/dashboard.css";',
   '@import "./styles/components/forms.css";',
   '@import "./styles/pages/records.css";',
