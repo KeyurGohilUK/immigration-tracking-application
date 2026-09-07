@@ -35,7 +35,8 @@ async function createLocalProfile(
   await expect(
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
-  if ((await page.viewportSize())?.width && (await page.viewportSize())!.width < 768) {
+  const profileViewport = page.viewportSize();
+  if (profileViewport && profileViewport.width < 768) {
     const memberCard = page.getByRole("button", {
       name: `Edit ${TEST_PROFILE.name}`,
     });
