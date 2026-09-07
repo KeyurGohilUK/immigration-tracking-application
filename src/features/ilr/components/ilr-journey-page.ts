@@ -9,6 +9,7 @@ import {
   type LifeEnglishRecord,
 } from "../../documents/domain/life-english";
 import type { HouseholdMember } from "../../household/domain/household-member";
+import { renderImmigrationPermissionDialogMarkup } from "../../immigration/components/immigration-permission-dialog";
 import {
   getPermissionRouteLabel,
   type ImmigrationPermission,
@@ -84,9 +85,15 @@ function createPermissionHistory(
     return list;
   }
   for (const [index, permission] of ordered.entries()) {
-    const item = document.createElement("div");
+    const item = document.createElement("button");
+    item.type = "button";
     item.className = `ilr-permission-row${index === 0 ? " is-current" : ""}`;
-    item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><div><strong></strong><span class="ilr-permission-dates"></span></div><small></small>`;
+    item.dataset.editPermission = permission.id;
+    item.setAttribute(
+      "aria-label",
+      `Edit ${getPermissionRouteLabel(permission)} permission`,
+    );
+    item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><span class="ilr-permission-copy"><strong></strong><span class="ilr-permission-dates"></span></span><small></small>`;
     const title = item.querySelector<HTMLElement>("strong");
     const dates = item.querySelector<HTMLElement>(".ilr-permission-dates");
     const role = item.querySelector<HTMLElement>("small");
@@ -231,9 +238,10 @@ export function renderIlrJourneyPage(
     <div id="ilr-household-selector"></div>
     <div id="ilr-summary"></div>
     <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div></div></section>
-      <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-manage-permissions" class="ilr-text-action" type="button">+ Add past visa</button></div><div id="ilr-permission-history"></div></section>
+      <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-add-permission" class="ilr-text-action" type="button">+ Add Permission</button></div><div id="ilr-permission-history"></div><p id="permission-page-error" class="form-error" role="alert" hidden></p></section>
     <aside class="notice ilr-notice" aria-labelledby="ilr-notice-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="ilr-notice-title">Estimate only—not an eligibility decision</h2><p>UrbanFox uses information recorded on this device. Always verify current GOV.UK rules and supporting evidence before applying.</p></div></aside>
-  </main>`,
+  </main>
+    ${renderImmigrationPermissionDialogMarkup()}`,
   );
   if (!selectedJourney) return;
   root.querySelector("#ilr-household-selector")?.replaceWith(
