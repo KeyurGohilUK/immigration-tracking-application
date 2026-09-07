@@ -121,11 +121,32 @@
 }
 
 .travel-entry-card {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
   padding: 1rem;
   border-radius: 1.4rem;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   transition:
     transform 180ms ease,
+    border-color 180ms ease,
     box-shadow 180ms ease;
+}
+
+.travel-entry-card-content {
+  display: grid;
+  min-width: 0;
+}
+
+.travel-entry-card:focus-visible {
+  border-color: var(--colour-strong);
+  outline: 2px solid var(--colour-strong);
+  outline-offset: 2px;
 }
 
 .travel-entry-card:hover {
@@ -200,10 +221,6 @@
   margin-top: 0.8rem;
   border: 1px solid var(--glass-border);
   background: rgb(255 255 255 / 7%);
-}
-
-.travel-entry-actions {
-  margin-top: 0.8rem;
 }
 
 .travel-empty-state {
@@ -310,8 +327,13 @@
   line-height: 1.45;
 }
 
-.trip-profile-save {
+.trip-profile-save,
+#delete-trip {
   width: 100%;
+}
+
+#delete-trip[hidden] {
+  display: none;
 }
 
 html[data-theme="dark"] .trip-profile-form .member-profile-control textarea {
