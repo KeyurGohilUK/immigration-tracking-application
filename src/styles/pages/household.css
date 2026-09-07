@@ -1,6 +1,6 @@
 @media (max-width: 47.99rem) {
   .family-overview-member {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     min-height: 6.5rem;
     padding: 1rem;
   }

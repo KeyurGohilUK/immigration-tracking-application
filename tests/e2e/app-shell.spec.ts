@@ -35,6 +35,29 @@ async function createLocalProfile(
   await expect(
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
+  const profileViewport = page.viewportSize();
+  if (profileViewport && profileViewport.width < 768) {
+    const memberCard = page.getByRole("button", {
+      name: `Edit ${TEST_PROFILE.name}`,
+    });
+    const alignment = await memberCard.evaluate((card) => {
+      const arrow = card.querySelector<HTMLElement>(".editable-card-arrow");
+      if (!arrow) return null;
+      const cardRect = card.getBoundingClientRect();
+      const arrowRect = arrow.getBoundingClientRect();
+      return {
+        rightGap: Math.round(cardRect.right - arrowRect.right),
+        verticalDelta: Math.round(
+          arrowRect.top +
+            arrowRect.height / 2 -
+            (cardRect.top + cardRect.height / 2),
+        ),
+      };
+    });
+    expect(alignment).not.toBeNull();
+    expect(alignment!.rightGap).toBeLessThanOrEqual(24);
+    expect(Math.abs(alignment!.verticalDelta)).toBeLessThanOrEqual(2);
+  }
 }
 
 async function enterPin(
