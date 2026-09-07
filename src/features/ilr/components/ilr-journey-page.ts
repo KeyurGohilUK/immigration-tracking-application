@@ -1,5 +1,6 @@
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { renderAppShell } from "../../../app/app";
 import type { AbsenceCheckResult } from "../../calculation/domain/absence-calculation";
 import type { QualifyingPeriodResult } from "../../calculation/domain/qualifying-period-calculation";
@@ -93,7 +94,7 @@ function createPermissionHistory(
       "aria-label",
       `Edit ${getPermissionRouteLabel(permission)} permission`,
     );
-    item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><span class="ilr-permission-copy"><strong></strong><span class="ilr-permission-dates"></span></span><small></small><span class="editable-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg></span>`;
+    item.innerHTML = `<span class="ilr-permission-dot" aria-hidden="true"></span><span class="ilr-permission-copy"><strong></strong><span class="ilr-permission-dates"></span></span><small></small>${renderEditableCardChevronMarkup()}`;
     const title = item.querySelector<HTMLElement>("strong");
     const dates = item.querySelector<HTMLElement>(".ilr-permission-dates");
     const role = item.querySelector<HTMLElement>("small");
