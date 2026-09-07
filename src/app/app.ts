@@ -1,6 +1,7 @@
 import { APP_NAME } from "../configuration/app-metadata";
 import type { HouseholdMember } from "../features/household/domain/household-member";
 import { renderHouseholdMemberDialogMarkup } from "../features/household/components/member-profile-dialog";
+import { renderEditableCardChevronMarkup } from "../shared/components/editable-card-affordance";
 
 const navigationItems = [
   {
@@ -199,7 +200,7 @@ function createDashboardProfileCard(
       <span class="dashboard-person-heading"><strong></strong><span class="dashboard-person-badge"></span></span>
       <small>Household profile</small>
     </span>
-    <span class="editable-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg></span>
+    ${renderEditableCardChevronMarkup()}
   `;
   const avatar = button.querySelector<HTMLElement>(".dashboard-person-avatar");
   const heading = button.querySelector<HTMLElement>("strong");
