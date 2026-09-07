@@ -140,7 +140,7 @@
 .ilr-permission-row {
   display: grid;
   min-height: 5.1rem;
-  grid-template-columns: auto minmax(0, 1fr) minmax(5.5rem, auto);
+  grid-template-columns: auto minmax(0, 1fr) minmax(5.5rem, auto) auto;
   gap: 0.85rem;
   padding: 0.9rem 1rem;
   border: 1px solid var(--glass-border);
@@ -207,7 +207,7 @@
 
 @media (max-width: 23rem) {
   .ilr-permission-row {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .ilr-permission-row small {

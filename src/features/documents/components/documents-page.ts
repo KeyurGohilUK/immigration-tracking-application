@@ -1,3 +1,4 @@
+import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
 import { renderAppShell } from "../../../app/app";
@@ -226,7 +227,10 @@ function renderVaultRequirement(
   const hasExistingEvidence =
     sectionId === "life-english" ? requirement.complete : !!existingDocument;
   const actionLabel = `${hasExistingEvidence ? "Edit" : "Add"} ${requirement.label}`;
-  const content = `<span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${sectionId === "address-history" ? requirement.label : actionLabel}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small>`;
+  const editChevron = hasExistingEvidence
+    ? renderEditableCardChevronMarkup()
+    : "";
+  const content = `<span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${sectionId === "address-history" ? requirement.label : actionLabel}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small>${sectionId === "address-history" ? "" : editChevron}`;
   if (sectionId !== "address-history") {
     const category = requirement.categories[0];
     if (sectionId === "life-english")
