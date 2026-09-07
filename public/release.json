@@ -1,8 +1,6 @@
 {
-  "version": "3.25.11",
+  "version": "3.25.12",
   "notes": [
-    "Permission history is now managed directly from the ILR journey page, removing the separate Immigration History screen.",
-    "The ILR action is now labelled Add Permission and opens the permission form immediately.",
-    "Existing permission cards can now be opened directly for editing, with delete available from the edit dialog."
+    "Editable household and permission cards now show a chevron affordance so it is clear that tapping the card opens more details."
   ]
 }
