@@ -192,12 +192,12 @@ function createTripCard(trip: Trip): HTMLElement {
   card.className = `timeline-entry travel-entry${trip.returnDate ? "" : " is-open"}`;
   card.innerHTML = `
     <span class="timeline-marker travel-timeline-marker" aria-hidden="true"></span>
-    <button class="timeline-entry-content travel-entry-card glass-panel" type="button" data-edit-trip="${trip.id}" aria-label="Edit trip to ${escapeAttribute(trip.destination)}">
+    <button class="timeline-entry-content travel-entry-card glass-panel" type="button" data-edit-trip="${trip.id}">
       <span class="travel-entry-card-content">
         <span class="travel-entry-topline">
           <span class="travel-entry-copy">
             <span class="travel-entry-title-row">
-              <h3></h3>
+              <span class="travel-entry-title" role="heading" aria-level="3"></span>
               <span class="trip-badges"></span>
             </span>
             <span class="travel-entry-location">Complete days outside the UK</span>
@@ -212,7 +212,9 @@ function createTripCard(trip: Trip): HTMLElement {
       ${renderEditableCardChevronMarkup()}
     </button>`;
 
-  const heading = card.querySelector<HTMLElement>("h3");
+  const editButton =
+    card.querySelector<HTMLButtonElement>("[data-edit-trip]");
+  const heading = card.querySelector<HTMLElement>(".travel-entry-title");
   const badges = card.querySelector<HTMLElement>(".trip-badges");
   const duration = card.querySelector<HTMLElement>(
     ".travel-entry-duration strong",
@@ -220,6 +222,8 @@ function createTripCard(trip: Trip): HTMLElement {
   const dates = card.querySelector<HTMLElement>(".travel-entry-duration span");
   const notes = card.querySelector<HTMLElement>(".trip-notes");
 
+  if (editButton)
+    editButton.setAttribute("aria-label", `Edit trip to ${trip.destination}`);
   if (heading) heading.textContent = trip.destination;
   if (!trip.returnDate) badges?.append(createBadge("Open trip", "is-open"));
   if (trip.exceptionalAbsence)
@@ -236,14 +240,6 @@ function createTripCard(trip: Trip): HTMLElement {
     notes.hidden = false;
   }
   return card;
-}
-
-function escapeAttribute(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
 }
 
 function createBadge(label: string, className = ""): HTMLElement {
