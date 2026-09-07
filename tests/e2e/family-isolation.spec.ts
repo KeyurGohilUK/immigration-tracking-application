@@ -24,7 +24,7 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
     page.getByRole("heading", { name: "Add household member", level: 2 }),
   ).toBeFocused();
   await expect(
-    page.getByRole("button", { name: "Close household member form" }),
+    page.getByRole("button", { name: "Close family form" }),
   ).not.toBeFocused();
   await page.getByLabel("Full name").fill("Isolation Dependant");
   await page.getByLabel("Date of birth").fill("1995-01-01");
