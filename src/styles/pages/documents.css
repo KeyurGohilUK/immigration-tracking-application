@@ -237,13 +237,16 @@
 
 .vault-requirement-action > button:not(.vault-applicability-action) {
   display: grid;
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   gap: 0.65rem;
   align-items: center;
   border: 0;
   padding: 0;
-  padding-inline: 0.15rem;
+  padding-inline: 0.75rem;
   color: inherit;
   background: transparent;
   text-align: left;
