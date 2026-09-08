@@ -11,6 +11,7 @@ import { getImmigrationPermissions } from "../../immigration/data/immigration-pe
 import { getTrips } from "../../travel/data/trip-repository";
 import { getAddressHistory } from "../../documents/data/address-history-repository";
 import { getLifeEnglishRecord } from "../../documents/data/life-english-repository";
+import { getEmploymentRecord } from "../../documents/data/employment-repository";
 import {
   BACKUP_FORMAT,
   BACKUP_KEY_DERIVATION_ITERATIONS,
@@ -55,7 +56,7 @@ export async function collectBackupData(
 ): Promise<BackupData> {
   const members = await getHouseholdMembers(vaultKey);
   const profileIds = members.map(({ id }) => id);
-  const [permissions, trips, addressHistory, lifeEnglish, documentMetadata] =
+  const [permissions, trips, addressHistory, lifeEnglish, employment, documentMetadata] =
     await Promise.all([
       Promise.all(
         profileIds.map(async (profileId) => ({
@@ -81,6 +82,12 @@ export async function collectBackupData(
           return { profileId, records: record ? [record] : [] };
         }),
       ),
+      Promise.all(
+        profileIds.map(async (profileId) => {
+          const record = await getEmploymentRecord(profileId, vaultKey);
+          return { profileId, records: record ? [record] : [] };
+        }),
+      ),
       getAllDocumentMetadata(vaultKey),
     ]);
   const documents = await Promise.all(
@@ -98,6 +105,7 @@ export async function collectBackupData(
     trips,
     addressHistory,
     lifeEnglish,
+    employment,
     documents,
   };
 }
