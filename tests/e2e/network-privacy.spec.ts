@@ -58,7 +58,7 @@ test("never sends local immigration data in network requests", async ({
   await createPrivateProfile(page);
 
   await page.getByRole("link", { name: "ILR", exact: true }).first().click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2022-01-10");
