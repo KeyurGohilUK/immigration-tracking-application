@@ -27,6 +27,13 @@ export interface DocumentBundlePlan {
   items: DocumentBundlePlanItem[];
 }
 
+export interface HouseholdDocumentBundleProfile {
+  profileId: string;
+  profileName: string;
+  documents: readonly DecryptedDocumentFile[];
+  addresses: readonly AddressHistoryEntry[];
+}
+
 const TEXT_ENCODER = new TextEncoder();
 
 export function buildDocumentBundlePlan(
@@ -108,17 +115,18 @@ export function buildDocumentBundlePlan(
   return { folders, items };
 }
 
-export async function createDocumentBundle(
+async function createDocumentBundleEntries(
   documents: readonly DecryptedDocumentFile[],
   addresses: readonly AddressHistoryEntry[],
   profileName: string,
-): Promise<Uint8Array<ArrayBuffer>> {
+  pathPrefix = "",
+): Promise<ZipEntry[]> {
   const plan = buildDocumentBundlePlan(documents, addresses, profileName);
   const filesById = new Map(
     documents.map((file) => [file.metadata.id, file] as const),
   );
   const entries: ZipEntry[] = plan.folders.map((folder) => ({
-    path: `${folder}/`,
+    path: `${pathPrefix}${folder}/`,
     bytes: new Uint8Array(),
     directory: true,
   }));
@@ -133,7 +141,10 @@ export async function createDocumentBundle(
         ).indexRows,
         profileName,
       );
-      entries.push({ path: item.path, bytes: addressIndexBytes });
+      entries.push({
+        path: `${pathPrefix}${item.path}`,
+        bytes: addressIndexBytes,
+      });
       continue;
     }
 
@@ -141,9 +152,52 @@ export async function createDocumentBundle(
     const file = filesById.get(item.documentId);
     if (!file)
       throw new Error("A document selected for the bundle is unavailable.");
-    entries.push({ path: item.path, bytes: file.bytes });
+    entries.push({
+      path: `${pathPrefix}${item.path}`,
+      bytes: file.bytes,
+    });
   }
 
+  return entries;
+}
+
+export async function createDocumentBundle(
+  documents: readonly DecryptedDocumentFile[],
+  addresses: readonly AddressHistoryEntry[],
+  profileName: string,
+): Promise<Uint8Array<ArrayBuffer>> {
+  return createStoredZip(
+    await createDocumentBundleEntries(documents, addresses, profileName),
+  );
+}
+
+export async function createHouseholdDocumentBundle(
+  profiles: readonly HouseholdDocumentBundleProfile[],
+): Promise<Uint8Array<ArrayBuffer>> {
+  if (profiles.length === 0)
+    throw new Error("Add at least one household profile before exporting.");
+
+  const usedFolders = new Set<string>();
+  const entries: ZipEntry[] = [];
+  for (const profile of profiles) {
+    const profileFolder = getUniqueProfileFolderName(
+      profile.profileName,
+      usedFolders,
+    );
+    entries.push({
+      path: `${profileFolder}/`,
+      bytes: new Uint8Array(),
+      directory: true,
+    });
+    entries.push(
+      ...(await createDocumentBundleEntries(
+        profile.documents,
+        profile.addresses,
+        profile.profileName,
+        `${profileFolder}/`,
+      )),
+    );
+  }
   return createStoredZip(entries);
 }
 
@@ -152,17 +206,31 @@ export function getDocumentBundleFileName(profileName: string): string {
   return `${safeName}-ILR-Document-Bundle.zip`;
 }
 
-export function downloadDocumentBundle(
-  bytes: Uint8Array<ArrayBuffer>,
-  profileName: string,
-): void {
+export function getHouseholdDocumentBundleFileName(): string {
+  return "UrbanFox-Household-ILR-Document-Bundle.zip";
+}
+
+function downloadZip(bytes: Uint8Array<ArrayBuffer>, fileName: string): void {
   const blob = new Blob([bytes], { type: "application/zip" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = getDocumentBundleFileName(profileName);
+  link.download = fileName;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+export function downloadDocumentBundle(
+  bytes: Uint8Array<ArrayBuffer>,
+  profileName: string,
+): void {
+  downloadZip(bytes, getDocumentBundleFileName(profileName));
+}
+
+export function downloadHouseholdDocumentBundle(
+  bytes: Uint8Array<ArrayBuffer>,
+): void {
+  downloadZip(bytes, getHouseholdDocumentBundleFileName());
 }
 
 function getVisibleSections(): DocumentVaultSectionDefinition[] {
@@ -173,6 +241,25 @@ function getVisibleSections(): DocumentVaultSectionDefinition[] {
 
 function getSectionFolderName(label: string): string {
   return sanitizePathPart(label.replace(/\s*\/\s*/g, " & "));
+}
+
+function getUniqueProfileFolderName(
+  profileName: string,
+  usedFolders: Set<string>,
+): string {
+  const base = sanitizePathPart(profileName || "Household member");
+  if (!usedFolders.has(base.toLowerCase())) {
+    usedFolders.add(base.toLowerCase());
+    return base;
+  }
+  let counter = 2;
+  let candidate = `${base} (${counter})`;
+  while (usedFolders.has(candidate.toLowerCase())) {
+    counter += 1;
+    candidate = `${base} (${counter})`;
+  }
+  usedFolders.add(candidate.toLowerCase());
+  return candidate;
 }
 
 function getUniqueFileName(

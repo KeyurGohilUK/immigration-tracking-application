@@ -157,7 +157,9 @@ import {
 } from "../features/documents/domain/document";
 import {
   createDocumentBundle,
+  createHouseholdDocumentBundle,
   downloadDocumentBundle,
+  downloadHouseholdDocumentBundle,
 } from "../features/documents/services/document-bundle-service";
 import {
   buildAddressEvidenceExportPlan,
@@ -1170,6 +1172,55 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             button.textContent = "Download address files + index";
             showDocumentPageError(
               "The Address History downloads could not be created. Check that the linked evidence files can still be opened.",
+            );
+          }
+        });
+      root
+        .querySelector<HTMLButtonElement>("#download-household-document-bundle")
+        ?.addEventListener("click", async (event) => {
+          const button = event.currentTarget as HTMLButtonElement;
+          const label = button.querySelector<HTMLElement>(
+            "[data-household-vault-download-label]",
+          );
+          if (!label) return;
+          button.disabled = true;
+          label.textContent = "CREATING HOUSEHOLD ZIP…";
+          try {
+            const profiles = await Promise.all(
+              familyMembers.map(async (member) => {
+                const memberDocuments = documents
+                  .filter(({ profileId }) => profileId === member.id)
+                  .sort(
+                    (left, right) =>
+                      left.sortOrder - right.sortOrder ||
+                      left.createdAt.localeCompare(right.createdAt),
+                  );
+                const [files, addresses] = await Promise.all([
+                  Promise.all(
+                    memberDocuments.map(({ id }) =>
+                      getDocumentFile(id, key, member.id),
+                    ),
+                  ),
+                  addressHistoryCache.get(member.id) ??
+                    getAddressHistory(member.id, key),
+                ]);
+                addressHistoryCache.set(member.id, addresses);
+                return {
+                  profileId: member.id,
+                  profileName: member.fullName,
+                  documents: files,
+                  addresses,
+                };
+              }),
+            );
+            const bytes = await createHouseholdDocumentBundle(profiles);
+            downloadHouseholdDocumentBundle(bytes);
+            label.textContent = "HOUSEHOLD ZIP DOWNLOADED";
+          } catch {
+            button.disabled = false;
+            label.textContent = "DOWNLOAD HOUSEHOLD ZIP";
+            showDocumentPageError(
+              "The household document bundle could not be created. Check that every household file can still be opened.",
             );
           }
         });

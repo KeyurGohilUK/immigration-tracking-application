@@ -843,7 +843,7 @@ test("stores and manages encrypted documents for a profile", async ({
     page.getByRole("heading", { name: "Final Application Documents" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "DOWNLOAD ZIP BUNDLE" }),
+    page.getByRole("button", { name: "DOWNLOAD MY ZIP" }),
   ).toBeDisabled();
   await expect(
     page.getByRole("progressbar", { name: "Document Vault readiness" }),
@@ -1027,7 +1027,7 @@ test("stores and manages encrypted documents for a profile", async ({
 
   const bundleDownloadPromise = page.waitForEvent("download");
   const bundleButton = page.getByRole("button", {
-    name: "DOWNLOAD ZIP BUNDLE",
+    name: "DOWNLOAD MY ZIP",
   });
   await expect(bundleButton.locator("svg")).toHaveCount(1);
   await expect(bundleButton.locator("path")).toHaveCount(2);
@@ -1107,6 +1107,43 @@ test("derives conditional Document Vault applicability from the Skilled Worker d
     family.getByRole("button", { name: "Add Relationship evidence" }),
   ).toBeEnabled();
   await expect(family.getByText("Not applicable")).toHaveCount(0);
+});
+
+test("downloads an optional combined household Document Vault bundle", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await page.getByRole("link", { name: "Family", exact: true }).click();
+  await page.getByRole("button", { name: "Add Household Member" }).click();
+  await page.getByLabel("Full name").fill("Household Dependant");
+  await page.getByLabel("Date of birth").fill("1995-04-12");
+  await page.getByLabel("Immigration role").selectOption("dependant");
+  await page.getByRole("button", { name: "Save household member" }).click();
+
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  const householdButton = page.getByRole("button", {
+    name: "DOWNLOAD HOUSEHOLD ZIP",
+  });
+  await expect(householdButton).toBeVisible();
+
+  const downloadPromise = page.waitForEvent("download");
+  await householdButton.click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe(
+    "UrbanFox-Household-ILR-Document-Bundle.zip",
+  );
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  if (!path) throw new Error("Household bundle download path was unavailable.");
+  const zipText = (await readFile(path)).toString("latin1");
+  expect(zipText).toContain(TEST_PROFILE.name);
+  expect(zipText).toContain("Household Dependant/");
+  expect(zipText).toContain("Address History/");
+  await expect(
+    page.getByRole("button", { name: "HOUSEHOLD ZIP DOWNLOADED" }),
+  ).toBeVisible();
 });
 
 test("adds and edits documents from non-address checklist items", async ({
