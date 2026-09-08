@@ -5,7 +5,9 @@ import type { DocumentMetadata } from "../domain/document";
 import {
   buildDocumentBundlePlan,
   createDocumentBundle,
+  createHouseholdDocumentBundle,
   getDocumentBundleFileName,
+  getHouseholdDocumentBundleFileName,
 } from "./document-bundle-service";
 
 const timestamp = "2026-09-03T09:00:00.000Z";
@@ -164,6 +166,66 @@ describe("Document Vault ZIP bundle", () => {
     expect(
       new DataView(bytes.buffer).getUint32(bytes.byteLength - 22, true),
     ).toBe(0x06054b50);
+  });
+
+  it("creates a combined household ZIP with isolated member folders", async () => {
+    const ownerFile = documentFile(
+      "1",
+      "employment-contract",
+      "owner-contract.pdf",
+    );
+    const dependantFile = {
+      ...documentFile("2", "payslip", "dependant-payslip.pdf"),
+      metadata: {
+        ...documentFile("2", "payslip", "dependant-payslip.pdf").metadata,
+        profileId: "dependant",
+      },
+    };
+    const bytes = await createHouseholdDocumentBundle([
+      {
+        profileId: "owner",
+        profileName: "Test User",
+        documents: [ownerFile],
+        addresses: [],
+      },
+      {
+        profileId: "dependant",
+        profileName: "Family Member",
+        documents: [dependantFile],
+        addresses: [],
+      },
+    ]);
+
+    const text = new TextDecoder().decode(bytes);
+    expect(text).toContain("Test User/Employment/owner-contract.pdf");
+    expect(text).toContain("Family Member/Salary & Tax/dependant-payslip.pdf");
+  });
+
+  it("keeps duplicate household names in separate folders", async () => {
+    const bytes = await createHouseholdDocumentBundle([
+      {
+        profileId: "one",
+        profileName: "Same Name",
+        documents: [],
+        addresses: [],
+      },
+      {
+        profileId: "two",
+        profileName: "Same Name",
+        documents: [],
+        addresses: [],
+      },
+    ]);
+
+    const text = new TextDecoder().decode(bytes);
+    expect(text).toContain("Same Name/");
+    expect(text).toContain("Same Name (2)/");
+  });
+
+  it("uses a stable household ZIP filename", () => {
+    expect(getHouseholdDocumentBundleFileName()).toBe(
+      "UrbanFox-Household-ILR-Document-Bundle.zip",
+    );
   });
 
   it("uses an applicant-specific ZIP filename", () => {
