@@ -64,38 +64,38 @@ export async function collectBackupData(
     employment,
     documentMetadata,
   ] = await Promise.all([
-      Promise.all(
-        profileIds.map(async (profileId) => ({
-          profileId,
-          records: await getImmigrationPermissions(profileId, vaultKey),
-        })),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => ({
-          profileId,
-          records: await getTrips(profileId, vaultKey),
-        })),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => ({
-          profileId,
-          records: await getAddressHistory(profileId, vaultKey),
-        })),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => {
-          const record = await getLifeEnglishRecord(profileId, vaultKey);
-          return { profileId, records: record ? [record] : [] };
-        }),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => {
-          const record = await getEmploymentRecord(profileId, vaultKey);
-          return { profileId, records: record ? [record] : [] };
-        }),
-      ),
-      getAllDocumentMetadata(vaultKey),
-    ]);
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getImmigrationPermissions(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getTrips(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getAddressHistory(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => {
+        const record = await getLifeEnglishRecord(profileId, vaultKey);
+        return { profileId, records: record ? [record] : [] };
+      }),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => {
+        const record = await getEmploymentRecord(profileId, vaultKey);
+        return { profileId, records: record ? [record] : [] };
+      }),
+    ),
+    getAllDocumentMetadata(vaultKey),
+  ]);
   const documents = await Promise.all(
     documentMetadata.map(async ({ id }) => {
       const document = await getDocumentFile(id, vaultKey);
