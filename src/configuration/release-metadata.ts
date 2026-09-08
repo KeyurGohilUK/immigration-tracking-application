@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.25.25";
+export const APP_VERSION = "3.25.26";
 
 export const RELEASE_NOTES = [
-  "Document Vault regression coverage now hardens route-driven readiness boundaries and household evidence isolation.",
+  "The ILR journey now combines recorded immigration permissions and travel absences into one chronological timeline.",
 ] as const;
