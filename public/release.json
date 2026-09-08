@@ -1,6 +1,7 @@
 {
   "version": "3.25.21",
   "notes": [
-    "Additional Documents now support encrypted custom tags, document and expiry dates, notes, and later reclassification from Edit details."
+    "Additional Documents now support encrypted custom tags, document and expiry dates, notes, and later reclassification from Edit details.",
+    "Document Vault applicability is now derived from supported immigration route and age rules instead of a manual Not applicable button."
   ]
 }
