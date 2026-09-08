@@ -172,11 +172,6 @@ import {
   saveEmploymentRecord,
 } from "../features/documents/data/employment-repository";
 import {
-  getRequirementApplicability,
-  saveRequirementApplicability,
-} from "../features/documents/data/requirement-applicability-repository";
-import type { RequirementApplicabilityRecord } from "../features/documents/domain/requirement-applicability";
-import {
   calculateAddressHistoryCoverage,
   getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
@@ -200,6 +195,7 @@ import {
   calculateProfileDocumentVaultProgress,
   getDefaultCategoryForSection,
 } from "../features/documents/domain/document-vault";
+import { getRouteDrivenNotApplicableRequirementIds } from "../features/documents/domain/document-requirement-rules";
 import {
   renderIlrJourneyPage,
   type IlrJourneyMember,
@@ -224,10 +220,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const addressHistoryCache = new Map<string, AddressHistoryEntry[]>();
     const lifeEnglishCache = new Map<string, LifeEnglishRecord | null>();
     const employmentCache = new Map<string, EmploymentRecord | null>();
-    const applicabilityCache = new Map<
-      string,
-      RequirementApplicabilityRecord | null
-    >();
 
     const lock = (): void => {
       if (!sessionKey) return;
@@ -337,8 +329,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           let lifeEnglishAvailable = lifeEnglishCache.has(member.id);
           let addressHistory = addressHistoryCache.get(member.id) ?? [];
           let addressHistoryAvailable = addressHistoryCache.has(member.id);
-          let applicability = applicabilityCache.get(member.id) ?? null;
-          let applicabilityAvailable = applicabilityCache.has(member.id);
           try {
             if (!permissions)
               permissions = await getImmigrationPermissions(member.id, key);
@@ -366,22 +356,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             addressHistory = [];
             addressHistoryAvailable = false;
           }
-          try {
-            if (!applicabilityCache.has(member.id))
-              applicability = await getRequirementApplicability(member.id, key);
-            applicabilityAvailable = true;
-          } catch {
-            applicability = null;
-            applicabilityAvailable = false;
-          }
           permissionCache.set(member.id, permissions);
           tripCache.set(member.id, trips);
           if (lifeEnglishAvailable)
             lifeEnglishCache.set(member.id, lifeEnglish);
           if (addressHistoryAvailable)
             addressHistoryCache.set(member.id, addressHistory);
-          if (applicabilityAvailable)
-            applicabilityCache.set(member.id, applicability);
 
           const latestPermission = [...permissions].sort((left, right) =>
             right.permissionStartDate.localeCompare(left.permissionStartDate),
@@ -411,11 +391,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             addressRequirement.startMonth,
             asOfMonth,
           );
+          const routeDrivenNotApplicable =
+            getRouteDrivenNotApplicableRequirementIds(
+              member,
+              permissions,
+              period.earliestApplicationDate ?? asOfDate,
+            );
           const documentVault =
             allDocuments !== null &&
             addressHistoryAvailable &&
-            lifeEnglishAvailable &&
-            applicabilityAvailable
+            lifeEnglishAvailable
               ? calculateProfileDocumentVaultProgress(
                   allDocuments.filter(
                     ({ profileId }) => profileId === member.id,
@@ -423,7 +408,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
                   addressHistory,
                   addressCoverage,
                   lifeEnglish,
-                  applicability?.notApplicableRequirementIds ?? [],
+                  routeDrivenNotApplicable,
                 )
               : null;
 
@@ -897,7 +882,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       lifeEnglish: LifeEnglishRecord | null,
       employment: EmploymentRecord | null,
       earliestApplicationDate: string | null,
-      applicability: RequirementApplicabilityRecord | null,
     ): void => {
       const asOfMonth = getUkCalendarDate().slice(0, 7);
       const addressCoverage = calculateAddressHistoryCoverage(
@@ -945,13 +929,19 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             member.id === selectedProfileId
               ? lifeEnglish
               : (lifeEnglishCache.get(member.id) ?? null);
+          const memberPermissions = permissionCache.get(member.id) ?? [];
           const progress = calculateProfileDocumentVaultProgress(
             documents.filter(({ profileId }) => profileId === member.id),
             entries,
             coverage,
             record,
-            applicabilityCache.get(member.id)?.notApplicableRequirementIds ??
-              [],
+            getRouteDrivenNotApplicableRequirementIds(
+              member,
+              memberPermissions,
+              member.id === selectedProfileId
+                ? (earliestApplicationDate ?? getUkCalendarDate())
+                : getUkCalendarDate(),
+            ),
           );
           return [member.id, progress.readinessPercent] as const;
         }),
@@ -969,7 +959,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         employment,
         employerLetterStatus,
         profileReadiness,
-        applicability?.notApplicableRequirementIds ?? [],
+        getRouteDrivenNotApplicableRequirementIds(
+          profile,
+          permissionCache.get(selectedProfileId) ?? [],
+          earliestApplicationDate ?? getUkCalendarDate(),
+        ),
       );
       wireAuthenticatedShell(profile, "Documents");
       const uploadDialog =
@@ -1275,35 +1269,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             showLifeInUkForm(root, lifeEnglish);
           if (button.dataset.lifeEnglishForm === "english-language")
             showEnglishLanguageForm(root, lifeEnglish);
-        });
-      }
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-requirement-applicability]",
-      )) {
-        button.addEventListener("click", async () => {
-          const requirementId = button.dataset.requirementApplicability;
-          if (!requirementId) return;
-          const existing = applicabilityCache.get(selectedProfileId) ?? null;
-          const ids = new Set(existing?.notApplicableRequirementIds ?? []);
-          if (ids.has(requirementId)) ids.delete(requirementId);
-          else ids.add(requirementId);
-          const next: RequirementApplicabilityRecord = {
-            version: 1,
-            profileId: selectedProfileId,
-            notApplicableRequirementIds: [...ids],
-            updatedAt: new Date().toISOString(),
-          };
-          button.disabled = true;
-          try {
-            await saveRequirementApplicability(next, key);
-            applicabilityCache.set(selectedProfileId, next);
-            await showDocuments(profile);
-          } catch {
-            button.disabled = false;
-            showDocumentPageError(
-              "The requirement applicability could not be saved. Your existing setting is unchanged.",
-            );
-          }
         });
       }
       const wireIndependentDialog = (
@@ -2328,13 +2293,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           getAllDocumentMetadata(key),
           Promise.all(
             familyMembers.map(async (member) => {
-              const [
-                permissions,
-                addressHistory,
-                lifeEnglish,
-                employment,
-                applicability,
-              ] = await Promise.all([
+              const [permissions, addressHistory, lifeEnglish, employment] =
+                await Promise.all([
                 permissionCache.get(member.id) ??
                   getImmigrationPermissions(member.id, key),
                 addressHistoryCache.get(member.id) ??
@@ -2345,22 +2305,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
                 employmentCache.has(member.id)
                   ? (employmentCache.get(member.id) ?? null)
                   : getEmploymentRecord(member.id, key),
-                applicabilityCache.has(member.id)
-                  ? (applicabilityCache.get(member.id) ?? null)
-                  : getRequirementApplicability(member.id, key),
               ]);
               permissionCache.set(member.id, permissions);
               addressHistoryCache.set(member.id, addressHistory);
               lifeEnglishCache.set(member.id, lifeEnglish);
               employmentCache.set(member.id, employment);
-              applicabilityCache.set(member.id, applicability);
               return {
                 id: member.id,
                 permissions,
                 addressHistory,
                 lifeEnglish,
                 employment,
-                applicability,
               };
             }),
           ),
@@ -2368,13 +2323,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (selectedProfileId !== profileId) return;
         const selected = profiles.find(({ id }) => id === profileId);
         if (!selected) throw new Error("A household member is required.");
-        const {
-          permissions,
-          addressHistory,
-          lifeEnglish,
-          employment,
-          applicability,
-        } = selected;
+        const { permissions, addressHistory, lifeEnglish, employment } =
+          selected;
         const addressRequirement = getAddressHistoryRequirement(permissions);
         const latestPermission = [...permissions].sort((left, right) =>
           right.permissionStartDate.localeCompare(left.permissionStartDate),
@@ -2398,10 +2348,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           lifeEnglish,
           employment,
           period.earliestApplicationDate,
-          applicability,
         );
       } catch {
-        renderDocuments(profile, [], [], null, null, null, null, null, null);
+        renderDocuments(profile, [], [], null, null, null, null, null);
         showDocumentPageError(
           "Encrypted Document Vault data could not be opened on this device.",
         );
