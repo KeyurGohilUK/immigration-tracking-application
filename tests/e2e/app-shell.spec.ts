@@ -1233,7 +1233,7 @@ test("adds and edits documents from non-address checklist items", async ({
 
   const employerLetterRow = employmentSection
     .locator(".vault-requirement-item")
-    .filter({ has: employmentSection.getByText("Edit Employer letter") });
+    .filter({ hasText: "Edit Employer letter" });
   const rowBox = await employerLetterRow.boundingBox();
   const stateBox = await employerLetterRow
     .locator(".vault-requirement-state")
