@@ -212,8 +212,7 @@ function createTripCard(trip: Trip): HTMLElement {
       ${renderEditableCardChevronMarkup()}
     </button>`;
 
-  const editButton =
-    card.querySelector<HTMLButtonElement>("[data-edit-trip]");
+  const editButton = card.querySelector<HTMLButtonElement>("[data-edit-trip]");
   const heading = card.querySelector<HTMLElement>(".travel-entry-title");
   const badges = card.querySelector<HTMLElement>(".trip-badges");
   const duration = card.querySelector<HTMLElement>(
