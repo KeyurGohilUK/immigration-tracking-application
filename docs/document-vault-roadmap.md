@@ -43,7 +43,7 @@ product roadmap.
 - [x] Add explicit, reversible Not applicable handling only for conditional
       requirements, excluding them from readiness while preserving the setting
       in encrypted local storage and backups.
-- [ ] Add richer Additional Documents metadata: custom tag/category, document
+- [x] Add richer Additional Documents metadata: custom tag/category, document
       date, expiry date, notes, and reclassification.
 - [x] Add Download Application Bundle ZIP export with section folders and safe
       filenames. Review/select UI and a manifest/checklist can be added later.
