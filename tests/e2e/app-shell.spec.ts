@@ -1762,7 +1762,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByText("No permission history recorded yet."),
   ).toBeVisible();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await expect(
     page.getByRole("dialog", { name: "Add immigration permission" }),
   ).toHaveClass(/liquid-dialog/);
@@ -1850,7 +1850,7 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("dependant");
   await page.getByLabel(/Visa grant date/).fill("2023-12-15");
@@ -2017,7 +2017,7 @@ test("shows recorded-absence usage on ILR and Travel without claiming eligibilit
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2022-01-01");
