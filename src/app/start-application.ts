@@ -777,6 +777,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyMembers = reviewedBackup.data.members;
           permissionCache.clear();
           tripCache.clear();
+          addressHistoryCache.clear();
+          lifeEnglishCache.clear();
+          employmentCache.clear();
           selectedProfileId = familyMembers[0]?.id ?? "";
           restoreDialog?.close();
           const currentMember = familyMembers[0];
@@ -809,6 +812,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyMembers = [];
           permissionCache.clear();
           tripCache.clear();
+          addressHistoryCache.clear();
+          lifeEnglishCache.clear();
+          employmentCache.clear();
           selectedProfileId = familyMembers[0]?.id ?? "";
           showLanding(
             "All UrbanFox ILR data and the local PIN were deleted from this browser.",
