@@ -80,9 +80,12 @@ export function showRequirementEvidenceForm(
   category: RequirementDialogCategory,
   existingDocument?: DocumentMetadata,
 ): void {
-  const dialog = root.querySelector<HTMLDialogElement>(`#${dialogId(category)}`);
+  const dialog = root.querySelector<HTMLDialogElement>(
+    `#${dialogId(category)}`,
+  );
   const form = root.querySelector<HTMLFormElement>(`#${formId(category)}`);
-  if (!dialog || !form) throw new Error("Requirement evidence form is unavailable.");
+  if (!dialog || !form)
+    throw new Error("Requirement evidence form is unavailable.");
   form.reset();
   (form.elements.namedItem("documentId") as HTMLInputElement).value =
     existingDocument?.id ?? "";
