@@ -40,7 +40,9 @@ product roadmap.
       requirement modal instead of opening a second upload modal.
 - [x] Add structured employment metadata (employer, job title, sponsorship
       status, dates, salary) and time-aware final employer-letter status.
-- [ ] Add explicit Not applicable handling for conditional requirements.
+- [x] Add explicit, reversible Not applicable handling only for conditional
+      requirements, excluding them from readiness while preserving the setting
+      in encrypted local storage and backups.
 - [ ] Add richer Additional Documents metadata: custom tag/category, document
       date, expiry date, notes, and reclassification.
 - [x] Add Download Application Bundle ZIP export with section folders and safe

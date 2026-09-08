@@ -26,6 +26,10 @@ import {
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   type DocumentMetadata,
 } from "../../documents/domain/document";
+import {
+  isRequirementApplicabilityCollection,
+  type RequirementApplicabilityRecord,
+} from "../../documents/domain/requirement-applicability";
 
 export const BACKUP_FORMAT = "urbanfox-ilr-encrypted-backup";
 export const BACKUP_VERSION = 1;
@@ -50,6 +54,7 @@ export interface BackupData {
   addressHistory: ProfileRecords<AddressHistoryEntry>[];
   lifeEnglish: ProfileRecords<LifeEnglishRecord>[];
   employment: ProfileRecords<EmploymentRecord>[];
+  requirementApplicability: ProfileRecords<RequirementApplicabilityRecord>[];
   documents?: BackupDocument[];
 }
 
@@ -232,6 +237,11 @@ export function isBackupPayload(value: unknown): value is BackupPayload {
       payload.data.employment,
       profileIds,
       isEmploymentCollection,
+    ) &&
+    hasExactlyExpectedProfiles(
+      payload.data.requirementApplicability,
+      profileIds,
+      isRequirementApplicabilityCollection,
     ) &&
     documentsAreValid
   );

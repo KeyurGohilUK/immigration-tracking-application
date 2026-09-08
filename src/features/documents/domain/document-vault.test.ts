@@ -31,7 +31,7 @@ describe("Document Vault readiness", () => {
     const progress = calculateDocumentVaultProgress([]);
 
     expect(progress.readinessPercent).toBe(0);
-    expect(progress.totalRequired).toBe(5);
+    expect(progress.totalRequired).toBe(8);
     expect(
       progress.sections.some(({ id }) => id === "identity-immigration"),
     ).toBe(false);
@@ -49,7 +49,7 @@ describe("Document Vault readiness", () => {
       documentFor("immigration-evidence", 1),
     ]);
 
-    expect(progress.totalRequired).toBe(5);
+    expect(progress.totalRequired).toBe(8);
     expect(progress.completedRequired).toBe(0);
     expect(progress.readinessPercent).toBe(0);
     expect(
@@ -83,7 +83,7 @@ describe("Document Vault readiness", () => {
     );
     expect(completeAddress?.status).toBe("complete");
     expect(completeAddress?.completedRequired).toBe(1);
-    expect(complete.readinessPercent).toBe(20);
+    expect(complete.readinessPercent).toBe(13);
   });
 
   it("keeps a fully covered timeline Partial while address evidence is still outstanding", () => {
@@ -182,15 +182,48 @@ describe("Document Vault readiness", () => {
     expect(partialFinal?.status).toBe("partial");
   });
 
-  it("does not make conditional or later evidence reduce readiness", () => {
+  it("does not count a conditional document as complete without its structured requirement state", () => {
     const progress = calculateDocumentVaultProgress([
       documentFor("life-in-uk", 0),
       documentFor("application-form", 1),
     ]);
 
     expect(progress.completedRequired).toBe(0);
-    expect(progress.totalRequired).toBe(5);
+    expect(progress.totalRequired).toBe(8);
     expect(progress.readinessPercent).toBe(0);
+  });
+
+  it("removes only conditional Not applicable requirements from the denominator", () => {
+    const progress = calculateDocumentVaultProgress([], {
+      notApplicableRequirementIds: [
+        "life-in-uk",
+        "relationship-evidence",
+        "payslip",
+      ],
+    });
+
+    expect(progress.totalRequired).toBe(6);
+    expect(progress.readinessPercent).toBe(0);
+    expect(
+      progress.sections
+        .find(({ id }) => id === "life-english")
+        ?.requirements.find(({ id }) => id === "life-in-uk")?.notApplicable,
+    ).toBe(true);
+    expect(
+      progress.sections
+        .find(({ id }) => id === "salary-tax")
+        ?.requirements.find(({ id }) => id === "payslip")?.notApplicable,
+    ).toBe(false);
+  });
+
+  it("restores a conditional requirement to the denominator when made applicable again", () => {
+    const excluded = calculateDocumentVaultProgress([], {
+      notApplicableRequirementIds: ["english-language"],
+    });
+    const restored = calculateDocumentVaultProgress([]);
+
+    expect(excluded.totalRequired).toBe(7);
+    expect(restored.totalRequired).toBe(8);
   });
 
   it("provides a sensible default upload category for every section", () => {

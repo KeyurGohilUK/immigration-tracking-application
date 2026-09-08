@@ -50,6 +50,7 @@ export async function replaceAllLocalData(
     addressHistory,
     lifeEnglish,
     employment,
+    requirementApplicability,
     documents,
   ] = await Promise.all([
     encryptRecord(data.members, vaultKey),
@@ -83,6 +84,12 @@ export async function replaceAllLocalData(
         encrypted: await encryptRecord(records, vaultKey),
       })),
     ),
+    Promise.all(
+      data.requirementApplicability.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
     data.documents === undefined
       ? Promise.resolve(undefined)
       : Promise.all(
@@ -106,6 +113,7 @@ export async function replaceAllLocalData(
         DATABASE_STORES.addressHistory,
         DATABASE_STORES.lifeEnglish,
         DATABASE_STORES.employment,
+        DATABASE_STORES.requirementApplicability,
         DATABASE_STORES.documents,
       ],
       "readwrite",
@@ -122,6 +130,9 @@ export async function replaceAllLocalData(
       DATABASE_STORES.lifeEnglish,
     );
     const employmentStore = transaction.objectStore(DATABASE_STORES.employment);
+    const applicabilityStore = transaction.objectStore(
+      DATABASE_STORES.requirementApplicability,
+    );
     const documentStore = transaction.objectStore(DATABASE_STORES.documents);
     transaction.oncomplete = () => {
       database.close();
@@ -141,6 +152,7 @@ export async function replaceAllLocalData(
       addressHistoryStore.clear();
       lifeEnglishStore.clear();
       employmentStore.clear();
+      applicabilityStore.clear();
       documentStore.clear();
       profileStore.put(members, HOUSEHOLD_MEMBERS_RECORD_KEY);
       for (const item of permissions)
@@ -152,6 +164,8 @@ export async function replaceAllLocalData(
         lifeEnglishStore.put(item.encrypted, item.profileId);
       for (const item of employment)
         employmentStore.put(item.encrypted, item.profileId);
+      for (const item of requirementApplicability)
+        applicabilityStore.put(item.encrypted, item.profileId);
       for (const item of documents ?? [])
         documentStore.put(item.encrypted, item.id);
     } catch {

@@ -25,6 +25,10 @@ import {
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   type DocumentMetadata,
 } from "../../documents/domain/document";
+import {
+  isRequirementApplicabilityCollection,
+  type RequirementApplicabilityRecord,
+} from "../../documents/domain/requirement-applicability";
 import type {
   BackupData,
   BackupDocument,
@@ -169,6 +173,23 @@ function migrateEmployment(
     result.push({ profileId: item.profileId, records: item.records });
   }
   return result;
+}
+
+function migrateRequirementApplicability(
+  value: unknown,
+  profileIds: readonly string[],
+): ProfileRecords<RequirementApplicabilityRecord>[] | null {
+  if (value === undefined)
+    return profileIds.map((profileId) => ({ profileId, records: [] }));
+  if (!isProfileRecords(value) || value.length !== profileIds.length)
+    return null;
+  return value.every(
+    ({ profileId, records }) =>
+      profileIds.includes(profileId) &&
+      isRequirementApplicabilityCollection(records, profileId),
+  )
+    ? (value as ProfileRecords<RequirementApplicabilityRecord>[])
+    : null;
 }
 
 function migrateDocuments(
@@ -340,12 +361,17 @@ export function migrateBackupPayload(
   );
   const lifeEnglish = migrateLifeEnglish(sourceData.lifeEnglish, profileIds);
   const employment = migrateEmployment(sourceData.employment, profileIds);
+  const requirementApplicability = migrateRequirementApplicability(
+    sourceData.requirementApplicability,
+    profileIds,
+  );
   const documents = migrateDocuments(sourceData.documents, profileIds);
   if (
     !trips ||
     !addressHistory ||
     !lifeEnglish ||
     !employment ||
+    !requirementApplicability ||
     documents === null
   )
     return null;
@@ -357,6 +383,7 @@ export function migrateBackupPayload(
     addressHistory,
     lifeEnglish,
     employment,
+    requirementApplicability,
     ...(documents === undefined ? {} : { documents }),
   };
 

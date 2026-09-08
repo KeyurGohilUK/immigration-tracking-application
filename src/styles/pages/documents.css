@@ -231,6 +231,23 @@
   );
 }
 
+.vault-requirement-action {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.vault-requirement-action > button:not(.vault-applicability-action) {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 0.65rem;
+  align-items: center;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+
 .vault-requirement-state {
   display: grid;
   width: 1.45rem;
@@ -266,6 +283,26 @@
 .vault-requirement-item.is-complete .vault-requirement-state,
 .vault-requirement-item.is-complete small {
   color: var(--ibiza-primary);
+}
+
+.vault-requirement-item.is-not-applicable {
+  border-style: dashed;
+  opacity: 0.82;
+}
+
+.vault-requirement-item.is-not-applicable .vault-requirement-state,
+.vault-requirement-item.is-not-applicable small {
+  color: var(--colour-text-muted);
+}
+
+.vault-applicability-action {
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 0.45rem 0.65rem;
+  color: var(--colour-text-muted);
+  background: color-mix(in srgb, var(--ibiza-surface-high) 70%, transparent);
+  font-size: 0.68rem;
+  font-weight: 800;
 }
 
 .vault-download-panel {
