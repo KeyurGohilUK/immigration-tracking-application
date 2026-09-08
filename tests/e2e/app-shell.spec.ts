@@ -1066,9 +1066,7 @@ test("adds and edits documents from non-address checklist items", async ({
   await employmentDialog
     .getByLabel("Sponsorship status")
     .selectOption("sponsored");
-  await employmentDialog
-    .getByLabel("Employment start date")
-    .fill("2023-01-10");
+  await employmentDialog.getByLabel("Employment start date").fill("2023-01-10");
   await employmentDialog.getByLabel("Annual salary (£)").fill("52000");
   await employmentDialog
     .getByRole("button", { name: "Save employment details" })
