@@ -1041,13 +1041,15 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 
   await page
-    .getByRole("button", { name: "Edit details Council tax statement" })
+    .getByRole("button", { name: "Rename Council tax statement" })
     .click();
   const councilTaxDialog = page.getByRole("dialog", {
-    name: "Edit Address proof",
+    name: "Rename document",
   });
   await councilTaxDialog.getByLabel("Document name").fill("Council tax bill");
-  await councilTaxDialog.getByRole("button", { name: "Save changes" }).click();
+  await councilTaxDialog
+    .getByRole("button", { name: "Save document name" })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Council tax bill" }),
   ).toBeVisible();
@@ -1328,14 +1330,18 @@ test("stores, edits and reclassifies Additional Documents metadata", async ({
   await expect(card).toContainText("Expires 2027-08-01");
   await expect(card).toContainText("Keep with the final application pack.");
 
-  await card.getByRole("button", { name: "Edit details Home Office letter" }).click();
+  await card
+    .getByRole("button", { name: "Edit details Home Office letter" })
+    .click();
   const editDialog = page.getByRole("dialog", {
     name: "Edit Additional supporting document",
   });
   await expect(editDialog.getByLabel("Custom tag / category")).toHaveValue(
     "Home Office correspondence",
   );
-  await editDialog.getByLabel("Category", { exact: true }).selectOption("travel-evidence");
+  await editDialog
+    .getByLabel("Category", { exact: true })
+    .selectOption("travel-evidence");
   await expect(editDialog.getByLabel("Custom tag / category")).toBeHidden();
   await editDialog.getByRole("button", { name: "Save changes" }).click();
 
