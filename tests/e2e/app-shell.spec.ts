@@ -417,7 +417,10 @@ test("guides Address History from the current address backwards", async ({
   await createLocalProfile(page);
 
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  const addPermission = page.getByRole("button", { name: "Add Permission" });
+  await expect(addPermission).toHaveClass(/primary-button/);
+  await expect(addPermission).toHaveCSS("border-radius", "999px");
+  await addPermission.click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2021-09-01");
@@ -1759,7 +1762,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByText("No permission history recorded yet."),
   ).toBeVisible();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await expect(
     page.getByRole("dialog", { name: "Add immigration permission" }),
   ).toHaveClass(/liquid-dialog/);
@@ -1771,11 +1774,12 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
   await page.getByRole("button", { name: "Save permission" }).click();
 
-  await expect(
-    page.getByRole("button", {
-      name: "Edit Skilled Worker permission",
-    }),
-  ).toBeVisible();
+  const permissionCard = page.getByRole("button", {
+    name: "Edit Skilled Worker permission",
+  });
+  await expect(permissionCard).toBeVisible();
+  await expect(permissionCard).toHaveCSS("border-radius", "17.6px");
+  await expect(permissionCard).toHaveCSS("overflow", "visible");
   await expect(
     page.getByText("Qualifying (5-year)", { exact: true }),
   ).toBeVisible();
@@ -1846,7 +1850,7 @@ test("shows a separate estimate for a household member who is a Skilled Worker d
     page.getByRole("button", { name: `Edit ${TEST_PROFILE.name}` }),
   ).toBeVisible();
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("dependant");
   await page.getByLabel(/Visa grant date/).fill("2023-12-15");
@@ -2013,7 +2017,7 @@ test("shows recorded-absence usage on ILR and Travel without claiming eligibilit
   await page.goto("/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "ILR", exact: true }).click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await page.getByLabel("Immigration route").selectOption("skilled-worker");
   await page.getByLabel("Permission held as").selectOption("main-applicant");
   await page.getByLabel(/Visa grant date/).fill("2022-01-01");

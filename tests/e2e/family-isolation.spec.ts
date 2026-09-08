@@ -35,7 +35,7 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
   await page
     .getByRole("button", { name: "Show Isolation Owner's ILR journey" })
     .click();
-  await page.getByRole("button", { name: "+ Add Permission" }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
   await expect(
     page.getByRole("heading", { name: "Add immigration permission", level: 2 }),
   ).toBeFocused();

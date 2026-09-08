@@ -1,6 +1,6 @@
 {
-  "version": "3.25.15",
+  "version": "3.25.16",
   "notes": [
-    "Trip history cards are now tappable edit capsules with a chevron, and trip deletion has moved into the Edit trip dialog."
+    "Add Permission now uses a compact primary pill action, and Permission history cards have cleaner uninterrupted rounded borders."
   ]
 }
