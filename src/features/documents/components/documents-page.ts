@@ -192,11 +192,12 @@ function renderVaultCategoryRows(
         section.id === "address-history"
           ? renderReadOnlyAddressList(addressHistory)
           : "";
-      const statusMessage = section.id === "employment"
-        ? `<p class="vault-section-status-message">${employerLetterStatus}</p>`
-        : section.statusMessage
-          ? `<p class="vault-section-status-message">${section.statusMessage}</p>`
-          : "";
+      const statusMessage =
+        section.id === "employment"
+          ? `<p class="vault-section-status-message">${employerLetterStatus}</p>`
+          : section.statusMessage
+            ? `<p class="vault-section-status-message">${section.statusMessage}</p>`
+            : "";
       let sectionAction = "";
       if (section.id === "address-history") {
         const addressActionLabel = missingCurrentAddress
