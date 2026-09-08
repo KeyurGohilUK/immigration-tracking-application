@@ -81,9 +81,10 @@ export function buildIlrJourneyTimeline(
     open: !trip.returnDate,
   }));
 
-  return [...permissionItems, ...tripItems].sort(
-    (left, right) =>
-      left.startDate.localeCompare(right.startDate) ||
-      (left.type === "permission" ? -1 : 1),
-  );
+  return [...permissionItems, ...tripItems].sort((left, right) => {
+    const dateOrder = left.startDate.localeCompare(right.startDate);
+    if (dateOrder !== 0) return dateOrder;
+    if (left.type === right.type) return left.id.localeCompare(right.id);
+    return left.type === "permission" ? -1 : 1;
+  });
 }
