@@ -51,7 +51,7 @@ product roadmap.
       address / Previous address prefixes.
 - [x] Generate a separate paged Address History Index PDF with address periods,
       full address, evidence filenames, and Page X of Y numbering.
-- [ ] Integrate Document Vault readiness into the central ILR journey/readiness
+- [x] Integrate Document Vault readiness into the central ILR journey/readiness
       view.
 - [ ] Add focused unit/browser coverage for each completed Document Vault
       workflow.
