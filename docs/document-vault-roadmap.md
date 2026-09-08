@@ -48,7 +48,7 @@ product roadmap.
 - [x] Add Download Application Bundle ZIP export with section folders and safe
       filenames. Review/select UI and a manifest/checklist can be added later.
 - [x] Add individual applicant bundle first.
-- [ ] Add optional combined household bundle.
+- [x] Add optional combined household bundle.
 - [x] Export Address History evidence as individually named files using Current
       address / Previous address prefixes.
 - [x] Generate a separate paged Address History Index PDF with address periods,
