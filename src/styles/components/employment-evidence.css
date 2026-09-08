@@ -46,13 +46,15 @@
 }
 
 #document-file,
-#employment-evidence-file {
+#employment-evidence-file,
+.requirement-evidence-form input[type="file"] {
   padding: 0.3rem 0.45rem;
   line-height: 2.55rem;
 }
 
 #document-file::file-selector-button,
-#employment-evidence-file::file-selector-button {
+#employment-evidence-file::file-selector-button,
+.requirement-evidence-form input[type="file"]::file-selector-button {
   height: 2.55rem;
   margin: 0 0.75rem 0 0;
   padding: 0 0.9rem;
