@@ -10,6 +10,7 @@ import {
   type LifeEnglishRecord,
 } from "../../documents/domain/life-english";
 import type { HouseholdMember } from "../../household/domain/household-member";
+import type { DocumentVaultProgress } from "../../documents/domain/document-vault";
 import { renderImmigrationPermissionDialogMarkup } from "../../immigration/components/immigration-permission-dialog";
 import {
   getPermissionRouteLabel,
@@ -22,6 +23,7 @@ export interface IlrJourneyMember {
   absence: AbsenceCheckResult;
   permissions: ImmigrationPermission[];
   lifeEnglish: LifeEnglishRecord | null;
+  documentVault: DocumentVaultProgress | null;
 }
 
 const DAY_IN_MILLISECONDS = 86_400_000;
@@ -216,6 +218,14 @@ function renderSelectedJourney(
           ? "Passed"
           : "To do",
     );
+    setMilestone(
+      milestones,
+      "[data-milestone='documents']",
+      journey.documentVault?.readinessPercent === 100,
+      journey.documentVault
+        ? `${journey.documentVault.readinessPercent}% ready`
+        : "Unavailable",
+    );
   }
   root
     .querySelector<HTMLElement>("#ilr-permission-history")
@@ -238,7 +248,7 @@ export function renderIlrJourneyPage(
     <div class="ilr-atmosphere" aria-hidden="true"></div>
     <div id="ilr-household-selector"></div>
     <div id="ilr-summary"></div>
-    <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div></div></section>
+    <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div><button id="ilr-open-document-vault" class="ilr-milestone ilr-milestone-action" data-milestone="documents" type="button" aria-label="Open Document Vault"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Document Vault evidence</span><strong></strong>${renderEditableCardChevronMarkup()}</button></div></section>
       <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-add-permission" class="primary-button ilr-add-permission-button" type="button"><span aria-hidden="true">＋</span><span>Add Permission</span></button></div><div id="ilr-permission-history"></div><p id="permission-page-error" class="form-error" role="alert" hidden></p></section>
     <aside class="notice ilr-notice" aria-labelledby="ilr-notice-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="ilr-notice-title">Estimate only—not an eligibility decision</h2><p>UrbanFox uses information recorded on this device. Always verify current GOV.UK rules and supporting evidence before applying.</p></div></aside>
   </main>
