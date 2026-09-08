@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.25.19";
+export const APP_VERSION = "3.25.20";
 
 export const RELEASE_NOTES = [
-  "Conditional Document Vault requirements can now be marked Not applicable, excluded from readiness, and made applicable again.",
+  "Document Vault checklist actions now have more breathing room at both edges, and selecting the UrbanFox wordmark opens the main ILR journey.",
 ] as const;
