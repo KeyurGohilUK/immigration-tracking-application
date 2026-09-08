@@ -1013,10 +1013,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         root.querySelector<HTMLDialogElement>("#employment-dialog");
       const employmentForm =
         root.querySelector<HTMLFormElement>("#employment-form");
-      const selectedEmployment =
-        employmentCache.get(selectedProfileId) ?? null;
-      const selectedPermissions =
-        permissionCache.get(selectedProfileId) ?? [];
+      const selectedEmployment = employmentCache.get(selectedProfileId) ?? null;
+      const selectedPermissions = permissionCache.get(selectedProfileId) ?? [];
       const selectedLatestPermission = [...selectedPermissions].sort(
         (left, right) =>
           right.permissionStartDate.localeCompare(left.permissionStartDate),
@@ -1070,8 +1068,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           updatedAt: now,
         };
         const validationError = validateEmploymentRecord(record);
-        const error =
-          employmentForm.querySelector<HTMLElement>("#employment-form-error");
+        const error = employmentForm.querySelector<HTMLElement>(
+          "#employment-form-error",
+        );
         if (validationError) {
           if (error) {
             error.textContent = validationError;
@@ -2220,12 +2219,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           getAllDocumentMetadata(key),
           Promise.all(
             familyMembers.map(async (member) => {
-              const [
-                permissions,
-                addressHistory,
-                lifeEnglish,
-                employment,
-              ] = await Promise.all([
+              const [permissions, addressHistory, lifeEnglish, employment] =
+                await Promise.all([
                   permissionCache.get(member.id) ??
                     getImmigrationPermissions(member.id, key),
                   addressHistoryCache.get(member.id) ??
@@ -2254,7 +2249,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (selectedProfileId !== profileId) return;
         const selected = profiles.find(({ id }) => id === profileId);
         if (!selected) throw new Error("A household member is required.");
-        const { permissions, addressHistory, lifeEnglish, employment } = selected;
+        const { permissions, addressHistory, lifeEnglish, employment } =
+          selected;
         const addressRequirement = getAddressHistoryRequirement(permissions);
         const latestPermission = [...permissions].sort((left, right) =>
           right.permissionStartDate.localeCompare(left.permissionStartDate),
