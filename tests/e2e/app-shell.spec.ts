@@ -1087,6 +1087,7 @@ test("marks only conditional vault requirements Not applicable and reverses the 
   await expect(
     page.getByText("0 of 8 core items complete", { exact: true }),
   ).toBeVisible();
+  await restoredSection.locator("summary").click();
   await expect(
     restoredSection.getByRole("button", {
       name: "Add Life in the UK evidence",
