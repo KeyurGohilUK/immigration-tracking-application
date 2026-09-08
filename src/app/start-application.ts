@@ -1298,8 +1298,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           });
         form?.addEventListener("submit", async (event) => {
           event.preventDefault();
-          const { documentId, displayName, category: formCategory, file } =
-            readRequirementEvidenceForm(form);
+          const {
+            documentId,
+            displayName,
+            category: formCategory,
+            file,
+          } = readRequirementEvidenceForm(form);
           const error = form.querySelector<HTMLElement>(
             "[data-requirement-error]",
           );
