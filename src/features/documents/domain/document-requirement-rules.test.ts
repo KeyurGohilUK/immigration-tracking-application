@@ -84,7 +84,10 @@ describe("route-driven Document Vault applicability", () => {
   });
 
   it("does not guess applicability for unsupported routes", () => {
-    const unsupported = { ...permission("dependant"), route: "global-talent" as const };
+    const unsupported = {
+      ...permission("dependant"),
+      route: "global-talent" as const,
+    };
     expect(
       getRouteDrivenNotApplicableRequirementIds(
         member("1990-01-01"),
