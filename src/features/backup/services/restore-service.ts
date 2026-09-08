@@ -43,8 +43,15 @@ export async function replaceAllLocalData(
   data: BackupData,
   vaultKey: CryptoKey,
 ): Promise<void> {
-  const [members, permissions, trips, addressHistory, lifeEnglish, employment, documents] =
-    await Promise.all([
+  const [
+    members,
+    permissions,
+    trips,
+    addressHistory,
+    lifeEnglish,
+    employment,
+    documents,
+  ] = await Promise.all([
       encryptRecord(data.members, vaultKey),
       Promise.all(
         data.permissions.map(async ({ profileId, records }) => ({
