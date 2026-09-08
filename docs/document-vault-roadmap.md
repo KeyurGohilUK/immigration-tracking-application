@@ -30,7 +30,7 @@ product roadmap.
 - [x] UK postcode lookup cancelled — no suitable open-source solution is
       available for provider-backed address selection. Keep manual structured
       address entry as the supported approach.
-- [ ] Add dedicated requirement-specific Liquid Glass modals for all vault
+- [x] Add dedicated requirement-specific Liquid Glass modals for all vault
       sections.
 - [x] Capture Life in the UK status, pass date, UAN/reference number, and
       optional evidence.

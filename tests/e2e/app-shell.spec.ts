@@ -981,10 +981,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(addDocumentDialog).toHaveClass(/liquid-dialog/);
   await expect(
     addDocumentDialog.locator('option[value="passport"]'),
-  ).toHaveCount(1);
+  ).toHaveCount(0);
   await expect(
     addDocumentDialog.locator('option[value="immigration-evidence"]'),
-  ).toHaveCount(1);
+  ).toHaveCount(0);
   await addDocumentDialog.getByLabel("Document file").setInputFiles({
     name: "council-tax.png",
     mimeType: "image/png",
@@ -1156,6 +1156,12 @@ test("adds and edits documents from non-address checklist items", async ({
 
   let dialog = page.getByRole("dialog", { name: "Add Employer letter" });
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel("Category", { exact: true })).toHaveCount(0);
+  await expect(
+    dialog.getByText(
+      "Add the employer letter you intend to rely on for the ILR application.",
+    ),
+  ).toBeVisible();
   const documentFile = dialog.getByLabel("Document file");
   await expect(documentFile).toBeVisible();
   const fileControlMetrics = await documentFile.evaluate((input) => {
@@ -1271,6 +1277,60 @@ test("adds and edits documents from non-address checklist items", async ({
   await expect(
     documentCollection.getByRole("heading", { name: "Employment contract" }),
   ).toBeVisible();
+});
+
+test("uses tailored Liquid Glass evidence dialogs across remaining Vault sections", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Vault" }).first().click();
+
+  const cases = [
+    {
+      section: "salary-tax",
+      action: "Add Payslip evidence",
+      dialog: "Add Payslip",
+      guidance:
+        "Add the payslip evidence you intend to rely on for salary and employment history.",
+    },
+    {
+      section: "travel-absences",
+      action: "Add Travel supporting evidence",
+      dialog: "Add Travel evidence",
+      guidance:
+        "Add supporting evidence only where it helps explain or verify a recorded absence.",
+    },
+    {
+      section: "family-dependants",
+      action: "Add Relationship evidence",
+      dialog: "Add Relationship evidence",
+      guidance:
+        "Add relationship or dependant evidence relevant to this applicant's route.",
+    },
+    {
+      section: "final-application",
+      action: "Add Final application form",
+      dialog: "Add Application form",
+      guidance:
+        "Add the final application document when it has been produced and checked.",
+    },
+  ] as const;
+
+  for (const item of cases) {
+    const section = page.locator(`[data-vault-section="${item.section}"]`);
+    await section.locator("summary").click();
+    await section.getByRole("button", { name: item.action }).click();
+    const dialog = page.getByRole("dialog", { name: item.dialog });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(item.guidance)).toBeVisible();
+    await expect(dialog.getByLabel("Category", { exact: true })).toHaveCount(0);
+    await expect(
+      dialog.getByRole("button", { name: "Encrypt and save document" }),
+    ).toBeVisible();
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).not.toBeVisible();
+  }
 });
 
 test("stores, edits and reclassifies Additional Documents metadata", async ({

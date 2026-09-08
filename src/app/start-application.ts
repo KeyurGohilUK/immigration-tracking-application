@@ -104,6 +104,12 @@ import {
   syncAdditionalDocumentFields,
 } from "../features/documents/components/documents-page";
 import {
+  getRequirementDialogCategories,
+  isRequirementDialogCategory,
+  readRequirementEvidenceForm,
+  showRequirementEvidenceForm,
+} from "../features/documents/components/requirement-evidence-dialog";
+import {
   readAddressEvidenceFile,
   readAddressHistoryForm,
   resetAddressHistoryForm,
@@ -1258,7 +1264,166 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const existingDocument = documents.find(
             ({ id }) => id === button.dataset.documentId,
           );
-          showDocumentUploadForm(root, category, undefined, existingDocument);
+          if (isRequirementDialogCategory(category))
+            showRequirementEvidenceForm(root, category, existingDocument);
+          else
+            showDocumentUploadForm(root, category, undefined, existingDocument);
+        });
+      }
+      for (const category of getRequirementDialogCategories()) {
+        const dialog = root.querySelector<HTMLDialogElement>(
+          `#requirement-${category}-dialog`,
+        );
+        const form = root.querySelector<HTMLFormElement>(
+          `#requirement-${category}-form`,
+        );
+        dialog
+          ?.querySelector<HTMLButtonElement>(".dialog-close")
+          ?.addEventListener("click", () => dialog.close());
+        dialog
+          ?.querySelector<HTMLButtonElement>("[data-requirement-cancel]")
+          ?.addEventListener("click", () => dialog.close());
+        dialog?.addEventListener("click", (event) => {
+          if (event.target === dialog) dialog.close();
+        });
+        form
+          ?.querySelector<HTMLInputElement>('input[type="file"]')
+          ?.addEventListener("change", (event) => {
+            const file = (event.currentTarget as HTMLInputElement).files?.[0];
+            const name = form.elements.namedItem(
+              "displayName",
+            ) as HTMLInputElement;
+            if (file && !name.value.trim())
+              name.value = suggestDocumentName(file.name);
+          });
+        form?.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const {
+            documentId,
+            displayName,
+            category: formCategory,
+            file,
+          } = readRequirementEvidenceForm(form);
+          const error = form.querySelector<HTMLElement>(
+            "[data-requirement-error]",
+          );
+          const existingDocument = documents.find(
+            ({ id }) => id === documentId,
+          );
+          const mimeType = file
+            ? resolveDocumentMimeType(file.name, file.type)
+            : null;
+          const validationError = file
+            ? validateDocumentUploadInput({
+                displayName,
+                category: formCategory,
+                fileName: file.name,
+                mimeType: mimeType ?? file.type,
+                size: file.size,
+              })
+            : existingDocument
+              ? validateDocumentName(displayName)
+              : "Choose a PDF, JPG, or PNG file.";
+          if (
+            validationError ||
+            (!file && !existingDocument) ||
+            (file && !mimeType)
+          ) {
+            if (error) {
+              error.textContent =
+                validationError ?? "Choose a PDF, JPG, or PNG file.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const profileDocuments = documents.filter(
+            ({ profileId }) => profileId === selectedProfileId,
+          );
+          const totalBytes = documents.reduce(
+            (total, document) => total + document.size,
+            0,
+          );
+          if (
+            !existingDocument &&
+            profileDocuments.length >= MAXIMUM_DOCUMENTS_PER_PROFILE
+          ) {
+            if (error) {
+              error.textContent =
+                "This profile already has the maximum of 25 documents.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const nextFileSize = file?.size ?? existingDocument?.size ?? 0;
+          if (
+            totalBytes - (existingDocument?.size ?? 0) + nextFileSize >
+            MAXIMUM_TOTAL_DOCUMENT_BYTES
+          ) {
+            if (error) {
+              error.textContent =
+                "Document storage would exceed the 50 MB app limit.";
+              error.hidden = false;
+            }
+            return;
+          }
+          const bytes = file
+            ? new Uint8Array(await file.arrayBuffer())
+            : undefined;
+          if (bytes && mimeType) {
+            const signatureError = validateDocumentSignature(mimeType, bytes);
+            if (signatureError) {
+              if (error) {
+                error.textContent = signatureError;
+                error.hidden = false;
+              }
+              return;
+            }
+          }
+          const timestamp = new Date().toISOString();
+          const metadata: DocumentMetadata = {
+            version: 1,
+            id: existingDocument?.id ?? crypto.randomUUID(),
+            profileId: selectedProfileId,
+            displayName,
+            fileName: file?.name.trim() ?? existingDocument?.fileName ?? "",
+            mimeType:
+              mimeType ?? existingDocument?.mimeType ?? "application/pdf",
+            size: file?.size ?? existingDocument?.size ?? 0,
+            category: formCategory,
+            sortOrder:
+              existingDocument?.sortOrder ??
+              profileDocuments.reduce(
+                (maximum, document) => Math.max(maximum, document.sortOrder),
+                -1,
+              ) + 1,
+            createdAt: existingDocument?.createdAt ?? timestamp,
+            updatedAt: timestamp,
+          };
+          const submit = form.querySelector<HTMLButtonElement>(
+            "[data-requirement-submit]",
+          );
+          if (submit) submit.disabled = true;
+          try {
+            if (bytes)
+              await saveDocument(metadata, bytes, key, selectedProfileId);
+            else
+              await saveDocumentMetadataBatch(
+                [metadata],
+                key,
+                selectedProfileId,
+              );
+            dialog?.close();
+            await showDocuments(profile);
+          } catch (storageError) {
+            if (error) {
+              error.textContent = getStorageFailureMessage(
+                storageError,
+                "The evidence could not be encrypted and saved.",
+              );
+              error.hidden = false;
+            }
+            if (submit) submit.disabled = false;
+          }
         });
       }
       for (const button of root.querySelectorAll<HTMLButtonElement>(

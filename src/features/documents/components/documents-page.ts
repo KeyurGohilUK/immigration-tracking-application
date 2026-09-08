@@ -28,6 +28,7 @@ import { renderLifeEnglishDialogs } from "./life-english-dialog";
 import { type LifeEnglishRecord } from "../domain/life-english";
 import { type EmploymentRecord } from "../domain/employment";
 import { renderEmploymentDialog } from "./employment-dialog";
+import { renderRequirementEvidenceDialogs } from "./requirement-evidence-dialog";
 
 export function renderDocumentsPage(
   root: HTMLElement,
@@ -99,6 +100,7 @@ export function renderDocumentsPage(
     )}
     ${renderLifeEnglishDialogs(documents)}
     ${renderEmploymentDialog()}
+    ${renderRequirementEvidenceDialogs()}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
