@@ -31,20 +31,10 @@ describe("employment record", () => {
 
   it("marks the employer letter for review when the application window opens", () => {
     expect(
-      getEmployerLetterTimingStatus(
-        base,
-        true,
-        "2028-05-09",
-        "2028-05-08",
-      ),
+      getEmployerLetterTimingStatus(base, true, "2028-05-09", "2028-05-08"),
     ).toBe("recorded-before-window");
     expect(
-      getEmployerLetterTimingStatus(
-        base,
-        true,
-        "2028-05-09",
-        "2028-05-09",
-      ),
+      getEmployerLetterTimingStatus(base, true, "2028-05-09", "2028-05-09"),
     ).toBe("review-at-application");
   });
 
