@@ -42,6 +42,7 @@ export function renderDocumentsPage(
   employment: EmploymentRecord | null,
   employerLetterStatus: string,
   profileReadiness: ReadonlyMap<string, number>,
+  notApplicableRequirementIds: readonly string[],
 ): void {
   const documents = allDocuments
     .filter(({ profileId }) => profileId === selectedProfileId)
@@ -59,6 +60,7 @@ export function renderDocumentsPage(
     addressHistory,
     addressCoverage,
     lifeEnglish,
+    notApplicableRequirementIds,
   );
   renderAppShell(
     root,
@@ -242,12 +244,28 @@ function renderVaultRequirement(
   const editChevron = hasExistingEvidence
     ? renderEditableCardChevronMarkup()
     : "";
-  const content = `<span class="vault-requirement-state" aria-hidden="true">${requirement.complete ? "✓" : "○"}</span><div><strong>${sectionId === "address-history" ? requirement.label : actionLabel}</strong><span>${requirement.guidance}</span></div><small>${requirement.complete ? completionLabel : incompleteLabel}</small>${sectionId === "address-history" ? "" : editChevron}`;
+  const stateIcon = requirement.notApplicable
+    ? "—"
+    : requirement.complete
+      ? "✓"
+      : "○";
+  const stateLabel = requirement.notApplicable
+    ? "Not applicable"
+    : requirement.complete
+      ? completionLabel
+      : incompleteLabel;
+  const content = `<span class="vault-requirement-state" aria-hidden="true">${stateIcon}</span><div><strong>${sectionId === "address-history" ? requirement.label : actionLabel}</strong><span>${requirement.guidance}</span></div><small>${stateLabel}</small>${sectionId === "address-history" || requirement.notApplicable ? "" : editChevron}`;
+  const applicabilityAction =
+    requirement.priority === "conditional"
+      ? `<button class="vault-applicability-action" type="button" data-requirement-applicability="${requirement.id}" aria-label="${requirement.notApplicable ? "Make" : "Mark"} ${requirement.label} ${requirement.notApplicable ? "applicable again" : "not applicable"}">${requirement.notApplicable ? "Make applicable" : "Not applicable"}</button>`
+      : "";
   if (sectionId !== "address-history") {
     const category = requirement.categories[0];
-    if (sectionId === "life-english")
-      return `<li class="vault-requirement-item vault-requirement-action${requirement.complete ? " is-complete" : ""}"><button type="button" data-life-english-form="${category}" aria-label="${actionLabel}">${content}</button></li>`;
-    return `<li class="vault-requirement-item vault-requirement-action${requirement.complete ? " is-complete" : ""}"><button type="button" data-document-evidence="${category}"${existingDocument ? ` data-document-id="${existingDocument.id}"` : ""} aria-label="${actionLabel}">${content}</button></li>`;
+    const evidenceAction =
+      sectionId === "life-english"
+        ? `<button type="button" data-life-english-form="${category}" aria-label="${actionLabel}"${requirement.notApplicable ? " disabled" : ""}>${content}</button>`
+        : `<button type="button" data-document-evidence="${category}"${existingDocument ? ` data-document-id="${existingDocument.id}"` : ""} aria-label="${actionLabel}"${requirement.notApplicable ? " disabled" : ""}>${content}</button>`;
+    return `<li class="vault-requirement-item vault-requirement-action${requirement.complete ? " is-complete" : ""}${requirement.notApplicable ? " is-not-applicable" : ""}">${evidenceAction}${applicabilityAction}</li>`;
   }
   return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}">${content}</li>`;
 }
@@ -259,6 +277,7 @@ function renderVaultStatusIcon(
   if (status === "needs-attention") return "!";
   if (status === "partial") return "◐";
   if (status === "required-later") return "↗";
+  if (status === "not-applicable") return "—";
   return "○";
 }
 function createDocumentCard(

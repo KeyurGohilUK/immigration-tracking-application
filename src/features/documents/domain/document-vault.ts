@@ -34,6 +34,7 @@ export const DOCUMENT_VAULT_STATUSES = [
   "needs-attention",
   "to-do",
   "required-later",
+  "not-applicable",
 ] as const;
 
 export type DocumentVaultSectionId =
@@ -62,6 +63,7 @@ export interface DocumentVaultSectionDefinition {
 export interface DocumentRequirementProgress extends DocumentRequirementDefinition {
   documentCount: number;
   complete: boolean;
+  notApplicable: boolean;
 }
 
 export interface DocumentVaultSectionProgress extends Omit<
@@ -270,6 +272,7 @@ export const DOCUMENT_VAULT_STATUS_LABELS: Record<DocumentVaultStatus, string> =
     "needs-attention": "Needs attention",
     "to-do": "To do",
     "required-later": "Required later",
+    "not-applicable": "Not applicable",
   };
 
 export interface DocumentVaultProgressOptions {
@@ -278,6 +281,7 @@ export interface DocumentVaultProgressOptions {
   addressHistoryHasCurrentAddress?: boolean;
   lifeInUkComplete?: boolean;
   englishRequirementComplete?: boolean;
+  notApplicableRequirementIds?: readonly string[];
 }
 
 export function calculateDocumentVaultProgress(
@@ -320,6 +324,9 @@ function calculateSectionProgress(
       requirement.categories.includes(document.category),
     ).length;
     let complete = documentCount > 0;
+    const notApplicable =
+      requirement.priority === "conditional" &&
+      options.notApplicableRequirementIds?.includes(requirement.id) === true;
     if (section.id === "address-history" && requirement.id === "address-proof")
       complete = options.addressHistoryComplete === true && documentCount > 0;
     if (section.id === "life-english" && requirement.id === "life-in-uk")
@@ -329,15 +336,20 @@ function calculateSectionProgress(
     return {
       ...requirement,
       documentCount,
-      complete,
+      complete: notApplicable ? false : complete,
+      notApplicable,
     };
   });
 
   const required = requirements.filter(
-    ({ priority }) => priority === "required",
+    ({ priority, notApplicable }) =>
+      priority === "required" || (priority === "conditional" && !notApplicable),
   );
   const completedRequired = required.filter(({ complete }) => complete).length;
   const completedItems = requirements.filter(({ complete }) => complete).length;
+  const applicableItems = requirements.filter(
+    ({ notApplicable }) => !notApplicable,
+  );
   let status: DocumentVaultStatus;
   let statusMessage: string | undefined;
   if (section.id === "address-history") {
@@ -362,8 +374,9 @@ function calculateSectionProgress(
       statusMessage =
         "Add the applicant’s address history and supporting evidence.";
     }
-  } else if (completedItems === 0) status = "to-do";
-  else if (completedItems < requirements.length) status = "partial";
+  } else if (applicableItems.length === 0) status = "not-applicable";
+  else if (completedItems === 0) status = "to-do";
+  else if (completedItems < applicableItems.length) status = "partial";
   else status = "complete";
 
   return {
@@ -373,7 +386,7 @@ function calculateSectionProgress(
     completedRequired,
     totalRequired: required.length,
     completedItems,
-    totalItems: requirements.length,
+    totalItems: applicableItems.length,
     statusMessage,
   };
 }
@@ -395,6 +408,7 @@ export function calculateProfileDocumentVaultProgress(
   addressHistory: readonly AddressHistoryEntry[],
   addressCoverage: AddressHistoryCoverage,
   lifeEnglish: LifeEnglishRecord | null,
+  notApplicableRequirementIds: readonly string[] = [],
 ): DocumentVaultProgress {
   return calculateDocumentVaultProgress(documents, {
     addressHistoryComplete: addressCoverage.complete,
@@ -404,5 +418,6 @@ export function calculateProfileDocumentVaultProgress(
       addressHistory.some(({ isCurrent }) => isCurrent),
     lifeInUkComplete: isLifeInUkComplete(lifeEnglish),
     englishRequirementComplete: isEnglishRequirementComplete(lifeEnglish),
+    notApplicableRequirementIds,
   });
 }

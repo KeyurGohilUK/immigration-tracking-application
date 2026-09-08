@@ -9,13 +9,14 @@ export const DATABASE_STORES = {
   addressHistory: "address-history",
   lifeEnglish: "life-english",
   employment: "employment",
+  requirementApplicability: "requirement-applicability",
 } as const;
 
 export type AppDatabaseStore =
   (typeof DATABASE_STORES)[keyof typeof DATABASE_STORES];
 
 const DATABASE_NAME = "urbanfox-ilr";
-const DATABASE_VERSION = 9;
+const DATABASE_VERSION = 10;
 
 export function applyDatabaseUpgrade(
   database: IDBDatabase,

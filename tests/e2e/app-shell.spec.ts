@@ -1043,6 +1043,56 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 });
 
+test("marks only conditional vault requirements Not applicable and reverses the choice", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Vault" }).first().click();
+
+  const salarySection = page.locator('[data-vault-section="salary-tax"]');
+  await salarySection.locator("summary").click();
+  await expect(
+    salarySection.getByRole("button", { name: /not applicable/i }),
+  ).toHaveCount(0);
+
+  const section = page.locator('[data-vault-section="life-english"]');
+  await section.locator("summary").click();
+  await section
+    .getByRole("button", {
+      name: "Mark Life in the UK evidence not applicable",
+    })
+    .click();
+
+  await expect(
+    page.getByText("0 of 7 core items complete", { exact: true }),
+  ).toBeVisible();
+  const notApplicableItem = section.locator(".is-not-applicable").filter({
+    hasText: "Life in the UK evidence",
+  });
+  await expect(notApplicableItem.getByText("Not applicable")).toBeVisible();
+  await expect(notApplicableItem).toHaveCSS("border-top-style", "dashed");
+
+  await page.reload();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Vault" }).first().click();
+  const restoredSection = page.locator('[data-vault-section="life-english"]');
+  await restoredSection.locator("summary").click();
+  await restoredSection
+    .getByRole("button", {
+      name: "Make Life in the UK evidence applicable again",
+    })
+    .click();
+  await expect(
+    page.getByText("0 of 8 core items complete", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    restoredSection.getByRole("button", {
+      name: "Add Life in the UK evidence",
+    }),
+  ).toBeEnabled();
+});
+
 test("adds and edits documents from non-address checklist items", async ({
   page,
 }) => {
@@ -2480,7 +2530,7 @@ test("shares household selection and progress styling across ILR, Vault, and Tra
   await lifeDialog.getByLabel("Status").selectOption("exempt");
   await lifeDialog.getByRole("button", { name: "Save", exact: true }).click();
   await expect(lifeDialog).not.toBeVisible();
-  await expect(ownerPill).toContainText("0%");
+  await expect(ownerPill).toContainText("13%");
   await page.getByRole("heading", { name: "Employment", exact: true }).click();
   await page
     .getByRole("button", { name: "Add Employer letter", exact: true })
@@ -2503,11 +2553,11 @@ test("shares household selection and progress styling across ILR, Vault, and Tra
     .getByRole("button", { name: "Encrypt and save document" })
     .click();
   await expect(employmentDialog).not.toBeVisible();
-  await expect(ownerPill).toContainText("20%");
+  await expect(ownerPill).toContainText("25%");
   await expect(otherPill).toContainText("0%");
   await expect(
     page.getByRole("progressbar", { name: "Document Vault readiness" }),
-  ).toHaveAttribute("aria-valuenow", "20");
+  ).toHaveAttribute("aria-valuenow", "25");
   // Keyboard selection must show only the selected person's evidence and progress.
   await otherPill.focus();
   await otherPill.press("Enter");
@@ -2638,12 +2688,12 @@ test("shares household selection and progress styling across ILR, Vault, and Tra
   await ownerPill.click();
   await expect(
     page.getByRole("progressbar", { name: "Document Vault readiness" }),
-  ).toHaveAttribute("aria-valuenow", "20");
+  ).toHaveAttribute("aria-valuenow", "25");
   await page.reload();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await page.getByRole("link", { name: "Vault", exact: true }).first().click();
   await ownerPill.click();
-  await expect(ownerPill).toContainText("20%");
+  await expect(ownerPill).toContainText("25%");
   await expect(otherPill).toContainText("0%");
 });
 
