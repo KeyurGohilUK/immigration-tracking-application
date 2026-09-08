@@ -325,7 +325,7 @@ test("creates, locks, and unlocks a local private space", async ({ page }) => {
   await createLocalProfile(page);
   const storedProfile = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -980,7 +980,7 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
   const storedDocument = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -1659,7 +1659,7 @@ test("permanently deletes all local application data", async ({ page }) => {
 
   const localData = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -1787,7 +1787,7 @@ test("adds, edits, persists, and deletes an encrypted family member", async ({
   );
   const storedFamily = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -1868,7 +1868,7 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   ).toBeVisible();
   const storedPermission = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -2018,7 +2018,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   await expect(page.getByText("8 Days", { exact: true })).toBeVisible();
   const storedTrip = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -2751,7 +2751,7 @@ test("forgotten PIN reset removes the vault and encrypted profile records", asyn
 
   const storedValues = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 9);
+      const request = indexedDB.open("urbanfox-ilr", 10);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
