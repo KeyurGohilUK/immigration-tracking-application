@@ -1041,13 +1041,13 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 
   await page
-    .getByRole("button", { name: "Rename Council tax statement" })
+    .getByRole("button", { name: "Edit details Council tax statement" })
     .click();
-  await page
-    .getByRole("dialog", { name: "Rename document" })
-    .getByLabel("Document name")
-    .fill("Council tax bill");
-  await page.getByRole("button", { name: "Save document name" }).click();
+  const councilTaxDialog = page.getByRole("dialog", {
+    name: "Edit Address proof",
+  });
+  await councilTaxDialog.getByLabel("Document name").fill("Council tax bill");
+  await councilTaxDialog.getByRole("button", { name: "Save changes" }).click();
   await expect(
     page.getByRole("heading", { name: "Council tax bill" }),
   ).toBeVisible();
@@ -1335,7 +1335,7 @@ test("stores, edits and reclassifies Additional Documents metadata", async ({
   await expect(editDialog.getByLabel("Custom tag / category")).toHaveValue(
     "Home Office correspondence",
   );
-  await editDialog.getByLabel("Category").selectOption("travel-evidence");
+  await editDialog.getByLabel("Category", { exact: true }).selectOption("travel-evidence");
   await expect(editDialog.getByLabel("Custom tag / category")).toBeHidden();
   await editDialog.getByRole("button", { name: "Save changes" }).click();
 
