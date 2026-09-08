@@ -93,7 +93,10 @@ function createJourneyTimeline(
 ): HTMLElement {
   const list = document.createElement("ol");
   list.className = "ilr-journey-timeline";
-  list.setAttribute("aria-label", "Chronological immigration and travel timeline");
+  list.setAttribute(
+    "aria-label",
+    "Chronological immigration and travel timeline",
+  );
   const items = buildIlrJourneyTimeline(
     permissions,
     trips,
@@ -320,7 +323,9 @@ function renderSelectedJourney(
   }
   root
     .querySelector<HTMLElement>("#ilr-journey-timeline")
-    ?.replaceChildren(createJourneyTimeline(permissions, trips, period, asOfDate));
+    ?.replaceChildren(
+      createJourneyTimeline(permissions, trips, period, asOfDate),
+    );
   root
     .querySelector<HTMLElement>("#ilr-permission-history")
     ?.replaceChildren(createPermissionHistory(permissions, period));
