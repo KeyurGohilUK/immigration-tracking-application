@@ -341,7 +341,13 @@ export function migrateBackupPayload(
   const lifeEnglish = migrateLifeEnglish(sourceData.lifeEnglish, profileIds);
   const employment = migrateEmployment(sourceData.employment, profileIds);
   const documents = migrateDocuments(sourceData.documents, profileIds);
-  if (!trips || !addressHistory || !lifeEnglish || !employment || documents === null)
+  if (
+    !trips ||
+    !addressHistory ||
+    !lifeEnglish ||
+    !employment ||
+    documents === null
+  )
     return null;
 
   const data: BackupData = {
