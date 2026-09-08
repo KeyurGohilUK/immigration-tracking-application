@@ -3,6 +3,7 @@ import {
   isDocumentMetadata,
   MAXIMUM_DOCUMENT_BYTES,
   resolveDocumentMimeType,
+  validateAdditionalDocumentMetadata,
   validateDocumentSignature,
   validateDocumentUploadInput,
   type DocumentMetadata,
@@ -53,6 +54,23 @@ describe("document validation", () => {
         size: MAXIMUM_DOCUMENT_BYTES + 1,
       }),
     ).toContain("5 MB");
+  });
+
+  it("validates richer Additional Documents metadata", () => {
+    expect(
+      validateAdditionalDocumentMetadata({
+        customTag: "Home Office correspondence",
+        documentDate: "2026-08-01",
+        expiryDate: "2027-08-01",
+        notes: "Keep with the final application pack.",
+      }),
+    ).toBeNull();
+    expect(
+      validateAdditionalDocumentMetadata({
+        documentDate: "2027-08-01",
+        expiryDate: "2026-08-01",
+      }),
+    ).toContain("before the document date");
   });
 
   it("checks file signatures instead of trusting the browser MIME type", () => {
