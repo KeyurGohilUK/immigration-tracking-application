@@ -1279,7 +1279,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   const backup = JSON.parse(backupText) as Record<string, unknown>;
   expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
   expect(backup.version).toBe(1);
-  expect(backup.dataSchemaVersion).toBe(7);
+  expect(backup.dataSchemaVersion).toBe(8);
   expect(backupText).not.toContain(TEST_PROFILE.name);
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
