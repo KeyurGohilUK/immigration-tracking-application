@@ -18,6 +18,10 @@ import {
   type LifeEnglishRecord,
 } from "../../documents/domain/life-english";
 import {
+  isEmploymentCollection,
+  type EmploymentRecord,
+} from "../../documents/domain/employment";
+import {
   isDocumentMetadata,
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   type DocumentMetadata,
@@ -45,6 +49,7 @@ export interface BackupData {
   trips: ProfileRecords<Trip>[];
   addressHistory: ProfileRecords<AddressHistoryEntry>[];
   lifeEnglish: ProfileRecords<LifeEnglishRecord>[];
+  employment: ProfileRecords<EmploymentRecord>[];
   documents?: BackupDocument[];
 }
 
@@ -222,6 +227,11 @@ export function isBackupPayload(value: unknown): value is BackupPayload {
       payload.data.lifeEnglish,
       profileIds,
       isLifeEnglishCollection,
+    ) &&
+    hasExactlyExpectedProfiles(
+      payload.data.employment,
+      profileIds,
+      isEmploymentCollection,
     ) &&
     documentsAreValid
   );

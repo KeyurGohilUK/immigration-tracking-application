@@ -43,46 +43,59 @@ export async function replaceAllLocalData(
   data: BackupData,
   vaultKey: CryptoKey,
 ): Promise<void> {
-  const [members, permissions, trips, addressHistory, lifeEnglish, documents] =
-    await Promise.all([
-      encryptRecord(data.members, vaultKey),
-      Promise.all(
-        data.permissions.map(async ({ profileId, records }) => ({
-          profileId,
-          encrypted: await encryptRecord(records, vaultKey),
-        })),
-      ),
-      Promise.all(
-        data.trips.map(async ({ profileId, records }) => ({
-          profileId,
-          encrypted: await encryptRecord(records, vaultKey),
-        })),
-      ),
-      Promise.all(
-        data.addressHistory.map(async ({ profileId, records }) => ({
-          profileId,
-          encrypted: await encryptRecord(records, vaultKey),
-        })),
-      ),
-      Promise.all(
-        data.lifeEnglish.map(async ({ profileId, records }) => ({
-          profileId,
-          encrypted: await encryptRecord(records, vaultKey),
-        })),
-      ),
-      data.documents === undefined
-        ? Promise.resolve(undefined)
-        : Promise.all(
-            data.documents.map(async ({ metadata, content }) => ({
-              id: metadata.id,
-              encrypted: await createEncryptedDocumentRecord(
-                metadata,
-                base64ToBytes(content),
-                vaultKey,
-              ),
-            })),
-          ),
-    ]);
+  const [
+    members,
+    permissions,
+    trips,
+    addressHistory,
+    lifeEnglish,
+    employment,
+    documents,
+  ] = await Promise.all([
+    encryptRecord(data.members, vaultKey),
+    Promise.all(
+      data.permissions.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    Promise.all(
+      data.trips.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    Promise.all(
+      data.addressHistory.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    Promise.all(
+      data.lifeEnglish.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    Promise.all(
+      data.employment.map(async ({ profileId, records }) => ({
+        profileId,
+        encrypted: await encryptRecord(records, vaultKey),
+      })),
+    ),
+    data.documents === undefined
+      ? Promise.resolve(undefined)
+      : Promise.all(
+          data.documents.map(async ({ metadata, content }) => ({
+            id: metadata.id,
+            encrypted: await createEncryptedDocumentRecord(
+              metadata,
+              base64ToBytes(content),
+              vaultKey,
+            ),
+          })),
+        ),
+  ]);
   const database = await openAppDatabase();
   await new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(
@@ -92,6 +105,7 @@ export async function replaceAllLocalData(
         DATABASE_STORES.trips,
         DATABASE_STORES.addressHistory,
         DATABASE_STORES.lifeEnglish,
+        DATABASE_STORES.employment,
         DATABASE_STORES.documents,
       ],
       "readwrite",
@@ -107,6 +121,7 @@ export async function replaceAllLocalData(
     const lifeEnglishStore = transaction.objectStore(
       DATABASE_STORES.lifeEnglish,
     );
+    const employmentStore = transaction.objectStore(DATABASE_STORES.employment);
     const documentStore = transaction.objectStore(DATABASE_STORES.documents);
     transaction.oncomplete = () => {
       database.close();
@@ -125,6 +140,7 @@ export async function replaceAllLocalData(
       tripStore.clear();
       addressHistoryStore.clear();
       lifeEnglishStore.clear();
+      employmentStore.clear();
       documentStore.clear();
       profileStore.put(members, HOUSEHOLD_MEMBERS_RECORD_KEY);
       for (const item of permissions)
@@ -134,6 +150,8 @@ export async function replaceAllLocalData(
         addressHistoryStore.put(item.encrypted, item.profileId);
       for (const item of lifeEnglish)
         lifeEnglishStore.put(item.encrypted, item.profileId);
+      for (const item of employment)
+        employmentStore.put(item.encrypted, item.profileId);
       for (const item of documents ?? [])
         documentStore.put(item.encrypted, item.id);
     } catch {

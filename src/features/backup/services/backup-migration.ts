@@ -17,6 +17,10 @@ import {
   type LifeEnglishRecord,
 } from "../../documents/domain/life-english";
 import {
+  isEmploymentCollection,
+  type EmploymentRecord,
+} from "../../documents/domain/employment";
+import {
   isDocumentMetadata,
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   type DocumentMetadata,
@@ -135,6 +139,30 @@ function migrateLifeEnglish(
       !expected.has(item.profileId) ||
       found.has(item.profileId) ||
       !isLifeEnglishCollection(item.records, item.profileId)
+    )
+      return null;
+    found.add(item.profileId);
+    result.push({ profileId: item.profileId, records: item.records });
+  }
+  return result;
+}
+
+function migrateEmployment(
+  value: unknown,
+  profileIds: readonly string[],
+): ProfileRecords<EmploymentRecord>[] | null {
+  if (value === undefined)
+    return profileIds.map((profileId) => ({ profileId, records: [] }));
+  if (!isProfileRecords(value) || value.length !== profileIds.length)
+    return null;
+  const expected = new Set(profileIds);
+  const found = new Set<string>();
+  const result: ProfileRecords<EmploymentRecord>[] = [];
+  for (const item of value) {
+    if (
+      !expected.has(item.profileId) ||
+      found.has(item.profileId) ||
+      !isEmploymentCollection(item.records, item.profileId)
     )
       return null;
     found.add(item.profileId);
@@ -311,8 +339,15 @@ export function migrateBackupPayload(
     profileIds,
   );
   const lifeEnglish = migrateLifeEnglish(sourceData.lifeEnglish, profileIds);
+  const employment = migrateEmployment(sourceData.employment, profileIds);
   const documents = migrateDocuments(sourceData.documents, profileIds);
-  if (!trips || !addressHistory || !lifeEnglish || documents === null)
+  if (
+    !trips ||
+    !addressHistory ||
+    !lifeEnglish ||
+    !employment ||
+    documents === null
+  )
     return null;
 
   const data: BackupData = {
@@ -321,6 +356,7 @@ export function migrateBackupPayload(
     trips,
     addressHistory,
     lifeEnglish,
+    employment,
     ...(documents === undefined ? {} : { documents }),
   };
 

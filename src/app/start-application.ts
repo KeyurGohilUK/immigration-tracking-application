@@ -113,6 +113,10 @@ import {
   syncAddressEvidenceName,
 } from "../features/documents/components/address-history-dialog";
 import {
+  readEmploymentInput,
+  showEmploymentForm,
+} from "../features/documents/components/employment-dialog";
+import {
   readEnglishLanguageForm,
   readEvidenceFile,
   readLifeEnglishEvidenceFiles,
@@ -162,6 +166,10 @@ import {
   saveLifeEnglishRecord,
 } from "../features/documents/data/life-english-repository";
 import {
+  getEmploymentRecord,
+  saveEmploymentRecord,
+} from "../features/documents/data/employment-repository";
+import {
   calculateAddressHistoryCoverage,
   getAddressHistoryMonthsRemaining,
   getAddressHistoryRequirement,
@@ -175,6 +183,12 @@ import {
   validateLifeEnglishInput,
   type LifeEnglishRecord,
 } from "../features/documents/domain/life-english";
+import {
+  getEmployerLetterTimingLabel,
+  getEmployerLetterTimingStatus,
+  validateEmploymentRecord,
+  type EmploymentRecord,
+} from "../features/documents/domain/employment";
 import {
   calculateProfileDocumentVaultProgress,
   getDefaultCategoryForSection,
@@ -202,6 +216,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const tripCache = new Map<string, Trip[]>();
     const addressHistoryCache = new Map<string, AddressHistoryEntry[]>();
     const lifeEnglishCache = new Map<string, LifeEnglishRecord | null>();
+    const employmentCache = new Map<string, EmploymentRecord | null>();
 
     const lock = (): void => {
       if (!sessionKey) return;
@@ -762,6 +777,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyMembers = reviewedBackup.data.members;
           permissionCache.clear();
           tripCache.clear();
+          addressHistoryCache.clear();
+          lifeEnglishCache.clear();
+          employmentCache.clear();
           selectedProfileId = familyMembers[0]?.id ?? "";
           restoreDialog?.close();
           const currentMember = familyMembers[0];
@@ -794,6 +812,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           familyMembers = [];
           permissionCache.clear();
           tripCache.clear();
+          addressHistoryCache.clear();
+          lifeEnglishCache.clear();
+          employmentCache.clear();
           selectedProfileId = familyMembers[0]?.id ?? "";
           showLanding(
             "All UrbanFox ILR data and the local PIN were deleted from this browser.",
@@ -849,6 +870,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       requiredAddressMonths: number | null,
       requiredAddressStartMonth: string | null,
       lifeEnglish: LifeEnglishRecord | null,
+      employment: EmploymentRecord | null,
+      earliestApplicationDate: string | null,
     ): void => {
       const asOfMonth = getUkCalendarDate().slice(0, 7);
       const addressCoverage = calculateAddressHistoryCoverage(
@@ -862,6 +885,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         requiredAddressStartMonth,
         requiredAddressMonths,
         asOfMonth,
+      );
+      const employerLetterStatus = getEmployerLetterTimingLabel(
+        getEmployerLetterTimingStatus(
+          employment,
+          documents.some(
+            ({ profileId, category }) =>
+              profileId === selectedProfileId && category === "employer-letter",
+          ),
+          earliestApplicationDate,
+          getUkCalendarDate(),
+        ),
       );
       const profileReadiness = new Map(
         familyMembers.map((member) => {
@@ -904,6 +938,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         requiredAddressStartMonth,
         addressMonthsRemaining,
         lifeEnglish,
+        employment,
+        employerLetterStatus,
         profileReadiness,
       );
       wireAuthenticatedShell(profile, "Documents");
@@ -973,6 +1009,95 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       );
       const lifeEnglishForm =
         root.querySelector<HTMLFormElement>("#life-english-form");
+      const employmentDialog =
+        root.querySelector<HTMLDialogElement>("#employment-dialog");
+      const employmentForm =
+        root.querySelector<HTMLFormElement>("#employment-form");
+      const selectedEmployment = employmentCache.get(selectedProfileId) ?? null;
+      const selectedPermissions = permissionCache.get(selectedProfileId) ?? [];
+      const selectedLatestPermission = [...selectedPermissions].sort(
+        (left, right) =>
+          right.permissionStartDate.localeCompare(left.permissionStartDate),
+      )[0];
+      const selectedPeriod =
+        selectedLatestPermission?.role === "dependant"
+          ? calculateSkilledWorkerDependantQualifyingPeriod(
+              selectedPermissions,
+              getUkCalendarDate(),
+            )
+          : calculateSkilledWorkerQualifyingPeriod({
+              permissions: selectedPermissions,
+              asOfDate: getUkCalendarDate(),
+            });
+      const selectedEmployerLetterStatus = getEmployerLetterTimingLabel(
+        getEmployerLetterTimingStatus(
+          selectedEmployment,
+          documents.some(
+            ({ profileId, category }) =>
+              profileId === selectedProfileId && category === "employer-letter",
+          ),
+          selectedPeriod.earliestApplicationDate,
+          getUkCalendarDate(),
+        ),
+      );
+      root
+        .querySelector<HTMLButtonElement>("[data-employment-details]")
+        ?.addEventListener("click", () =>
+          showEmploymentForm(
+            root,
+            employmentCache.get(selectedProfileId) ?? null,
+            selectedEmployerLetterStatus,
+          ),
+        );
+      employmentDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => employmentDialog.close());
+      employmentDialog?.addEventListener("click", (event) => {
+        if (event.target === employmentDialog) employmentDialog.close();
+      });
+      employmentForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const input = readEmploymentInput(employmentForm);
+        const existing = employmentCache.get(selectedProfileId) ?? null;
+        const now = new Date().toISOString();
+        const record: EmploymentRecord = {
+          version: 1,
+          profileId: selectedProfileId,
+          ...input,
+          createdAt: existing?.createdAt ?? now,
+          updatedAt: now,
+        };
+        const validationError = validateEmploymentRecord(record);
+        const error = employmentForm.querySelector<HTMLElement>(
+          "#employment-form-error",
+        );
+        if (validationError) {
+          if (error) {
+            error.textContent = validationError;
+            error.hidden = false;
+          }
+          return;
+        }
+        const submit = employmentForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        if (submit) submit.disabled = true;
+        try {
+          await saveEmploymentRecord(selectedProfileId, record, key);
+          employmentCache.set(selectedProfileId, record);
+          employmentDialog?.close();
+          await showDocuments(profile);
+        } catch (storageError) {
+          if (error) {
+            error.textContent = getStorageFailureMessage(
+              storageError,
+              "This encrypted employment record could not be saved.",
+            );
+            error.hidden = false;
+          }
+          if (submit) submit.disabled = false;
+        }
+      });
       root
         .querySelector<HTMLButtonElement>("[data-download-address-evidence]")
         ?.addEventListener("click", async (event) => {
@@ -2094,7 +2219,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           getAllDocumentMetadata(key),
           Promise.all(
             familyMembers.map(async (member) => {
-              const [permissions, addressHistory, lifeEnglish] =
+              const [permissions, addressHistory, lifeEnglish, employment] =
                 await Promise.all([
                   permissionCache.get(member.id) ??
                     getImmigrationPermissions(member.id, key),
@@ -2103,15 +2228,20 @@ export async function startApplication(root: HTMLElement): Promise<void> {
                   lifeEnglishCache.has(member.id)
                     ? (lifeEnglishCache.get(member.id) ?? null)
                     : getLifeEnglishRecord(member.id, key),
+                  employmentCache.has(member.id)
+                    ? (employmentCache.get(member.id) ?? null)
+                    : getEmploymentRecord(member.id, key),
                 ]);
               permissionCache.set(member.id, permissions);
               addressHistoryCache.set(member.id, addressHistory);
               lifeEnglishCache.set(member.id, lifeEnglish);
+              employmentCache.set(member.id, employment);
               return {
                 id: member.id,
                 permissions,
                 addressHistory,
                 lifeEnglish,
+                employment,
               };
             }),
           ),
@@ -2119,8 +2249,22 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (selectedProfileId !== profileId) return;
         const selected = profiles.find(({ id }) => id === profileId);
         if (!selected) throw new Error("A household member is required.");
-        const { permissions, addressHistory, lifeEnglish } = selected;
+        const { permissions, addressHistory, lifeEnglish, employment } =
+          selected;
         const addressRequirement = getAddressHistoryRequirement(permissions);
+        const latestPermission = [...permissions].sort((left, right) =>
+          right.permissionStartDate.localeCompare(left.permissionStartDate),
+        )[0];
+        const period =
+          latestPermission?.role === "dependant"
+            ? calculateSkilledWorkerDependantQualifyingPeriod(
+                permissions,
+                getUkCalendarDate(),
+              )
+            : calculateSkilledWorkerQualifyingPeriod({
+                permissions,
+                asOfDate: getUkCalendarDate(),
+              });
         renderDocuments(
           profile,
           documents,
@@ -2128,9 +2272,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           addressRequirement.requiredMonths,
           addressRequirement.startMonth,
           lifeEnglish,
+          employment,
+          period.earliestApplicationDate,
         );
       } catch {
-        renderDocuments(profile, [], [], null, null, null);
+        renderDocuments(profile, [], [], null, null, null, null, null);
         showDocumentPageError(
           "Encrypted Document Vault data could not be opened on this device.",
         );

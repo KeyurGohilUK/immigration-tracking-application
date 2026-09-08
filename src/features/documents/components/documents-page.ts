@@ -26,6 +26,8 @@ import {
 } from "./address-history-dialog";
 import { renderLifeEnglishDialogs } from "./life-english-dialog";
 import { type LifeEnglishRecord } from "../domain/life-english";
+import { type EmploymentRecord } from "../domain/employment";
+import { renderEmploymentDialog } from "./employment-dialog";
 
 export function renderDocumentsPage(
   root: HTMLElement,
@@ -37,6 +39,8 @@ export function renderDocumentsPage(
   requiredAddressStartMonth: string | null,
   addressMonthsRemaining: number | null,
   lifeEnglish: LifeEnglishRecord | null,
+  employment: EmploymentRecord | null,
+  employerLetterStatus: string,
   profileReadiness: ReadonlyMap<string, number>,
 ): void {
   const documents = allDocuments
@@ -62,7 +66,7 @@ export function renderDocumentsPage(
     `<main id="main-content" class="cohort-page documents-main document-vault-main">
       <div id="vault-household-selector"></div>
       <div id="vault-summary"></div>
-      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory, documents)}</section>
+      <section class="vault-category-list" aria-label="Document Vault categories">${renderVaultCategoryRows(vaultProgress.sections, addressHistory, documents, employment, employerLetterStatus)}</section>
 <section class="vault-download-panel"><button id="download-document-bundle" class="vault-download-button" type="button" ${documents.length === 0 && addressHistory.length === 0 ? "disabled" : ""}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3.5 6.5h6l2 2h9v10.5h-17Z"/><rect x="10" y="12.5" width="7" height="5.5" rx="1"/><path d="M11.5 12.5v-1a2 2 0 0 1 4 0v1"/></svg><span data-vault-download-label>DOWNLOAD ZIP BUNDLE</span></button></section>
 <aside class="notice compact-notice documents-backup-notice" aria-labelledby="documents-backup-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="documents-backup-title">Backups include documents</h2><p>Encrypted backups include document files. Keep originals and the separate backup password safe because UrbanFox cannot recover them.</p></div></aside>
       <section class="documents-panel" aria-labelledby="document-list-title"><div class="section-heading"><div><p class="eyebrow">Selected profile</p><h2 id="document-list-title">Document collection</h2></div></div><div id="document-list" class="document-list"></div></section>
@@ -92,6 +96,7 @@ export function renderDocumentsPage(
       documents,
     )}
     ${renderLifeEnglishDialogs(documents)}
+    ${renderEmploymentDialog()}
     ${renderLiquidGlassDialog({
       id: "document-rename-dialog",
       labelledBy: "document-rename-title",
@@ -173,6 +178,8 @@ function renderVaultCategoryRows(
   sections: readonly DocumentVaultSectionProgress[],
   addressHistory: readonly AddressHistoryEntry[],
   documents: readonly DocumentMetadata[],
+  employment: EmploymentRecord | null,
+  employerLetterStatus: string,
 ): string {
   return sections
     .map((section) => {
@@ -185,9 +192,12 @@ function renderVaultCategoryRows(
         section.id === "address-history"
           ? renderReadOnlyAddressList(addressHistory)
           : "";
-      const statusMessage = section.statusMessage
-        ? `<p class="vault-section-status-message">${section.statusMessage}</p>`
-        : "";
+      const statusMessage =
+        section.id === "employment"
+          ? `<p class="vault-section-status-message">${employerLetterStatus}</p>`
+          : section.statusMessage
+            ? `<p class="vault-section-status-message">${section.statusMessage}</p>`
+            : "";
       let sectionAction = "";
       if (section.id === "address-history") {
         const addressActionLabel = missingCurrentAddress
@@ -196,6 +206,8 @@ function renderVaultCategoryRows(
             ? "Edit address"
             : "Add address";
         sectionAction = `<button class="vault-section-add${missingCurrentAddress ? " is-attention-action" : ""}" type="button" data-add-vault-section="${section.id}">${addressActionLabel}</button>`;
+      } else if (section.id === "employment") {
+        sectionAction = `<button class="vault-section-add" type="button" data-employment-details>${employment ? "Edit employment details" : "Add employment details"}</button>`;
       }
       return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
     })

@@ -124,7 +124,7 @@ describe("legacy backup migration", () => {
     ]);
   });
 
-  it("preserves current schema 7 Life/English records", () => {
+  it("preserves schema 7 Life/English records and adds empty employment", () => {
     const record = {
       version: 1,
       profileId: "member-1",
@@ -150,11 +150,14 @@ describe("legacy backup migration", () => {
     );
 
     expect(migrated?.data.lifeEnglish[0]?.records).toEqual([record]);
+    expect(migrated?.data.employment).toEqual([
+      { profileId: "member-1", records: [] },
+    ]);
   });
 
   it("rejects pre-backup and future schema versions", () => {
     expect(migrateBackupPayload(payload(3, {}), 3)).toBeNull();
-    expect(migrateBackupPayload(payload(8, {}), 8)).toBeNull();
+    expect(migrateBackupPayload(payload(9, {}), 9)).toBeNull();
   });
 
   it("rejects mismatched encrypted payload schema metadata", () => {

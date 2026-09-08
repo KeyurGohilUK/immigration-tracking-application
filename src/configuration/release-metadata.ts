@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.25.17";
+export const APP_VERSION = "3.25.18";
 
 export const RELEASE_NOTES = [
-  "The ILR milestone track now shows Document Vault evidence readiness for the selected household member and opens that member’s Vault directly.",
+  "Document Vault Employment now stores encrypted employer, role, sponsorship, dates and salary details, with employer-letter review guidance tied to the ILR application window.",
 ] as const;

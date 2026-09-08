@@ -11,6 +11,7 @@ import { getImmigrationPermissions } from "../../immigration/data/immigration-pe
 import { getTrips } from "../../travel/data/trip-repository";
 import { getAddressHistory } from "../../documents/data/address-history-repository";
 import { getLifeEnglishRecord } from "../../documents/data/life-english-repository";
+import { getEmploymentRecord } from "../../documents/data/employment-repository";
 import {
   BACKUP_FORMAT,
   BACKUP_KEY_DERIVATION_ITERATIONS,
@@ -55,34 +56,46 @@ export async function collectBackupData(
 ): Promise<BackupData> {
   const members = await getHouseholdMembers(vaultKey);
   const profileIds = members.map(({ id }) => id);
-  const [permissions, trips, addressHistory, lifeEnglish, documentMetadata] =
-    await Promise.all([
-      Promise.all(
-        profileIds.map(async (profileId) => ({
-          profileId,
-          records: await getImmigrationPermissions(profileId, vaultKey),
-        })),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => ({
-          profileId,
-          records: await getTrips(profileId, vaultKey),
-        })),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => ({
-          profileId,
-          records: await getAddressHistory(profileId, vaultKey),
-        })),
-      ),
-      Promise.all(
-        profileIds.map(async (profileId) => {
-          const record = await getLifeEnglishRecord(profileId, vaultKey);
-          return { profileId, records: record ? [record] : [] };
-        }),
-      ),
-      getAllDocumentMetadata(vaultKey),
-    ]);
+  const [
+    permissions,
+    trips,
+    addressHistory,
+    lifeEnglish,
+    employment,
+    documentMetadata,
+  ] = await Promise.all([
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getImmigrationPermissions(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getTrips(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => ({
+        profileId,
+        records: await getAddressHistory(profileId, vaultKey),
+      })),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => {
+        const record = await getLifeEnglishRecord(profileId, vaultKey);
+        return { profileId, records: record ? [record] : [] };
+      }),
+    ),
+    Promise.all(
+      profileIds.map(async (profileId) => {
+        const record = await getEmploymentRecord(profileId, vaultKey);
+        return { profileId, records: record ? [record] : [] };
+      }),
+    ),
+    getAllDocumentMetadata(vaultKey),
+  ]);
   const documents = await Promise.all(
     documentMetadata.map(async ({ id }) => {
       const document = await getDocumentFile(id, vaultKey);
@@ -98,6 +111,7 @@ export async function collectBackupData(
     trips,
     addressHistory,
     lifeEnglish,
+    employment,
     documents,
   };
 }

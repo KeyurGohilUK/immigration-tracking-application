@@ -22,6 +22,7 @@ const backupData: BackupData = {
   trips: [{ profileId: "member-1", records: [] }],
   addressHistory: [{ profileId: "member-1", records: [] }],
   lifeEnglish: [{ profileId: "member-1", records: [] }],
+  employment: [{ profileId: "member-1", records: [] }],
 };
 
 describe("encrypted backup", () => {
@@ -107,6 +108,10 @@ describe("encrypted backup", () => {
       ],
       lifeEnglish: [
         ...backupData.lifeEnglish,
+        { profileId: "member-2", records: [] },
+      ],
+      employment: [
+        ...backupData.employment,
         { profileId: "member-2", records: [] },
       ],
     };
