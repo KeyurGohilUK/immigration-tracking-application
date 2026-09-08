@@ -40,9 +40,9 @@ product roadmap.
       requirement modal instead of opening a second upload modal.
 - [x] Add structured employment metadata (employer, job title, sponsorship
       status, dates, salary) and time-aware final employer-letter status.
-- [x] Add explicit, reversible Not applicable handling only for conditional
-      requirements, excluding them from readiness while preserving the setting
-      in encrypted local storage and backups.
+- [x] Derive Not applicable status from supported immigration route and
+      age-based settlement rules instead of allowing users to manually bypass
+      conditional requirements; excluded items stay outside readiness.
 - [x] Add richer Additional Documents metadata: custom tag/category, document
       date, expiry date, notes, and reclassification.
 - [x] Add Download Application Bundle ZIP export with section folders and safe
@@ -61,8 +61,9 @@ product roadmap.
 ## Product rules
 
 - Readiness is based on requirements completed, not file count.
-- Required later and Not applicable items must not unfairly reduce current
-  readiness.
+- Required later and route-derived Not applicable items must not unfairly
+  reduce current readiness. Users must not be able to manually bypass a
+  requirement by marking it Not applicable.
 - Address-history duration is route-driven; never hard-code five years globally.
 - Guided Address History starts with the current address and works backwards to
   the permission-derived required start month. Each previous address end month
