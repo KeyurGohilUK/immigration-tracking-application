@@ -296,11 +296,21 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
     const showIlrJourney = async (profile: HouseholdMember): Promise<void> => {
       const asOfDate = getUkCalendarDate();
+      const asOfMonth = asOfDate.slice(0, 7);
+      let allDocuments: DocumentMetadata[] | null = null;
+      try {
+        allDocuments = await getAllDocumentMetadata(key);
+      } catch {
+        allDocuments = null;
+      }
       const journeys = await Promise.all(
         familyMembers.map(async (member): Promise<IlrJourneyMember> => {
           let permissions = permissionCache.get(member.id);
           let trips = tripCache.get(member.id);
           let lifeEnglish = lifeEnglishCache.get(member.id) ?? null;
+          let lifeEnglishAvailable = lifeEnglishCache.has(member.id);
+          let addressHistory = addressHistoryCache.get(member.id) ?? [];
+          let addressHistoryAvailable = addressHistoryCache.has(member.id);
           try {
             if (!permissions)
               permissions = await getImmigrationPermissions(member.id, key);
@@ -315,12 +325,25 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           try {
             if (!lifeEnglishCache.has(member.id))
               lifeEnglish = await getLifeEnglishRecord(member.id, key);
+            lifeEnglishAvailable = true;
           } catch {
             lifeEnglish = null;
+            lifeEnglishAvailable = false;
+          }
+          try {
+            if (!addressHistoryCache.has(member.id))
+              addressHistory = await getAddressHistory(member.id, key);
+            addressHistoryAvailable = true;
+          } catch {
+            addressHistory = [];
+            addressHistoryAvailable = false;
           }
           permissionCache.set(member.id, permissions);
           tripCache.set(member.id, trips);
-          lifeEnglishCache.set(member.id, lifeEnglish);
+          if (lifeEnglishAvailable)
+            lifeEnglishCache.set(member.id, lifeEnglish);
+          if (addressHistoryAvailable)
+            addressHistoryCache.set(member.id, addressHistory);
 
           const latestPermission = [...permissions].sort((left, right) =>
             right.permissionStartDate.localeCompare(left.permissionStartDate),
@@ -343,11 +366,32 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             asOfDate,
             applicationDate: period.earliestApplicationDate ?? asOfDate,
           };
+          const addressRequirement = getAddressHistoryRequirement(permissions);
+          const addressCoverage = calculateAddressHistoryCoverage(
+            addressHistory,
+            addressRequirement.requiredMonths,
+            addressRequirement.startMonth,
+            asOfMonth,
+          );
+          const documentVault =
+            allDocuments !== null &&
+            addressHistoryAvailable &&
+            lifeEnglishAvailable
+              ? calculateProfileDocumentVaultProgress(
+                  allDocuments.filter(
+                    ({ profileId }) => profileId === member.id,
+                  ),
+                  addressHistory,
+                  addressCoverage,
+                  lifeEnglish,
+                )
+              : null;
 
           return {
             member,
             permissions,
             lifeEnglish,
+            documentVault,
             period,
             absence: isDependant
               ? calculateRecordedDependantAbsenceCheck(absenceInput)
@@ -357,6 +401,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       );
       renderIlrJourneyPage(root, journeys, selectedProfileId, asOfDate);
       wireAuthenticatedShell(profile, "ILR");
+      root
+        .querySelector<HTMLButtonElement>("#ilr-open-document-vault")
+        ?.addEventListener("click", () => void showDocuments(profile));
 
       const selectedPermissions =
         journeys.find(({ member }) => member.id === selectedProfileId)
