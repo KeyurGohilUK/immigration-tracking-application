@@ -246,7 +246,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         .querySelector<HTMLAnchorElement>(".wordmark")
         ?.addEventListener("click", (event) => {
           event.preventDefault();
-          renderDashboard(profile);
+          void showIlrJourney(profile);
         });
       for (const link of root.querySelectorAll<HTMLAnchorElement>(
         "[data-navigation]",
