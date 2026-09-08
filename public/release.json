@@ -1,6 +1,6 @@
 {
-  "version": "3.25.16",
+  "version": "3.25.17",
   "notes": [
-    "Add Permission now uses a compact primary pill action, and Permission history cards have cleaner uninterrupted rounded borders."
+    "The ILR milestone track now shows Document Vault evidence readiness for the selected household member and opens that member’s Vault directly."
   ]
 }

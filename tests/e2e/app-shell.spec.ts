@@ -1762,6 +1762,15 @@ test("tracks encrypted immigration permissions without claiming eligibility", as
   await expect(
     page.getByText("No permission history recorded yet."),
   ).toBeVisible();
+  const vaultMilestone = page.getByRole("button", {
+    name: "Open Document Vault",
+  });
+  await expect(vaultMilestone).toContainText("0% ready");
+  await vaultMilestone.click();
+  await expect(
+    page.getByRole("heading", { name: "Evidence readiness", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
   await page.getByRole("button", { name: "Add Permission" }).click();
   await expect(
     page.getByRole("dialog", { name: "Add immigration permission" }),
