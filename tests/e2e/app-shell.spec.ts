@@ -1231,6 +1231,7 @@ test("adds and edits documents from non-address checklist items", async ({
     page.getByRole("heading", { name: "Updated employer letter" }),
   ).toBeVisible();
 
+  await employmentSection.locator("summary").click();
   const employerLetterRow = employmentSection
     .locator(".vault-requirement-item")
     .filter({ hasText: "Edit Employer letter" });
@@ -1251,7 +1252,6 @@ test("adds and edits documents from non-address checklist items", async ({
     ).toBeGreaterThanOrEqual(12);
   }
 
-  await employmentSection.locator("summary").click();
   await employmentSection
     .getByRole("button", { name: "Add employment contract" })
     .click();
