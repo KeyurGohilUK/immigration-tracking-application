@@ -82,3 +82,71 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
     page.getByRole("region", { name: "Permission not recorded", exact: true }),
   ).toBeVisible();
 });
+
+test("keeps Document Vault evidence isolated between household members", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Accept and continue" }).click();
+
+  for (const [index, digit] of [..."2468"].entries()) {
+    await page.getByLabel(`Choose PIN digit ${index + 1}`).fill(digit);
+    await page.getByLabel(`Confirm PIN digit ${index + 1}`).fill(digit);
+  }
+
+  await page.getByLabel("Full name").fill("Vault Owner");
+  await page.getByLabel("Date of birth").fill("1990-01-01");
+  await page.getByLabel("Immigration role").selectOption("main-applicant");
+  await page.getByRole("button", { name: "Create household member" }).click();
+
+  await page.getByRole("link", { name: "Family", exact: true }).first().click();
+  await page.getByRole("button", { name: "Add Household Member" }).click();
+  await page.getByLabel("Full name").fill("Vault Dependant");
+  await page.getByLabel("Date of birth").fill("1995-01-01");
+  await page.getByLabel("Immigration role").selectOption("dependant");
+  await page.getByRole("button", { name: "Save household member" }).click();
+
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  await page
+    .getByRole("button", { name: "Show Vault Owner's documents" })
+    .click();
+
+  const employment = page.locator('[data-vault-section="employment"]');
+  await employment.locator("summary").click();
+  await employment
+    .getByRole("button", { name: "Add Employer letter", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", { name: "Add Employer letter" });
+  await dialog.getByLabel("Document file").setInputFiles({
+    name: "owner-employer-letter.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  });
+  await dialog.getByLabel("Document name").fill("Owner employer letter");
+  await dialog
+    .getByRole("button", { name: "Encrypt and save document" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Owner employer letter" }),
+  ).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Show Vault Dependant's documents" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Owner employer letter" }),
+  ).toHaveCount(0);
+  await expect(page.getByText("No documents added yet")).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Show Vault Owner's documents" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Owner employer letter" }),
+  ).toBeVisible();
+});

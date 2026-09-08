@@ -1,6 +1,6 @@
 {
-  "version": "3.25.24",
+  "version": "3.25.25",
   "notes": [
-    "Document Vault can now download one combined household ZIP with a separate sectioned folder for every household member."
+    "Document Vault regression coverage now hardens route-driven readiness boundaries and household evidence isolation."
   ]
 }
