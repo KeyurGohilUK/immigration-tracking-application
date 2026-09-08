@@ -170,8 +170,7 @@ export function validateAdditionalDocumentMetadata(input: {
     return "Keep the custom tag to 50 characters or fewer.";
   if (!isOptionalDate(input.documentDate))
     return "Enter a valid document date.";
-  if (!isOptionalDate(input.expiryDate))
-    return "Enter a valid expiry date.";
+  if (!isOptionalDate(input.expiryDate)) return "Enter a valid expiry date.";
   if (
     input.documentDate &&
     input.expiryDate &&
