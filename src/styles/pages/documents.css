@@ -318,6 +318,26 @@
   background: color-mix(in srgb, var(--ibiza-surface) 48%, transparent);
 }
 
+.vault-download-panel.has-household-download {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  border-radius: 1.85rem;
+}
+
+.vault-download-button-secondary {
+  color: var(--colour-text);
+  background: color-mix(in srgb, var(--ibiza-surface-high) 88%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
+}
+
+@media (max-width: 640px) {
+  .vault-download-panel.has-household-download {
+    grid-template-columns: 1fr;
+    border-radius: 1.65rem;
+  }
+}
+
 .vault-download-button {
   display: flex;
   width: 100%;
