@@ -44,6 +44,10 @@ export interface DocumentMetadata {
   size: number;
   category: DocumentCategory;
   addressHistoryId?: string;
+  customTag?: string;
+  documentDate?: string;
+  expiryDate?: string;
+  notes?: string;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
@@ -147,6 +151,38 @@ export function validateDocumentName(name: string): string | null {
     : "Enter a document name between 1 and 100 characters.";
 }
 
+function isOptionalDate(value: unknown): boolean {
+  return (
+    value === undefined ||
+    (typeof value === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+      !Number.isNaN(Date.parse(value + "T00:00:00Z")))
+  );
+}
+
+export function validateAdditionalDocumentMetadata(input: {
+  customTag?: string;
+  documentDate?: string;
+  expiryDate?: string;
+  notes?: string;
+}): string | null {
+  if ((input.customTag?.trim().length ?? 0) > 50)
+    return "Keep the custom tag to 50 characters or fewer.";
+  if (!isOptionalDate(input.documentDate))
+    return "Enter a valid document date.";
+  if (!isOptionalDate(input.expiryDate))
+    return "Enter a valid expiry date.";
+  if (
+    input.documentDate &&
+    input.expiryDate &&
+    input.expiryDate < input.documentDate
+  )
+    return "Expiry date cannot be before the document date.";
+  if ((input.notes?.trim().length ?? 0) > 500)
+    return "Keep notes to 500 characters or fewer.";
+  return null;
+}
+
 export function isDocumentMetadata(value: unknown): value is DocumentMetadata {
   if (!value || typeof value !== "object") return false;
   const document = value as Partial<DocumentMetadata>;
@@ -167,6 +203,17 @@ export function isDocumentMetadata(value: unknown): value is DocumentMetadata {
     DOCUMENT_CATEGORIES.includes(document.category as DocumentCategory) &&
     (document.addressHistoryId === undefined ||
       isRecordIdentifier(document.addressHistoryId)) &&
+    (document.customTag === undefined ||
+      (typeof document.customTag === "string" &&
+        document.customTag === document.customTag.trim() &&
+        document.customTag.length <= 50)) &&
+    isOptionalDate(document.documentDate) &&
+    isOptionalDate(document.expiryDate) &&
+    (document.notes === undefined ||
+      (typeof document.notes === "string" &&
+        document.notes === document.notes.trim() &&
+        document.notes.length <= 500)) &&
+    validateAdditionalDocumentMetadata(document) === null &&
     Number.isInteger(document.sortOrder) &&
     (document.sortOrder ?? -1) >= 0 &&
     (document.sortOrder ?? -1) <= MAXIMUM_DOCUMENTS_PER_PROFILE
