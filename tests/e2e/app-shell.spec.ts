@@ -1055,6 +1055,29 @@ test("adds and edits documents from non-address checklist items", async ({
     employmentSection.getByText("To do", { exact: true }),
   ).toBeVisible();
   await employmentSection.locator("summary").click();
+  await employmentSection
+    .getByRole("button", { name: "Add employment details" })
+    .click();
+  const employmentDialog = page.getByRole("dialog", {
+    name: "Employment details",
+  });
+  await employmentDialog.getByLabel("Employer name").fill("Example Ltd");
+  await employmentDialog.getByLabel("Job title").fill("Software Engineer");
+  await employmentDialog
+    .getByLabel("Sponsorship status")
+    .selectOption("sponsored");
+  await employmentDialog
+    .getByLabel("Employment start date")
+    .fill("2023-01-10");
+  await employmentDialog.getByLabel("Annual salary (£)").fill("52000");
+  await employmentDialog
+    .getByRole("button", { name: "Save employment details" })
+    .click();
+  await expect(employmentDialog).not.toBeVisible();
+  await expect(
+    employmentSection.getByText("Employer letter not added", { exact: true }),
+  ).toBeVisible();
+  await employmentSection.locator("summary").click();
   await expect(
     employmentSection.getByRole("button", { name: "Add document" }),
   ).toHaveCount(0);
