@@ -1,6 +1,7 @@
 import { renderAppShell } from "../../../app/app";
 import { calculateCompleteAbsenceDays } from "../../../shared/date/absence-days";
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
+import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
 import type { HouseholdMember } from "../../household/domain/household-member";
@@ -99,7 +100,7 @@ export function renderTripsPage(
         <label class="checkbox-field trip-review-card" for="exceptional-absence"><input id="exceptional-absence" name="exceptionalAbsence" type="checkbox" /><span><strong>Flag for manual review</strong><small>This may be a permitted or exceptional absence and supporting evidence may be required.</small></span></label>
         <p id="trip-form-error" class="form-error" role="alert" hidden></p>`,
       actions:
-        '<button class="primary-button family-save-button member-profile-save trip-profile-save" type="submit"><span>Save trip</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>',
+        '<button id="delete-trip" class="secondary-button danger-button" type="button" hidden>Delete trip</button><button class="primary-button family-save-button member-profile-save trip-profile-save" type="submit"><span>Save trip</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>',
       dialogClass: "member-profile-dialog trip-profile-dialog",
       formClass: "member-profile-form trip-profile-form",
       headerClass: "member-profile-header trip-profile-header",
@@ -191,36 +192,37 @@ function createTripCard(trip: Trip): HTMLElement {
   card.className = `timeline-entry travel-entry${trip.returnDate ? "" : " is-open"}`;
   card.innerHTML = `
     <span class="timeline-marker travel-timeline-marker" aria-hidden="true"></span>
-    <div class="timeline-entry-content travel-entry-card glass-panel">
-      <div class="travel-entry-topline">
-        <div class="travel-entry-copy">
-          <div class="travel-entry-title-row">
-            <h3></h3>
-            <div class="trip-badges"></div>
-          </div>
-          <p class="travel-entry-location">Complete days outside the UK</p>
-        </div>
-        <div class="travel-entry-duration">
-          <strong></strong>
-          <span></span>
-        </div>
-      </div>
-      <p class="trip-notes travel-entry-note" hidden></p>
-      <div class="member-actions travel-entry-actions">
-        <button class="member-action" type="button">Edit</button>
-        <button class="member-action destructive-action" type="button">Delete</button>
-      </div>
-    </div>`;
+    <button class="timeline-entry-content travel-entry-card glass-panel" type="button" data-edit-trip="${trip.id}">
+      <span class="travel-entry-card-content">
+        <span class="travel-entry-topline">
+          <span class="travel-entry-copy">
+            <span class="travel-entry-title-row">
+              <span class="travel-entry-title" role="heading" aria-level="3"></span>
+              <span class="trip-badges"></span>
+            </span>
+            <span class="travel-entry-location">Complete days outside the UK</span>
+          </span>
+          <span class="travel-entry-duration">
+            <strong></strong>
+            <span></span>
+          </span>
+        </span>
+        <span class="trip-notes travel-entry-note" hidden></span>
+      </span>
+      ${renderEditableCardChevronMarkup()}
+    </button>`;
 
-  const heading = card.querySelector<HTMLElement>("h3");
+  const editButton = card.querySelector<HTMLButtonElement>("[data-edit-trip]");
+  const heading = card.querySelector<HTMLElement>(".travel-entry-title");
   const badges = card.querySelector<HTMLElement>(".trip-badges");
   const duration = card.querySelector<HTMLElement>(
     ".travel-entry-duration strong",
   );
   const dates = card.querySelector<HTMLElement>(".travel-entry-duration span");
   const notes = card.querySelector<HTMLElement>(".trip-notes");
-  const actions = card.querySelectorAll<HTMLButtonElement>(".member-action");
 
+  if (editButton)
+    editButton.setAttribute("aria-label", `Edit trip to ${trip.destination}`);
   if (heading) heading.textContent = trip.destination;
   if (!trip.returnDate) badges?.append(createBadge("Open trip", "is-open"));
   if (trip.exceptionalAbsence)
@@ -235,17 +237,6 @@ function createTripCard(trip: Trip): HTMLElement {
   if (notes && trip.notes) {
     notes.textContent = trip.notes;
     notes.hidden = false;
-  }
-
-  const edit = actions[0];
-  const remove = actions[1];
-  if (edit) {
-    edit.dataset.editTrip = trip.id;
-    edit.setAttribute("aria-label", `Edit trip to ${trip.destination}`);
-  }
-  if (remove) {
-    remove.dataset.deleteTrip = trip.id;
-    remove.setAttribute("aria-label", `Delete trip to ${trip.destination}`);
   }
   return card;
 }
@@ -304,7 +295,12 @@ export function showTripForm(root: HTMLElement, trip?: Trip): void {
   form.reset();
   const title = form.querySelector<HTMLElement>("#trip-form-title");
   const error = form.querySelector<HTMLElement>("#trip-form-error");
+  const deleteButton = form.querySelector<HTMLButtonElement>("#delete-trip");
   if (title) title.textContent = trip ? "Edit trip" : "Add trip";
+  if (deleteButton) {
+    deleteButton.hidden = !trip;
+    deleteButton.dataset.tripId = trip?.id ?? "";
+  }
   if (error) {
     error.textContent = "";
     error.hidden = true;

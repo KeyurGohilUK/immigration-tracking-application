@@ -2267,11 +2267,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         });
       }
 
-      for (const button of root.querySelectorAll<HTMLButtonElement>(
-        "[data-delete-trip]",
-      )) {
-        button.addEventListener("click", async () => {
-          const trip = trips.find(({ id }) => id === button.dataset.deleteTrip);
+      form
+        ?.querySelector<HTMLButtonElement>("#delete-trip")
+        ?.addEventListener("click", async (event) => {
+          const button = event.currentTarget as HTMLButtonElement;
+          const trip = trips.find(({ id }) => id === button.dataset.tripId);
           if (
             !trip ||
             !window.confirm(
@@ -2283,9 +2283,10 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           try {
             await saveTrips(selectedProfileId, nextTrips, key);
             tripCache.set(selectedProfileId, nextTrips);
+            dialog?.close();
             renderTrips(profile, nextTrips);
           } catch {
-            const error = root.querySelector<HTMLElement>("#trip-page-error");
+            const error = form.querySelector<HTMLElement>("#trip-form-error");
             if (error) {
               error.textContent =
                 "The trip could not be deleted. Your existing data is unchanged.";
@@ -2293,7 +2294,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             }
           }
         });
-      }
 
       form?.addEventListener("submit", async (event) => {
         event.preventDefault();
