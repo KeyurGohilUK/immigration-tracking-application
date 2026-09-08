@@ -2220,8 +2220,12 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           getAllDocumentMetadata(key),
           Promise.all(
             familyMembers.map(async (member) => {
-              const [permissions, addressHistory, lifeEnglish, employment] =
-                await Promise.all([
+              const [
+                permissions,
+                addressHistory,
+                lifeEnglish,
+                employment,
+              ] = await Promise.all([
                   permissionCache.get(member.id) ??
                     getImmigrationPermissions(member.id, key),
                   addressHistoryCache.get(member.id) ??
