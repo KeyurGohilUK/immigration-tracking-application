@@ -1067,56 +1067,46 @@ test("stores and manages encrypted documents for a profile", async ({
   ).toBeVisible();
 });
 
-test("marks only conditional vault requirements Not applicable and reverses the choice", async ({
+test("derives conditional Document Vault applicability from the Skilled Worker dependant route", async ({
   page,
 }) => {
   await page.goto("/");
   await createLocalProfile(page);
-  await page.getByRole("link", { name: "Vault" }).first().click();
 
-  const salarySection = page.locator('[data-vault-section="salary-tax"]');
-  await salarySection.locator("summary").click();
+  await page.getByRole("link", { name: "ILR", exact: true }).click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
+  await page.getByLabel("Immigration route").selectOption("skilled-worker");
+  await page.getByLabel("Permission held as").selectOption("dependant");
+  await page.getByLabel(/Visa grant date/).fill("2023-12-15");
+  await page.getByLabel("Permission start date").fill("2023-12-15");
+  await page.getByLabel("Permission expiry date").fill("2029-12-31");
+  await page.getByLabel("Actual UK arrival date").fill("2024-01-15");
+  await page.getByRole("button", { name: "Save permission" }).click();
+
+  await page.getByRole("link", { name: "Vault" }).first().click();
   await expect(
-    salarySection.getByRole("button", { name: /not applicable/i }),
+    page.getByRole("button", { name: /mark .* not applicable/i }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /make .* applicable again/i }),
   ).toHaveCount(0);
 
-  const section = page.locator('[data-vault-section="life-english"]');
-  await section.locator("summary").click();
-  await section
-    .getByRole("button", {
-      name: "Mark Life in the UK evidence not applicable",
-    })
-    .click();
-
+  const lifeEnglish = page.locator('[data-vault-section="life-english"]');
+  await lifeEnglish.locator("summary").click();
   await expect(
-    page.getByText("0 of 7 core items complete", { exact: true }),
-  ).toBeVisible();
-  await section.locator("summary").click();
-  const notApplicableItem = section.locator(".is-not-applicable").filter({
-    hasText: "Life in the UK evidence",
-  });
-  await expect(notApplicableItem.getByText("Not applicable")).toBeVisible();
-  await expect(notApplicableItem).toHaveCSS("border-top-style", "dashed");
-
-  await page.reload();
-  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
-  await page.getByRole("link", { name: "Vault" }).first().click();
-  const restoredSection = page.locator('[data-vault-section="life-english"]');
-  await restoredSection.locator("summary").click();
-  await restoredSection
-    .getByRole("button", {
-      name: "Make Life in the UK evidence applicable again",
-    })
-    .click();
-  await expect(
-    page.getByText("0 of 8 core items complete", { exact: true }),
-  ).toBeVisible();
-  await restoredSection.locator("summary").click();
-  await expect(
-    restoredSection.getByRole("button", {
-      name: "Add Life in the UK evidence",
-    }),
+    lifeEnglish.getByRole("button", { name: "Add Life in the UK evidence" }),
   ).toBeEnabled();
+  await expect(
+    lifeEnglish.getByRole("button", { name: "Add English-language evidence" }),
+  ).toBeEnabled();
+  await expect(lifeEnglish.getByText("Not applicable")).toHaveCount(0);
+
+  const family = page.locator('[data-vault-section="family-dependants"]');
+  await family.locator("summary").click();
+  await expect(
+    family.getByRole("button", { name: "Add Relationship evidence" }),
+  ).toBeEnabled();
+  await expect(family.getByText("Not applicable")).toHaveCount(0);
 });
 
 test("adds and edits documents from non-address checklist items", async ({
