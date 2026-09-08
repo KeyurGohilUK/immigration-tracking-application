@@ -1043,11 +1043,13 @@ test("stores and manages encrypted documents for a profile", async ({
   await page
     .getByRole("button", { name: "Rename Council tax statement" })
     .click();
-  await page
-    .getByRole("dialog", { name: "Rename document" })
-    .getByLabel("Document name")
-    .fill("Council tax bill");
-  await page.getByRole("button", { name: "Save document name" }).click();
+  const councilTaxDialog = page.getByRole("dialog", {
+    name: "Rename document",
+  });
+  await councilTaxDialog.getByLabel("Document name").fill("Council tax bill");
+  await councilTaxDialog
+    .getByRole("button", { name: "Save document name" })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Council tax bill" }),
   ).toBeVisible();
@@ -1279,6 +1281,75 @@ test("adds and edits documents from non-address checklist items", async ({
   await expect(
     documentCollection.getByRole("heading", { name: "Employment contract" }),
   ).toBeVisible();
+});
+
+test("stores, edits and reclassifies Additional Documents metadata", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Vault" }).first().click();
+
+  const additionalSection = page.locator('[data-vault-section="additional"]');
+  await additionalSection.locator("summary").click();
+  await additionalSection
+    .getByRole("button", { name: "Add Additional supporting evidence" })
+    .click();
+
+  const dialog = page.getByRole("dialog", {
+    name: "Add Additional supporting document",
+  });
+  const tinyPng = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+    "base64",
+  );
+  await dialog.getByLabel("Document file").setInputFiles({
+    name: "home-office-letter.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await dialog.getByLabel("Document name").fill("Home Office letter");
+  await expect(dialog.getByLabel("Custom tag / category")).toBeVisible();
+  await dialog
+    .getByLabel("Custom tag / category")
+    .fill("Home Office correspondence");
+  await dialog.getByLabel("Document date").fill("2026-08-01");
+  await dialog.getByLabel("Expiry date").fill("2027-08-01");
+  await dialog
+    .getByLabel("Notes")
+    .fill("Keep with the final application pack.");
+  await dialog
+    .getByRole("button", { name: "Encrypt and save document" })
+    .click();
+
+  const card = page.locator(".document-card").filter({
+    hasText: "Home Office letter",
+  });
+  await expect(card).toContainText("Home Office correspondence");
+  await expect(card).toContainText("Document date 2026-08-01");
+  await expect(card).toContainText("Expires 2027-08-01");
+  await expect(card).toContainText("Keep with the final application pack.");
+
+  await card
+    .getByRole("button", { name: "Edit details Home Office letter" })
+    .click();
+  const editDialog = page.getByRole("dialog", {
+    name: "Edit Additional supporting document",
+  });
+  await expect(editDialog.getByLabel("Custom tag / category")).toHaveValue(
+    "Home Office correspondence",
+  );
+  await editDialog
+    .getByLabel("Category", { exact: true })
+    .selectOption("travel-evidence");
+  await expect(editDialog.getByLabel("Custom tag / category")).toBeHidden();
+  await editDialog.getByRole("button", { name: "Save changes" }).click();
+
+  const updatedCard = page.locator(".document-card").filter({
+    hasText: "Home Office letter",
+  });
+  await expect(updatedCard).toContainText("Travel evidence");
+  await expect(updatedCard).not.toContainText("Home Office correspondence");
 });
 
 test("resets local data safely when the PIN is forgotten", async ({ page }) => {

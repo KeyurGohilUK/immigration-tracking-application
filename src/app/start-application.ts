@@ -101,6 +101,7 @@ import {
   showDocumentRenameForm,
   showDocumentUploadForm,
   suggestDocumentName,
+  syncAdditionalDocumentFields,
 } from "../features/documents/components/documents-page";
 import {
   readAddressEvidenceFile,
@@ -142,6 +143,7 @@ import {
   MAXIMUM_DOCUMENTS_PER_PROFILE,
   MAXIMUM_TOTAL_DOCUMENT_BYTES,
   resolveDocumentMimeType,
+  validateAdditionalDocumentMetadata,
   validateDocumentName,
   validateDocumentSignature,
   validateDocumentUploadInput,
@@ -2007,6 +2009,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (event.target === renameDialog) renameDialog.close();
       });
       uploadForm
+        ?.querySelector<HTMLSelectElement>("#document-category")
+        ?.addEventListener("change", () =>
+          syncAdditionalDocumentFields(uploadForm),
+        );
+      uploadForm
         ?.querySelector<HTMLInputElement>("#document-file")
         ?.addEventListener("change", (event) => {
           const file = (event.currentTarget as HTMLInputElement).files?.[0];
@@ -2021,8 +2028,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const error = uploadForm.querySelector<HTMLElement>(
           "#document-form-error",
         );
-        const { documentId, displayName, category, addressHistoryId, file } =
-          readDocumentUploadForm(uploadForm);
+        const {
+          documentId,
+          displayName,
+          category,
+          addressHistoryId,
+          customTag,
+          documentDate,
+          expiryDate,
+          notes,
+          file,
+        } = readDocumentUploadForm(uploadForm);
         const existingDocument = documents.find(({ id }) => id === documentId);
         const mimeType = file
           ? resolveDocumentMimeType(file.name, file.type)
@@ -2038,14 +2054,26 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           : existingDocument
             ? validateDocumentName(displayName)
             : "Choose a PDF, JPG, or PNG file.";
+        const additionalMetadataError =
+          category === "additional-document"
+            ? validateAdditionalDocumentMetadata({
+                customTag,
+                documentDate,
+                expiryDate,
+                notes,
+              })
+            : null;
         if (
           validationError ||
+          additionalMetadataError ||
           (!file && !existingDocument) ||
           (file && !mimeType)
         ) {
           if (error) {
             error.textContent =
-              validationError ?? "Choose a PDF, JPG, or PNG file.";
+              validationError ??
+              additionalMetadataError ??
+              "Choose a PDF, JPG, or PNG file.";
             error.hidden = false;
           }
           return;
@@ -2120,9 +2148,19 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           category,
           ...(addressHistoryId
             ? { addressHistoryId }
-            : existingDocument?.addressHistoryId
+            : category === "address-proof" && existingDocument?.addressHistoryId
               ? { addressHistoryId: existingDocument.addressHistoryId }
               : {}),
+          ...(category === "additional-document" && customTag
+            ? { customTag }
+            : {}),
+          ...(category === "additional-document" && documentDate
+            ? { documentDate }
+            : {}),
+          ...(category === "additional-document" && expiryDate
+            ? { expiryDate }
+            : {}),
+          ...(category === "additional-document" && notes ? { notes } : {}),
           sortOrder:
             existingDocument?.sortOrder ??
             profileDocuments.reduce(
@@ -2176,6 +2214,21 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             ({ id }) => id === button.dataset.documentId,
           );
           if (document) showDocumentRenameForm(root, document);
+        });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-edit-document-details]",
+      ))
+        button.addEventListener("click", () => {
+          const document = documents.find(
+            ({ id }) => id === button.dataset.documentId,
+          );
+          if (document)
+            showDocumentUploadForm(
+              root,
+              document.category,
+              document.addressHistoryId,
+              document,
+            );
         });
       renameForm?.addEventListener("submit", async (event) => {
         event.preventDefault();

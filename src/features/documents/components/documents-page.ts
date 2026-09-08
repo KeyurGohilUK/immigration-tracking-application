@@ -83,7 +83,7 @@ export function renderDocumentsPage(
       subtitle: "PDF, JPG, or PNG · Maximum 5 MB",
       iconSvg:
         '<svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg>',
-      body: `<input name="documentId" type="hidden" /><div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file" data-document-file-label>Document file</label><input name="addressHistoryId" type="hidden" /><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance" data-document-file-guidance>The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><optgroup label="Identity & Immigration"><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option></optgroup><optgroup label="Address History"><option value="address-proof">Address proof</option></optgroup><optgroup label="Employment"><option value="employer-letter">Employer letter</option><option value="employment-contract">Employment contract</option></optgroup><optgroup label="Salary & Tax"><option value="payslip">Payslip</option><option value="tax-document">Tax document</option></optgroup><optgroup label="Travel & Absences"><option value="travel-evidence">Travel evidence</option></optgroup><optgroup label="Life in the UK & English"><option value="life-in-uk">Life in the UK evidence</option><option value="english-language">English-language evidence</option></optgroup><optgroup label="Family / Dependants"><option value="relationship-evidence">Relationship evidence</option></optgroup><optgroup label="Final Application Documents"><option value="application-form">Application form</option><option value="declaration-consent">Declaration or consent</option></optgroup><optgroup label="Additional Documents"><option value="additional-document">Additional supporting document</option></optgroup></select></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
+      body: `<input name="documentId" type="hidden" /><div class="family-form-fields"><div class="family-field family-field-wide"><label for="document-file" data-document-file-label>Document file</label><input name="addressHistoryId" type="hidden" /><input id="document-file" name="documentFile" type="file" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" required /><p class="field-guidance" data-document-file-guidance>The file is encrypted before it is stored in this browser.</p></div><div class="family-field family-field-wide"><label for="document-name">Document name</label><input id="document-name" name="displayName" maxlength="100" required /></div><div class="family-field family-field-wide"><label for="document-category">Category</label><select id="document-category" name="category" required><option value="">Choose category</option><optgroup label="Identity & Immigration"><option value="passport">Passport</option><option value="immigration-evidence">Immigration evidence</option></optgroup><optgroup label="Address History"><option value="address-proof">Address proof</option></optgroup><optgroup label="Employment"><option value="employer-letter">Employer letter</option><option value="employment-contract">Employment contract</option></optgroup><optgroup label="Salary & Tax"><option value="payslip">Payslip</option><option value="tax-document">Tax document</option></optgroup><optgroup label="Travel & Absences"><option value="travel-evidence">Travel evidence</option></optgroup><optgroup label="Life in the UK & English"><option value="life-in-uk">Life in the UK evidence</option><option value="english-language">English-language evidence</option></optgroup><optgroup label="Family / Dependants"><option value="relationship-evidence">Relationship evidence</option></optgroup><optgroup label="Final Application Documents"><option value="application-form">Application form</option><option value="declaration-consent">Declaration or consent</option></optgroup><optgroup label="Additional Documents"><option value="additional-document">Additional supporting document</option></optgroup></select></div><div class="family-field family-field-wide" data-additional-document-fields hidden><label for="document-custom-tag">Custom tag / category <span class="optional-label">Optional</span></label><input id="document-custom-tag" name="customTag" maxlength="50" /></div><div class="family-field" data-additional-document-fields hidden><label for="document-date">Document date <span class="optional-label">Optional</span></label><input id="document-date" name="documentDate" type="date" /></div><div class="family-field" data-additional-document-fields hidden><label for="document-expiry-date">Expiry date <span class="optional-label">Optional</span></label><input id="document-expiry-date" name="expiryDate" type="date" /></div><div class="family-field family-field-wide" data-additional-document-fields hidden><label for="document-notes">Notes <span class="optional-label">Optional</span></label><textarea id="document-notes" name="notes" maxlength="500" rows="3"></textarea></div></div><p id="document-form-error" class="form-error" role="alert" hidden></p>`,
       actions:
         '<button class="secondary-button" type="button" data-document-cancel>Cancel</button><button class="primary-button family-save-button liquid-dialog-save" type="submit" data-document-submit>Encrypt and save document</button>',
       dialogClass: "document-dialog",
@@ -286,7 +286,7 @@ function createDocumentCard(
   isLast: boolean,
 ): HTMLElement {
   const card = documentNode("article", "document-card");
-  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden>Needs attention · no address linked</span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button><button class="member-action" type="button" data-rename-document>Rename</button><button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
+  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden>Needs attention · no address linked</span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button>${document.category === "additional-document" ? '<button class="member-action" type="button" data-edit-document-details>Edit details</button>' : '<button class="member-action" type="button" data-rename-document>Rename</button>'}<button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
   const heading = card.querySelector<HTMLElement>("h3");
   const originalName = card.querySelector<HTMLElement>(
     ".document-original-name",
@@ -299,10 +299,24 @@ function createDocumentCard(
   if (category)
     category.textContent = DOCUMENT_CATEGORY_LABELS[document.category];
   if (size) size.textContent = formatDocumentBytes(document.size);
-  if (review)
+  if (review) {
+    const expired =
+      !!document.expiryDate &&
+      document.expiryDate < new Date().toISOString().slice(0, 10);
+    if (expired) review.textContent = "Needs attention · expired";
     review.hidden = !(
-      document.category === "address-proof" && !document.addressHistoryId
+      expired ||
+      (document.category === "address-proof" && !document.addressHistoryId)
     );
+  }
+  const metadataParts = [
+    document.customTag,
+    document.documentDate ? `Document date ${document.documentDate}` : "",
+    document.expiryDate ? `Expires ${document.expiryDate}` : "",
+    document.notes,
+  ].filter(Boolean);
+  if (metadataParts.length > 0 && originalName)
+    originalName.textContent = `${document.fileName} · ${metadataParts.join(" · ")}`;
   for (const button of card.querySelectorAll<HTMLButtonElement>("button")) {
     button.dataset.documentId = document.id;
     const action = button.textContent?.trim();
@@ -360,6 +374,15 @@ export function showDocumentUploadForm(
     "displayName",
   ) as HTMLInputElement;
   displayName.value = existingDocument?.displayName ?? "";
+  (form.elements.namedItem("customTag") as HTMLInputElement).value =
+    existingDocument?.customTag ?? "";
+  (form.elements.namedItem("documentDate") as HTMLInputElement).value =
+    existingDocument?.documentDate ?? "";
+  (form.elements.namedItem("expiryDate") as HTMLInputElement).value =
+    existingDocument?.expiryDate ?? "";
+  (form.elements.namedItem("notes") as HTMLTextAreaElement).value =
+    existingDocument?.notes ?? "";
+  syncAdditionalDocumentFields(form);
   const fileInput = form.elements.namedItem("documentFile") as HTMLInputElement;
   fileInput.required = !existingDocument;
   const title = dialog.querySelector<HTMLElement>("#document-form-title");
@@ -400,6 +423,17 @@ export function showDocumentUploadForm(
   dialog.showModal();
 }
 
+export function syncAdditionalDocumentFields(form: HTMLFormElement): void {
+  const category = (
+    form.elements.namedItem("category") as HTMLSelectElement | null
+  )?.value;
+  const show = category === "additional-document";
+  for (const field of form.querySelectorAll<HTMLElement>(
+    "[data-additional-document-fields]",
+  ))
+    field.hidden = !show;
+}
+
 export function suggestDocumentName(fileName: string): string {
   const withoutExtension = fileName.replace(/\.[^.]+$/, "");
   const suggestion = withoutExtension.replace(/[_-]+/g, " ").trim();
@@ -411,6 +445,10 @@ export function readDocumentUploadForm(form: HTMLFormElement): {
   displayName: string;
   category: DocumentCategory;
   addressHistoryId?: string;
+  customTag?: string;
+  documentDate?: string;
+  expiryDate?: string;
+  notes?: string;
   file: File | null;
 } {
   const data = new FormData(form);
@@ -420,6 +458,10 @@ export function readDocumentUploadForm(form: HTMLFormElement): {
     displayName: String(data.get("displayName") ?? "").trim(),
     category: String(data.get("category") ?? "") as DocumentCategory,
     addressHistoryId: String(data.get("addressHistoryId") ?? "") || undefined,
+    customTag: String(data.get("customTag") ?? "").trim() || undefined,
+    documentDate: String(data.get("documentDate") ?? "") || undefined,
+    expiryDate: String(data.get("expiryDate") ?? "") || undefined,
+    notes: String(data.get("notes") ?? "").trim() || undefined,
     file: input.files?.[0] ?? null,
   };
 }
