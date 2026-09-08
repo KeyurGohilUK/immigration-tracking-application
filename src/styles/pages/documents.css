@@ -243,6 +243,7 @@
   align-items: center;
   border: 0;
   padding: 0;
+  padding-inline: 0.15rem;
   color: inherit;
   background: transparent;
   text-align: left;
