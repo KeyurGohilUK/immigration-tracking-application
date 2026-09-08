@@ -44,15 +44,12 @@ export function showEmploymentForm(
       record.employerName;
     (form.elements.namedItem("jobTitle") as HTMLInputElement).value =
       record.jobTitle;
-    (
-      form.elements.namedItem("sponsorshipStatus") as HTMLSelectElement
-    ).value = record.sponsorshipStatus;
-    (
-      form.elements.namedItem("employmentStartDate") as HTMLInputElement
-    ).value = record.employmentStartDate;
-    (
-      form.elements.namedItem("employmentEndDate") as HTMLInputElement
-    ).value = record.employmentEndDate;
+    (form.elements.namedItem("sponsorshipStatus") as HTMLSelectElement).value =
+      record.sponsorshipStatus;
+    (form.elements.namedItem("employmentStartDate") as HTMLInputElement).value =
+      record.employmentStartDate;
+    (form.elements.namedItem("employmentEndDate") as HTMLInputElement).value =
+      record.employmentEndDate;
     (form.elements.namedItem("annualSalary") as HTMLInputElement).value =
       record.annualSalary === null ? "" : String(record.annualSalary);
   }
