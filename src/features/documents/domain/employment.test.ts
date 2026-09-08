@@ -42,8 +42,8 @@ describe("employment record", () => {
     expect(getEmployerLetterTimingStatus(null, true, null, "2026-09-08")).toBe(
       "details-missing",
     );
-    expect(
-      getEmployerLetterTimingStatus(base, false, null, "2026-09-08"),
-    ).toBe("letter-missing");
+    expect(getEmployerLetterTimingStatus(base, false, null, "2026-09-08")).toBe(
+      "letter-missing",
+    );
   });
 });
