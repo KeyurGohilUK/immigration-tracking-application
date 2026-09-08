@@ -1246,7 +1246,9 @@ test("adds and edits documents from non-address checklist items", async ({
   expect(arrowBox).not.toBeNull();
   if (rowBox && stateBox && arrowBox) {
     expect(stateBox.x - rowBox.x).toBeGreaterThanOrEqual(12);
-    expect(rowBox.x + rowBox.width - (arrowBox.x + arrowBox.width)).toBeGreaterThanOrEqual(12);
+    expect(
+      rowBox.x + rowBox.width - (arrowBox.x + arrowBox.width),
+    ).toBeGreaterThanOrEqual(12);
   }
 
   await employmentSection.locator("summary").click();
