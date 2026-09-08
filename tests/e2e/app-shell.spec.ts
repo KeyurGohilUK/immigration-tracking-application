@@ -150,6 +150,28 @@ test("shows the anonymous landing page without tracker controls", async ({
   expect(buttonTheme.text).toBe("rgb(255, 255, 255)");
 });
 
+test("opens the main ILR journey when the app wordmark is selected", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  await expect(
+    page.getByRole("progressbar", { name: "Document Vault readiness" }),
+  ).toBeVisible();
+
+  await page.locator(".wordmark").click();
+
+  await expect(
+    page.getByRole("heading", { name: "ILR milestone track" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Primary navigation" }).locator(
+      'a[data-navigation="ILR"]',
+    ),
+  ).toHaveAttribute("aria-current", "page");
+});
+
 test("shows install and update controls in every device header", async ({
   page,
 }) => {
@@ -1208,6 +1230,24 @@ test("adds and edits documents from non-address checklist items", async ({
   await expect(
     page.getByRole("heading", { name: "Updated employer letter" }),
   ).toBeVisible();
+
+  const employerLetterRow = employmentSection
+    .locator(".vault-requirement-item")
+    .filter({ has: employmentSection.getByText("Edit Employer letter") });
+  const rowBox = await employerLetterRow.boundingBox();
+  const stateBox = await employerLetterRow
+    .locator(".vault-requirement-state")
+    .boundingBox();
+  const arrowBox = await employerLetterRow
+    .locator(".editable-card-arrow")
+    .boundingBox();
+  expect(rowBox).not.toBeNull();
+  expect(stateBox).not.toBeNull();
+  expect(arrowBox).not.toBeNull();
+  if (rowBox && stateBox && arrowBox) {
+    expect(stateBox.x - rowBox.x).toBeGreaterThanOrEqual(12);
+    expect(rowBox.x + rowBox.width - (arrowBox.x + arrowBox.width)).toBeGreaterThanOrEqual(12);
+  }
 
   await employmentSection.locator("summary").click();
   await employmentSection
