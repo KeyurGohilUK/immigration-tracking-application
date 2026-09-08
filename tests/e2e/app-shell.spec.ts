@@ -1964,9 +1964,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
     page.getByRole("button", { name: "Delete trip to India" }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Edit trip to India" }).click();
-  await expect(
-    page.getByRole("dialog", { name: "Edit trip" }),
-  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Edit trip" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Delete trip", exact: true }),
   ).toBeVisible();
@@ -2001,9 +1999,7 @@ test("tracks encrypted trips, open travel, and overlap warnings", async ({
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Edit trip to Canada" }).click();
-  await expect(
-    page.getByRole("dialog", { name: "Edit trip" }),
-  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Edit trip" })).toBeVisible();
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete trip", exact: true }).click();
   await expect(
