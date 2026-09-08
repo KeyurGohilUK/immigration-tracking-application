@@ -255,10 +255,7 @@ function renderVaultRequirement(
       ? completionLabel
       : incompleteLabel;
   const content = `<span class="vault-requirement-state" aria-hidden="true">${stateIcon}</span><div><strong>${sectionId === "address-history" ? requirement.label : actionLabel}</strong><span>${requirement.guidance}</span></div><small>${stateLabel}</small>${sectionId === "address-history" || requirement.notApplicable ? "" : editChevron}`;
-  const applicabilityAction =
-    requirement.priority === "conditional"
-      ? `<button class="vault-applicability-action" type="button" data-requirement-applicability="${requirement.id}" aria-label="${requirement.notApplicable ? "Make" : "Mark"} ${requirement.label} ${requirement.notApplicable ? "applicable again" : "not applicable"}">${requirement.notApplicable ? "Make applicable" : "Not applicable"}</button>`
-      : "";
+  const applicabilityAction = "";
   if (sectionId !== "address-history") {
     const category = requirement.categories[0];
     const evidenceAction =
