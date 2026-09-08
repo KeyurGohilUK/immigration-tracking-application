@@ -2207,6 +2207,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           if (documentId) void downloadDecryptedDocument(documentId, false);
         });
       for (const button of root.querySelectorAll<HTMLButtonElement>(
+        "[data-rename-document]",
+      ))
+        button.addEventListener("click", () => {
+          const document = documents.find(
+            ({ id }) => id === button.dataset.documentId,
+          );
+          if (document) showDocumentRenameForm(root, document);
+        });
+      for (const button of root.querySelectorAll<HTMLButtonElement>(
         "[data-edit-document-details]",
       ))
         button.addEventListener("click", () => {
