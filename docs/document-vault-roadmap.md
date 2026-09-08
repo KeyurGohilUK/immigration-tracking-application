@@ -55,8 +55,8 @@ product roadmap.
       full address, evidence filenames, and Page X of Y numbering.
 - [x] Integrate Document Vault readiness into the central ILR journey/readiness
       view.
-- [ ] Add focused unit/browser coverage for each completed Document Vault
-      workflow.
+- [x] Add focused unit/browser coverage for each completed Document Vault
+      workflow. See `docs/document-vault-test-coverage.md` for the coverage map.
 
 ## Product rules
 
