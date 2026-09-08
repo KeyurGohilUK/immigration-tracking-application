@@ -110,6 +110,10 @@ describe("encrypted backup", () => {
         ...backupData.lifeEnglish,
         { profileId: "member-2", records: [] },
       ],
+      employment: [
+        ...backupData.employment,
+        { profileId: "member-2", records: [] },
+      ],
     };
     const password = "a-secure-backup-password";
     const backup = await createEncryptedBackup(data, password);
