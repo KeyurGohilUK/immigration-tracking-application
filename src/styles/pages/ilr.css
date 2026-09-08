@@ -274,7 +274,6 @@
   border-radius: 1.2rem;
 }
 
-
 .ilr-journey-timeline {
   position: relative;
   display: grid;
@@ -386,12 +385,20 @@
 }
 
 .ilr-timeline-status.is-qualifying {
-  border-color: color-mix(in srgb, var(--colour-strong) 36%, var(--glass-border));
+  border-color: color-mix(
+    in srgb,
+    var(--colour-strong) 36%,
+    var(--glass-border)
+  );
   color: var(--colour-strong);
 }
 
 .ilr-timeline-status.is-attention {
-  border-color: color-mix(in srgb, var(--ibiza-orange) 45%, var(--glass-border));
+  border-color: color-mix(
+    in srgb,
+    var(--ibiza-orange) 45%,
+    var(--glass-border)
+  );
   color: var(--ibiza-orange);
 }
 
