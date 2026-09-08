@@ -1,6 +1,6 @@
 {
-  "version": "3.25.20",
+  "version": "3.25.21",
   "notes": [
-    "Document Vault checklist actions now have more breathing room at both edges, and selecting the UrbanFox wordmark opens the main ILR journey."
+    "Additional Documents now support encrypted custom tags, document and expiry dates, notes, and later reclassification from Edit details."
   ]
 }
