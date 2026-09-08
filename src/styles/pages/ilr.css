@@ -113,6 +113,28 @@
   font-weight: 650;
 }
 
+.ilr-milestone-action {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ilr-milestone-action .editable-card-arrow {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.ilr-milestone-action:hover,
+.ilr-milestone-action:focus-visible {
+  outline: 0;
+  color: var(--colour-strong);
+}
+
 .ilr-milestone strong {
   color: var(--ibiza-orange);
   font-size: 0.68rem;
