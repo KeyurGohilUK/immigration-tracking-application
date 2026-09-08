@@ -981,10 +981,10 @@ test("stores and manages encrypted documents for a profile", async ({
   await expect(addDocumentDialog).toHaveClass(/liquid-dialog/);
   await expect(
     addDocumentDialog.locator('option[value="passport"]'),
-  ).toHaveCount(1);
+  ).toHaveCount(0);
   await expect(
     addDocumentDialog.locator('option[value="immigration-evidence"]'),
-  ).toHaveCount(1);
+  ).toHaveCount(0);
   await addDocumentDialog.getByLabel("Document file").setInputFiles({
     name: "council-tax.png",
     mimeType: "image/png",
