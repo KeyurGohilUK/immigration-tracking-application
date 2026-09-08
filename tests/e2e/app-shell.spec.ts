@@ -166,9 +166,9 @@ test("opens the main ILR journey when the app wordmark is selected", async ({
     page.getByRole("heading", { name: "ILR milestone track" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("navigation", { name: "Primary navigation" }).locator(
-      'a[data-navigation="ILR"]',
-    ),
+    page
+      .getByRole("navigation", { name: "Primary navigation" })
+      .locator('a[data-navigation="ILR"]'),
   ).toHaveAttribute("aria-current", "page");
 });
 
