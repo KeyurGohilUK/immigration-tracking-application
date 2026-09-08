@@ -1067,6 +1067,7 @@ test("marks only conditional vault requirements Not applicable and reverses the 
   await expect(
     page.getByText("0 of 7 core items complete", { exact: true }),
   ).toBeVisible();
+  await section.locator("summary").click();
   const notApplicableItem = section.locator(".is-not-applicable").filter({
     hasText: "Life in the UK evidence",
   });
@@ -1327,7 +1328,7 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   const backup = JSON.parse(backupText) as Record<string, unknown>;
   expect(backup.format).toBe("urbanfox-ilr-encrypted-backup");
   expect(backup.version).toBe(1);
-  expect(backup.dataSchemaVersion).toBe(8);
+  expect(backup.dataSchemaVersion).toBe(9);
   expect(backupText).not.toContain(TEST_PROFILE.name);
   await expect(
     page.getByText("Encrypted backup downloaded", { exact: false }),
