@@ -262,7 +262,6 @@ function getUniqueProfileFolderName(
   return candidate;
 }
 
-
 function getUniqueFileName(
   folder: string,
   proposed: string,
