@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.25.15";
+export const APP_VERSION = "3.25.16";
 
 export const RELEASE_NOTES = [
-  "Trip history cards are now tappable edit capsules with a chevron, and trip deletion has moved into the Edit trip dialog.",
+  "Add Permission now uses a compact primary pill action, and Permission history cards have cleaner uninterrupted rounded borders.",
 ] as const;
