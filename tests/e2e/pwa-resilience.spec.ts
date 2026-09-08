@@ -113,7 +113,7 @@ test("activates a service-worker update, removes stale caches, and preserves Ind
         ),
       );
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 8);
+      const request = indexedDB.open("urbanfox-ilr", 9);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -172,7 +172,7 @@ test("activates a service-worker update, removes stale caches, and preserves Ind
 
   const after = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("urbanfox-ilr", 8);
+      const request = indexedDB.open("urbanfox-ilr", 9);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
