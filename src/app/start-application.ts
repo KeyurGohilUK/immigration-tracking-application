@@ -2295,17 +2295,17 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             familyMembers.map(async (member) => {
               const [permissions, addressHistory, lifeEnglish, employment] =
                 await Promise.all([
-                permissionCache.get(member.id) ??
-                  getImmigrationPermissions(member.id, key),
-                addressHistoryCache.get(member.id) ??
-                  getAddressHistory(member.id, key),
-                lifeEnglishCache.has(member.id)
-                  ? (lifeEnglishCache.get(member.id) ?? null)
-                  : getLifeEnglishRecord(member.id, key),
-                employmentCache.has(member.id)
-                  ? (employmentCache.get(member.id) ?? null)
-                  : getEmploymentRecord(member.id, key),
-              ]);
+                  permissionCache.get(member.id) ??
+                    getImmigrationPermissions(member.id, key),
+                  addressHistoryCache.get(member.id) ??
+                    getAddressHistory(member.id, key),
+                  lifeEnglishCache.has(member.id)
+                    ? (lifeEnglishCache.get(member.id) ?? null)
+                    : getLifeEnglishRecord(member.id, key),
+                  employmentCache.has(member.id)
+                    ? (employmentCache.get(member.id) ?? null)
+                    : getEmploymentRecord(member.id, key),
+                ]);
               permissionCache.set(member.id, permissions);
               addressHistoryCache.set(member.id, addressHistory);
               lifeEnglishCache.set(member.id, lifeEnglish);
