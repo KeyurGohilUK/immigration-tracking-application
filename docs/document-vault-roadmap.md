@@ -38,7 +38,7 @@ product roadmap.
       number, and optional evidence.
 - [x] Keep Life in the UK and English evidence uploads inline within the
       requirement modal instead of opening a second upload modal.
-- [ ] Add structured employment metadata (employer, job title, sponsorship
+- [x] Add structured employment metadata (employer, job title, sponsorship
       status, dates, salary) and time-aware final employer-letter status.
 - [ ] Add explicit Not applicable handling for conditional requirements.
 - [ ] Add richer Additional Documents metadata: custom tag/category, document
