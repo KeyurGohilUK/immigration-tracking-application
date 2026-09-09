@@ -60,7 +60,7 @@ Document Vault-specific work is tracked separately in
 - [x] Add a visible lock-now action and configurable inactivity timeout.
 - [x] Create a chronological immigration and travel timeline.
 - [x] Add accessible success, warning, error, and manual-review states through the shared semantic status component.
-- [ ] Design appropriate loading, saving, empty, and corrupted-data states.
+- [x] Design shared loading, saving, empty, and corrupted-data states and apply them to core ILR, Travel, Document Vault, and encrypted-save workflows.
 - [ ] Implement the original white, near-black, and neutral-grey brand tokens if
       still required; the current product uses the approved Ibiza Sunset Liquid
       Glass system.
