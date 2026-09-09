@@ -466,9 +466,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLElement>("#ilr-outstanding-information")
         ?.addEventListener("click", (event) => {
-          const action = (event.target as HTMLElement).closest<HTMLButtonElement>(
-            "[data-ilr-attention-target]",
-          );
+          const action = (
+            event.target as HTMLElement
+          ).closest<HTMLButtonElement>("[data-ilr-attention-target]");
           if (!action) return;
 
           const target = action.dataset.ilrAttentionTarget;
