@@ -474,7 +474,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           const target = action.dataset.ilrAttentionTarget;
           const itemId = action.dataset.ilrAttentionId;
           if (target === "add-permission") {
-            root.querySelector<HTMLButtonElement>("#ilr-add-permission")?.click();
+            root
+              .querySelector<HTMLButtonElement>("#ilr-add-permission")
+              ?.click();
             return;
           }
           if (target === "permission-history") {
