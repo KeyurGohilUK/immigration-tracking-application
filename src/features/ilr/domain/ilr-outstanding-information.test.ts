@@ -96,7 +96,7 @@ describe("ILR outstanding information", () => {
       "4 applicable required items are still outstanding.",
     );
     expect(result[0]?.action).toEqual({
-      label: "Add permission",
+      label: "Enter permission details",
       target: "add-permission",
     });
     expect(result.find(({ id }) => id === "absence-review")).toMatchObject({
