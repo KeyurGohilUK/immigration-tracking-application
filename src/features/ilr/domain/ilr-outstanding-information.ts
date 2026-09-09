@@ -63,7 +63,17 @@ export function getIlrOutstandingInformation(
     });
   }
 
-  if (!isEnglishRequirementComplete(lifeEnglish)) {
+  const lifeEnglishSection = documentVault?.sections.find(
+    ({ id }) => id === "life-english",
+  );
+  const englishApplicable =
+    lifeEnglishSection?.requirements.find(({ id }) => id === "english-language")
+      ?.notApplicable === false;
+  const lifeInUkApplicable =
+    lifeEnglishSection?.requirements.find(({ id }) => id === "life-in-uk")
+      ?.notApplicable === false;
+
+  if (englishApplicable && !isEnglishRequirementComplete(lifeEnglish)) {
     items.push({
       id: "english-language",
       label: "English language",
@@ -72,7 +82,7 @@ export function getIlrOutstandingInformation(
     });
   }
 
-  if (!isLifeInUkComplete(lifeEnglish)) {
+  if (lifeInUkApplicable && !isLifeInUkComplete(lifeEnglish)) {
     items.push({
       id: "life-in-uk",
       label: "Life in the UK",
