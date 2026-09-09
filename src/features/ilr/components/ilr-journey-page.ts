@@ -206,7 +206,7 @@ function createPermissionHistory(
   if (ordered.length === 0) {
     const empty = createUiState({
       kind: "empty",
-      title: "No permission history recorded",
+      title: "No permission history recorded yet.",
       message:
         "Add the selected member’s immigration permission to start the qualifying-period calculation.",
     });
