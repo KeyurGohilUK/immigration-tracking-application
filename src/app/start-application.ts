@@ -722,6 +722,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             const result = await enrollDeviceUnlock(pin, record);
             if (result.status !== "success") {
               if (error) {
+                error.dataset.diagnostic = result.diagnostic ?? result.status;
                 error.textContent =
                   result.status === "cancelled"
                     ? "Device confirmation was cancelled. You can try again."

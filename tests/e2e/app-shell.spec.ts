@@ -109,9 +109,12 @@ async function expectDeviceUnlockEnabled(
       const error = await page
         .locator("#device-unlock-form-error")
         .textContent();
-      return `${state ?? "missing state"} | ${error ?? "missing error"}`;
+      const diagnostic = await page
+        .locator("#device-unlock-form-error")
+        .getAttribute("data-diagnostic");
+      return `${state ?? "missing state"} | ${error ?? "missing error"} | ${diagnostic ?? "no diagnostic"}`;
     })
-    .toBe("Enabled | ");
+    .toBe("Enabled |  | no diagnostic");
 }
 
 async function fillStructuredAddress(

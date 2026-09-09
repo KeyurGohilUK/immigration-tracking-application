@@ -96,7 +96,7 @@ describe("Device Unlock", () => {
           error: new DOMException("cancelled", "NotAllowedError"),
         }),
       ),
-    ).resolves.toEqual({ status: "cancelled" });
+    ).resolves.toMatchObject({ status: "cancelled" });
   });
 
   it("rejects an authentication secret from a different credential", async () => {

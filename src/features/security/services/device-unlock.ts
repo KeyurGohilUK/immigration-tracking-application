@@ -37,7 +37,7 @@ export type DeviceUnlockFailure =
 
 export type DeviceEnrollmentResult =
   | { status: "success"; record: DeviceUnlockRecord }
-  | { status: DeviceUnlockFailure };
+  | { status: DeviceUnlockFailure; diagnostic?: string };
 
 export type DeviceAuthenticationResult =
   { status: "success"; key: CryptoKey } | { status: DeviceUnlockFailure };
@@ -182,7 +182,10 @@ export async function enrollDeviceUnlock(
       },
     };
   } catch (error) {
-    return { status: classifyError(error) };
+    return {
+      status: classifyError(error),
+      diagnostic: error instanceof Error ? error.name : "UnknownError",
+    };
   } finally {
     masterKeyBytes.fill(0);
   }
