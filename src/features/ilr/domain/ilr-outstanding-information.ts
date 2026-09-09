@@ -11,8 +11,7 @@ export type IlrOutstandingActionTarget =
   | "add-permission"
   | "permission-history"
   | "travel"
-  | "document-vault"
-  | "life-english";
+  | "document-vault";
 
 export interface IlrOutstandingAction {
   label: string;
@@ -112,7 +111,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Record how the English-language requirement is met, or confirm an applicable exemption.",
       severity: "todo",
-      action: { label: "Update English evidence", target: "life-english" },
+      action: { label: "Update English evidence", target: "document-vault" },
       externalLink: {
         label: "View official English guidance",
         href: "https://www.gov.uk/english-language",
@@ -127,7 +126,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Record the Life in the UK result or confirm an applicable exemption.",
       severity: "todo",
-      action: { label: "Update Life in the UK", target: "life-english" },
+      action: { label: "Update Life in the UK", target: "document-vault" },
       externalLink: {
         label: "Book or view official test guidance",
         href: "https://www.gov.uk/life-in-the-uk-test",
