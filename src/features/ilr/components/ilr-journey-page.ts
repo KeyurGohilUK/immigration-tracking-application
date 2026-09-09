@@ -279,6 +279,7 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
       primaryAction.className = "ilr-outstanding-action";
       primaryAction.textContent = item.action.label;
       primaryAction.dataset.ilrAttentionTarget = item.action.target;
+      primaryAction.dataset.ilrAttentionId = item.id;
       actions.append(primaryAction);
 
       if (item.externalLink) {
