@@ -100,6 +100,20 @@ async function addVirtualDeviceAuthenticator(
   return { session, id: result.authenticatorId };
 }
 
+async function expectDeviceUnlockEnabled(
+  page: import("@playwright/test").Page,
+): Promise<void> {
+  await expect
+    .poll(async () => {
+      const state = await page.locator("#device-unlock-state").textContent();
+      const error = await page
+        .locator("#device-unlock-form-error")
+        .textContent();
+      return `${state ?? "missing state"} | ${error ?? "missing error"}`;
+    })
+    .toBe("Enabled | ");
+}
+
 async function fillStructuredAddress(
   scope: import("@playwright/test").Locator,
   address: {
@@ -3087,7 +3101,7 @@ test("enables, persists, uses, and disables Device Unlock", async ({
   await page.getByRole("button", { name: "Enable" }).click();
   await page.getByLabel("Current four-digit PIN").fill(TEST_PROFILE.pin);
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page.getByText("Enabled", { exact: true })).toBeVisible();
+  await expectDeviceUnlockEnabled(page);
 
   await page.reload();
   await expect(
@@ -3140,7 +3154,7 @@ test("falls back to the PIN when an enrolled authenticator is unavailable", asyn
   await page.getByRole("button", { name: "Enable" }).click();
   await page.getByLabel("Current four-digit PIN").fill(TEST_PROFILE.pin);
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page.getByText("Enabled", { exact: true })).toBeVisible();
+  await expectDeviceUnlockEnabled(page);
 
   await page.getByRole("button", { name: "Lock now" }).click();
   await expect(
