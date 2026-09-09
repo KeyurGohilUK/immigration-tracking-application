@@ -245,7 +245,7 @@ test("surfaces outstanding tracked information on the ILR journey", async ({
   await expect(outstanding).toContainText("Travel & absences");
   await expect(outstanding).toContainText("Document Vault");
   await expect(
-    outstanding.getByRole("button", { name: "Add permission" }),
+    outstanding.getByRole("button", { name: "Enter permission details" }),
   ).toBeVisible();
   await expect(
     outstanding.getByRole("button", { name: "Review travel" }),
