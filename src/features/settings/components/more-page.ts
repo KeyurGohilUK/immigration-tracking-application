@@ -3,6 +3,10 @@ import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass
 import { APP_VERSION } from "../../../configuration/release-metadata";
 import { renderDeleteDataDialog } from "./delete-data-dialog";
 import { getThemePreference } from "../services/theme-preference";
+import {
+  getInactivityTimeoutMinutes,
+  INACTIVITY_TIMEOUT_OPTIONS,
+} from "../services/inactivity-timeout-preference";
 
 export function renderMorePage(root: HTMLElement, householdSize: number): void {
   renderAppShell(
@@ -30,6 +34,7 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
             <div class="settings-list">
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4Z"/><path d="M8 7V5h8v2M8 12h8"/></svg></span><div><h3 id="local-data-title">Stored only on this device</h3><p>Encrypted while UrbanFox is locked; there is no online app database.</p></div><span class="settings-state">Local</span></div>
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><div><h3>App lock</h3><p>Require the four-digit PIN before records can be viewed again.</p></div><button id="lock-from-more" class="settings-row-action" type="button">Lock now</button></div>
+            <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span><div><h3><label for="inactivity-timeout">Auto-lock after inactivity</label></h3><p>Choose how long UrbanFox stays unlocked when there is no pointer or keyboard activity.</p></div><select id="inactivity-timeout" class="settings-row-select" aria-label="Auto-lock after inactivity">${INACTIVITY_TIMEOUT_OPTIONS.map((minutes) => `<option value="${minutes}">${minutes} ${minutes === 1 ? "minute" : "minutes"}</option>`).join("")}</select></div>
             </div>
           </div>
         </details>
@@ -151,4 +156,9 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
     .forEach((option) => {
       option.checked = option.value === themePreference;
     });
+  const inactivityTimeout = root.querySelector<HTMLSelectElement>(
+    "#inactivity-timeout",
+  );
+  if (inactivityTimeout)
+    inactivityTimeout.value = String(getInactivityTimeoutMinutes());
 }
