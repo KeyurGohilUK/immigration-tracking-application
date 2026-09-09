@@ -53,6 +53,16 @@ describe("session lock", () => {
     stop();
   });
 
+  it("uses a configured inactivity timeout when provided", () => {
+    const onLock = vi.fn();
+    const { environment, timers } = createEnvironment();
+
+    const stop = startSessionLock(onLock, environment, 15 * 60 * 1000);
+
+    expect([...timers.values()][0]?.timeout).toBe(15 * 60 * 1000);
+    stop();
+  });
+
   it("resets the inactivity timer after pointer or keyboard activity", () => {
     const onLock = vi.fn();
     const { environment, timers, dispatch } = createEnvironment();
