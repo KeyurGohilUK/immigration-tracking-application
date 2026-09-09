@@ -31,7 +31,7 @@ export function showFirstUseGuide(
     </div>
     <p class="first-use-guide-replay">You can reopen this guide later from Profile &amp; settings.</p>`,
     actions: isFirstUse
-      ? '<button class="secondary-button" type="button" data-guide-action="dismissed">Skip for now</button><button class="primary-button liquid-dialog-save" type="button" data-guide-action="completed">Continue to UrbanFox</button>'
+      ? '<button class="primary-button liquid-dialog-save" type="button" data-guide-action="completed">Continue to UrbanFox</button><button class="secondary-button" type="button" data-guide-action="dismissed">Skip for now</button>'
       : '<button class="primary-button liquid-dialog-save" type="button" data-guide-close>Close guide</button>',
     dialogClass: "first-use-guide-dialog",
     closeLabel: isFirstUse ? "Skip welcome guide" : "Close welcome guide",
