@@ -4,6 +4,7 @@ import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass
 import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import { createUiState } from "../../../shared/components/ui-state";
 import type { HouseholdMember } from "../../household/domain/household-member";
 import type { Trip, TripInput } from "../domain/trip";
 
@@ -161,10 +162,13 @@ export function renderTripsPage(
   if (!list || !count) throw new Error("Trips page could not be rendered.");
   count.textContent = `${trips.length} ${trips.length === 1 ? "trip" : "trips"}`;
   if (trips.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "family-empty-state travel-empty-state";
-    empty.innerHTML =
-      "<h3>No trips recorded</h3><p>Add each trip outside the UK for the selected profile. Do not combine different people’s travel.</p>";
+    const empty = createUiState({
+      kind: "empty",
+      title: "No trips recorded",
+      message:
+        "Add each trip outside the UK for the selected profile. Do not combine different people’s travel.",
+    });
+    empty.classList.add("travel-empty-state");
     list.append(empty);
     return;
   }
