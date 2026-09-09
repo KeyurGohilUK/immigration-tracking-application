@@ -1,6 +1,11 @@
 import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import {
+  applySemanticStatus,
+  renderSemanticStatus,
+  type SemanticStatusTone,
+} from "../../../shared/components/semantic-status";
 import { renderAppShell } from "../../../app/app";
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import type { HouseholdMember } from "../../household/domain/household-member";
@@ -143,6 +148,13 @@ export function renderDocumentsPage(
           : vaultProgress.readinessPercent > 0
             ? "In progress"
             : "To do",
+      statusTone: requiresReview
+        ? "error"
+        : vaultProgress.readinessPercent === 100
+          ? "success"
+          : vaultProgress.readinessPercent > 0
+            ? "warning"
+            : "todo",
       requiresReview: requiresReview || vaultProgress.readinessPercent < 100,
       progressLabel: "Document completion",
       progressAccessibleName: "Document Vault readiness",
@@ -176,6 +188,16 @@ export function renderDocumentsPage(
       createDocumentCard(document, index === 0, index === documents.length - 1),
     ),
   );
+}
+
+function getVaultStatusTone(
+  status: DocumentVaultSectionProgress["status"],
+): SemanticStatusTone {
+  if (status === "complete") return "success";
+  if (status === "needs-attention") return "error";
+  if (status === "partial") return "warning";
+  if (status === "to-do") return "todo";
+  return "info";
 }
 
 function renderVaultCategoryRows(
@@ -213,7 +235,7 @@ function renderVaultCategoryRows(
       } else if (section.id === "employment") {
         sectionAction = `<button class="vault-section-add" type="button" data-employment-details>${employment ? "Edit employment details" : "Add employment details"}</button>`;
       }
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div>${renderSemanticStatus({ label: statusLabel, tone: getVaultStatusTone(section.status), className: "vault-category-status" })}</summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
@@ -269,23 +291,13 @@ function renderVaultRequirement(
   return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}">${content}</li>`;
 }
 
-function renderVaultStatusIcon(
-  status: DocumentVaultSectionProgress["status"],
-): string {
-  if (status === "complete") return "✓";
-  if (status === "needs-attention") return "!";
-  if (status === "partial") return "◐";
-  if (status === "required-later") return "↗";
-  if (status === "not-applicable") return "—";
-  return "○";
-}
 function createDocumentCard(
   document: DocumentMetadata,
   isFirst: boolean,
   isLast: boolean,
 ): HTMLElement {
   const card = documentNode("article", "document-card");
-  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden>Needs attention · no address linked</span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button>${document.category === "additional-document" ? '<button class="member-action" type="button" data-edit-document-details>Edit details</button>' : '<button class="member-action" type="button" data-rename-document>Rename</button>'}<button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
+  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden></span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button>${document.category === "additional-document" ? '<button class="member-action" type="button" data-edit-document-details>Edit details</button>' : '<button class="member-action" type="button" data-rename-document>Rename</button>'}<button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
   const heading = card.querySelector<HTMLElement>("h3");
   const originalName = card.querySelector<HTMLElement>(
     ".document-original-name",
@@ -302,11 +314,20 @@ function createDocumentCard(
     const expired =
       !!document.expiryDate &&
       document.expiryDate < new Date().toISOString().slice(0, 10);
-    if (expired) review.textContent = "Needs attention · expired";
-    review.hidden = !(
-      expired ||
-      (document.category === "address-proof" && !document.addressHistoryId)
-    );
+    const missingAddress =
+      document.category === "address-proof" && !document.addressHistoryId;
+    if (expired || missingAddress) {
+      applySemanticStatus(
+        review,
+        expired
+          ? "Needs attention · expired"
+          : "Needs attention · no address linked",
+        "review",
+      );
+      review.hidden = false;
+    } else {
+      review.hidden = true;
+    }
   }
   const metadataParts = [
     document.customTag,

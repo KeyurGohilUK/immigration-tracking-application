@@ -121,7 +121,19 @@ export function renderTripsPage(
       status:
         overview?.absenceStatus === "within-recorded-limit"
           ? "Within recorded limit"
-          : "Review needed",
+          : overview?.absenceStatus === "potentially-over-limit"
+            ? "Potentially over limit"
+            : overview?.absenceStatus === "manual-review"
+              ? "Manual review"
+              : "Review needed",
+      statusTone:
+        overview?.absenceStatus === "within-recorded-limit"
+          ? "success"
+          : overview?.absenceStatus === "manual-review"
+            ? "review"
+            : overview?.absenceStatus === "potentially-over-limit"
+              ? "error"
+              : "warning",
       requiresReview: overview?.absenceStatus !== "within-recorded-limit",
       progressLabel: "Recorded absence usage",
       progressAccessibleName: "Recorded rolling absence usage",

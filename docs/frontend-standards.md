@@ -34,6 +34,7 @@ Shared components:
 - `src/styles/components/forms.css` and `form-controls.css`: shared form primitives.
 - `src/styles/components/dialog-compat.css`: compatibility rules for older dialog markup while migration completes.
 - `src/styles/components/liquid-glass-dialog.css`: shared Ibiza Sunset Liquid Glass modal system.
+- `src/shared/components/semantic-status.ts` and `src/styles/components/semantic-status.css`: shared labelled success, warning, error, review, information, and to-do states. Use these instead of feature-local colour-only status pills.
 
 Feature/page modules live under `src/styles/pages/` and own their base, responsive, and feature-specific states. Current modules include public, legal, security, dashboard, setup, records, documents, household, ILR, member editor, and travel.
 
@@ -48,6 +49,7 @@ Do not recreate catch-all files such as `foundation.css` or `application.css`. W
 - Prefer low-specificity class selectors. Do not use IDs for styling.
 - Do not add `!important`. The only allowed uses are the four declarations in the central reduced-motion accessibility override.
 - Avoid duplicate feature-specific copies of common controls, cards, dialogs, navigation, or buttons.
+- Status meaning must be conveyed by visible text plus a decorative hidden icon; colour may reinforce the state but must never be the only signal. Dynamic form errors continue to use `role="alert"`.
 - ILR, Document Vault, Travel, and Family Overview use the shared `.cohort-page` layout (`styles/components/cohort-page.css`) for page width, responsive padding, and section gaps. Keep these values out of the individual page stylesheets.
 - ILR, Document Vault, and Travel share `shared/components/household-selector.ts` and `progress-card.ts`, with styles under `styles/components/`. Pages supply their own progress calculations and labels; shared components only render them. Profile pills emit `profile-select`, handled by the authenticated app shell.
 - Keep responsive rules with the component they modify.

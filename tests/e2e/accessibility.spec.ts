@@ -260,7 +260,9 @@ test("communicates document readiness states with text and structure, not colour
     const section = sections.nth(index);
     const status = section.locator(".vault-category-status");
     await expect(status).toBeVisible();
-    const label = (await status.textContent())?.trim() ?? "";
+    const label =
+      (await status.locator(".semantic-status-label").textContent())?.trim() ??
+      "";
     expect([
       "Complete",
       "Partial",
@@ -271,9 +273,43 @@ test("communicates document readiness states with text and structure, not colour
 
     const summary = section.locator("summary");
     await expect(summary).toContainText(label);
-    await expect(section.locator(".vault-category-state")).toHaveAttribute(
+    await expect(status).toHaveAttribute("data-status-tone");
+    await expect(status.locator(".semantic-status-icon")).toHaveAttribute(
       "aria-hidden",
       "true",
     );
   }
+});
+
+test("uses labelled semantic states for ILR success, warning and review outcomes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+
+  const summaryStatus = page.locator(".progress-card-status");
+  await expect(summaryStatus).toContainText("Setup incomplete");
+  await expect(summaryStatus).toHaveAttribute("data-status-tone", "warning");
+  await expect(summaryStatus.locator(".semantic-status-icon")).toHaveAttribute(
+    "aria-hidden",
+    "true",
+  );
+
+  const outstanding = page.locator("#ilr-outstanding-information");
+  const reviewStatus = outstanding
+    .locator(".semantic-status")
+    .filter({ hasText: "Review" })
+    .first();
+  await expect(reviewStatus).toHaveAttribute("data-status-tone", "review");
+  await expect(reviewStatus.locator(".semantic-status-icon")).toHaveAttribute(
+    "aria-hidden",
+    "true",
+  );
+
+  const todoStatus = outstanding
+    .locator(".semantic-status")
+    .filter({ hasText: "To do" })
+    .first();
+  await expect(todoStatus).toHaveAttribute("data-status-tone", "todo");
 });

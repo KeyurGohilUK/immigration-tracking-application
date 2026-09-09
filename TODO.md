@@ -59,7 +59,7 @@ Document Vault-specific work is tracked separately in
       outstanding information. See `docs/ilr-dashboard.md`.
 - [x] Add a visible lock-now action and configurable inactivity timeout.
 - [x] Create a chronological immigration and travel timeline.
-- [ ] Add accessible success, warning, error, and manual-review states.
+- [x] Add accessible success, warning, error, and manual-review states through the shared semantic status component.
 - [ ] Design appropriate loading, saving, empty, and corrupted-data states.
 - [ ] Implement the original white, near-black, and neutral-grey brand tokens if
       still required; the current product uses the approved Ibiza Sunset Liquid

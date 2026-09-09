@@ -67,7 +67,7 @@
 .vault-category-row {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 0.75rem;
   align-items: center;
   min-height: 4.05rem;
@@ -116,30 +116,10 @@
 }
 
 .vault-category-status {
-  color: var(--colour-text-muted);
   font-size: 0.68rem;
   font-weight: 850;
   letter-spacing: 0.035em;
   text-transform: uppercase;
-}
-
-.vault-category-state {
-  display: grid;
-  width: 1.45rem;
-  height: 1.45rem;
-  place-items: center;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  color: var(--colour-text-muted);
-  font-size: 0.75rem;
-  font-weight: 900;
-}
-
-.vault-section-card.status-complete .vault-category-status,
-.vault-section-card.status-complete .vault-category-state,
-.vault-section-card.status-partial .vault-category-status,
-.vault-section-card.status-partial .vault-category-state {
-  color: var(--ibiza-primary);
 }
 
 .vault-section-card.status-partial .vault-category-row::before {
@@ -160,11 +140,6 @@
   background: var(--colour-danger);
   box-shadow: 0 0 0.9rem
     color-mix(in srgb, var(--colour-danger) 34%, transparent);
-}
-
-.vault-section-card.status-needs-attention .vault-category-status,
-.vault-section-card.status-needs-attention .vault-category-state {
-  color: var(--colour-danger);
 }
 
 .vault-section-card.status-required-later {
@@ -433,22 +408,12 @@
 }
 
 .document-category,
-.document-size,
-.document-review-badge {
+.document-size {
   border: 1px solid var(--glass-border);
   border-radius: 999px;
   padding: 0.25rem 0.55rem;
   font-size: 0.72rem;
   font-weight: 700;
-}
-
-.document-review-badge {
-  border-color: color-mix(
-    in srgb,
-    var(--ibiza-orange) 55%,
-    var(--glass-border)
-  );
-  color: var(--ibiza-orange);
 }
 
 .document-review-badge[hidden] {

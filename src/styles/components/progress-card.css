@@ -54,26 +54,7 @@
 }
 
 .progress-card-status {
-  display: flex;
   flex: 0 0 auto;
-  gap: 0.4rem;
-  align-items: center;
-  padding: 0.38rem 0.62rem;
-  border-radius: 999px;
-  background: var(--glass-surface-strong);
-  font-size: 0.66rem;
-  font-weight: 700;
-}
-
-.progress-card-status i {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 999px;
-  background: #10b981;
-}
-
-.progress-card-status.requires-review i {
-  background: var(--ibiza-orange);
 }
 
 .progress-card-summary {
