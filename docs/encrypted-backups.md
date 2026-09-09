@@ -33,7 +33,7 @@ and matching metadata.
 
 The app shows the household name and record counts before replacement. The user
 must acknowledge the replace-only behaviour and accept a final confirmation.
-All restored records are re-encrypted with the current device's local PIN key,
+All restored records are re-encrypted with the current device's unlocked master key,
 then the profiles, permissions, and trips are replaced together in one
 IndexedDB transaction. If encryption or the transaction fails, the previous
 local records remain unchanged. The vault and local PIN are not replaced.

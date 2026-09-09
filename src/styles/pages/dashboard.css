@@ -585,6 +585,13 @@ html[data-theme="dark"] .appearance-toggle-thumb {
   color: var(--colour-text);
 }
 
+.device-unlock-setting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
 .settings-row-select {
   min-height: 2.2rem;
   max-width: 8rem;

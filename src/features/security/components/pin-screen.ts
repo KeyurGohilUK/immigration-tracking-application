@@ -236,15 +236,22 @@ export function renderPinScreen(
               <p>Please enter your 4-digit security code to continue.</p>
             </div>
             <form id="pin-form" class="pin-form security-keypad-form" novalidate>
-              <div class="security-hidden-pin-inputs">
-                ${renderPinInputs("pin", "Four-digit PIN")}
+              <div id="device-unlock-actions" class="device-unlock-actions" hidden>
+                <button id="device-unlock-button" class="primary-button" type="button">Unlock with Device Unlock</button>
+                <button id="use-pin-button" class="security-forgot-pin" type="button">Use PIN instead</button>
+                <p id="device-unlock-status" class="more-card-status" role="status"></p>
               </div>
-              <div class="security-pin-indicators" aria-hidden="true">
-                ${Array.from({ length: 4 }, (_, index) => `<span data-pin-indicator="${index}"></span>`).join("")}
+              <div id="pin-entry-controls">
+                <div class="security-hidden-pin-inputs">
+                  ${renderPinInputs("pin", "Four-digit PIN")}
+                </div>
+                <div class="security-pin-indicators" aria-hidden="true">
+                  ${Array.from({ length: 4 }, (_, index) => `<span data-pin-indicator="${index}"></span>`).join("")}
+                </div>
+                ${renderUnlockKeypad()}
+                <p id="pin-error" class="form-error security-keypad-error" role="alert" hidden></p>
+                <button id="forgot-pin-reset" class="security-forgot-pin" type="button">Forgot PIN?</button>
               </div>
-              ${renderUnlockKeypad()}
-              <p id="pin-error" class="form-error security-keypad-error" role="alert" hidden></p>
-              <button id="forgot-pin-reset" class="security-forgot-pin" type="button">Forgot PIN?</button>
             </form>
           </section>
         </main>
@@ -267,6 +274,53 @@ export function renderPinScreen(
   }
 
   return form;
+}
+
+export function showDeviceUnlockOption(
+  form: HTMLFormElement,
+  onUnlock: () => Promise<void>,
+): void {
+  const actions = form.querySelector<HTMLElement>("#device-unlock-actions");
+  const pinControls = form.querySelector<HTMLElement>("#pin-entry-controls");
+  const unlockButton = form.querySelector<HTMLButtonElement>(
+    "#device-unlock-button",
+  );
+  const usePinButton = form.querySelector<HTMLButtonElement>("#use-pin-button");
+  const status = form.querySelector<HTMLElement>("#device-unlock-status");
+  if (!actions || !pinControls || !unlockButton || !usePinButton || !status)
+    return;
+
+  actions.hidden = false;
+  pinControls.hidden = true;
+  usePinButton.addEventListener("click", () => {
+    actions.hidden = true;
+    pinControls.hidden = false;
+    form.querySelector<HTMLElement>(".security-keypad")?.focus();
+  });
+  unlockButton.addEventListener("click", async () => {
+    unlockButton.disabled = true;
+    status.textContent = "Confirm on your device…";
+    try {
+      await onUnlock();
+    } finally {
+      unlockButton.disabled = false;
+    }
+  });
+}
+
+export function showDeviceUnlockStatus(
+  form: HTMLFormElement,
+  message: string,
+  revealPin = false,
+): void {
+  const status = form.querySelector<HTMLElement>("#device-unlock-status");
+  if (status) status.textContent = message;
+  if (revealPin) {
+    const actions = form.querySelector<HTMLElement>("#device-unlock-actions");
+    const pinControls = form.querySelector<HTMLElement>("#pin-entry-controls");
+    if (actions) actions.hidden = true;
+    if (pinControls) pinControls.hidden = false;
+  }
 }
 
 export function showPinError(form: HTMLFormElement, message: string): void {

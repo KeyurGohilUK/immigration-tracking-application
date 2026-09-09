@@ -34,6 +34,7 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
             <div class="settings-list">
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4Z"/><path d="M8 7V5h8v2M8 12h8"/></svg></span><div><h3 id="local-data-title">Stored only on this device</h3><p>Encrypted while UrbanFox is locked; there is no online app database.</p></div><span class="settings-state">Local</span></div>
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><div><h3>App lock</h3><p>Require the four-digit PIN before records can be viewed again.</p></div><button id="lock-from-more" class="settings-row-action" type="button">Lock now</button></div>
+            <div class="settings-row" id="device-unlock-setting"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v2M16 4h2a2 2 0 0 1 2 2v2M8 20H6a2 2 0 0 1-2-2v-2M16 20h2a2 2 0 0 0 2-2v-2"/><path d="M9 10h.01M15 10h.01M9 15c2 1.4 4 1.4 6 0"/></svg></span><div><h3>Device Unlock</h3><p id="device-unlock-description">Use your device’s secure authentication to unlock UrbanFox more quickly. Your PIN remains available as a fallback.</p><p id="device-unlock-settings-status" class="more-card-status" role="status"></p></div><div class="device-unlock-setting-actions"><span id="device-unlock-state" class="settings-state">Checking…</span><button id="configure-device-unlock" class="settings-row-action" type="button" hidden>Enable</button><button id="disable-device-unlock" class="settings-row-action" type="button" hidden>Disable</button></div></div>
             <div class="settings-row"><span class="settings-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span><div><h3><label for="inactivity-timeout">Auto-lock after inactivity</label></h3><p>Choose how long UrbanFox stays unlocked when there is no pointer or keyboard activity.</p></div><select id="inactivity-timeout" class="settings-row-select" aria-label="Auto-lock after inactivity">${INACTIVITY_TIMEOUT_OPTIONS.map((minutes) => `<option value="${minutes}">${minutes} ${minutes === 1 ? "minute" : "minutes"}</option>`).join("")}</select></div>
             </div>
           </div>
@@ -155,6 +156,24 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
       actions:
         '<button id="review-backup" class="primary-button liquid-dialog-save" type="submit">Review backup</button>',
       closeLabel: "Close restore form",
+    })}
+    ${renderLiquidGlassDialog({
+      id: "device-unlock-dialog",
+      labelledBy: "device-unlock-dialog-title",
+      formId: "device-unlock-form",
+      eyebrow: "Device security",
+      title: "Enable Device Unlock",
+      subtitle:
+        "Enter your current PIN, then confirm using this device. Your PIN will remain required and available as a fallback.",
+      iconSvg:
+        '<svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v2M16 4h2a2 2 0 0 1 2 2v2M8 20H6a2 2 0 0 1-2-2v-2M16 20h2a2 2 0 0 0 2-2v-2"/><path d="M9 10h.01M15 10h.01M9 15c2 1.4 4 1.4 6 0"/></svg>',
+      body: `<label for="device-unlock-pin">Current four-digit PIN</label>
+        <input id="device-unlock-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="current-password" required />
+        <p class="field-guidance">Authentication is handled by your device. UrbanFox never receives or stores biometric data.</p>
+        <p id="device-unlock-form-error" class="form-error" role="alert" hidden></p>`,
+      actions:
+        '<button class="primary-button liquid-dialog-save" type="submit">Continue</button>',
+      closeLabel: "Close Device Unlock setup",
     })}
     ${renderDeleteDataDialog("unlocked")}`,
   );

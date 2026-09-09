@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type BrowserContext } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { RELEASE_NOTES } from "../../src/configuration/release-metadata";
 
@@ -76,6 +76,45 @@ async function enterPin(
   for (const [index, digit] of [...pin].entries()) {
     await page.getByLabel(`${label} digit ${index + 1}`).fill(digit);
   }
+}
+
+async function addVirtualDeviceAuthenticator(
+  context: BrowserContext,
+  page: import("@playwright/test").Page,
+): Promise<{ session: import("@playwright/test").CDPSession; id: string }> {
+  const session = await context.newCDPSession(page);
+  await session.send("WebAuthn.enable");
+  const result = await session.send("WebAuthn.addVirtualAuthenticator", {
+    options: {
+      protocol: "ctap2",
+      ctap2Version: "ctap2_2",
+      transport: "internal",
+      hasResidentKey: true,
+      hasUserVerification: true,
+      hasPrf: true,
+      hasHmacSecret: true,
+      automaticPresenceSimulation: true,
+      isUserVerified: true,
+    },
+  });
+  return { session, id: result.authenticatorId };
+}
+
+async function expectDeviceUnlockEnabled(
+  page: import("@playwright/test").Page,
+): Promise<void> {
+  await expect
+    .poll(async () => {
+      const state = await page.locator("#device-unlock-state").textContent();
+      const error = await page
+        .locator("#device-unlock-form-error")
+        .textContent();
+      const diagnostic = await page
+        .locator("#device-unlock-form-error")
+        .getAttribute("data-diagnostic");
+      return `${state ?? "missing state"} | ${error ?? "missing error"} | ${diagnostic ?? "no diagnostic"}`;
+    })
+    .toBe("Enabled |  | no diagnostic");
 }
 
 async function fillStructuredAddress(
@@ -3045,6 +3084,117 @@ test("locks from Profile settings and requires the PIN again", async ({
     page.getByRole("heading", { name: "Enter Security PIN" }),
   ).toBeVisible();
 
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+});
+
+test("enables, persists, uses, and disables Device Unlock", async ({
+  page,
+  context,
+}) => {
+  const authenticator = await addVirtualDeviceAuthenticator(context, page);
+  await page.goto("http://localhost:4173/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Protect this device", { exact: true }).click();
+
+  await expect(page.getByText("Device Unlock", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Enable" }).click();
+  await page.getByLabel("Current four-digit PIN").fill(TEST_PROFILE.pin);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expectDeviceUnlockEnabled(page);
+
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Unlock with Device Unlock" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Unlock with Device Unlock" }).click();
+  await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+
+  await page.getByRole("button", { name: "Lock app" }).click();
+  await authenticator.session.send("WebAuthn.setUserVerified", {
+    authenticatorId: authenticator.id,
+    isUserVerified: false,
+  });
+  await page.getByRole("button", { name: "Unlock with Device Unlock" }).click();
+  await expect(page.getByRole("status")).toContainText("cancelled");
+  await authenticator.session.send("WebAuthn.setUserVerified", {
+    authenticatorId: authenticator.id,
+    isUserVerified: true,
+  });
+  await page.getByRole("button", { name: "Use PIN instead" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Protect this device", { exact: true }).click();
+  await page.getByRole("button", { name: "Disable" }).click();
+  await page.getByLabel("Current four-digit PIN").fill(TEST_PROFILE.pin);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByText("Disabled", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Lock now" }).click();
+  await expect(
+    page.getByRole("button", { name: "Unlock with Device Unlock" }),
+  ).toHaveCount(0);
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+});
+
+test("falls back to the PIN when an enrolled authenticator is unavailable", async ({
+  page,
+  context,
+}) => {
+  const authenticator = await addVirtualDeviceAuthenticator(context, page);
+  await page.goto("http://localhost:4173/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Protect this device", { exact: true }).click();
+  await page.getByRole("button", { name: "Enable" }).click();
+  await page.getByLabel("Current four-digit PIN").fill(TEST_PROFILE.pin);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expectDeviceUnlockEnabled(page);
+
+  await page.getByRole("button", { name: "Lock now" }).click();
+  await expect(
+    page.getByRole("button", { name: "Unlock with Device Unlock" }),
+  ).toBeVisible();
+  const credentials = await authenticator.session.send(
+    "WebAuthn.getCredentials",
+    {
+      authenticatorId: authenticator.id,
+    },
+  );
+  await authenticator.session.send("WebAuthn.removeCredential", {
+    authenticatorId: authenticator.id,
+    credentialId: credentials.credentials[0]!.credentialId,
+  });
+  await page.getByRole("button", { name: "Unlock with Device Unlock" }).click();
+  await expect(page.getByRole("status")).toContainText("cancelled");
+  await page.getByRole("button", { name: "Use PIN instead" }).click();
+  await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
+  await expect(
+    page.getByRole("link", { name: "ILR", exact: true }).first(),
+  ).toHaveAttribute("aria-current", "page");
+});
+
+test("keeps Device Unlock unavailable without a platform authenticator", async ({
+  page,
+}) => {
+  await page.goto("http://localhost:4173/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Protect this device", { exact: true }).click();
+
+  await expect(page.getByText("Disabled", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Enable" })).toHaveCount(0);
+  await expect(page.getByText(/unavailable in this browser/u)).toBeVisible();
+
+  await page.getByRole("button", { name: "Lock now" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
     page.getByRole("link", { name: "ILR", exact: true }).first(),
