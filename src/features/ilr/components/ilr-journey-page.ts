@@ -280,6 +280,25 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
       primaryAction.textContent = item.action.label;
       primaryAction.dataset.ilrAttentionTarget = item.action.target;
       primaryAction.dataset.ilrAttentionId = item.id;
+      primaryAction.addEventListener("click", () => {
+        if (item.action.target === "add-permission") {
+          document.querySelector<HTMLButtonElement>("#ilr-add-permission")?.click();
+          return;
+        }
+        if (item.action.target === "permission-history") {
+          document
+            .querySelector<HTMLElement>("#ilr-history-title")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+        const navigation =
+          item.action.target === "travel" ? "Trips" : "Documents";
+        document
+          .querySelector<HTMLAnchorElement>(
+            `[data-navigation="${navigation}"]`,
+          )
+          ?.click();
+      });
       actions.append(primaryAction);
 
       if (item.externalLink) {
