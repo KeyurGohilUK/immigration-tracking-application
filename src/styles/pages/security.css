@@ -568,6 +568,7 @@ a {
   }
 
   .security-card h1 {
+    max-width: none;
     margin-bottom: 0.45rem;
     font-size: clamp(1.55rem, 7vw, 1.95rem);
   }
