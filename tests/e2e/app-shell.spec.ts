@@ -174,6 +174,9 @@ test("keeps core onboarding screens within a standard mobile viewport", async ({
   await guide.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Create your four-digit PIN" }),
+  ).toBeVisible();
 
   const pinMetrics = await page.evaluate(() => ({
     scrollHeight: document.documentElement.scrollHeight,
