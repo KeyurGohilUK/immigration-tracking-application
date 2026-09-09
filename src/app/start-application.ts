@@ -463,6 +463,55 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#ilr-open-document-vault")
         ?.addEventListener("click", () => void showDocuments(profile));
+      root
+        .querySelector<HTMLElement>("#ilr-outstanding-information")
+        ?.addEventListener("click", (event) => {
+          const action = (event.target as HTMLElement).closest<HTMLButtonElement>(
+            "[data-ilr-attention-target]",
+          );
+          if (!action) return;
+
+          const target = action.dataset.ilrAttentionTarget;
+          const itemId = action.dataset.ilrAttentionId;
+          if (target === "add-permission") {
+            root
+              .querySelector<HTMLButtonElement>("#ilr-add-permission")
+              ?.click();
+            return;
+          }
+          if (target === "permission-history") {
+            root
+              .querySelector<HTMLElement>("#ilr-history-title")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+          }
+          if (target === "travel") {
+            void showTrips(profile);
+            return;
+          }
+          if (target === "document-vault" || target === "life-english") {
+            void (async () => {
+              await showDocuments(profile);
+              if (target !== "life-english") return;
+
+              const section = root.querySelector<HTMLDetailsElement>(
+                '[data-vault-section="life-english"]',
+              );
+              if (section) section.open = true;
+
+              const buttonName =
+                itemId === "english-language"
+                  ? "Add English language evidence"
+                  : itemId === "life-in-uk"
+                    ? "Add Life in the UK evidence"
+                    : null;
+              if (!buttonName) return;
+              [...root.querySelectorAll<HTMLButtonElement>("button")].find(
+                (button) => button.textContent?.trim() === buttonName,
+              )?.click();
+            })();
+          }
+        });
 
       const selectedPermissions =
         journeys.find(({ member }) => member.id === selectedProfileId)
