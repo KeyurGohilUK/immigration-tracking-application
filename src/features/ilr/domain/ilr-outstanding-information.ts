@@ -51,7 +51,7 @@ export function getIlrOutstandingInformation(
       severity: "review",
       action: {
         label: period.issues.includes("no-permission-history")
-          ? "Add permission"
+          ? "Enter permission details"
           : "Review permissions",
         target: period.issues.includes("no-permission-history")
           ? "add-permission"
