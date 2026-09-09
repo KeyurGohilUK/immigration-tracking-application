@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_INACTIVITY_TIMEOUT_MINUTES,
   getInactivityTimeoutMinutes,
@@ -6,8 +6,23 @@ import {
   setInactivityTimeoutMinutes,
 } from "./inactivity-timeout-preference";
 
+function createStorage(): Storage {
+  const values = new Map<string, string>();
+  return {
+    get length() {
+      return values.size;
+    },
+    clear: () => values.clear(),
+    getItem: (key) => values.get(key) ?? null,
+    key: (index) => [...values.keys()][index] ?? null,
+    removeItem: (key) => void values.delete(key),
+    setItem: (key, value) => values.set(key, String(value)),
+  };
+}
+
 describe("inactivity timeout preference", () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => vi.stubGlobal("localStorage", createStorage()));
+  afterEach(() => vi.unstubAllGlobals());
 
   it("defaults to five minutes", () => {
     expect(getInactivityTimeoutMinutes()).toBe(
