@@ -463,7 +463,6 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLButtonElement>("#ilr-open-document-vault")
         ?.addEventListener("click", () => void showDocuments(profile));
-
       const selectedPermissions =
         journeys.find(({ member }) => member.id === selectedProfileId)
           ?.permissions ?? [];

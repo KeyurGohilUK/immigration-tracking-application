@@ -264,14 +264,53 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
     const row = document.createElement("div");
     row.className = `ilr-outstanding-item is-${item.severity}`;
     row.innerHTML =
-      '<span class="ilr-outstanding-icon" aria-hidden="true"></span><div><strong></strong><p></p></div><span class="ilr-outstanding-state"></span>';
+      '<span class="ilr-outstanding-icon" aria-hidden="true"></span><div class="ilr-outstanding-copy"><strong></strong><p></p><div class="ilr-outstanding-actions"></div></div><span class="ilr-outstanding-state"></span>';
     const icon = row.querySelector<HTMLElement>(".ilr-outstanding-icon");
     const title = row.querySelector<HTMLElement>("strong");
     const detail = row.querySelector<HTMLElement>("p");
+    const actions = row.querySelector<HTMLElement>(".ilr-outstanding-actions");
     const state = row.querySelector<HTMLElement>(".ilr-outstanding-state");
     if (icon) icon.textContent = item.severity === "review" ? "!" : "○";
     if (title) title.textContent = item.label;
     if (detail) detail.textContent = item.detail;
+    if (actions) {
+      const primaryAction = document.createElement("button");
+      primaryAction.type = "button";
+      primaryAction.className = "ilr-outstanding-action";
+      primaryAction.textContent = item.action.label;
+      primaryAction.dataset.ilrAttentionTarget = item.action.target;
+      primaryAction.dataset.ilrAttentionId = item.id;
+      primaryAction.addEventListener("click", () => {
+        if (item.action.target === "add-permission") {
+          document
+            .querySelector<HTMLButtonElement>("#ilr-add-permission")
+            ?.click();
+          return;
+        }
+        if (item.action.target === "permission-history") {
+          document
+            .querySelector<HTMLElement>("#ilr-history-title")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+        const navigation =
+          item.action.target === "travel" ? "Trips" : "Documents";
+        document
+          .querySelector<HTMLAnchorElement>(`[data-navigation="${navigation}"]`)
+          ?.click();
+      });
+      actions.append(primaryAction);
+
+      if (item.externalLink) {
+        const officialLink = document.createElement("a");
+        officialLink.className = "ilr-outstanding-official-link";
+        officialLink.href = item.externalLink.href;
+        officialLink.target = "_blank";
+        officialLink.rel = "noopener noreferrer";
+        officialLink.textContent = `${item.externalLink.label} ↗`;
+        actions.append(officialLink);
+      }
+    }
     if (state)
       applySemanticStatus(
         state,

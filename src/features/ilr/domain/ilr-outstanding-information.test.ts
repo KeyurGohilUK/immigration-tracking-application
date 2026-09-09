@@ -95,6 +95,24 @@ describe("ILR outstanding information", () => {
     expect(result.at(-1)?.detail).toBe(
       "4 applicable required items are still outstanding.",
     );
+    expect(result[0]?.action).toEqual({
+      label: "Enter permission details",
+      target: "add-permission",
+    });
+    expect(result.find(({ id }) => id === "absence-review")).toMatchObject({
+      action: { label: "Review travel", target: "travel" },
+      externalLink: {
+        href: "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-continuous-residence",
+      },
+    });
+    expect(result.find(({ id }) => id === "english-language")).toMatchObject({
+      action: { label: "Update English evidence", target: "document-vault" },
+      externalLink: { href: "https://www.gov.uk/english-language" },
+    });
+    expect(result.find(({ id }) => id === "life-in-uk")).toMatchObject({
+      action: { label: "Update Life in the UK", target: "document-vault" },
+      externalLink: { href: "https://www.gov.uk/life-in-the-uk-test" },
+    });
   });
 
   it("does not show route-driven Not applicable Life or English items as outstanding", () => {

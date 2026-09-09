@@ -427,6 +427,45 @@
   line-height: 1.45;
 }
 
+.ilr-outstanding-copy {
+  min-width: 0;
+}
+
+.ilr-outstanding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.7rem;
+  align-items: center;
+  margin-top: 0.55rem;
+}
+
+.ilr-outstanding-action,
+.ilr-outstanding-official-link {
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.ilr-outstanding-action {
+  min-height: 2rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--colour-strong);
+  background: var(--glass-surface-strong);
+  font: inherit;
+  cursor: pointer;
+}
+
+.ilr-outstanding-action:hover,
+.ilr-outstanding-action:focus-visible {
+  border-color: var(--colour-strong);
+}
+
+.ilr-outstanding-official-link {
+  color: var(--colour-strong);
+  text-underline-offset: 0.16rem;
+}
+
 .ilr-outstanding-state {
   justify-self: end;
 }

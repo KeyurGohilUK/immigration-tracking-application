@@ -10,8 +10,9 @@ This avoids maintaining a second dashboard with duplicate calculations.
 ## Outstanding information
 
 The ILR journey now also includes a **What needs attention** summary derived
-from the same calculation and Document Vault results. It surfaces only recorded
-gaps or review states, including:
+from the same calculation and Document Vault results. It surfaces only recorded gaps or review states. Each item now includes a concrete in-app action and, where useful, a secondary link to current official GOV.UK guidance. Actions route directly to permission entry/review, Travel, or Document Vault, with official GOV.UK guidance linked where useful.
+
+Examples include:
 
 - missing or review-required permission history
 - incomplete, exceptional, open-trip or potentially over-limit absence checks
