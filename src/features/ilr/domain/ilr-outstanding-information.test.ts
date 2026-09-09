@@ -46,7 +46,15 @@ const documentVault: DocumentVaultProgress = {
   completedRequired: 7,
   totalRequired: 7,
   completedSections: 6,
-  sections: [],
+  sections: [
+    {
+      id: "life-english",
+      requirements: [
+        { id: "life-in-uk", notApplicable: false },
+        { id: "english-language", notApplicable: false },
+      ],
+    },
+  ] as DocumentVaultProgress["sections"],
 };
 
 describe("ILR outstanding information", () => {
@@ -92,6 +100,29 @@ describe("ILR outstanding information", () => {
     expect(result.at(-1)?.detail).toBe(
       "4 applicable required items are still outstanding.",
     );
+  });
+
+  it("does not show route-driven Not applicable Life or English items as outstanding", () => {
+    const result = getIlrOutstandingInformation(
+      period,
+      absence,
+      null,
+      {
+        ...documentVault,
+        readinessPercent: 100,
+        sections: [
+          {
+            id: "life-english",
+            requirements: [
+              { id: "life-in-uk", notApplicable: true },
+              { id: "english-language", notApplicable: true },
+            ],
+          },
+        ] as DocumentVaultProgress["sections"],
+      },
+    );
+
+    expect(result).toEqual([]);
   });
 
   it("calls out open and potentially permitted travel records for review", () => {
