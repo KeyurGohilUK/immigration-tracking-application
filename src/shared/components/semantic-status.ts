@@ -18,6 +18,14 @@ const STATUS_ICONS: Record<SemanticStatusTone, string> = {
   todo: "○",
 };
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 export interface SemanticStatusOptions {
   label: string;
   tone: SemanticStatusTone;
@@ -29,7 +37,7 @@ export function renderSemanticStatus({
   tone,
   className = "",
 }: SemanticStatusOptions): string {
-  return `<span class="semantic-status semantic-status-${tone}${className ? ` ${className}` : ""}" data-status-tone="${tone}"><span class="semantic-status-icon" aria-hidden="true">${STATUS_ICONS[tone]}</span><span class="semantic-status-label">${label}</span></span>`;
+  return `<span class="semantic-status semantic-status-${tone}${className ? ` ${className}` : ""}" data-status-tone="${tone}"><span class="semantic-status-icon" aria-hidden="true">${STATUS_ICONS[tone]}</span><span class="semantic-status-label">${escapeHtml(label)}</span></span>`;
 }
 
 export function applySemanticStatus(
