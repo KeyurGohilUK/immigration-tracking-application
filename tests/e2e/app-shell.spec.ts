@@ -166,9 +166,9 @@ test("keeps core onboarding screens within a standard mobile viewport", async ({
   await page.getByRole("button", { name: "Get started" }).click();
   const guide = page.getByRole("dialog", { name: "Before you begin" });
   await expect(guide).toBeVisible();
-  const guideFits = await guide.locator("form").evaluate(
-    (form) => form.scrollHeight <= form.clientHeight + 2,
-  );
+  const guideFits = await guide
+    .locator("form")
+    .evaluate((form) => form.scrollHeight <= form.clientHeight + 2);
   expect(guideFits).toBe(true);
 
   await guide.getByRole("button", { name: "Continue to UrbanFox" }).click();
