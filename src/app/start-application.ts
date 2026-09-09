@@ -551,7 +551,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const submit = form.querySelector<HTMLButtonElement>(
           'button[type="submit"]',
         );
-        const busy = submit ? setButtonBusy(submit, "Saving permission…") : null;
+        const busy = submit
+          ? setButtonBusy(submit, "Saving permission…")
+          : null;
         try {
           await saveImmigrationPermissions(
             selectedProfileId,
