@@ -1,6 +1,10 @@
 import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import {
+  renderSemanticStatus,
+  type SemanticStatusTone,
+} from "../../../shared/components/semantic-status";
 import { renderAppShell } from "../../../app/app";
 import { renderLiquidGlassDialog } from "../../../shared/components/liquid-glass-dialog";
 import type { HouseholdMember } from "../../household/domain/household-member";
@@ -178,6 +182,16 @@ export function renderDocumentsPage(
   );
 }
 
+function getVaultStatusTone(
+  status: DocumentVaultSectionProgress["status"],
+): SemanticStatusTone {
+  if (status === "complete") return "success";
+  if (status === "needs-attention") return "error";
+  if (status === "partial") return "warning";
+  if (status === "to-do") return "todo";
+  return "info";
+}
+
 function renderVaultCategoryRows(
   sections: readonly DocumentVaultSectionProgress[],
   addressHistory: readonly AddressHistoryEntry[],
@@ -213,7 +227,7 @@ function renderVaultCategoryRows(
       } else if (section.id === "employment") {
         sectionAction = `<button class="vault-section-add" type="button" data-employment-details>${employment ? "Edit employment details" : "Add employment details"}</button>`;
       }
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div><span class="vault-category-status">${statusLabel}</span><span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div>${renderSemanticStatus({ label: statusLabel, tone: getVaultStatusTone(section.status), className: "vault-category-status" })}<span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
