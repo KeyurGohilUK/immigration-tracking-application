@@ -54,8 +54,9 @@ Document Vault-specific work is tracked separately in
 
 ## UX and accessibility
 
-- [ ] Create a dashboard showing progress, estimated eligibility date, absence
-      status, and outstanding information.
+- [x] Use the ILR journey as the settlement dashboard, showing progress,
+      estimated eligibility date, absence status, Vault readiness, and
+      outstanding information. See `docs/ilr-dashboard.md`.
 - [x] Add a visible lock-now action and configurable inactivity timeout.
 - [x] Create a chronological immigration and travel timeline.
 - [ ] Add accessible success, warning, error, and manual-review states.
