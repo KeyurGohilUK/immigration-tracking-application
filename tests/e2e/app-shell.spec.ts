@@ -87,11 +87,12 @@ async function addVirtualDeviceAuthenticator(
   const result = await session.send("WebAuthn.addVirtualAuthenticator", {
     options: {
       protocol: "ctap2",
-      ctap2Version: "ctap2_1",
+      ctap2Version: "ctap2_2",
       transport: "internal",
       hasResidentKey: true,
       hasUserVerification: true,
       hasPrf: true,
+      hasHmacSecret: true,
       automaticPresenceSimulation: true,
       isUserVerified: true,
     },
