@@ -2,6 +2,7 @@ import { renderEditableCardChevronMarkup } from "../../../shared/components/edit
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
 import {
+  applySemanticStatus,
   renderSemanticStatus,
   type SemanticStatusTone,
 } from "../../../shared/components/semantic-status";
@@ -296,7 +297,7 @@ function createDocumentCard(
   isLast: boolean,
 ): HTMLElement {
   const card = documentNode("article", "document-card");
-  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden>Needs attention · no address linked</span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button>${document.category === "additional-document" ? '<button class="member-action" type="button" data-edit-document-details>Edit details</button>' : '<button class="member-action" type="button" data-rename-document>Rename</button>'}<button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
+  card.innerHTML = `<div class="document-card-main"><span class="document-type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7Z"/><path d="M15 3v5h4M10 12h6M10 16h6"/></svg></span><div class="document-copy"><h3></h3><p class="document-original-name"></p><div class="document-badges"><span class="document-category"></span><span class="document-size"></span><span class="document-review-badge" hidden></span></div></div></div><div class="document-actions"><button class="member-action" type="button" data-open-document>Open</button><button class="member-action" type="button" data-download-document>Download</button>${document.category === "additional-document" ? '<button class="member-action" type="button" data-edit-document-details>Edit details</button>' : '<button class="member-action" type="button" data-rename-document>Rename</button>'}<button class="member-action document-order-action" type="button" data-move-document="up" aria-label="Move document up">↑</button><button class="member-action document-order-action" type="button" data-move-document="down" aria-label="Move document down">↓</button><button class="member-action destructive-action" type="button" data-delete-document>Delete</button></div>`;
   const heading = card.querySelector<HTMLElement>("h3");
   const originalName = card.querySelector<HTMLElement>(
     ".document-original-name",
@@ -313,11 +314,18 @@ function createDocumentCard(
     const expired =
       !!document.expiryDate &&
       document.expiryDate < new Date().toISOString().slice(0, 10);
-    if (expired) review.textContent = "Needs attention · expired";
-    review.hidden = !(
-      expired ||
-      (document.category === "address-proof" && !document.addressHistoryId)
-    );
+    const missingAddress =
+      document.category === "address-proof" && !document.addressHistoryId;
+    if (expired || missingAddress) {
+      applySemanticStatus(
+        review,
+        expired ? "Needs attention · expired" : "Needs attention · no address linked",
+        "review",
+      );
+      review.hidden = false;
+    } else {
+      review.hidden = true;
+    }
   }
   const metadataParts = [
     document.customTag,
