@@ -413,3 +413,83 @@
     max-width: none;
   }
 }
+
+
+.ilr-outstanding-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ilr-outstanding-item,
+.ilr-outstanding-complete {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  background: var(--glass-surface);
+}
+
+.ilr-outstanding-icon,
+.ilr-outstanding-complete > span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass-surface-strong);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ilr-outstanding-item strong,
+.ilr-outstanding-complete strong {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.ilr-outstanding-item p,
+.ilr-outstanding-complete p {
+  margin: 0.18rem 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+.ilr-outstanding-state {
+  padding: 0.22rem 0.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  background: var(--glass-surface-strong);
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.ilr-outstanding-item.is-review .ilr-outstanding-icon,
+.ilr-outstanding-item.is-review .ilr-outstanding-state {
+  color: var(--ibiza-orange);
+}
+
+.ilr-outstanding-item.is-todo .ilr-outstanding-icon,
+.ilr-outstanding-complete > span {
+  color: var(--colour-strong);
+}
+
+.ilr-outstanding-complete {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+@media (max-width: 34rem) {
+  .ilr-outstanding-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ilr-outstanding-state {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
