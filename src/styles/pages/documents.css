@@ -116,16 +116,10 @@
 }
 
 .vault-category-status {
-  color: var(--colour-text-muted);
   font-size: 0.68rem;
   font-weight: 850;
   letter-spacing: 0.035em;
   text-transform: uppercase;
-}
-
-.vault-section-card.status-complete .vault-category-status,
-.vault-section-card.status-partial .vault-category-status {
-  color: var(--ibiza-primary);
 }
 
 .vault-section-card.status-partial .vault-category-row::before {
@@ -146,10 +140,6 @@
   background: var(--colour-danger);
   box-shadow: 0 0 0.9rem
     color-mix(in srgb, var(--colour-danger) 34%, transparent);
-}
-
-.vault-section-card.status-needs-attention .vault-category-status {
-  color: var(--colour-danger);
 }
 
 .vault-section-card.status-required-later {
