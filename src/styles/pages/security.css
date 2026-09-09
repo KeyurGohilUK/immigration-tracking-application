@@ -559,12 +559,12 @@ a {
 @media (max-width: 38rem) {
   .security-main {
     min-height: calc(100dvh - 4.5rem);
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
   }
 
   .security-card {
     width: 100%;
-    padding: 1rem;
+    padding: 0.85rem 1rem;
   }
 
   .security-card h1 {
@@ -578,8 +578,8 @@ a {
   }
 
   .pin-form {
-    gap: 0.45rem;
-    margin-top: 1rem;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
   }
 
   .pin-fieldset {
@@ -604,13 +604,13 @@ a {
   }
 
   .pin-guidance {
-    margin-top: 0.85rem;
-    padding: 0.75rem 0.85rem;
+    margin-top: 0.6rem;
+    padding: 0.65rem 0.8rem;
   }
 
   .pin-guidance p {
-    font-size: 0.72rem;
-    line-height: 1.4;
+    font-size: 0.7rem;
+    line-height: 1.35;
   }
 
   .pin-guidance p + p {
