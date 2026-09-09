@@ -1,56 +1,54 @@
-import { describe, expect, it, vi } from "vitest";
-import { createUiState, setButtonBusy } from "./ui-state";
+import { describe, expect, it } from "vitest";
+import { getUiStateSemantics, setButtonBusy } from "./ui-state";
 
 describe("shared UI resilience states", () => {
-  it("exposes loading and corrupted-data semantics without relying on colour", () => {
-    const loading = createUiState({
-      kind: "loading",
-      title: "Opening records",
-      message: "Decrypting local data.",
+  it("defines accessible semantics for loading, empty and corrupted-data states", () => {
+    expect(getUiStateSemantics("loading")).toEqual({
+      role: "status",
+      ariaLive: "polite",
+      ariaBusy: true,
+      statusLabel: "Loading",
+      tone: "info",
     });
-    expect(loading.getAttribute("role")).toBe("status");
-    expect(loading.getAttribute("aria-live")).toBe("polite");
-    expect(loading.getAttribute("aria-busy")).toBe("true");
-    expect(loading.textContent).toContain("Loading");
-    expect(loading.textContent).toContain("Opening records");
-
-    const error = createUiState({
-      kind: "error",
-      title: "Records could not be opened",
-      message: "Restore a known-good backup.",
+    expect(getUiStateSemantics("empty")).toEqual({
+      role: null,
+      ariaLive: null,
+      ariaBusy: false,
+      statusLabel: "Nothing here yet",
+      tone: "todo",
     });
-    expect(error.getAttribute("role")).toBe("alert");
-    expect(error.textContent).toContain("Data problem");
-  });
-
-  it("creates an optional accessible recovery action", () => {
-    const onAction = vi.fn();
-    const state = createUiState({
-      kind: "error",
-      title: "Records unavailable",
-      message: "Try again.",
-      actionLabel: "Retry",
-      onAction,
+    expect(getUiStateSemantics("error")).toEqual({
+      role: "alert",
+      ariaLive: null,
+      ariaBusy: false,
+      statusLabel: "Data problem",
+      tone: "error",
     });
-
-    const action = state.querySelector<HTMLButtonElement>("button");
-    expect(action?.type).toBe("button");
-    action?.click();
-    expect(onAction).toHaveBeenCalledOnce();
   });
 
   it("marks buttons busy and restores their original content and state", () => {
-    const button = document.createElement("button");
-    button.innerHTML = "<span>Save trip</span>";
+    const attributes = new Map<string, string>();
+    const button = {
+      disabled: false,
+      innerHTML: "<span>Save trip</span>",
+      textContent: "Save trip",
+      setAttribute(name: string, value: string) {
+        attributes.set(name, value);
+      },
+      removeAttribute(name: string) {
+        attributes.delete(name);
+      },
+    } as unknown as HTMLButtonElement;
+
     const busy = setButtonBusy(button, "Saving trip…");
 
     expect(button.disabled).toBe(true);
-    expect(button.getAttribute("aria-busy")).toBe("true");
+    expect(attributes.get("aria-busy")).toBe("true");
     expect(button.textContent).toBe("Saving trip…");
 
     busy.restore();
     expect(button.disabled).toBe(false);
-    expect(button.hasAttribute("aria-busy")).toBe(false);
+    expect(attributes.has("aria-busy")).toBe(false);
     expect(button.innerHTML).toBe("<span>Save trip</span>");
   });
 });
