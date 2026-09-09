@@ -16,12 +16,13 @@ export interface SessionLockEnvironment {
 export function startSessionLock(
   onLock: () => void,
   environment: SessionLockEnvironment = window,
+  inactivityTimeoutMs = INACTIVITY_TIMEOUT_MS,
 ): () => void {
-  let timeout = environment.setTimeout(onLock, INACTIVITY_TIMEOUT_MS);
+  let timeout = environment.setTimeout(onLock, inactivityTimeoutMs);
 
   const resetTimeout = (): void => {
     environment.clearTimeout(timeout);
-    timeout = environment.setTimeout(onLock, INACTIVITY_TIMEOUT_MS);
+    timeout = environment.setTimeout(onLock, inactivityTimeoutMs);
   };
 
   for (const eventName of ["pointerdown", "keydown"] as const) {
