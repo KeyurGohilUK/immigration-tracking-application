@@ -49,6 +49,7 @@ const expectedImports = [
   '@import "./styles/pages/member-editor.css";',
   '@import "./styles/pages/travel.css";',
   '@import "./styles/components/liquid-glass-dialog.css";',
+  '@import "./styles/components/first-use-guide.css";',
 ];
 const entryLines = stylesheetEntry
   .split("\n")

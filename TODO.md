@@ -23,11 +23,12 @@ Document Vault-specific work is tracked separately in
 - [ ] Define Freddy’s guidance role for explaining features, prompting for
       missing information, and celebrating completed setup steps.
 - [ ] Give users a clear way to skip, dismiss, or replay Freddy guidance.
+- [x] Make the first-use privacy, backup, and legal guide skippable and replayable.
 - [ ] Ensure Freddy never presents calculations as legal advice or definitive
       immigration eligibility.
 - [ ] Keep legal warnings and critical errors visually independent from Freddy.
 - [ ] Provide accessible text for every Freddy expression or visual cue.
-- [ ] Add a first-use explanation of local storage, backups, and legal limits.
+- [x] Add a first-use explanation of local storage, backups, and legal limits.
 
 ## Privacy, resilience, and security
 

@@ -84,6 +84,14 @@ export function renderMorePage(root: HTMLElement, householdSize: number): void {
           </div>
         </section>
 
+        <section class="more-card standalone-settings-card" aria-labelledby="welcome-guide-title">
+          <div class="standalone-settings-heading">
+            <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 7v5c0 4.4 2.7 7.5 7 9 4.3-1.5 7-4.6 7-9V7Z"/><path d="M9 12h6M12 9v6"/></svg></span>
+            <div><p class="eyebrow">Help</p><h2 id="welcome-guide-title">Welcome guide</h2><p>Review local storage, encrypted backups, and the tracking-only legal limits.</p></div>
+            <button id="replay-welcome-guide" class="settings-row-action" type="button">Replay</button>
+          </div>
+        </section>
+
         <details class="more-card danger-zone collapsible-settings-section">
           <summary class="more-card-heading">
             <span class="more-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg></span>

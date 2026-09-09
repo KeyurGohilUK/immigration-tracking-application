@@ -3,10 +3,12 @@ import {
   openAppDatabase,
 } from "../../../infrastructure/storage/app-database";
 import { clearCurrentTermsAcceptance } from "../../legal/data/terms-repository";
+import { clearOnboardingPreference } from "../../onboarding/services/onboarding-preference";
 
 interface LocalDataDeletionDependencies {
   clearIndexedDbStores: () => Promise<void>;
   clearTermsAcceptance: () => void;
+  clearOnboardingPreference: () => void;
 }
 
 async function clearIndexedDbStores(): Promise<void> {
@@ -46,6 +48,7 @@ async function clearIndexedDbStores(): Promise<void> {
 const defaultDependencies: LocalDataDeletionDependencies = {
   clearIndexedDbStores,
   clearTermsAcceptance: clearCurrentTermsAcceptance,
+  clearOnboardingPreference,
 };
 
 export async function deleteAllLocalData(
@@ -53,4 +56,5 @@ export async function deleteAllLocalData(
 ): Promise<void> {
   await dependencies.clearIndexedDbStores();
   dependencies.clearTermsAcceptance();
+  dependencies.clearOnboardingPreference();
 }
