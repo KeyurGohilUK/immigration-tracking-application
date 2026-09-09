@@ -3163,11 +3163,19 @@ test("falls back to the PIN when an enrolled authenticator is unavailable", asyn
   await expect(
     page.getByRole("button", { name: "Unlock with Device Unlock" }),
   ).toBeVisible();
-  await authenticator.session.send("WebAuthn.removeVirtualAuthenticator", {
+  const credentials = await authenticator.session.send(
+    "WebAuthn.getCredentials",
+    {
+      authenticatorId: authenticator.id,
+    },
+  );
+  await authenticator.session.send("WebAuthn.removeCredential", {
     authenticatorId: authenticator.id,
+    credentialId: credentials.credentials[0]!.credentialId,
   });
   await page.getByRole("button", { name: "Unlock with Device Unlock" }).click();
-  await expect(page.getByRole("status")).toContainText("unavailable");
+  await expect(page.getByRole("status")).toContainText("cancelled");
+  await page.getByRole("button", { name: "Use PIN instead" }).click();
   await enterPin(page, "Four-digit PIN", TEST_PROFILE.pin);
   await expect(
     page.getByRole("link", { name: "ILR", exact: true }).first(),
