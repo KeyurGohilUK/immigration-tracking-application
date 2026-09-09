@@ -214,8 +214,7 @@ export function renderPinScreen(
             </form>
             <aside class="pin-guidance" aria-label="PIN security information">
               <strong>Important</strong>
-              <p>Your PIN helps prevent casual access but is not a replacement for device security.</p>
-              <p>There is no PIN recovery. Keep an encrypted backup in case you forget it.</p>
+              <p>Forgotten PINs cannot be recovered. Keep an encrypted backup, and continue to rely on your device security too.</p>
             </aside>
           </section>
         </main>
