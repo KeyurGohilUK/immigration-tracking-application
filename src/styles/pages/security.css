@@ -237,6 +237,23 @@
   margin: 0;
 }
 
+.device-unlock-actions,
+#pin-entry-controls {
+  display: grid;
+  width: 100%;
+  gap: 1.4rem;
+  justify-items: center;
+}
+
+.device-unlock-actions .primary-button {
+  width: min(100%, 18rem);
+}
+
+.device-unlock-actions[hidden],
+#pin-entry-controls[hidden] {
+  display: none;
+}
+
 .security-hidden-pin-inputs {
   position: absolute;
   width: 1px;

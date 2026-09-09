@@ -32,6 +32,8 @@ Document Vault-specific work is tracked separately in
 
 ## Privacy, resilience, and security
 
+- [x] Add optional WebAuthn Device Unlock with PIN fallback and local-only key wrapping.
+
 - [x] Test behaviour when browser storage is unavailable or full.
 - [ ] Add the chosen contact email to `SECURITY.md` before public release.
 - [x] Test restoration from every supported older schema version.

@@ -86,6 +86,8 @@ import {
   clearPinInputs,
   renderPinScreen,
   setPinFormBusy,
+  showDeviceUnlockOption,
+  showDeviceUnlockStatus,
   showPinError,
   type PinScreenMode,
 } from "../features/security/components/pin-screen";
@@ -96,8 +98,18 @@ import {
 import { isValidPin } from "../features/security/domain/pin";
 import { startSessionLock } from "../features/security/services/session-lock";
 import {
+  deleteDeviceUnlockRecord,
+  getDeviceUnlockRecord,
+  saveDeviceUnlockRecord,
+} from "../features/security/data/device-unlock-repository";
+import { browserDeviceAuthenticator } from "../features/security/services/device-authenticator";
+import {
+  authenticateWithDevice,
+  enrollDeviceUnlock,
+} from "../features/security/services/device-unlock";
+import {
   createVault,
-  unlockVault,
+  unlockVaultWithPin,
   type VaultRecord,
 } from "../features/security/services/vault-crypto";
 import { getUkCalendarDate } from "../shared/date/uk-calendar-date";
@@ -581,6 +593,27 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     const renderMore = (profile: HouseholdMember): void => {
       renderMorePage(root, familyMembers.length);
       wireAuthenticatedShell(profile, "More");
+      const deviceUnlockDialog = root.querySelector<HTMLDialogElement>(
+        "#device-unlock-dialog",
+      );
+      const deviceUnlockForm = root.querySelector<HTMLFormElement>(
+        "#device-unlock-form",
+      );
+      const configureDeviceUnlock = root.querySelector<HTMLButtonElement>(
+        "#configure-device-unlock",
+      );
+      const disableDeviceUnlock = root.querySelector<HTMLButtonElement>(
+        "#disable-device-unlock",
+      );
+      const deviceUnlockState = root.querySelector<HTMLElement>(
+        "#device-unlock-state",
+      );
+      const deviceUnlockDescription = root.querySelector<HTMLElement>(
+        "#device-unlock-description",
+      );
+      const deviceUnlockSettingsStatus = root.querySelector<HTMLElement>(
+        "#device-unlock-settings-status",
+      );
       const backupDialog =
         root.querySelector<HTMLDialogElement>("#backup-dialog");
       const backupForm = root.querySelector<HTMLFormElement>("#backup-form");
@@ -596,6 +629,130 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         "#replace-local-data",
       );
       let reviewedBackup: BackupPayload | null = null;
+      let deviceUnlockAction: "enable" | "disable" = "enable";
+
+      const refreshDeviceUnlockSetting = async (): Promise<void> => {
+        const [available, enrolled] = await Promise.all([
+          browserDeviceAuthenticator.isAvailable(),
+          getDeviceUnlockRecord(),
+        ]);
+        if (deviceUnlockState)
+          deviceUnlockState.textContent = enrolled ? "Enabled" : "Disabled";
+        if (configureDeviceUnlock) {
+          configureDeviceUnlock.hidden = !available || record.version !== 2;
+          configureDeviceUnlock.textContent = enrolled
+            ? "Re-register"
+            : "Enable";
+        }
+        if (disableDeviceUnlock) disableDeviceUnlock.hidden = !enrolled;
+        if (!available && deviceUnlockDescription)
+          deviceUnlockDescription.textContent =
+            "Device Unlock is unavailable in this browser. Your PIN continues to protect UrbanFox.";
+      };
+
+      const openDeviceUnlockDialog = (action: "enable" | "disable"): void => {
+        deviceUnlockAction = action;
+        deviceUnlockForm?.reset();
+        const error = deviceUnlockForm?.querySelector<HTMLElement>(
+          "#device-unlock-form-error",
+        );
+        if (error) error.hidden = true;
+        const title = deviceUnlockDialog?.querySelector<HTMLElement>(
+          "#device-unlock-dialog-title",
+        );
+        if (title)
+          title.textContent =
+            action === "enable"
+              ? "Enable Device Unlock"
+              : "Disable Device Unlock";
+        deviceUnlockDialog?.showModal();
+      };
+
+      configureDeviceUnlock?.addEventListener("click", () =>
+        openDeviceUnlockDialog("enable"),
+      );
+      disableDeviceUnlock?.addEventListener("click", () =>
+        openDeviceUnlockDialog("disable"),
+      );
+      deviceUnlockDialog
+        ?.querySelector<HTMLButtonElement>(".dialog-close")
+        ?.addEventListener("click", () => deviceUnlockDialog.close());
+      deviceUnlockDialog?.addEventListener("click", (event) => {
+        if (event.target === deviceUnlockDialog) deviceUnlockDialog.close();
+      });
+      deviceUnlockForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const pin = String(new FormData(deviceUnlockForm).get("pin") ?? "");
+        const error = deviceUnlockForm.querySelector<HTMLElement>(
+          "#device-unlock-form-error",
+        );
+        if (error) error.hidden = true;
+        if (!isValidPin(pin)) {
+          if (error) {
+            error.textContent = "Enter your current four-digit PIN.";
+            error.hidden = false;
+          }
+          return;
+        }
+        const submit = deviceUnlockForm.querySelector<HTMLButtonElement>(
+          'button[type="submit"]',
+        );
+        const busy = submit
+          ? setButtonBusy(
+              submit,
+              deviceUnlockAction === "enable" ? "Confirming…" : "Disabling…",
+            )
+          : null;
+        try {
+          const pinUnlock = await unlockVaultWithPin(pin, record);
+          if (!pinUnlock) {
+            if (error) {
+              error.textContent =
+                "That PIN could not unlock this private space.";
+              error.hidden = false;
+            }
+            return;
+          }
+          if (deviceUnlockAction === "disable") {
+            await deleteDeviceUnlockRecord();
+            if (deviceUnlockSettingsStatus)
+              deviceUnlockSettingsStatus.textContent =
+                "Device Unlock disabled. Your PIN and encrypted data are unchanged.";
+          } else if (record.version === 2) {
+            const result = await enrollDeviceUnlock(pin, record);
+            if (result.status !== "success") {
+              if (error) {
+                error.textContent =
+                  result.status === "cancelled"
+                    ? "Device confirmation was cancelled. You can try again."
+                    : result.status === "unsupported" ||
+                        result.status === "credential-unavailable"
+                      ? "This device could not create a secure Device Unlock credential."
+                      : "Device Unlock could not be enabled. Your PIN and data are unchanged.";
+                error.hidden = false;
+              }
+              return;
+            }
+            await saveDeviceUnlockRecord(result.record);
+            if (deviceUnlockSettingsStatus)
+              deviceUnlockSettingsStatus.textContent =
+                "Device Unlock enabled. Your PIN remains the fallback.";
+          }
+          deviceUnlockDialog?.close();
+          await refreshDeviceUnlockSetting();
+        } catch {
+          if (error) {
+            error.textContent =
+              "The security setting could not be changed. Your data is unchanged.";
+            error.hidden = false;
+          }
+        } finally {
+          busy?.restore();
+        }
+      });
+      void refreshDeviceUnlockSetting().catch(() => {
+        if (deviceUnlockState) deviceUnlockState.textContent = "Unavailable";
+      });
       root
         .querySelector<HTMLButtonElement>("#lock-from-more")
         ?.addEventListener("click", lock);
@@ -3017,6 +3174,40 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           );
         },
       });
+      if (existingRecord?.version === 2) {
+        void getDeviceUnlockRecord()
+          .then(async (deviceRecord) => {
+            if (!deviceRecord) return;
+            if (!(await browserDeviceAuthenticator.isAvailable())) return;
+            showDeviceUnlockOption(form, async () => {
+              const result = await authenticateWithDevice(
+                deviceRecord,
+                existingRecord,
+              );
+              if (result.status === "success") {
+                await showTracker(result.key, existingRecord);
+                if (shouldShowFirstUseGuide())
+                  showFirstUseGuide(root, { mode: "first-use" });
+                return;
+              }
+              if (result.status === "cancelled") {
+                showDeviceUnlockStatus(
+                  form,
+                  "Device confirmation was cancelled. Try again or use your PIN.",
+                );
+                return;
+              }
+              showDeviceUnlockStatus(
+                form,
+                "Device Unlock is unavailable. Use your PIN to continue.",
+                true,
+              );
+            });
+          })
+          .catch(() => {
+            // PIN-only unlock remains available when optional setup cannot load.
+          });
+      }
     }
 
     form.addEventListener("submit", async (event) => {
@@ -3049,9 +3240,18 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         if (!existingRecord) {
           throw new Error("The encrypted vault could not be found.");
         }
-        const key = await unlockVault(pin, existingRecord);
-        if (key) {
-          await showTracker(key, existingRecord);
+        const unlocked = await unlockVaultWithPin(pin, existingRecord);
+        if (unlocked) {
+          let activeRecord = existingRecord;
+          if (unlocked.upgradedRecord) {
+            try {
+              await saveVaultRecord(unlocked.upgradedRecord);
+              activeRecord = unlocked.upgradedRecord;
+            } catch {
+              // The legacy vault remains usable with its PIN if migration cannot persist.
+            }
+          }
+          await showTracker(unlocked.key, activeRecord);
           if (shouldShowFirstUseGuide())
             showFirstUseGuide(root, { mode: "first-use" });
           return;

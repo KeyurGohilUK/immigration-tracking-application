@@ -18,9 +18,11 @@ Anonymous visitors see a public introduction before entering local-profile
 setup. Tracker navigation and device controls are not rendered on the public
 screen.
 
-Local profiles are protected by a four-digit PIN. The PIN derives an encryption
-key in the browser and is never stored; see [Local PIN and encrypted
-vault](docs/local-security.md) for the design and its limitations.
+Local profiles are protected by a four-digit PIN. The PIN wraps a random master
+encryption key in the browser and is never stored. Supported devices can
+optionally use Face ID, Touch ID, or device authentication for quick unlock;
+the PIN remains mandatory and is always the fallback. See [Local PIN and
+encrypted vault](docs/local-security.md) for the design and its limitations.
 Household owners can add, edit, and delete separate encrypted family-member
 profiles without sending those details to a server, then switch the active
 tracking profile consistently between Home and Family.
