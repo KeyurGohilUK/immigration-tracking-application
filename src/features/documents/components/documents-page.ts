@@ -319,7 +319,9 @@ function createDocumentCard(
     if (expired || missingAddress) {
       applySemanticStatus(
         review,
-        expired ? "Needs attention · expired" : "Needs attention · no address linked",
+        expired
+          ? "Needs attention · expired"
+          : "Needs attention · no address linked",
         "review",
       );
       review.hidden = false;
