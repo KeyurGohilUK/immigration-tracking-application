@@ -27,11 +27,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Show exact Prettier diff
-        run: |
-          npx prettier --write src/styles/pages/security.css tests/e2e/app-shell.spec.ts
-          git diff -- src/styles/pages/security.css tests/e2e/app-shell.spec.ts
-          exit 1
+      - name: Run quality checks
+        run: npm run check
 
   playwright-mobile:
     name: Playwright mobile tests
