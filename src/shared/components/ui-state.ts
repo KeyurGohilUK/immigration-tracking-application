@@ -26,22 +26,38 @@ function stateStatusLabel(kind: UiStateKind): string {
   return "Nothing here yet";
 }
 
+export interface UiStateSemantics {
+  role: "status" | "alert" | null;
+  ariaLive: "polite" | null;
+  ariaBusy: boolean;
+  statusLabel: string;
+  tone: SemanticStatusTone;
+}
+
+export function getUiStateSemantics(kind: UiStateKind): UiStateSemantics {
+  return {
+    role: kind === "loading" ? "status" : kind === "error" ? "alert" : null,
+    ariaLive: kind === "loading" ? "polite" : null,
+    ariaBusy: kind === "loading",
+    statusLabel: stateStatusLabel(kind),
+    tone: stateTone(kind),
+  };
+}
+
 export function createUiState(options: UiStateOptions): HTMLElement {
   const container = document.createElement("div");
   container.className = `ui-state ui-state-${options.kind}`;
-  if (options.kind === "loading") {
-    container.setAttribute("role", "status");
-    container.setAttribute("aria-live", "polite");
-    container.setAttribute("aria-busy", "true");
-  } else if (options.kind === "error") {
-    container.setAttribute("role", "alert");
-  }
+  const semantics = getUiStateSemantics(options.kind);
+  if (semantics.role) container.setAttribute("role", semantics.role);
+  if (semantics.ariaLive)
+    container.setAttribute("aria-live", semantics.ariaLive);
+  if (semantics.ariaBusy) container.setAttribute("aria-busy", "true");
 
   container.innerHTML =
     `<div class="ui-state-indicator" aria-hidden="true"></div>` +
     `<div class="ui-state-copy">${renderSemanticStatus({
-      label: options.statusLabel ?? stateStatusLabel(options.kind),
-      tone: stateTone(options.kind),
+      label: options.statusLabel ?? semantics.statusLabel,
+      tone: semantics.tone,
       className: "ui-state-status",
     })}<strong class="ui-state-title"></strong><p class="ui-state-message"></p></div>`;
 
