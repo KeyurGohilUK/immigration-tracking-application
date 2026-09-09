@@ -147,6 +147,13 @@ export function renderDocumentsPage(
           : vaultProgress.readinessPercent > 0
             ? "In progress"
             : "To do",
+      statusTone: requiresReview
+        ? "error"
+        : vaultProgress.readinessPercent === 100
+          ? "success"
+          : vaultProgress.readinessPercent > 0
+            ? "warning"
+            : "todo",
       requiresReview: requiresReview || vaultProgress.readinessPercent < 100,
       progressLabel: "Document completion",
       progressAccessibleName: "Document Vault readiness",
@@ -227,7 +234,7 @@ function renderVaultCategoryRows(
       } else if (section.id === "employment") {
         sectionAction = `<button class="vault-section-add" type="button" data-employment-details>${employment ? "Edit employment details" : "Add employment details"}</button>`;
       }
-      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div>${renderSemanticStatus({ label: statusLabel, tone: getVaultStatusTone(section.status), className: "vault-category-status" })}<span class="vault-category-state" aria-hidden="true">${renderVaultStatusIcon(section.status)}</span></summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
+      return `<details class="vault-section-card status-${section.status}" data-vault-section="${section.id}"><summary class="vault-category-row"><span class="vault-category-icon" aria-hidden="true">${section.icon}</span><div><h2>${section.label}</h2><p class="vault-category-description">${section.description}</p>${statusMessage}</div>${renderSemanticStatus({ label: statusLabel, tone: getVaultStatusTone(section.status), className: "vault-category-status" })}</summary><div class="vault-requirement-panel"><div class="vault-requirement-heading"><div><strong>Checklist</strong><span>${section.completedItems} of ${section.totalItems} added</span></div>${sectionAction}</div><ul class="vault-requirement-list">${section.requirements.map((requirement) => renderVaultRequirement(requirement, section.id, documents)).join("")}</ul>${addressList}</div></details>`;
     })
     .join("");
 }
@@ -283,16 +290,6 @@ function renderVaultRequirement(
   return `<li class="vault-requirement-item${requirement.complete ? " is-complete" : ""}">${content}</li>`;
 }
 
-function renderVaultStatusIcon(
-  status: DocumentVaultSectionProgress["status"],
-): string {
-  if (status === "complete") return "✓";
-  if (status === "needs-attention") return "!";
-  if (status === "partial") return "◐";
-  if (status === "required-later") return "↗";
-  if (status === "not-applicable") return "—";
-  return "○";
-}
 function createDocumentCard(
   document: DocumentMetadata,
   isFirst: boolean,
