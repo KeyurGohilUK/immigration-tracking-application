@@ -506,7 +506,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
                   : null;
             if (!buttonName) return;
 
-            const button = [...root.querySelectorAll<HTMLButtonElement>("button")].find(
+            const button = [
+              ...root.querySelectorAll<HTMLButtonElement>("button"),
+            ].find(
               (candidate) => candidate.textContent?.trim() === buttonName,
             );
             button?.click();
