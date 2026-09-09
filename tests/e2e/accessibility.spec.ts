@@ -313,3 +313,38 @@ test("uses labelled semantic states for ILR success, warning and review outcomes
     .first();
   await expect(todoStatus).toHaveAttribute("data-status-tone", "todo");
 });
+
+
+test("uses the shared empty-state pattern across ILR, Travel and Document Vault", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+  const ilrEmptyStates = page.locator(
+    ".ilr-empty-state .ui-state-empty, .ilr-empty-state.ui-state-empty",
+  );
+  await expect(ilrEmptyStates.first()).toBeVisible();
+  await expect(
+    ilrEmptyStates.first().locator(".semantic-status-label"),
+  ).toHaveText("Nothing here yet");
+
+  await page.getByRole("link", { name: "Travel", exact: true }).first().click();
+  const travelEmpty = page.locator(".travel-empty-state.ui-state-empty");
+  await expect(travelEmpty).toBeVisible();
+  await expect(travelEmpty).toContainText("No trips recorded");
+  await expect(travelEmpty.locator(".semantic-status-icon")).toHaveAttribute(
+    "aria-hidden",
+    "true",
+  );
+
+  await page.getByRole("link", { name: "Vault", exact: true }).first().click();
+  const documentEmpty = page.locator(".document-empty-state.ui-state-empty");
+  await expect(documentEmpty).toBeVisible();
+  await expect(documentEmpty).toContainText("No documents added yet");
+  await expect(documentEmpty.locator(".semantic-status")).toHaveAttribute(
+    "data-status-tone",
+    "todo",
+  );
+});
