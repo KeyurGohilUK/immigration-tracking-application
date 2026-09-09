@@ -111,10 +111,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Record how the English-language requirement is met, or confirm an applicable exemption.",
       severity: "todo",
-      action: {
-        label: "Update English evidence",
-        target: "document-vault",
-      },
+      action: { label: "Update English evidence", target: "document-vault" },
       externalLink: {
         label: "View official English guidance",
         href: "https://www.gov.uk/english-language",
@@ -129,10 +126,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Record the Life in the UK result or confirm an applicable exemption.",
       severity: "todo",
-      action: {
-        label: "Update Life in the UK",
-        target: "document-vault",
-      },
+      action: { label: "Update Life in the UK", target: "document-vault" },
       externalLink: {
         label: "Book or view official test guidance",
         href: "https://www.gov.uk/life-in-the-uk-test",
@@ -147,10 +141,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Document readiness is unavailable. Reopen the Vault and check the local data.",
       severity: "review",
-      action: {
-        label: "Open Document Vault",
-        target: "document-vault",
-      },
+      action: { label: "Open Document Vault", target: "document-vault" },
     });
   } else if (documentVault.readinessPercent < 100) {
     const missing = Math.max(
@@ -165,10 +156,7 @@ export function getIlrOutstandingInformation(
           ? "1 applicable required item is still outstanding."
           : `${missing} applicable required items are still outstanding.`,
       severity: "todo",
-      action: {
-        label: "Review missing evidence",
-        target: "document-vault",
-      },
+      action: { label: "Review missing evidence", target: "document-vault" },
     });
   }
 
