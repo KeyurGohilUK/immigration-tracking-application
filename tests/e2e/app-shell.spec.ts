@@ -157,6 +157,41 @@ test("locks zoom in the mobile viewport metadata", async ({
   expect(viewportContent).toContain("viewport-fit=cover");
 });
 
+test("keeps core onboarding screens within a standard mobile viewport", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Get started" }).click();
+  const guide = page.getByRole("dialog", { name: "Before you begin" });
+  await expect(guide).toBeVisible();
+  const guideFits = await guide.locator("form").evaluate(
+    (form) => form.scrollHeight <= form.clientHeight + 2,
+  );
+  expect(guideFits).toBe(true);
+
+  await guide.getByRole("button", { name: "Continue to UrbanFox" }).click();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Accept and continue" }).click();
+
+  const pinFits = await page.evaluate(
+    () => document.documentElement.scrollHeight <= window.innerHeight + 2,
+  );
+  expect(pinFits).toBe(true);
+
+  await enterPin(page, "Choose PIN", TEST_PROFILE.pin);
+  await enterPin(page, "Confirm PIN", TEST_PROFILE.pin);
+
+  await expect(
+    page.getByRole("heading", { name: "Who are we tracking first?" }),
+  ).toBeVisible();
+  const memberFits = await page.evaluate(
+    () => document.documentElement.scrollHeight <= window.innerHeight + 2,
+  );
+  expect(memberFits).toBe(true);
+});
+
 test("shows the anonymous landing page without tracker controls", async ({
   page,
 }) => {
