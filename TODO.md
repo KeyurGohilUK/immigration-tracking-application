@@ -56,9 +56,8 @@ Document Vault-specific work is tracked separately in
 
 - [ ] Create a dashboard showing progress, estimated eligibility date, absence
       status, and outstanding information.
-- [ ] Add a visible lock-now action and configurable inactivity timeout.
-      The lock-now action exists; configurable timeout remains pending.
-- [ ] Create a chronological immigration and travel timeline.
+- [x] Add a visible lock-now action and configurable inactivity timeout.
+- [x] Create a chronological immigration and travel timeline.
 - [ ] Add accessible success, warning, error, and manual-review states.
 - [ ] Design appropriate loading, saving, empty, and corrupted-data states.
 - [ ] Implement the original white, near-black, and neutral-grey brand tokens if

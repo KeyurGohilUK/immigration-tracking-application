@@ -1717,6 +1717,38 @@ test("keeps profile settings sections collapsed until requested", async ({
   await expect(page.locator("#open-install-settings")).toHaveCount(0);
 });
 
+test("persists a configurable inactivity auto-lock timeout", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+
+  await page.getByText("Protect this device", { exact: true }).click();
+  const timeout = page.getByLabel("Auto-lock after inactivity");
+  await expect(timeout).toHaveValue("5");
+  await expect(timeout.locator("option")).toHaveText([
+    "1 minute",
+    "5 minutes",
+    "15 minutes",
+    "30 minutes",
+  ]);
+
+  await timeout.selectOption("15");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        localStorage.getItem("urbanfox-inactivity-timeout-minutes"),
+      ),
+    )
+    .toBe("15");
+
+  await page.getByRole("link", { name: "Family", exact: true }).click();
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await page.getByText("Protect this device", { exact: true }).click();
+  await expect(page.getByLabel("Auto-lock after inactivity")).toHaveValue("15");
+});
+
 test("animates expandable sections when opening and closing", async ({
   page,
 }) => {

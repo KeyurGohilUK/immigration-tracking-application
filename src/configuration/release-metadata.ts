@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.25.26";
+export const APP_VERSION = "3.25.27";
 
 export const RELEASE_NOTES = [
-  "The ILR journey now combines recorded immigration permissions and travel absences into one chronological timeline.",
+  "Device security now lets you choose a 1, 5, 15, or 30 minute inactivity auto-lock timeout.",
 ] as const;

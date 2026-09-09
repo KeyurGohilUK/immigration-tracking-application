@@ -1,6 +1,6 @@
 {
-  "version": "3.25.26",
+  "version": "3.25.27",
   "notes": [
-    "The ILR journey now combines recorded immigration permissions and travel absences into one chronological timeline."
+    "Device security now lets you choose a 1, 5, 15, or 30 minute inactivity auto-lock timeout."
   ]
 }

@@ -5,6 +5,12 @@ import {
   setThemePreference,
   type ThemePreference,
 } from "../features/settings/services/theme-preference";
+import {
+  getInactivityTimeoutMinutes,
+  inactivityTimeoutMilliseconds,
+  isInactivityTimeoutMinutes,
+  setInactivityTimeoutMinutes,
+} from "../features/settings/services/inactivity-timeout-preference";
 import { wireDeleteDataDialog } from "../features/settings/components/delete-data-dialog";
 import {
   BACKUP_PASSWORD_MINIMUM_LENGTH,
@@ -311,7 +317,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           selectProfile((event as CustomEvent<string>).detail);
         });
       stopSessionLock?.();
-      stopSessionLock = startSessionLock(lock);
+      stopSessionLock = startSessionLock(
+        lock,
+        window,
+        inactivityTimeoutMilliseconds(getInactivityTimeoutMinutes()),
+      );
     };
 
     const renderDashboard = (profile: HouseholdMember): void => {
@@ -593,6 +603,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             setThemePreference(input.value as ThemePreference);
           }),
         );
+      root
+        .querySelector<HTMLSelectElement>("#inactivity-timeout")
+        ?.addEventListener("change", (event) => {
+          const select = event.currentTarget as HTMLSelectElement;
+          const minutes = Number(select.value);
+          if (!isInactivityTimeoutMinutes(minutes)) {
+            select.value = String(getInactivityTimeoutMinutes());
+            return;
+          }
+          setInactivityTimeoutMinutes(minutes);
+          stopSessionLock?.();
+          stopSessionLock = startSessionLock(
+            lock,
+            window,
+            inactivityTimeoutMilliseconds(minutes),
+          );
+        });
       root
         .querySelector<HTMLButtonElement>("#view-legal")
         ?.addEventListener("click", () =>
