@@ -9,15 +9,15 @@ offline use, backup, restore, and Document Vault workflows.
 
 The minimum supported versions are:
 
-| Platform | Browser | Minimum version | PWA install |
-| ----------------- | -------------- | --------------: | -------------------------------------------------------------------------- |
-| iPhone / iPad | Safari | 17.4 | Yes, through Add to Home Screen |
-| Android | Chrome | 121 | Yes |
-| Windows | Chrome | 121 | Yes |
-| Windows | Microsoft Edge | 121 | Yes |
-| macOS | Safari | 17.4 | Supported as a browser; installation depends on the OS/browser capability |
-| macOS | Chrome | 121 | Yes |
-| Desktop | Firefox | 122 | Browser use only; install is not part of the supported PWA path |
+| Platform      | Browser        | Minimum version | PWA install                                                               |
+| ------------- | -------------- | --------------: | ------------------------------------------------------------------------- |
+| iPhone / iPad | Safari         |            17.4 | Yes, through Add to Home Screen                                           |
+| Android       | Chrome         |             121 | Yes                                                                       |
+| Windows       | Chrome         |             121 | Yes                                                                       |
+| Windows       | Microsoft Edge |             121 | Yes                                                                       |
+| macOS         | Safari         |            17.4 | Supported as a browser; installation depends on the OS/browser capability |
+| macOS         | Chrome         |             121 | Yes                                                                       |
+| Desktop       | Firefox        |             122 | Browser use only; install is not part of the supported PWA path           |
 
 The project targets these versions or newer. Older versions may appear to work
 but are not part of the supported test or release baseline.
@@ -29,7 +29,8 @@ A supported browser must provide all of the following:
 - Web Crypto with AES-GCM and PBKDF2.
 - IndexedDB with reliable transaction support.
 - Service workers and Cache Storage.
-- Blob, File, FileReader, URL and download APIs used by backup and Document Vault workflows.
+- Blob, File, FileReader, URL and download APIs used by backup and Document
+  Vault workflows.
 - Modern JavaScript modules and ES2022 syntax.
 - CSS features used by the Ibiza Sunset Liquid Glass interface, including
   `color-mix()`, backdrop filtering, custom properties and modern layout.
