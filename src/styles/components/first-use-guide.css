@@ -67,3 +67,44 @@
     padding: 0.75rem;
   }
 }
+
+
+@media (max-width: 38rem) {
+  .first-use-guide-dialog .liquid-dialog-form {
+    gap: 0.6rem;
+    padding: 0.85rem;
+  }
+
+  .first-use-guide-dialog .liquid-dialog-header {
+    gap: 0.2rem;
+    padding: 0.15rem 2.5rem 0.2rem;
+  }
+
+  .first-use-guide-dialog .liquid-dialog-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .first-use-guide-dialog .liquid-dialog-header h2 {
+    font-size: 1.55rem;
+  }
+
+  .first-use-guide-dialog .liquid-dialog-subtitle {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .first-use-guide-dialog .liquid-dialog-body,
+  .first-use-guide-dialog .liquid-dialog-actions {
+    gap: 0.5rem;
+  }
+
+  .first-use-guide-dialog .liquid-dialog-actions > button {
+    min-height: 3rem;
+  }
+
+  .first-use-guide-replay {
+    margin-top: 0.6rem;
+  }
+}
