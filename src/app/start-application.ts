@@ -501,7 +501,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
 
               const buttonName =
                 itemId === "english-language"
-                  ? "Add English language evidence"
+                  ? "Add English-language evidence"
                   : itemId === "life-in-uk"
                     ? "Add Life in the UK evidence"
                     : null;
