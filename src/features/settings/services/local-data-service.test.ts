@@ -12,9 +12,12 @@ describe("local data deletion", () => {
       clearTermsAcceptance: () => {
         calls.push("terms");
       },
+      clearOnboardingPreference: () => {
+        calls.push("onboarding");
+      },
     });
 
-    expect(calls).toEqual(["indexed-db", "terms"]);
+    expect(calls).toEqual(["indexed-db", "terms", "onboarding"]);
   });
 
   it("preserves terms acceptance when the IndexedDB transaction fails", async () => {
@@ -25,6 +28,7 @@ describe("local data deletion", () => {
         clearIndexedDbStores: () =>
           Promise.reject(new Error("storage unavailable")),
         clearTermsAcceptance,
+        clearOnboardingPreference: vi.fn(),
       }),
     ).rejects.toThrow("storage unavailable");
     expect(clearTermsAcceptance).not.toHaveBeenCalled();

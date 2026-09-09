@@ -1,0 +1,52 @@
+.first-use-guide-dialog {
+  width: min(calc(100% - 2rem), 40rem);
+}
+
+.first-use-guide-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.first-use-guide-list section {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-medium);
+  background: var(--glass-surface);
+}
+
+.first-use-guide-list section > span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--colour-on-strong);
+  font-weight: 800;
+  background: var(--ibiza-gradient);
+}
+
+.first-use-guide-list h3,
+.first-use-guide-list p {
+  margin: 0;
+}
+
+.first-use-guide-list p {
+  margin-top: var(--space-1);
+  color: var(--colour-text-muted);
+}
+
+.first-use-guide-replay {
+  margin: var(--space-3) 0 0;
+  color: var(--colour-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 38rem) {
+  .first-use-guide-list section {
+    padding: var(--space-2);
+  }
+}

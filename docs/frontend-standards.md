@@ -34,6 +34,7 @@ Shared components:
 - `src/styles/components/forms.css` and `form-controls.css`: shared form primitives.
 - `src/styles/components/dialog-compat.css`: compatibility rules for older dialog markup while migration completes.
 - `src/styles/components/liquid-glass-dialog.css`: shared Ibiza Sunset Liquid Glass modal system.
+- `src/styles/components/first-use-guide.css`: welcome-guide content inside the shared dialog system.
 - `src/shared/components/semantic-status.ts` and `src/styles/components/semantic-status.css`: shared labelled success, warning, error, review, information, and to-do states. Use these instead of feature-local colour-only status pills.
 - `src/shared/components/ui-state.ts` and `src/styles/components/ui-state.css`: shared loading, empty, corrupted/error and button-busy presentation. Use these instead of feature-local placeholder cards or changing button text ad hoc.
 

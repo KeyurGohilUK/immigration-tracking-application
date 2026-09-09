@@ -12,6 +12,7 @@ async function createLocalProfile(
   page: import("@playwright/test").Page,
 ): Promise<void> {
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
   await enterPin(page, "Choose PIN", TEST_PROFILE.pin);
@@ -353,6 +354,14 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   await page.getByRole("button", { name: "Get started" }).click();
 
   await expect(
+    page.getByRole("dialog", { name: "Before you begin" }),
+  ).toBeVisible();
+  await expect(page.getByText("Stored only on this device")).toBeVisible();
+  await expect(page.getByText("Keep an encrypted backup")).toBeVisible();
+  await expect(page.getByText("Tracking—not legal advice")).toBeVisible();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
+
+  await expect(
     page.getByRole("heading", { name: "Terms and privacy" }),
   ).toBeVisible();
   await expect(
@@ -372,12 +381,33 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   );
 });
 
+test("allows the first-use guide to be skipped without repeating it", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Skip for now" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Terms and privacy" }),
+  ).toBeVisible();
+
+  await page.reload();
+  await page.getByRole("button", { name: "Get started" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Before you begin" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Terms and privacy" }),
+  ).toBeVisible();
+});
+
 test("keeps the legal action inside the desktop viewport", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
 
   const actionBox = await page
     .getByRole("button", { name: "Accept and continue" })
@@ -1530,6 +1560,7 @@ test("resets local data safely when the PIN is forgotten", async ({ page }) => {
   await page.reload();
   await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await expect(
     page.getByRole("heading", { name: "Terms and privacy" }),
   ).toBeVisible();
@@ -1554,6 +1585,12 @@ test("manages the local profile and encrypted backups", async ({ page }) => {
   await expect(
     page.getByText("Encrypted locally", { exact: true }),
   ).toBeVisible();
+
+  await page.getByRole("button", { name: "Replay" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Before you begin" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Close guide" }).click();
 
   await page.getByText("Protect this device", { exact: true }).click();
   await expect(
@@ -1991,6 +2028,7 @@ test("permanently deletes all local application data", async ({ page }) => {
   await page.reload();
   await expect(page.getByRole("button", { name: "Get started" })).toBeVisible();
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await expect(
     page.getByRole("heading", { name: "Terms and privacy" }),
   ).toBeVisible();
@@ -3082,6 +3120,7 @@ test("rejects mismatched PIN confirmation during private-space setup", async ({
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
 

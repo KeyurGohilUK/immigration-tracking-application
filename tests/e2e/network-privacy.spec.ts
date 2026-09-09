@@ -30,6 +30,7 @@ async function createPrivateProfile(
   page: import("@playwright/test").Page,
 ): Promise<void> {
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
   await enterPin(page, "Choose PIN", "8642");

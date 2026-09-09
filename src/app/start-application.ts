@@ -1,6 +1,8 @@
 import { renderApp, renderSplash } from "./app";
 import { renderLandingPage } from "../features/landing/components/landing-page";
 import { renderMorePage } from "../features/settings/components/more-page";
+import { showFirstUseGuide } from "../features/onboarding/components/first-use-guide";
+import { shouldShowFirstUseGuide } from "../features/onboarding/services/onboarding-preference";
 import {
   setThemePreference,
   type ThemePreference,
@@ -627,6 +629,11 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         .querySelector<HTMLButtonElement>("#view-legal")
         ?.addEventListener("click", () =>
           showLegal(false, () => renderMore(profile)),
+        );
+      root
+        .querySelector<HTMLButtonElement>("#replay-welcome-guide")
+        ?.addEventListener("click", () =>
+          showFirstUseGuide(root, { mode: "replay" }),
         );
       root
         .querySelector<HTMLButtonElement>("#create-backup")
@@ -3045,6 +3052,8 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const key = await unlockVault(pin, existingRecord);
         if (key) {
           await showTracker(key, existingRecord);
+          if (shouldShowFirstUseGuide())
+            showFirstUseGuide(root, { mode: "first-use" });
           return;
         }
 
@@ -3122,8 +3131,16 @@ export async function startApplication(root: HTMLElement): Promise<void> {
     root
       .querySelector<HTMLButtonElement>("#get-started")
       ?.addEventListener("click", () => {
-        if (hasCurrentTermsAcceptance()) void continueToPin();
-        else showLegal(true);
+        const continueSetup = (): void => {
+          if (hasCurrentTermsAcceptance()) void continueToPin();
+          else showLegal(true);
+        };
+        if (shouldShowFirstUseGuide()) {
+          showFirstUseGuide(root, {
+            mode: "first-use",
+            onClose: continueSetup,
+          });
+        } else continueSetup();
       });
     for (const link of root.querySelectorAll<HTMLButtonElement>(
       "[data-legal-view]",

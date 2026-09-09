@@ -14,6 +14,7 @@ async function enterPin(page: Page, label: string, pin: string): Promise<void> {
 
 async function createLocalProfile(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
   await enterPin(page, "Choose PIN", TEST_PROFILE.pin);

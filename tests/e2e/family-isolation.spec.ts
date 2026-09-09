@@ -5,6 +5,7 @@ test("keeps family-member travel and ILR state isolated when switching profiles"
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
 
@@ -88,6 +89,7 @@ test("keeps Document Vault evidence isolated between household members", async (
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Get started" }).click();
+  await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
 

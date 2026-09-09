@@ -1,6 +1,6 @@
 {
-  "version": "3.25.30",
+  "version": "3.25.31",
   "notes": [
-    "Core ILR, Travel, and Document Vault workflows now share accessible loading, saving, empty, and encrypted-data problem states."
+    "A new replayable welcome guide explains local-only storage, encrypted backups, and UrbanFox's tracking-only legal limits."
   ]
 }
