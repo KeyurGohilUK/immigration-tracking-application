@@ -1,0 +1,82 @@
+.ui-state {
+  display: grid;
+  min-width: 0;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 1.15rem;
+  background: var(--glass-surface);
+}
+
+.ui-state-indicator {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid var(--glass-border);
+  border-radius: 999px;
+}
+
+.ui-state-loading {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.ui-state-loading .ui-state-indicator {
+  border-top-color: var(--ibiza-primary);
+  animation: ui-state-spin 900ms linear infinite;
+}
+
+.ui-state-empty .ui-state-indicator {
+  border-style: dashed;
+}
+
+.ui-state-error {
+  border-color: color-mix(
+    in srgb,
+    var(--colour-danger) 42%,
+    var(--glass-border)
+  );
+}
+
+.ui-state-error .ui-state-indicator {
+  border-color: var(--colour-danger);
+}
+
+.ui-state-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+}
+
+.ui-state-title {
+  color: var(--colour-strong);
+  font-size: 0.88rem;
+}
+
+.ui-state-message {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.ui-state-status {
+  justify-self: start;
+  margin-bottom: 0.1rem;
+}
+
+.ui-state-action {
+  justify-self: start;
+}
+
+@keyframes ui-state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-state-loading .ui-state-indicator {
+    animation: none;
+    border-top-color: var(--ibiza-primary);
+  }
+}
