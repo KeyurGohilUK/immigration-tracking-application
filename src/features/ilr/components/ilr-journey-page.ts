@@ -1,5 +1,6 @@
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import { createUiState } from "../../../shared/components/ui-state";
 import {
   applySemanticStatus,
   renderSemanticStatus,
@@ -122,9 +123,14 @@ function createJourneyTimeline(
   );
   if (items.length === 0) {
     const empty = document.createElement("li");
+    const state = createUiState({
+      kind: "empty",
+      title: "Journey timeline is empty",
+      message:
+        "Add permission history or travel records to build the journey timeline.",
+    });
     empty.className = "ilr-empty-state";
-    empty.textContent =
-      "Add permission history or travel records to build the journey timeline.";
+    empty.append(state);
     list.append(empty);
     return list;
   }
@@ -198,9 +204,13 @@ function createPermissionHistory(
     right.permissionStartDate.localeCompare(left.permissionStartDate),
   );
   if (ordered.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "ilr-empty-state";
-    empty.textContent = "No permission history recorded yet.";
+    const empty = createUiState({
+      kind: "empty",
+      title: "No permission history recorded",
+      message:
+        "Add the selected member’s immigration permission to start the qualifying-period calculation.",
+    });
+    empty.classList.add("ilr-empty-state");
     list.append(empty);
     return list;
   }
