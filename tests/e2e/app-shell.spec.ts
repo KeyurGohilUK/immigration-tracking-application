@@ -445,9 +445,9 @@ test("opens PIN setup from the public landing page", async ({ page }) => {
   await expect(
     page.getByRole("dialog", { name: "Before you begin" }),
   ).toBeVisible();
-  await expect(page.getByText("Stored only on this device")).toBeVisible();
-  await expect(page.getByText("Keep an encrypted backup")).toBeVisible();
-  await expect(page.getByText("Tracking—not legal advice")).toBeVisible();
+  await expect(page.getByText("Private on this device")).toBeVisible();
+  await expect(page.getByText("Back up your records")).toBeVisible();
+  await expect(page.getByText("Tracker, not legal advice")).toBeVisible();
   await page.getByRole("button", { name: "Continue to UrbanFox" }).click();
 
   await expect(
