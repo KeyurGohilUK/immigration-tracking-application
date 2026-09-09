@@ -60,12 +60,7 @@ const documentVault: DocumentVaultProgress = {
 describe("ILR outstanding information", () => {
   it("shows no outstanding information when the tracked journey is complete", () => {
     expect(
-      getIlrOutstandingInformation(
-        period,
-        absence,
-        lifeEnglish,
-        documentVault,
-      ),
+      getIlrOutstandingInformation(period, absence, lifeEnglish, documentVault),
     ).toEqual([]);
   });
 
@@ -103,24 +98,19 @@ describe("ILR outstanding information", () => {
   });
 
   it("does not show route-driven Not applicable Life or English items as outstanding", () => {
-    const result = getIlrOutstandingInformation(
-      period,
-      absence,
-      null,
-      {
-        ...documentVault,
-        readinessPercent: 100,
-        sections: [
-          {
-            id: "life-english",
-            requirements: [
-              { id: "life-in-uk", notApplicable: true },
-              { id: "english-language", notApplicable: true },
-            ],
-          },
-        ] as DocumentVaultProgress["sections"],
-      },
-    );
+    const result = getIlrOutstandingInformation(period, absence, null, {
+      ...documentVault,
+      readinessPercent: 100,
+      sections: [
+        {
+          id: "life-english",
+          requirements: [
+            { id: "life-in-uk", notApplicable: true },
+            { id: "english-language", notApplicable: true },
+          ],
+        },
+      ] as DocumentVaultProgress["sections"],
+    });
 
     expect(result).toEqual([]);
   });
