@@ -204,8 +204,12 @@ test("surfaces outstanding tracked information on the ILR journey", async ({
   await expect(outstanding).toContainText("Permission history");
   await expect(outstanding).toContainText("Travel & absences");
   await expect(outstanding).toContainText("Document Vault");
-  await expect(outstanding.getByText("Review", { exact: true }).first()).toBeVisible();
-  await expect(outstanding.getByText("To do", { exact: true }).first()).toBeVisible();
+  await expect(
+    outstanding.getByText("Review", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    outstanding.getByText("To do", { exact: true }).first(),
+  ).toBeVisible();
 });
 
 test("opens the main ILR journey when the app wordmark is selected", async ({
