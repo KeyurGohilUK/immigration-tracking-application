@@ -12,7 +12,7 @@ Document Vault-specific work is tracked separately in
 - [ ] Update the GitHub repository description to use the final UrbanFox ILR name.
 - [ ] Choose a public contact email for security and legal enquiries.
 - [ ] Confirm whether the initial public release is described as alpha or beta.
-- [ ] Record supported browsers and minimum versions.
+- [x] Record supported browsers and minimum versions in `docs/browser-support.md`.
 - [ ] Configure branch protection for `main` after required checks exist.
 
 ## Freddy and onboarding
