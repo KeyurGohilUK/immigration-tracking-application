@@ -1,5 +1,5 @@
-export const APP_VERSION = "3.25.27";
+export const APP_VERSION = "3.25.28";
 
 export const RELEASE_NOTES = [
-  "Device security now lets you choose a 1, 5, 15, or 30 minute inactivity auto-lock timeout.",
+  "The ILR journey now highlights outstanding tracked information alongside progress, dates, absences, milestones, Vault readiness, and timeline history.",
 ] as const;
