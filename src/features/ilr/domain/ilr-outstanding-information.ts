@@ -26,10 +26,9 @@ export function getIlrOutstandingInformation(
     items.push({
       id: "permission-history",
       label: "Permission history",
-      detail:
-        period.issues.includes("no-permission-history")
-          ? "Add immigration permission history so the qualifying period can be calculated."
-          : "Review the recorded permission history because the qualifying period is not fully calculated.",
+      detail: period.issues.includes("no-permission-history")
+        ? "Add immigration permission history so the qualifying period can be calculated."
+        : "Review the recorded permission history because the qualifying period is not fully calculated.",
       severity: "review",
     });
   } else if (period.status === "manual-review") {
@@ -95,7 +94,8 @@ export function getIlrOutstandingInformation(
     items.push({
       id: "document-vault-unavailable",
       label: "Document Vault",
-      detail: "Document readiness is unavailable. Reopen the Vault and check the local data.",
+      detail:
+        "Document readiness is unavailable. Reopen the Vault and check the local data.",
       severity: "review",
     });
   } else if (documentVault.readinessPercent < 100) {
