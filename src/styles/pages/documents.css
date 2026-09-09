@@ -123,22 +123,8 @@
   text-transform: uppercase;
 }
 
-.vault-category-state {
-  display: grid;
-  width: 1.45rem;
-  height: 1.45rem;
-  place-items: center;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  color: var(--colour-text-muted);
-  font-size: 0.75rem;
-  font-weight: 900;
-}
-
 .vault-section-card.status-complete .vault-category-status,
-.vault-section-card.status-complete .vault-category-state,
-.vault-section-card.status-partial .vault-category-status,
-.vault-section-card.status-partial .vault-category-state {
+.vault-section-card.status-partial .vault-category-status {
   color: var(--ibiza-primary);
 }
 
@@ -162,8 +148,7 @@
     color-mix(in srgb, var(--colour-danger) 34%, transparent);
 }
 
-.vault-section-card.status-needs-attention .vault-category-status,
-.vault-section-card.status-needs-attention .vault-category-state {
+.vault-section-card.status-needs-attention .vault-category-status {
   color: var(--colour-danger);
 }
 
