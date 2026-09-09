@@ -3095,7 +3095,7 @@ test("enables, persists, uses, and disables Device Unlock", async ({
   context,
 }) => {
   const authenticator = await addVirtualDeviceAuthenticator(context, page);
-  await page.goto("/");
+  await page.goto("http://localhost:4173/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByText("Protect this device", { exact: true }).click();
@@ -3150,7 +3150,7 @@ test("falls back to the PIN when an enrolled authenticator is unavailable", asyn
   context,
 }) => {
   const authenticator = await addVirtualDeviceAuthenticator(context, page);
-  await page.goto("/");
+  await page.goto("http://localhost:4173/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByText("Protect this device", { exact: true }).click();
@@ -3177,7 +3177,7 @@ test("falls back to the PIN when an enrolled authenticator is unavailable", asyn
 test("keeps Device Unlock unavailable without a platform authenticator", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("http://localhost:4173/");
   await createLocalProfile(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByText("Protect this device", { exact: true }).click();
