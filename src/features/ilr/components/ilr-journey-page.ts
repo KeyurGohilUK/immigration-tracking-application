@@ -21,6 +21,7 @@ import {
   buildIlrJourneyTimeline,
   type IlrJourneyTimelineItem,
 } from "../domain/ilr-journey-timeline";
+import { getIlrOutstandingInformation } from "../domain/ilr-outstanding-information";
 
 export interface IlrJourneyMember {
   member: HouseholdMember;
@@ -209,6 +210,45 @@ function createPermissionHistory(
   return list;
 }
 
+function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
+  const list = document.createElement("div");
+  list.className = "ilr-outstanding-list";
+  const items = getIlrOutstandingInformation(
+    journey.period,
+    journey.absence,
+    journey.lifeEnglish,
+    journey.documentVault,
+  );
+
+  if (items.length === 0) {
+    const complete = document.createElement("div");
+    complete.className = "ilr-outstanding-complete";
+    complete.innerHTML =
+      '<span aria-hidden="true">✓</span><div><strong>No outstanding tracked items</strong><p>UrbanFox has no missing or review items from the information currently recorded.</p></div>';
+    list.append(complete);
+    return list;
+  }
+
+  for (const item of items) {
+    const row = document.createElement("div");
+    row.className = `ilr-outstanding-item is-${item.severity}`;
+    row.innerHTML =
+      '<span class="ilr-outstanding-icon" aria-hidden="true"></span><div><strong></strong><p></p></div><span class="ilr-outstanding-state"></span>';
+    const icon = row.querySelector<HTMLElement>(".ilr-outstanding-icon");
+    const title = row.querySelector<HTMLElement>("strong");
+    const detail = row.querySelector<HTMLElement>("p");
+    const state = row.querySelector<HTMLElement>(".ilr-outstanding-state");
+    if (icon) icon.textContent = item.severity === "review" ? "!" : "○";
+    if (title) title.textContent = item.label;
+    if (detail) detail.textContent = item.detail;
+    if (state)
+      state.textContent = item.severity === "review" ? "Review" : "To do";
+    list.append(row);
+  }
+
+  return list;
+}
+
 function setMilestone(
   container: HTMLElement,
   selector: string,
@@ -274,6 +314,9 @@ function renderSelectedJourney(
       ],
     }),
   );
+  root
+    .querySelector<HTMLElement>("#ilr-outstanding-information")
+    ?.replaceChildren(createOutstandingInformation(journey));
   const milestones = root.querySelector<HTMLElement>("#ilr-milestones");
   if (milestones) {
     setMilestone(
@@ -347,6 +390,7 @@ export function renderIlrJourneyPage(
     <div class="ilr-atmosphere" aria-hidden="true"></div>
     <div id="ilr-household-selector"></div>
     <div id="ilr-summary"></div>
+    <section class="ilr-section" aria-labelledby="ilr-outstanding-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">◎</span><h2 id="ilr-outstanding-title">What needs attention</h2></div><span>Based on recorded data</span></div><div id="ilr-outstanding-information"></div></section>
     <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div><button id="ilr-open-document-vault" class="ilr-milestone ilr-milestone-action" data-milestone="documents" type="button" aria-label="Open Document Vault"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Document Vault evidence</span><strong></strong>${renderEditableCardChevronMarkup()}</button></div></section>
       <section class="ilr-section" aria-labelledby="ilr-timeline-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">↕</span><h2 id="ilr-timeline-title">Immigration &amp; travel timeline</h2></div><span>Oldest to newest</span></div><div id="ilr-journey-timeline"></div></section>
       <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-add-permission" class="primary-button ilr-add-permission-button" type="button"><span aria-hidden="true">＋</span><span>Add Permission</span></button></div><div id="ilr-permission-history"></div><p id="permission-page-error" class="form-error" role="alert" hidden></p></section>

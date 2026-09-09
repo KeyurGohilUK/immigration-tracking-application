@@ -190,6 +190,28 @@ test("shows permissions and travel together in chronological order on the ILR jo
   await expect(items.nth(1)).toContainText("4 whole days outside");
 });
 
+test("surfaces outstanding tracked information on the ILR journey", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+
+  await expect(
+    page.getByRole("heading", { name: "What needs attention" }),
+  ).toBeVisible();
+  const outstanding = page.locator("#ilr-outstanding-information");
+  await expect(outstanding).toContainText("Permission history");
+  await expect(outstanding).toContainText("Travel & absences");
+  await expect(outstanding).toContainText("Document Vault");
+  await expect(
+    outstanding.getByText("Review", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    outstanding.getByText("To do", { exact: true }).first(),
+  ).toBeVisible();
+});
+
 test("opens the main ILR journey when the app wordmark is selected", async ({
   page,
 }) => {
