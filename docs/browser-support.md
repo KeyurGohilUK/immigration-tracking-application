@@ -10,7 +10,7 @@ offline use, backup, restore, and Document Vault workflows.
 The minimum supported versions are:
 
 | Platform | Browser | Minimum version | PWA install |
-| --- | --- | ---: | --- |
+| ----------------- | -------------- | --------------: | -------------------------------------------------------------------------- |
 | iPhone / iPad | Safari | 17.4 | Yes, through Add to Home Screen |
 | Android | Chrome | 121 | Yes |
 | Windows | Chrome | 121 | Yes |
