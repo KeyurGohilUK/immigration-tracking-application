@@ -1,5 +1,10 @@
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import {
+  applySemanticStatus,
+  renderSemanticStatus,
+  type SemanticStatusTone,
+} from "../../../shared/components/semantic-status";
 import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { renderAppShell } from "../../../app/app";
 import type { AbsenceCheckResult } from "../../calculation/domain/absence-calculation";
@@ -52,6 +57,17 @@ function periodStatusLabel(status: QualifyingPeriodResult["status"]): string {
   if (status === "manual-review") return "Review needed";
   if (status === "unsupported") return "Route review";
   return "Setup incomplete";
+}
+
+function periodStatusTone(
+  status: QualifyingPeriodResult["status"],
+): SemanticStatusTone {
+  if (status === "period-complete" || status === "application-window-open")
+    return "success";
+  if (status === "not-yet-complete") return "info";
+  if (status === "manual-review") return "review";
+  if (status === "unsupported") return "warning";
+  return "warning";
 }
 
 function progressForPeriod(
@@ -145,18 +161,24 @@ function createJourneyTimeline(
     const status = document.createElement("span");
     status.className = "ilr-timeline-status";
     if (item.type === "permission") {
-      status.textContent = item.current
+      const label = item.current
         ? "Current"
         : item.qualifying
           ? "Qualifying"
           : "Recorded";
-      if (item.qualifying) status.classList.add("is-qualifying");
+      applySemanticStatus(
+        status,
+        label,
+        item.qualifying || item.current ? "success" : "info",
+      );
     } else if (item.open) {
-      status.textContent = "Open trip";
-      status.classList.add("is-attention");
+      applySemanticStatus(status, "Open trip", "review");
     } else {
-      status.textContent = `${item.daysOutside ?? 0} whole days outside`;
-      if (item.exceptional) status.classList.add("is-attention");
+      applySemanticStatus(
+        status,
+        `${item.daysOutside ?? 0} whole days outside`,
+        item.exceptional ? "review" : "info",
+      );
     }
 
     row.append(marker, copy, status);
@@ -224,7 +246,7 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
     const complete = document.createElement("div");
     complete.className = "ilr-outstanding-complete";
     complete.innerHTML =
-      '<span aria-hidden="true">✓</span><div><strong>No outstanding tracked items</strong><p>UrbanFox has no missing or review items from the information currently recorded.</p></div>';
+      `${renderSemanticStatus({ label: "Complete", tone: "success", className: "ilr-outstanding-state" })}<div><strong>No outstanding tracked items</strong><p>UrbanFox has no missing or review items from the information currently recorded.</p></div>`;
     list.append(complete);
     return list;
   }
@@ -242,7 +264,11 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
     if (title) title.textContent = item.label;
     if (detail) detail.textContent = item.detail;
     if (state)
-      state.textContent = item.severity === "review" ? "Review" : "To do";
+      applySemanticStatus(
+        state,
+        item.severity === "review" ? "Review" : "To do",
+        item.severity === "review" ? "review" : "todo",
+      );
     list.append(row);
   }
 
@@ -289,6 +315,7 @@ function renderSelectedJourney(
           : "Main applicant permission"
         : "Add permission history to calculate this journey",
       status: periodStatusLabel(period.status),
+      statusTone: periodStatusTone(period.status),
       requiresReview: ["incomplete", "manual-review", "unsupported"].includes(
         period.status,
       ),
