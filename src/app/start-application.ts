@@ -466,9 +466,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLElement>("#ilr-outstanding-information")
         ?.addEventListener("click", (event) => {
-          const action = (event.target as HTMLElement).closest(
-            "[data-ilr-attention-target]",
-          );
+          const source = event.target;
+          if (!(source instanceof Element)) return;
+          const action = source.closest("[data-ilr-attention-target]");
           if (!(action instanceof HTMLButtonElement)) return;
 
           const target = action.dataset.ilrAttentionTarget;
@@ -508,9 +508,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
                   : null;
             if (!buttonName) return;
 
-            const button = [
-              ...root.querySelectorAll<HTMLButtonElement>("button"),
-            ].find(
+            const buttons =
+              root.querySelectorAll<HTMLButtonElement>("button");
+            const button = [...buttons].find(
               (candidate) => candidate.textContent?.trim() === buttonName,
             );
             button?.click();
