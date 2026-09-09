@@ -585,6 +585,38 @@ html[data-theme="dark"] .appearance-toggle-thumb {
   color: var(--colour-text);
 }
 
+.settings-row-select {
+  min-height: 2.2rem;
+  max-width: 8rem;
+  padding: 0 1.8rem 0 0.7rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--colour-text);
+  background-color: var(--glass-surface-strong);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.settings-row-select:focus-visible {
+  outline: 2px solid var(--colour-strong);
+  outline-offset: 2px;
+}
+
+@media (max-width: 28rem) {
+  .settings-row:has(.settings-row-select) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .settings-row-select {
+    grid-column: 2;
+    justify-self: start;
+    max-width: 100%;
+  }
+}
+
+
 .more-card-status {
   min-height: 1.25rem;
   margin-top: 0.65rem;
