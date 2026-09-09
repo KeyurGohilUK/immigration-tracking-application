@@ -182,14 +182,17 @@ test("keeps core onboarding screens within a standard mobile viewport", async ({
     scrollHeight: document.documentElement.scrollHeight,
     viewportHeight: window.innerHeight,
     headerHeight:
-      document.querySelector<HTMLElement>(".public-header")?.getBoundingClientRect()
-        .height ?? 0,
+      document
+        .querySelector<HTMLElement>(".public-header")
+        ?.getBoundingClientRect().height ?? 0,
     mainHeight:
-      document.querySelector<HTMLElement>(".security-main")?.getBoundingClientRect()
-        .height ?? 0,
+      document
+        .querySelector<HTMLElement>(".security-main")
+        ?.getBoundingClientRect().height ?? 0,
     cardHeight:
-      document.querySelector<HTMLElement>(".security-card")?.getBoundingClientRect()
-        .height ?? 0,
+      document
+        .querySelector<HTMLElement>(".security-card")
+        ?.getBoundingClientRect().height ?? 0,
   }));
   expect(
     pinMetrics.scrollHeight,
