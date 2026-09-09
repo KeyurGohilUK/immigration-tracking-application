@@ -106,11 +106,11 @@ describe("ILR outstanding information", () => {
       },
     });
     expect(result.find(({ id }) => id === "english-language")).toMatchObject({
-      action: { label: "Update English evidence", target: "life-english" },
+      action: { label: "Update English evidence", target: "document-vault" },
       externalLink: { href: "https://www.gov.uk/english-language" },
     });
     expect(result.find(({ id }) => id === "life-in-uk")).toMatchObject({
-      action: { label: "Update Life in the UK", target: "life-english" },
+      action: { label: "Update Life in the UK", target: "document-vault" },
       externalLink: { href: "https://www.gov.uk/life-in-the-uk-test" },
     });
   });
