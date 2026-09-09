@@ -8,6 +8,7 @@ import {
 } from "../../documents/domain/life-english";
 
 export type IlrOutstandingActionTarget =
+  | "add-permission"
   | "permission-history"
   | "travel"
   | "document-vault"
@@ -52,7 +53,9 @@ export function getIlrOutstandingInformation(
         label: period.issues.includes("no-permission-history")
           ? "Add permission"
           : "Review permissions",
-        target: "permission-history",
+        target: period.issues.includes("no-permission-history")
+          ? "add-permission"
+          : "permission-history",
       },
     });
   } else if (period.status === "manual-review") {
