@@ -7,11 +7,29 @@ import {
   type LifeEnglishRecord,
 } from "../../documents/domain/life-english";
 
+export type IlrOutstandingActionTarget =
+  | "permission-history"
+  | "travel"
+  | "document-vault"
+  | "life-english";
+
+export interface IlrOutstandingAction {
+  label: string;
+  target: IlrOutstandingActionTarget;
+}
+
+export interface IlrOutstandingExternalLink {
+  label: string;
+  href: string;
+}
+
 export interface IlrOutstandingItem {
   id: string;
   label: string;
   detail: string;
   severity: "todo" | "review";
+  action: IlrOutstandingAction;
+  externalLink?: IlrOutstandingExternalLink;
 }
 
 export function getIlrOutstandingInformation(
@@ -30,6 +48,12 @@ export function getIlrOutstandingInformation(
         ? "Add immigration permission history so the qualifying period can be calculated."
         : "Review the recorded permission history because the qualifying period is not fully calculated.",
       severity: "review",
+      action: {
+        label: period.issues.includes("no-permission-history")
+          ? "Add permission"
+          : "Review permissions",
+        target: "permission-history",
+      },
     });
   } else if (period.status === "manual-review") {
     items.push({
@@ -38,6 +62,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Review the recorded permission history because the calculation contains an issue that needs checking.",
       severity: "review",
+      action: { label: "Review permissions", target: "permission-history" },
     });
   }
 
@@ -59,6 +84,11 @@ export function getIlrOutstandingInformation(
               ? "Review the exceptional or potentially permitted absence and supporting evidence."
               : "Review travel and permission records so the absence check can be completed.",
       severity: "review",
+      action: { label: "Review travel", target: "travel" },
+      externalLink: {
+        label: "View official absence rules",
+        href: "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-continuous-residence",
+      },
     });
   }
 
@@ -76,8 +106,14 @@ export function getIlrOutstandingInformation(
     items.push({
       id: "english-language",
       label: "English language",
-      detail: "Record how the English-language requirement is met or exempt.",
+      detail:
+        "Record how the English-language requirement is met, or confirm an applicable exemption.",
       severity: "todo",
+      action: { label: "Update English evidence", target: "life-english" },
+      externalLink: {
+        label: "View official English guidance",
+        href: "https://www.gov.uk/english-language",
+      },
     });
   }
 
@@ -85,8 +121,14 @@ export function getIlrOutstandingInformation(
     items.push({
       id: "life-in-uk",
       label: "Life in the UK",
-      detail: "Record the Life in the UK result or applicable exemption.",
+      detail:
+        "Record the Life in the UK result or confirm an applicable exemption.",
       severity: "todo",
+      action: { label: "Update Life in the UK", target: "life-english" },
+      externalLink: {
+        label: "Book or view official test guidance",
+        href: "https://www.gov.uk/life-in-the-uk-test",
+      },
     });
   }
 
@@ -97,6 +139,7 @@ export function getIlrOutstandingInformation(
       detail:
         "Document readiness is unavailable. Reopen the Vault and check the local data.",
       severity: "review",
+      action: { label: "Open Document Vault", target: "document-vault" },
     });
   } else if (documentVault.readinessPercent < 100) {
     const missing = Math.max(
@@ -111,6 +154,7 @@ export function getIlrOutstandingInformation(
           ? "1 applicable required item is still outstanding."
           : `${missing} applicable required items are still outstanding.`,
       severity: "todo",
+      action: { label: "Review missing evidence", target: "document-vault" },
     });
   }
 
