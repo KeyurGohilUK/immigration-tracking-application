@@ -260,7 +260,9 @@ test("communicates document readiness states with text and structure, not colour
     const section = sections.nth(index);
     const status = section.locator(".vault-category-status");
     await expect(status).toBeVisible();
-    const label = (await status.textContent())?.trim() ?? "";
+    const label =
+      (await status.locator(".semantic-status-label").textContent())?.trim() ??
+      "";
     expect([
       "Complete",
       "Partial",
@@ -278,7 +280,6 @@ test("communicates document readiness states with text and structure, not colour
     );
   }
 });
-
 
 test("uses labelled semantic states for ILR success, warning and review outcomes", async ({
   page,
