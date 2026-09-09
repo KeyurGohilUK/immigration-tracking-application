@@ -1,4 +1,7 @@
-import { applySemanticStatus, type SemanticStatusTone } from "./semantic-status";
+import {
+  applySemanticStatus,
+  type SemanticStatusTone,
+} from "./semantic-status";
 
 interface ProgressMetric {
   label: string;
