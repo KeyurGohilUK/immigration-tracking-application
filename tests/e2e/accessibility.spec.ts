@@ -314,7 +314,6 @@ test("uses labelled semantic states for ILR success, warning and review outcomes
   await expect(todoStatus).toHaveAttribute("data-status-tone", "todo");
 });
 
-
 test("uses the shared empty-state pattern across ILR, Travel and Document Vault", async ({
   page,
 }) => {
