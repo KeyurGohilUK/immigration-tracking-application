@@ -35,9 +35,11 @@ official GOV.UK sources are documented in
 [Calculation methodology](docs/calculation-methodology.md); it is not a full
 eligibility result.
 
-Supported browsers can install the site as a Progressive Web App. The app
-provides an install button when the browser reports that installation is
-available and caches only same-origin application resources for offline launch.
+Supported browsers can install the site as a Progressive Web App. The supported
+browser baseline and minimum versions are documented in
+[Browser support](docs/browser-support.md). The app provides an install button
+when the browser reports that installation is available and caches only
+same-origin application resources for offline launch.
 The shared install icon in every screen header opens installed/latest versions
 and release notes, and can safely clear only UrbanFox application caches before
 reloading; encrypted IndexedDB records are preserved.
