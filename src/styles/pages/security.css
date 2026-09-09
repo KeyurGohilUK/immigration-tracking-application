@@ -46,9 +46,9 @@
 
 .pin-inputs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 3.5rem));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.75rem;
-  justify-content: center;
+  width: 100%;
 }
 
 .pin-form .pin-digit {
@@ -525,4 +525,51 @@ html[data-theme="dark"] .security-forgot-pin:hover {
 button,
 a {
   font: inherit;
+}
+
+
+.first-member-form input,
+.first-member-form select {
+  width: 100%;
+  min-height: 3.35rem;
+  box-sizing: border-box;
+  padding: 0 0.9rem;
+  border: 1px solid rgb(91 63 70 / 16%);
+  border-radius: 1rem;
+  color: var(--colour-text);
+  background-color: rgb(255 255 255 / 58%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 68%);
+  font: inherit;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.first-member-form input:focus,
+.first-member-form select:focus {
+  border-color: rgb(238 9 121 / 48%);
+  outline: 0;
+  background-color: rgb(255 255 255 / 72%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 72%),
+    0 0 0 1px rgb(238 9 121 / 22%),
+    0 0 1.15rem rgb(238 9 121 / 10%);
+}
+
+@media (max-width: 38rem) {
+  .security-main {
+    padding-inline: 0.75rem;
+  }
+
+  .security-card {
+    width: 100%;
+    padding: 1.25rem;
+  }
+
+  .pin-inputs {
+    gap: 0.6rem;
+  }
+
+  .pin-form .pin-digit {
+    min-height: 4rem;
+  }
 }
