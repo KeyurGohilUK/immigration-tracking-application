@@ -245,6 +245,21 @@ test("surfaces outstanding tracked information on the ILR journey", async ({
   await expect(outstanding).toContainText("Travel & absences");
   await expect(outstanding).toContainText("Document Vault");
   await expect(
+    outstanding.getByRole("button", { name: "Add permission" }),
+  ).toBeVisible();
+  await expect(
+    outstanding.getByRole("button", { name: "Review travel" }),
+  ).toBeVisible();
+  await expect(
+    outstanding.getByRole("button", { name: "Review missing evidence" }),
+  ).toBeVisible();
+  await expect(
+    outstanding.getByRole("link", { name: /View official absence rules/u }),
+  ).toHaveAttribute(
+    "href",
+    "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-continuous-residence",
+  );
+  await expect(
     outstanding.getByText("Review", { exact: true }).first(),
   ).toBeVisible();
   await expect(
