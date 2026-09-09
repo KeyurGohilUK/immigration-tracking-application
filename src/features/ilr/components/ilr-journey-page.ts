@@ -210,9 +210,7 @@ function createPermissionHistory(
   return list;
 }
 
-function createOutstandingInformation(
-  journey: IlrJourneyMember,
-): HTMLElement {
+function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
   const list = document.createElement("div");
   list.className = "ilr-outstanding-list";
   const items = getIlrOutstandingInformation(
@@ -243,7 +241,8 @@ function createOutstandingInformation(
     if (icon) icon.textContent = item.severity === "review" ? "!" : "○";
     if (title) title.textContent = item.label;
     if (detail) detail.textContent = item.detail;
-    if (state) state.textContent = item.severity === "review" ? "Review" : "To do";
+    if (state)
+      state.textContent = item.severity === "review" ? "Review" : "To do";
     list.append(row);
   }
 
