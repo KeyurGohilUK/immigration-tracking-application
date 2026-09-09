@@ -1,6 +1,7 @@
 import { renderEditableCardChevronMarkup } from "../../../shared/components/editable-card-affordance";
 import { createHouseholdSelector } from "../../../shared/components/household-selector";
 import { createProgressCard } from "../../../shared/components/progress-card";
+import { createUiState } from "../../../shared/components/ui-state";
 import {
   applySemanticStatus,
   renderSemanticStatus,
@@ -176,10 +177,13 @@ export function renderDocumentsPage(
   const list = root.querySelector<HTMLElement>("#document-list");
   if (!list) throw new Error("Documents could not be rendered.");
   if (documents.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "family-empty-state document-empty-state";
-    empty.innerHTML =
-      "<h3>No documents added yet</h3><p>Add only files you want encrypted and stored locally for this person.</p>";
+    const empty = createUiState({
+      kind: "empty",
+      title: "No documents added yet",
+      message:
+        "Add only files you want encrypted and stored locally for this person.",
+    });
+    empty.classList.add("document-empty-state");
     list.append(empty);
     return;
   }

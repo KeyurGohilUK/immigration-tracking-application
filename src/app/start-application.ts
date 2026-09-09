@@ -100,6 +100,7 @@ import {
 } from "../features/security/services/vault-crypto";
 import { getUkCalendarDate } from "../shared/date/uk-calendar-date";
 import { getStorageFailureMessage } from "../infrastructure/storage/storage-error";
+import { createUiState, setButtonBusy } from "../shared/components/ui-state";
 import {
   readDocumentRenameForm,
   readDocumentUploadForm,
@@ -550,7 +551,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const submit = form.querySelector<HTMLButtonElement>(
           'button[type="submit"]',
         );
-        if (submit) submit.disabled = true;
+        const busy = submit
+          ? setButtonBusy(submit, "Saving permission…")
+          : null;
         try {
           await saveImmigrationPermissions(
             selectedProfileId,
@@ -568,7 +571,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             error.hidden = false;
           }
-          if (submit) submit.disabled = false;
+          busy?.restore();
         }
       });
     };
@@ -659,10 +662,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const submit = backupForm.querySelector<HTMLButtonElement>(
           'button[type="submit"]',
         );
-        if (submit) {
-          submit.disabled = true;
-          submit.textContent = "Encrypting backup…";
-        }
+        const busy = submit
+          ? setButtonBusy(submit, "Encrypting backup…")
+          : null;
         try {
           const backupData = await collectBackupData(key);
           const backup = await createEncryptedBackup(backupData, password);
@@ -680,10 +682,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             error.hidden = false;
           }
         } finally {
-          if (submit) {
-            submit.disabled = false;
-            submit.textContent = "Download encrypted backup";
-          }
+          busy?.restore();
         }
       });
       root
@@ -2595,8 +2594,23 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
       } catch {
         renderDocuments(profile, [], [], null, null, null, null, null);
-        showDocumentPageError(
-          "Encrypted Document Vault data could not be opened on this device.",
+        root
+          .querySelector<HTMLElement>("#vault-summary")
+          ?.setAttribute("hidden", "");
+        root
+          .querySelector<HTMLElement>(".vault-category-list")
+          ?.setAttribute("hidden", "");
+        root
+          .querySelector<HTMLElement>(".vault-download-panel")
+          ?.setAttribute("hidden", "");
+        root.querySelector<HTMLElement>("#document-list")?.replaceChildren(
+          createUiState({
+            kind: "error",
+            title: "Document Vault data could not be opened",
+            message:
+              "UrbanFox could not decrypt this profile’s local evidence data. Existing encrypted files have not been changed. Restore a known-good encrypted backup before adding or replacing evidence.",
+            statusLabel: "Encrypted data unavailable",
+          }),
         );
       }
     };
@@ -2844,7 +2858,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const submit = form.querySelector<HTMLButtonElement>(
           'button[type="submit"]',
         );
-        if (submit) submit.disabled = true;
+        const busy = submit ? setButtonBusy(submit, "Saving trip…") : null;
         try {
           await saveTrips(selectedProfileId, nextTrips, key);
           tripCache.set(selectedProfileId, nextTrips);
@@ -2858,15 +2872,28 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             );
             error.hidden = false;
           }
-          if (submit) submit.disabled = false;
+          busy?.restore();
         }
       });
     };
 
     const showTrips = async (profile: HouseholdMember): Promise<void> => {
+      const cachedTrips = tripCache.get(selectedProfileId);
+      const cachedPermissions = permissionCache.get(selectedProfileId);
+      if (!cachedTrips || !cachedPermissions) {
+        renderTrips(profile, []);
+        const list = root.querySelector<HTMLElement>("#trip-list");
+        list?.replaceChildren(
+          createUiState({
+            kind: "loading",
+            title: "Opening travel records",
+            message: "Decrypting this profile’s locally stored travel history.",
+          }),
+        );
+        const add = root.querySelector<HTMLButtonElement>("#add-trip");
+        if (add) add.disabled = true;
+      }
       try {
-        const cachedTrips = tripCache.get(selectedProfileId);
-        const cachedPermissions = permissionCache.get(selectedProfileId);
         const [trips, permissions] = await Promise.all([
           cachedTrips ?? getTrips(selectedProfileId, key),
           cachedPermissions ??
@@ -2879,12 +2906,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         renderTrips(profile, []);
         const add = root.querySelector<HTMLButtonElement>("#add-trip");
         if (add) add.disabled = true;
-        const error = root.querySelector<HTMLElement>("#trip-page-error");
-        if (error) {
-          error.textContent =
-            "This profile’s encrypted travel records could not be opened.";
-          error.hidden = false;
-        }
+        root.querySelector<HTMLElement>("#trip-list")?.replaceChildren(
+          createUiState({
+            kind: "error",
+            title: "Travel records could not be opened",
+            message:
+              "UrbanFox could not decrypt this profile’s travel data. Do not add new trips until the local data problem is resolved or a known-good encrypted backup is restored.",
+            statusLabel: "Encrypted data unavailable",
+          }),
+        );
       }
     };
 
