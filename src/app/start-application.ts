@@ -662,7 +662,9 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         const submit = backupForm.querySelector<HTMLButtonElement>(
           'button[type="submit"]',
         );
-        const busy = submit ? setButtonBusy(submit, "Encrypting backup…") : null;
+        const busy = submit
+          ? setButtonBusy(submit, "Encrypting backup…")
+          : null;
         try {
           const backupData = await collectBackupData(key);
           const backup = await createEncryptedBackup(backupData, password);
@@ -2592,18 +2594,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
         );
       } catch {
         renderDocuments(profile, [], [], null, null, null, null, null);
-        root.querySelector<HTMLElement>("#vault-summary")?.setAttribute(
-          "hidden",
-          "",
-        );
-        root.querySelector<HTMLElement>(".vault-category-list")?.setAttribute(
-          "hidden",
-          "",
-        );
-        root.querySelector<HTMLElement>(".vault-download-panel")?.setAttribute(
-          "hidden",
-          "",
-        );
+        root
+          .querySelector<HTMLElement>("#vault-summary")
+          ?.setAttribute("hidden", "");
+        root
+          .querySelector<HTMLElement>(".vault-category-list")
+          ?.setAttribute("hidden", "");
+        root
+          .querySelector<HTMLElement>(".vault-download-panel")
+          ?.setAttribute("hidden", "");
         root.querySelector<HTMLElement>("#document-list")?.replaceChildren(
           createUiState({
             kind: "error",
