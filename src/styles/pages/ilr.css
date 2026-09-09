@@ -273,3 +273,143 @@
 .ilr-notice {
   border-radius: 1.2rem;
 }
+
+.ilr-journey-timeline {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilr-journey-timeline::before {
+  position: absolute;
+  top: 1.4rem;
+  bottom: 1.4rem;
+  left: 1.2rem;
+  width: 1px;
+  background: color-mix(in srgb, var(--ibiza-primary) 32%, var(--glass-border));
+  content: "";
+}
+
+.ilr-timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  min-height: 4.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--glass-border);
+  border-bottom: 0;
+  background: var(--glass-surface);
+}
+
+.ilr-timeline-item:first-child {
+  border-radius: 1.2rem 1.2rem 0 0;
+}
+
+.ilr-timeline-item:last-child {
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 0 0 1.2rem 1.2rem;
+}
+
+.ilr-timeline-item:only-child {
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 1.2rem;
+}
+
+.ilr-timeline-marker {
+  z-index: 1;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--colour-strong);
+  background: var(--glass-surface-strong);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.ilr-timeline-item.is-trip .ilr-timeline-marker {
+  color: var(--ibiza-primary);
+}
+
+.ilr-timeline-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.22rem;
+}
+
+.ilr-timeline-heading {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.ilr-timeline-heading strong {
+  overflow: hidden;
+  font-size: 0.88rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ilr-timeline-type,
+.ilr-timeline-status {
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.ilr-timeline-type {
+  color: var(--colour-text-muted);
+}
+
+.ilr-timeline-dates,
+.ilr-timeline-detail {
+  color: var(--colour-text-muted);
+  font-size: 0.7rem;
+}
+
+.ilr-timeline-status {
+  max-width: 10rem;
+  color: var(--colour-text-muted);
+  text-align: center;
+}
+
+.ilr-timeline-status.is-qualifying {
+  border-color: color-mix(
+    in srgb,
+    var(--colour-strong) 36%,
+    var(--glass-border)
+  );
+  color: var(--colour-strong);
+}
+
+.ilr-timeline-status.is-attention {
+  border-color: color-mix(
+    in srgb,
+    var(--ibiza-orange) 45%,
+    var(--glass-border)
+  );
+  color: var(--ibiza-orange);
+}
+
+@media (max-width: 34rem) {
+  .ilr-timeline-item {
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+  }
+
+  .ilr-timeline-status {
+    grid-column: 2;
+    justify-self: start;
+    max-width: none;
+  }
+}

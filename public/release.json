@@ -1,6 +1,6 @@
 {
-  "version": "3.25.25",
+  "version": "3.25.26",
   "notes": [
-    "Document Vault regression coverage now hardens route-driven readiness boundaries and household evidence isolation."
+    "The ILR journey now combines recorded immigration permissions and travel absences into one chronological timeline."
   ]
 }

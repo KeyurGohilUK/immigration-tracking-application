@@ -16,12 +16,18 @@ import {
   getPermissionRouteLabel,
   type ImmigrationPermission,
 } from "../../immigration/domain/immigration-permission";
+import type { Trip } from "../../travel/domain/trip";
+import {
+  buildIlrJourneyTimeline,
+  type IlrJourneyTimelineItem,
+} from "../domain/ilr-journey-timeline";
 
 export interface IlrJourneyMember {
   member: HouseholdMember;
   period: QualifyingPeriodResult;
   absence: AbsenceCheckResult;
   permissions: ImmigrationPermission[];
+  trips: Trip[];
   lifeEnglish: LifeEnglishRecord | null;
   documentVault: DocumentVaultProgress | null;
 }
@@ -69,6 +75,94 @@ function daysUntil(value: string | null, asOfDate: string): number | null {
         DAY_IN_MILLISECONDS,
     ),
   );
+}
+
+function timelineItemDateLabel(item: IlrJourneyTimelineItem): string {
+  if (item.type === "permission")
+    return `${formatDate(item.startDate)} – ${formatDate(item.endDate)}`;
+  return item.endDate
+    ? `${formatDate(item.startDate)} – ${formatDate(item.endDate)}`
+    : `Left the UK ${formatDate(item.startDate)} · Return not recorded`;
+}
+
+function createJourneyTimeline(
+  permissions: ImmigrationPermission[],
+  trips: Trip[],
+  period: QualifyingPeriodResult,
+  asOfDate: string,
+): HTMLElement {
+  const list = document.createElement("ol");
+  list.className = "ilr-journey-timeline";
+  list.setAttribute(
+    "aria-label",
+    "Chronological immigration and travel timeline",
+  );
+  const items = buildIlrJourneyTimeline(
+    permissions,
+    trips,
+    period.relevantPermissionIds,
+    asOfDate,
+  );
+  if (items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "ilr-empty-state";
+    empty.textContent =
+      "Add permission history or travel records to build the journey timeline.";
+    list.append(empty);
+    return list;
+  }
+
+  for (const item of items) {
+    const row = document.createElement("li");
+    row.className = `ilr-timeline-item is-${item.type}`;
+    row.dataset.timelineType = item.type;
+    row.dataset.timelineId = item.id;
+    const marker = document.createElement("span");
+    marker.className = "ilr-timeline-marker";
+    marker.setAttribute("aria-hidden", "true");
+    marker.textContent = item.type === "permission" ? "▣" : "✈";
+
+    const copy = document.createElement("div");
+    copy.className = "ilr-timeline-copy";
+    const heading = document.createElement("div");
+    heading.className = "ilr-timeline-heading";
+    const title = document.createElement("strong");
+    title.textContent = item.title;
+    const type = document.createElement("span");
+    type.className = "ilr-timeline-type";
+    type.textContent = item.type === "permission" ? "Permission" : "Travel";
+    heading.append(title, type);
+
+    const date = document.createElement("span");
+    date.className = "ilr-timeline-dates";
+    date.textContent = timelineItemDateLabel(item);
+    const detail = document.createElement("span");
+    detail.className = "ilr-timeline-detail";
+    detail.textContent = item.detail;
+    copy.append(heading, date, detail);
+
+    const status = document.createElement("span");
+    status.className = "ilr-timeline-status";
+    if (item.type === "permission") {
+      status.textContent = item.current
+        ? "Current"
+        : item.qualifying
+          ? "Qualifying"
+          : "Recorded";
+      if (item.qualifying) status.classList.add("is-qualifying");
+    } else if (item.open) {
+      status.textContent = "Open trip";
+      status.classList.add("is-attention");
+    } else {
+      status.textContent = `${item.daysOutside ?? 0} whole days outside`;
+      if (item.exceptional) status.classList.add("is-attention");
+    }
+
+    row.append(marker, copy, status);
+    list.append(row);
+  }
+
+  return list;
 }
 
 function createPermissionHistory(
@@ -135,7 +229,7 @@ function renderSelectedJourney(
   journey: IlrJourneyMember,
   asOfDate: string,
 ): void {
-  const { period, absence, permissions, lifeEnglish } = journey;
+  const { period, absence, permissions, trips, lifeEnglish } = journey;
   const latestPermission = [...permissions].sort((left, right) =>
     right.permissionStartDate.localeCompare(left.permissionStartDate),
   )[0];
@@ -228,6 +322,11 @@ function renderSelectedJourney(
     );
   }
   root
+    .querySelector<HTMLElement>("#ilr-journey-timeline")
+    ?.replaceChildren(
+      createJourneyTimeline(permissions, trips, period, asOfDate),
+    );
+  root
     .querySelector<HTMLElement>("#ilr-permission-history")
     ?.replaceChildren(createPermissionHistory(permissions, period));
 }
@@ -249,6 +348,7 @@ export function renderIlrJourneyPage(
     <div id="ilr-household-selector"></div>
     <div id="ilr-summary"></div>
     <section class="ilr-section" aria-labelledby="ilr-milestone-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon" aria-hidden="true">⌁</span><h2 id="ilr-milestone-title">ILR milestone track</h2></div><span>Recorded evidence</span></div><div id="ilr-milestones" class="ilr-milestone-list glass-panel"><div class="ilr-milestone" data-milestone="residence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Continuous residence</span><strong></strong></div><div class="ilr-milestone" data-milestone="absence"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Absence limit ceiling</span><strong></strong></div><div class="ilr-milestone" data-milestone="english"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>English language</span><strong></strong></div><div class="ilr-milestone" data-milestone="life"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Life in the UK test</span><strong></strong></div><button id="ilr-open-document-vault" class="ilr-milestone ilr-milestone-action" data-milestone="documents" type="button" aria-label="Open Document Vault"><span class="ilr-milestone-icon" aria-hidden="true"></span><span>Document Vault evidence</span><strong></strong>${renderEditableCardChevronMarkup()}</button></div></section>
+      <section class="ilr-section" aria-labelledby="ilr-timeline-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">↕</span><h2 id="ilr-timeline-title">Immigration &amp; travel timeline</h2></div><span>Oldest to newest</span></div><div id="ilr-journey-timeline"></div></section>
       <section class="ilr-section" aria-labelledby="ilr-history-title"><div class="ilr-section-heading"><div><span class="ilr-section-icon is-secondary" aria-hidden="true">▱</span><h2 id="ilr-history-title">Permission history</h2></div><button id="ilr-add-permission" class="primary-button ilr-add-permission-button" type="button"><span aria-hidden="true">＋</span><span>Add Permission</span></button></div><div id="ilr-permission-history"></div><p id="permission-page-error" class="form-error" role="alert" hidden></p></section>
     <aside class="notice ilr-notice" aria-labelledby="ilr-notice-title"><span class="notice-icon" aria-hidden="true">i</span><div><h2 id="ilr-notice-title">Estimate only—not an eligibility decision</h2><p>UrbanFox uses information recorded on this device. Always verify current GOV.UK rules and supporting evidence before applying.</p></div></aside>
   </main>

@@ -150,6 +150,46 @@ test("shows the anonymous landing page without tracker controls", async ({
   expect(buttonTheme.text).toBe("rgb(255, 255, 255)");
 });
 
+test("shows permissions and travel together in chronological order on the ILR journey", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await createLocalProfile(page);
+
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+  await page.getByRole("button", { name: "Add Permission" }).click();
+  await page.getByLabel("Immigration route").selectOption("skilled-worker");
+  await page.getByLabel("Permission held as").selectOption("dependant");
+  await page.getByLabel(/Visa grant date/).fill("2022-01-01");
+  await page.getByLabel("Permission start date").fill("2022-01-01");
+  await page.getByLabel("Permission expiry date").fill("2028-01-01");
+  await page.getByLabel("Actual UK arrival date").fill("2022-01-01");
+  await page.getByRole("button", { name: "Save permission" }).click();
+
+  await page.getByRole("link", { name: "Travel", exact: true }).first().click();
+  await page.getByRole("button", { name: "Add trip" }).click();
+  await page.getByLabel("UK departure date").fill("2024-04-10");
+  await page.getByLabel(/UK return date/).fill("2024-04-15");
+  await page.getByLabel("Destination").fill("France");
+  await page.getByRole("button", { name: "Save trip" }).click();
+
+  await page.getByRole("link", { name: "ILR", exact: true }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "Immigration & travel timeline" }),
+  ).toBeVisible();
+
+  const timeline = page.getByRole("list", {
+    name: "Chronological immigration and travel timeline",
+  });
+  const items = timeline.locator(".ilr-timeline-item");
+  await expect(items).toHaveCount(2);
+  await expect(items.nth(0)).toContainText("Skilled Worker");
+  await expect(items.nth(0)).toContainText("Permission");
+  await expect(items.nth(1)).toContainText("France");
+  await expect(items.nth(1)).toContainText("Travel");
+  await expect(items.nth(1)).toContainText("4 whole days outside");
+});
+
 test("opens the main ILR journey when the app wordmark is selected", async ({
   page,
 }) => {

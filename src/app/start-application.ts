@@ -423,6 +423,7 @@ export async function startApplication(root: HTMLElement): Promise<void> {
           return {
             member,
             permissions,
+            trips,
             lifeEnglish,
             documentVault,
             period,
