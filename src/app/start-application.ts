@@ -466,17 +466,15 @@ export async function startApplication(root: HTMLElement): Promise<void> {
       root
         .querySelector<HTMLElement>("#ilr-outstanding-information")
         ?.addEventListener("click", (event) => {
-          const action = (
-            event.target as HTMLElement
-          ).closest<HTMLButtonElement>("[data-ilr-attention-target]");
-          if (!action) return;
+          const action = (event.target as HTMLElement).closest(
+            "[data-ilr-attention-target]",
+          );
+          if (!(action instanceof HTMLButtonElement)) return;
 
           const target = action.dataset.ilrAttentionTarget;
           const itemId = action.dataset.ilrAttentionId;
           if (target === "add-permission") {
-            root
-              .querySelector<HTMLButtonElement>("#ilr-add-permission")
-              ?.click();
+            root.querySelector<HTMLButtonElement>("#ilr-add-permission")?.click();
             return;
           }
           if (target === "permission-history") {
@@ -489,28 +487,30 @@ export async function startApplication(root: HTMLElement): Promise<void> {
             void showTrips(profile);
             return;
           }
-          if (target === "document-vault" || target === "life-english") {
-            void (async () => {
-              await showDocuments(profile);
-              if (target !== "life-english") return;
+          if (target !== "document-vault" && target !== "life-english") return;
 
-              const section = root.querySelector<HTMLDetailsElement>(
-                '[data-vault-section="life-english"]',
-              );
-              if (section) section.open = true;
+          void (async () => {
+            await showDocuments(profile);
+            if (target !== "life-english") return;
 
-              const buttonName =
-                itemId === "english-language"
-                  ? "Add English-language evidence"
-                  : itemId === "life-in-uk"
-                    ? "Add Life in the UK evidence"
-                    : null;
-              if (!buttonName) return;
-              [...root.querySelectorAll<HTMLButtonElement>("button")].find(
-                (button) => button.textContent?.trim() === buttonName,
-              )?.click();
-            })();
-          }
+            const section = root.querySelector<HTMLDetailsElement>(
+              '[data-vault-section="life-english"]',
+            );
+            if (section) section.open = true;
+
+            const buttonName =
+              itemId === "english-language"
+                ? "Add English-language evidence"
+                : itemId === "life-in-uk"
+                  ? "Add Life in the UK evidence"
+                  : null;
+            if (!buttonName) return;
+
+            const button = [...root.querySelectorAll<HTMLButtonElement>("button")].find(
+              (candidate) => candidate.textContent?.trim() === buttonName,
+            );
+            button?.click();
+          })();
         });
 
       const selectedPermissions =
