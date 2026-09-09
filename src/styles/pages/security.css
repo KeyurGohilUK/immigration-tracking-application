@@ -1,11 +1,13 @@
 .security-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--colour-surface);
 }
 
 .security-main {
   display: grid;
   min-height: calc(100vh - 4.5rem);
+  min-height: calc(100dvh - 4.5rem);
   place-items: center;
   padding: 1.5rem 1rem;
 }
@@ -46,9 +48,9 @@
 
 .pin-inputs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 3.5rem));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.75rem;
-  justify-content: center;
+  width: 100%;
 }
 
 .pin-form .pin-digit {
@@ -525,4 +527,109 @@ html[data-theme="dark"] .security-forgot-pin:hover {
 button,
 a {
   font: inherit;
+}
+
+.first-member-form input,
+.first-member-form select {
+  width: 100%;
+  min-height: 3.35rem;
+  box-sizing: border-box;
+  padding: 0 0.9rem;
+  border: 1px solid rgb(91 63 70 / 16%);
+  border-radius: 1rem;
+  color: var(--colour-text);
+  background-color: rgb(255 255 255 / 58%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 68%);
+  font: inherit;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.first-member-form input:focus,
+.first-member-form select:focus {
+  border-color: rgb(238 9 121 / 48%);
+  outline: 0;
+  background-color: rgb(255 255 255 / 72%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 72%),
+    0 0 0 1px rgb(238 9 121 / 22%),
+    0 0 1.15rem rgb(238 9 121 / 10%);
+}
+
+@media (max-width: 38rem) {
+  .security-main {
+    min-height: calc(100dvh - 4.5rem);
+    padding: 0.5rem 0.75rem;
+  }
+
+  .security-card {
+    width: 100%;
+    padding: 0.85rem 1rem;
+  }
+
+  .security-card h1 {
+    max-width: none;
+    margin-bottom: 0.45rem;
+    font-size: clamp(1.55rem, 7vw, 1.95rem);
+  }
+
+  .security-card > p:not(.eyebrow):first-of-type {
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+  .pin-form {
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+  }
+
+  .pin-fieldset {
+    margin-top: 0.15rem;
+  }
+
+  .pin-fieldset legend {
+    margin: 0.15rem 0 0.4rem;
+  }
+
+  .pin-inputs {
+    gap: 0.55rem;
+  }
+
+  .pin-form .pin-digit {
+    min-height: 3.6rem;
+  }
+
+  .pin-form .primary-button {
+    min-height: 3rem;
+    margin-top: 0.5rem;
+  }
+
+  .pin-guidance {
+    margin-top: 0.6rem;
+    padding: 0.65rem 0.8rem;
+  }
+
+  .pin-guidance p {
+    font-size: 0.7rem;
+    line-height: 1.35;
+  }
+
+  .pin-guidance p + p {
+    margin-top: 0.3rem;
+  }
+
+  .first-member-form input,
+  .first-member-form select {
+    min-height: 3rem;
+  }
+
+  .first-member-form label {
+    font-size: 0.82rem;
+  }
+
+  .storage-note {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
 }

@@ -205,7 +205,7 @@ export function renderPinScreen(
           <section class="security-card" aria-labelledby="pin-title">
             <p class="eyebrow">Local privacy</p>
             <h1 id="pin-title">Create your four-digit PIN</h1>
-            <p>Your PIN will lock information stored on this device.</p>
+            <p>Use this PIN to unlock your encrypted records on this device.</p>
             <form id="pin-form" class="pin-form" novalidate>
               ${renderPinInputs("pin", "Choose PIN")}
               ${renderPinInputs("confirmPin", "Confirm PIN")}
@@ -214,8 +214,7 @@ export function renderPinScreen(
             </form>
             <aside class="pin-guidance" aria-label="PIN security information">
               <strong>Important</strong>
-              <p>A four-digit PIN helps prevent casual access, but it is not equivalent to your device encryption or a strong password.</p>
-              <p>There is no PIN recovery. A forgotten PIN will require deleting local data and restoring a backup.</p>
+              <p>Forgotten PINs cannot be recovered. Keep an encrypted backup, and continue to rely on your device security too.</p>
             </aside>
           </section>
         </main>
