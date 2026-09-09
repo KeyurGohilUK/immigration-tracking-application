@@ -11,7 +11,7 @@ describe("semantic status", () => {
     expect(markup).toContain('data-status-tone="error"');
     expect(markup).toContain('aria-hidden="true"');
     expect(markup).toContain(
-      '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;',
+      "&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;",
     );
     expect(markup).not.toContain("<script>");
   });
