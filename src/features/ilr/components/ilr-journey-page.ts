@@ -282,7 +282,9 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
       primaryAction.dataset.ilrAttentionId = item.id;
       primaryAction.addEventListener("click", () => {
         if (item.action.target === "add-permission") {
-          document.querySelector<HTMLButtonElement>("#ilr-add-permission")?.click();
+          document
+            .querySelector<HTMLButtonElement>("#ilr-add-permission")
+            ?.click();
           return;
         }
         if (item.action.target === "permission-history") {
