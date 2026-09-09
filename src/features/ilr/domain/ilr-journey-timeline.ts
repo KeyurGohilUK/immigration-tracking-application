@@ -58,8 +58,8 @@ export function buildIlrJourneyTimeline(
       title: getPermissionRouteLabel(permission),
       detail:
         permission.role === "dependant"
-          ? "Dependant permission"
-          : "Main applicant permission",
+          ? "Held as dependant"
+          : "Held as main applicant",
       qualifying: qualifyingIds.has(permission.id),
       current:
         permission.permissionStartDate <= asOfDate &&
