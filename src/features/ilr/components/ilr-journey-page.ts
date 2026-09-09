@@ -245,8 +245,7 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
   if (items.length === 0) {
     const complete = document.createElement("div");
     complete.className = "ilr-outstanding-complete";
-    complete.innerHTML =
-      `${renderSemanticStatus({ label: "Complete", tone: "success", className: "ilr-outstanding-state" })}<div><strong>No outstanding tracked items</strong><p>UrbanFox has no missing or review items from the information currently recorded.</p></div>`;
+    complete.innerHTML = `${renderSemanticStatus({ label: "Complete", tone: "success", className: "ilr-outstanding-state" })}<div><strong>No outstanding tracked items</strong><p>UrbanFox has no missing or review items from the information currently recorded.</p></div>`;
     list.append(complete);
     return list;
   }
