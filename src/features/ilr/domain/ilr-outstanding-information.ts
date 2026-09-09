@@ -8,10 +8,7 @@ import {
 } from "../../documents/domain/life-english";
 
 export type IlrOutstandingActionTarget =
-  | "add-permission"
-  | "permission-history"
-  | "travel"
-  | "document-vault";
+  "add-permission" | "permission-history" | "travel" | "document-vault";
 
 export interface IlrOutstandingAction {
   label: string;
