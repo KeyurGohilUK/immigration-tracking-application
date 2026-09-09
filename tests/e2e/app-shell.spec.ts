@@ -175,10 +175,23 @@ test("keeps core onboarding screens within a standard mobile viewport", async ({
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Accept and continue" }).click();
 
-  const pinFits = await page.evaluate(
-    () => document.documentElement.scrollHeight <= window.innerHeight + 2,
-  );
-  expect(pinFits).toBe(true);
+  const pinMetrics = await page.evaluate(() => ({
+    scrollHeight: document.documentElement.scrollHeight,
+    viewportHeight: window.innerHeight,
+    headerHeight:
+      document.querySelector<HTMLElement>(".public-header")?.getBoundingClientRect()
+        .height ?? 0,
+    mainHeight:
+      document.querySelector<HTMLElement>(".security-main")?.getBoundingClientRect()
+        .height ?? 0,
+    cardHeight:
+      document.querySelector<HTMLElement>(".security-card")?.getBoundingClientRect()
+        .height ?? 0,
+  }));
+  expect(
+    pinMetrics.scrollHeight,
+    `PIN viewport metrics: ${JSON.stringify(pinMetrics)}`,
+  ).toBeLessThanOrEqual(pinMetrics.viewportHeight + 2);
 
   await enterPin(page, "Choose PIN", TEST_PROFILE.pin);
   await enterPin(page, "Confirm PIN", TEST_PROFILE.pin);
