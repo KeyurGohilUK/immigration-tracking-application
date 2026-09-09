@@ -296,9 +296,7 @@ function createOutstandingInformation(journey: IlrJourneyMember): HTMLElement {
         const navigation =
           item.action.target === "travel" ? "Trips" : "Documents";
         document
-          .querySelector<HTMLAnchorElement>(
-            `[data-navigation="${navigation}"]`,
-          )
+          .querySelector<HTMLAnchorElement>(`[data-navigation="${navigation}"]`)
           ?.click();
       });
       actions.append(primaryAction);
