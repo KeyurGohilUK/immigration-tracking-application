@@ -1,30 +1,35 @@
 .first-use-guide-dialog {
-  width: min(calc(100% - 2rem), 40rem);
+  width: min(calc(100% - 1rem), 36rem);
 }
 
 .first-use-guide-list {
   display: grid;
-  gap: var(--space-3);
-}
-
-.first-use-guide-list section {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-3);
-  align-items: start;
-  padding: var(--space-3);
+  overflow: hidden;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-medium);
   background: var(--glass-surface);
 }
 
+.first-use-guide-list section {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.85rem 0.9rem;
+}
+
+.first-use-guide-list section + section {
+  border-top: 1px solid var(--glass-border);
+}
+
 .first-use-guide-list section > span {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   place-items: center;
   border-radius: 50%;
   color: var(--colour-on-strong);
+  font-size: 0.78rem;
   font-weight: 800;
   background: var(--ibiza-gradient);
 }
@@ -34,19 +39,31 @@
   margin: 0;
 }
 
+.first-use-guide-list h3 {
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
 .first-use-guide-list p {
-  margin-top: var(--space-1);
+  margin-top: 0.2rem;
   color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
 .first-use-guide-replay {
   margin: var(--space-3) 0 0;
   color: var(--colour-text-muted);
+  font-size: 0.76rem;
   text-align: center;
 }
 
 @media (max-width: 38rem) {
+  .first-use-guide-dialog {
+    width: calc(100% - 0.75rem);
+  }
+
   .first-use-guide-list section {
-    padding: var(--space-2);
+    padding: 0.75rem;
   }
 }
