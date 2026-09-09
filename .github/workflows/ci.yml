@@ -33,6 +33,8 @@ jobs:
   playwright-mobile:
     name: Playwright mobile tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     timeout-minutes: 10
     steps:
       - name: Check out repository
@@ -44,8 +46,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Run mobile Playwright tests
         run: npm run test:e2e -- --project=mobile-chromium
       - name: Upload mobile Playwright report on failure
@@ -59,6 +59,8 @@ jobs:
   playwright-desktop:
     name: Playwright desktop tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     timeout-minutes: 10
     steps:
       - name: Check out repository
@@ -70,8 +72,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Run desktop Playwright tests
         run: npm run test:e2e -- --project=desktop-chromium
       - name: Upload desktop Playwright report on failure
@@ -85,6 +85,8 @@ jobs:
   playwright-pages:
     name: GitHub Pages production PWA tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     timeout-minutes: 10
     steps:
       - name: Check out repository
@@ -96,8 +98,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Test GitHub Pages production subpath
         run: npm run test:pages
       - name: Upload Pages Playwright report on failure
