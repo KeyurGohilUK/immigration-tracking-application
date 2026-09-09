@@ -1,3 +1,5 @@
+import { applySemanticStatus, type SemanticStatusTone } from "./semantic-status";
+
 interface ProgressMetric {
   label: string;
   value: string;
@@ -11,6 +13,7 @@ interface ProgressCardOptions {
   title: string;
   subtitle: string;
   status: string;
+  statusTone?: SemanticStatusTone;
   requiresReview: boolean;
   progressLabel: string;
   progressAccessibleName: string;
@@ -27,9 +30,12 @@ export function createProgressCard(options: ProgressCardOptions): HTMLElement {
   card.querySelector(".progress-card-kicker")!.textContent = options.kicker;
   card.querySelector("h1, h2")!.textContent = options.title;
   card.querySelector("p")!.textContent = options.subtitle;
-  const status = card.querySelector(".progress-card-status")!;
-  status.classList.toggle("requires-review", options.requiresReview);
-  status.querySelector("span")!.textContent = options.status;
+  const status = card.querySelector<HTMLElement>(".progress-card-status")!;
+  applySemanticStatus(
+    status,
+    options.status,
+    options.statusTone ?? (options.requiresReview ? "review" : "success"),
+  );
   const percent = Number.isFinite(options.progressPercent)
     ? Math.max(0, Math.min(100, options.progressPercent))
     : 0;
