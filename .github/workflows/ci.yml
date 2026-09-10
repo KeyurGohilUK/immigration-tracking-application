@@ -27,29 +27,83 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Print Prettier diff for ILR CSS
-        run: |
-          npx prettier --write src/styles/pages/ilr.css
-          git diff -- src/styles/pages/ilr.css
-          exit 1
+      - name: Run quality checks
+        run: npm run check
 
   playwright-mobile:
-    if: false
     name: Playwright mobile tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    timeout-minutes: 10
     steps:
-      - run: echo skipped
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run mobile Playwright tests
+        run: npm run test:e2e -- --project=mobile-chromium
+      - name: Upload mobile Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-mobile-report
+          path: playwright-report/
+          retention-days: 7
 
   playwright-desktop:
-    if: false
     name: Playwright desktop tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    timeout-minutes: 10
     steps:
-      - run: echo skipped
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run desktop Playwright tests
+        run: npm run test:e2e -- --project=desktop-chromium
+      - name: Upload desktop Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-desktop-report
+          path: playwright-report/
+          retention-days: 7
 
   playwright-pages:
-    if: false
     name: GitHub Pages production PWA tests
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    timeout-minutes: 10
     steps:
-      - run: echo skipped
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Test GitHub Pages production subpath
+        run: npm run test:pages
+      - name: Upload Pages Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-pages-report
+          path: playwright-report/
+          retention-days: 7
