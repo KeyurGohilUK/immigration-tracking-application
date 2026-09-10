@@ -525,7 +525,7 @@
   text-underline-offset: 0.16rem;
 }
 
-.ilr-outstanding-state {
+.ilr-outstanding-item .ilr-outstanding-state {
   display: none;
 }
 
